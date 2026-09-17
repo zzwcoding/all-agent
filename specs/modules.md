@@ -112,5 +112,5 @@
 | 脚本 | 职责 | 状态 |
 |---|---|---|
 | `tools/schema_check.py` | 语义 CI 的 L1–L4 级（schema 合法/引用一致/依赖白名单/profile 合规），断言表 specs/schema_check.md AC1–7 | 已建（票 03） |
-| `tools/graph_index.py` | YAML → 内存图（多跳/闭包/影响链） | 一期建（票 04） |
+| `tools/graph_index.py` | YAML → 内存图（多跳/闭包/影响链） | 已建（票 04） |
 | `tools/skill_deps_check.py` `tools/fixture_run.py` `tools/archive_check.py` 三闸 + `tools/ci.sh` | 从 sdd-flow2 实例化拷贝（含单测；fixture_run 新增 cmd-* 断言与占位 pending） | 已建（票 03 随迁） |

@@ -1,0 +1,72 @@
+{
+  "skill": "graph_index（图索引构建器，票 04）",
+  "description": "最小域出厂集：fixtures/schema_check/ontology/valid-domain 的自管副本 ontology-base + AC6 修改变体 ontology-modified（AGG-BOHAI-002 改名「单井日产量台账」、新增 AGG-BOHAI-003，其余与 base 逐字节一致）。断言 specs/graph_index.md AC1–6；每条 cmd-* 都是独立进程对当前仓内容全量重建（工具只读不写，无缓存文件）；节点/边/影响集数字是固定输入下的确定值。schema 机读表经 {fixture_dir}/schema 符号链接取自仓内 ontology/schema（单一真源，不复制）。",
+  "assertions": [
+    {
+      "ac": "AC1",
+      "type": "cmd-succeeds",
+      "cmd": "python3 tools/graph_index.py {fixture_dir}/ontology-base --query DICT-BOHAI-01",
+      "outputContains": ["命中: DICT-BOHAI-01", "图统计: 节点=16 边=29"]
+    },
+    {
+      "ac": "AC2",
+      "type": "cmd-succeeds",
+      "cmd": "python3 tools/graph_index.py {fixture_dir}/ontology-base --query AGG-BOHAI-002",
+      "outputContains": ["命中: AGG-BOHAI-002", "单井日产量记录", "DailyProductionRecord", "targetAggregate: AGG-BOHAI-001", "m1-object-model.yaml"]
+    },
+    {
+      "ac": "AC2",
+      "type": "cmd-succeeds",
+      "cmd": "python3 tools/graph_index.py {fixture_dir}/ontology-base --query AGG-BOHAI-002 --json",
+      "outputContains": ["\"found\": true", "\"model\": \"M1\"", "\"domain\": \"bohai-fixture\""]
+    },
+    {
+      "ac": "AC3",
+      "type": "cmd-succeeds",
+      "cmd": "python3 tools/graph_index.py {fixture_dir}/ontology-base --query AGG-BOHAI-002 --closure 2",
+      "outputContains": ["引用闭包 (--closure): 2 个下游节点", "AGG-BOHAI-001", "DICT-BOHAI-01", "hops=2", "via=dictionaryId", "path=AGG-BOHAI-002 → AGG-BOHAI-001 → DICT-BOHAI-01"]
+    },
+    {
+      "ac": "AC4",
+      "type": "cmd-succeeds",
+      "cmd": "python3 tools/graph_index.py {fixture_dir}/ontology-base --query AGG-BOHAI-001 --impact",
+      "outputContains": ["影响集 (--impact): 14 个受影响节点", "BH-BOHAI-RecordDailyOutput", "QR-BOHAI-001", "SCR-BOHAI-01", "ACTOR-BOHAI-001", "via=reusedBy"]
+    },
+    {
+      "ac": "AC5",
+      "type": "cmd-fails",
+      "cmd": "python3 tools/graph_index.py {fixture_dir}/ontology-base --query AGG-BOHAI-999",
+      "outputContains": ["未找到", "AGG-BOHAI-999"]
+    },
+    {
+      "ac": "AC5",
+      "type": "cmd-fails",
+      "cmd": "python3 tools/graph_index.py {fixture_dir}/ontology-base --query AGG-BOHAI-999 --json",
+      "outputContains": ["\"found\": false", "未找到"]
+    },
+    {
+      "ac": "AC6",
+      "type": "cmd-succeeds",
+      "cmd": "python3 tools/graph_index.py {fixture_dir}/ontology-base --query AGG-BOHAI-002",
+      "outputContains": ["单井日产量记录"]
+    },
+    {
+      "ac": "AC6",
+      "type": "cmd-succeeds",
+      "cmd": "python3 tools/graph_index.py {fixture_dir}/ontology-modified --query AGG-BOHAI-002",
+      "outputContains": ["单井日产量台账"]
+    },
+    {
+      "ac": "AC6",
+      "type": "cmd-fails",
+      "cmd": "python3 tools/graph_index.py {fixture_dir}/ontology-base --query AGG-BOHAI-003",
+      "outputContains": ["未找到", "AGG-BOHAI-003"]
+    },
+    {
+      "ac": "AC6",
+      "type": "cmd-succeeds",
+      "cmd": "python3 tools/graph_index.py {fixture_dir}/ontology-modified --query AGG-BOHAI-003 --json",
+      "outputContains": ["\"found\": true", "单井月度汇总"]
+    }
+  ]
+}
