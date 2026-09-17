@@ -1,0 +1,32 @@
+# AGENTS.md · All-agent 仓库协作说明
+
+> 任何 agent/新窗口进入本仓，先读本文件，再按"新窗口入口"恢复上下文。
+
+## 这个仓库是什么
+
+**All-agent = 企业语义中台 + 建造/运行一体化平台**：本体仓（Git+YAML）为唯一真源，多输入（需求/数据库/源代码/文档）多输出（应用包/Skill/MCP/分析报告/运行时语义服务），三循环自迭代。形态：**skill+脚本，不建代码系统**。
+
+- 建造方法：`sdd-flow2`（~/.agents/skills/sdd-flow2，从 sdd-flow 分叉，专攻 skill+脚本形态）
+- 核心纪律：skill=深模块（卡/边界/依赖/输入输出契约/出厂集/归档）；约定不落闸等于没有
+
+## 新窗口入口协议
+
+1. 读本文件 → `docs/prd.md`（顶部状态行判断阶段）
+2. `CONTEXT.md`（术语表）、`RESOURCES.md`（R 编号信源清单）
+3. `specs/`（卡与登记表）、`tickets/`（进度）
+4. 报告"当前在阶段 X、产物 Y 已有/缺失"，给出下一步，**停下等拍板**
+
+## 目录地图
+
+| 路径 | 是什么 |
+|---|---|
+| `docs/prd.md` | PRD（状态驱动：粗稿→逼问中→已定稿） |
+| `docs/design-sdd-flow2.md` | sdd-flow2 设计案（两条验收主线） |
+| `references/` | 调研落盘：omf-spec-digest（OMF 规范精读）/ existing-research-inventory（既有调研盘点）/ tech-selection（选型） |
+| `diagrams/` | 三张图：all-agent（大总架构）/ skill-structure（skill 组织）/ sdd-flow2（建造流内部） |
+| `specs/` `tickets/` `tools/` `policies/` | 骨架已立，随阶段推进填充 |
+| `ontology/` | 本体仓（规划，首个业务域=渤海油田产量域） |
+
+## 使用方式（建成后）
+
+工作流各功能 = 用户级 skill（需求探索/本体建模/逆向/生成/治理），Kimi Code 按触发面自动路由；闸与工具在 `tools/`，CI 即四闸。
