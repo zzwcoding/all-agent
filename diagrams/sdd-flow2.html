@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+  <title>sdd-flow2 优化后架构图</title>
+  <style>
+    html, body { height:100%; margin:0; }
+    body { display:flex; flex-direction:column; background:#1e1e2e; color:#cdd6f4; font-family:system-ui,sans-serif; }
+    h1 { font-size:16px; padding:8px 16px; margin:0; display:flex; align-items:center; gap:12px; flex:0 0 auto; }
+    .toggle-btn { font-size:12px; padding:4px 10px; background:#313244; color:#cdd6f4; border:1px solid #89b4fa; border-radius:4px; cursor:pointer; font-family:inherit; }
+    .toggle-btn:hover { background:#45475a; }
+    .toggle-btn .state { color:#a6e3a1; margin-left:4px; }
+    .overview.hidden { display:none; }
+    #host { flex:1 1 auto; width:100vw; min-height:0; }
+    #host svg { width:100%; height:100%; display:block; }
+    .mermaid { shape-rendering: geometricPrecision; }
+    .overview { padding:0 16px 8px; font-size:12px; color:#bac2de; }
+    .overview table { border-collapse:collapse; margin-top:6px; }
+    .overview td, .overview th { border:1px solid #45475a; padding:3px 8px; text-align:left; }
+  </style>
+</head>
+<body>
+  <h1>sdd-flow2 优化后架构图 · All-agent · 拖拽平移 · 滚轮缩放<button id="toggle-overview" class="toggle-btn" type="button">显示说明文字<span class="state"></span></button></h1>
+  <div class="overview hidden">
+    <b>这张图是什么</b>：sdd-flow2（skill+脚本项目专用建造流）优化后的分层架构——四层半：编排层 → 阶段流水线（七阶段，标出四处改造点）→ 共享规约 → 确定性脚本 → 数据档案；外加外部底层 skill 依赖与 dogfooding 自指回路。正文对照 docs/design-sdd-flow2.md。<br>
+    <b>怎么读</b>：蓝框=普通节点；红框 🛡️=防护闸（防什么见节点描述）；实线=主流程（编排/调用/产出），虚线=只读依赖/自指回路；暗灰虚线框=外部依赖（不在本仓治理范围）。<br>
+    <b>防护清单表</b>：
+    <table id="guard-table"><tr><th>闸</th><th>节点</th><th>防什么</th></tr>
+      <tr><td>边界闸</td><td>DEP</td><td>skill 私拉未声明依赖/越层引用</td></tr>
+      <tr><td>出厂集回归</td><td>FIX</td><td>skill 指导书静默漂移（改了正文坏了老行为）</td></tr>
+      <tr><td>schema 校验</td><td>SCH</td><td>绕过语义 CI 的非法本体进仓</td></tr>
+    </table>
+    <b>节点明细表</b>：
+    <table id="node-table"><tr><th>节点 ID</th><th>干什么</th><th>为什么</th><th>下游</th></tr>
+      <tr><td>ORCH</td><td>阶段 0–7 路由、窗口分层、交接包</td><td>编排层不干活，只守产物契约</td><td>七阶段流水线</td></tr>
+      <tr><td>ST0</td><td>识别项目类型为 skill+脚本，选配 CI 形态</td><td>无构建链，CI 内容不同</td><td>ST2</td></tr>
+      <tr><td>ST2</td><td>把 skill 当深模块划卡：触发面/reads/writes/依赖/边界</td><td>skill 一多就必须有卡，否则边界全靠自觉</td><td>SPEC、ST3</td></tr>
+      <tr><td>ST3</td><td>验收测试表换成出厂集断言表</td><td>AI 工序没法写单测，断言必须确定性可判</td><td>FIXT</td></tr>
+      <tr><td>ST5</td><td>实现双轨：脚本走 TDD，skill 出厂集先行</td><td>出厂集先行 = skill 界的测试先行</td><td>EXT、FIXT</td></tr>
+      <tr><td>ST6</td><td>CI 四闸：脚本单测+出厂集回归+边界闸+schema 校验</td><td>写着没闸的禁令等于不存在</td><td>DEP/FIX/SCH</td></tr>
+      <tr><td>ST7</td><td>体检加 skill 腐烂检测：漂移/久未跑/段落雷同</td><td>skill 资产会腐，需定期对账</td><td>候选清单回阶段 4</td></tr>
+      <tr><td>FMT</td><td>skill 卡格式真源</td><td>规则只在一处有原文</td><td>ST2 读</td></tr>
+      <tr><td>INH</td><td>继承 sdd-flow 的七件规约</td><td>分叉不重写，能继承就继承</td><td>各阶段读</td></tr>
+      <tr><td>SPEC</td><td>skill 卡集合（含 sdd-flow2 自卡）</td><td>卡是唯一真源</td><td>DEP 读</td></tr>
+      <tr><td>FIXT</td><td>出厂集：固定输入+断言</td><td>skill 行为的可判验收物</td><td>FIX 读</td></tr>
+      <tr><td>LOG</td><td>施工日志/ADR/CHANGELOG</td><td>产物即状态，跨会话恢复靠它</td><td>ST7 读</td></tr>
+      <tr><td>EXT</td><td>外部底层 skill（tdd/grilling 等）</td><td>声明为外部依赖，不许私拉</td><td>被 ST5 调用</td></tr>
+    </table>
+  </div>
+  <div id="host" class="mermaid">
+    flowchart TB
+      subgraph L0["L0 编排层 · 进入:任何任务 · 节拍:按阶段路由 · 退出:产物验收"]
+        ORCH["sdd-flow2 编排器——只路由不干活:阶段 0–7 路由 · 窗口分层 · 交接包"]
+      end
+      subgraph L1["L1 阶段流水线 · 七阶段(改造点四处)"]
+        ST0["阶段 0 初始化——识别 skill+脚本项目类型,选配 CI 形态"]
+        ST2["阶段 2 划分——产出 skill 卡:触发面+reads/writes+依赖行+边界"]
+        ST3["阶段 3 规格——验收测试表换成出厂集断言表,每条确定性可判"]
+        ST5["阶段 5 实现——双轨:脚本走 TDD · skill 出厂集先行"]
+        ST6["阶段 6 CI——四闸齐跑:脚本单测+出厂集回归+边界闸+schema 校验"]
+        ST7["阶段 7 体检——新增 skill 腐烂检测:漂移/久未跑/段落雷同"]
+      end
+      subgraph L2["L2 共享规约(只读)"]
+        FMT["skill 卡格式真源(新增)"]
+        INH["继承七件规约:逼问清单/深模块准则/导览验收等"]
+      end
+      subgraph L3["L3 确定性脚本"]
+        DEP["边界闸——扫 skill 内文件引用对卡上依赖行 🛡️ 防私拉依赖与越层引用"]
+        FIX["出厂集回归 runner——固定输入跑断言,双门槛 🛡️ 防 skill 指导书静默漂移"]
+        SCH["schema 校验——本体 YAML 合法性 🛡️ 防绕过语义 CI 进仓"]
+      end
+      subgraph L4["L4 数据与档案"]
+        SPEC["skill 卡集合(含 sdd-flow2 自卡)"]
+        FIXT["出厂集:固定输入+断言集"]
+        LOG["施工日志+ADR+CHANGELOG"]
+      end
+      EXT["外部底层 skill 群——声明为外部依赖,不许私拉"]
+
+      ORCH -->|"按阶段路由,发交接包"| ST0
+      ST0 -->|"项目类型定 CI 形态"| ST2
+      ST2 -->|"产出 skill 卡"| SPEC
+      ST2 -->|"卡定稿进规格"| ST3
+      ST3 -->|"断言表落出厂集"| FIXT
+      ST3 -->|"验收可判进实现"| ST5
+      ST5 -->|"实现完成进 CI"| ST6
+      ST6 -->|"调用三闸"| DEP
+      ST6 -->|"调用三闸"| FIX
+      ST6 -->|"调用三闸"| SCH
+      ST6 -->|"绿了进体检节奏"| ST7
+      ST7 -->|"候选清单回阶段 4 拆票"| ST2
+      ST2 -.->|"读卡格式"| FMT
+      ST0 -.->|"读继承规约"| INH
+      DEP -.->|"读卡上依赖行与边界"| SPEC
+      FIX -.->|"读出厂集"| FIXT
+      ST5 -.->|"显式声明后调用"| EXT
+      ST7 -.->|"读档案对账"| LOG
+      ORCH -.->|"dogfooding 自指:自己第一个被写卡治理"| SPEC
+
+      classDef guardSec fill:#3a1a1a,stroke:#f38ba8,stroke-width:2px,color:#f38ba8
+      classDef extGray fill:#262637,stroke:#6c7086,stroke-width:1px,color:#6c7086,stroke-dasharray:5 5
+      class DEP,FIX,SCH guardSec
+      class EXT extGray
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.2/dist/svg-pan-zoom.min.js"></script>
+  <script>
+    mermaid.initialize({ startOnLoad: false, theme: "dark",
+      themeVariables: { darkMode: true, background: "#1e1e2e", primaryColor: "#313244",
+        primaryBorderColor: "#89b4fa", primaryTextColor: "#cdd6f4", lineColor: "#89b4fa" },
+      securityLevel: "loose" });
+    mermaid.run({ querySelector: "#host" }).then(() => {
+      const svg = document.querySelector("#host svg");
+      svg.removeAttribute("height");
+      window.pz = svgPanZoom(svg, { zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true });
+    });
+  </script>
+  <script>
+    (function() {
+      const btn = document.getElementById("toggle-overview");
+      const overview = document.querySelector(".overview");
+      const stateEl = btn.querySelector(".state");
+      btn.addEventListener("click", function() {
+        const isHidden = overview.classList.toggle("hidden");
+        stateEl.textContent = isHidden ? "（已隐藏）" : "（已显示）";
+      });
+      stateEl.textContent = "（已隐藏）";
+    })();
+  </script>
+</body>
+</html>
