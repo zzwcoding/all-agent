@@ -1,0 +1,16 @@
+# RESOURCES.md · All-agent 信源清单
+
+> 规则：写论断回查原文，不凭记忆。R 编号在 PRD/spec/底稿中引用。
+
+| 编号 | 信源 | 内容 | 位置 |
+|---|---|---|---|
+| R1 | OMF 规范精读摘要（v6 全文 144k + v9 全文 64k 一手提取） | 11 模型字段级 schema、ID/ref 约定、校验门禁、版本演进、建模顺序 | `references/omf-spec-digest.md`；源仓 github.com/sharptoolbox/ontology_modeling_framework |
+| R2 | 既有调研资产盘点（9 份稿） | DataBuddy/Ossie/ContextSeek/Data4A/刘镔辉笔记的核心主张与复用建议，含交叉印证矩阵 | `references/existing-research-inventory.md` |
+| R3 | 技术选型调研 | YAML 解析=PyYAML、图索引=纯 Python 内存图、MCP=官方 SDK 轻量可行 | `references/tech-selection.md` |
+| R4 | DataBuddy《从业务本体到持续进化》 | 4+1 语义能力域、五级语义 CI、S0–S8 检索瀑布、强类型中间态、三源建议池+四条红线 | 经 R2 索引；原文笔记 teach-petro-agent/references/data-agent-research.md |
+| R5 | 渤海油田业务设定书 v3 | 首个业务域素材：8 表 DDL、指标口径库、治理角色链 | teach-petro-agent/docs/business-setting.md |
+| R6 | sdd-flow2 设计案 | skill=深模块、四层半、两条验收主线 | docs/design-sdd-flow2.md |
+| R7 | Frank Coyle《为什么 Agentic 系统需要本体论》 | 神经符号护栏："Pydantic at the door, ontology at the ledger"；Agent 无副作用先行 | /Users/divh/Downloads/资料/本体论/ 字幕稿 |
+| R8 | 《Fundamentals of Analytics Engineering》 | 数据底座生命周期、语义层落地条件、治理三支柱 | /Users/divh/Downloads/资料/技术书籍/…/原书提取/ |
+
+数字弹药（引用时注 R2/R4）：语义自动覆盖 70~80%；企业可被 AI 理解的数据仅 5~10%；95% 生死线阶梯（语义层 70-75% → +记忆反馈 80-90% → +Loop Engineering 逼近 95%）。
