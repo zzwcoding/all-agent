@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+  <title>skill 结构图：解剖与逻辑包含</title>
+  <style>
+    html, body { height:100%; margin:0; }
+    body { display:flex; flex-direction:column; background:#1e1e2e; color:#cdd6f4; font-family:system-ui,sans-serif; }
+    h1 { font-size:16px; padding:8px 16px; margin:0; display:flex; align-items:center; gap:12px; flex:0 0 auto; }
+    .toggle-btn { font-size:12px; padding:4px 10px; background:#313244; color:#cdd6f4; border:1px solid #89b4fa; border-radius:4px; cursor:pointer; font-family:inherit; }
+    .toggle-btn:hover { background:#45475a; }
+    .toggle-btn .state { color:#a6e3a1; margin-left:4px; }
+    .overview.hidden { display:none; }
+    #host { flex:1 1 auto; width:100vw; min-height:0; }
+    #host svg { width:100%; height:100%; display:block; }
+    .mermaid { shape-rendering: geometricPrecision; }
+    .overview { padding:0 16px 8px; font-size:12px; color:#bac2de; }
+    .overview table { border-collapse:collapse; margin-top:6px; }
+    .overview td, .overview th { border:1px solid #45475a; padding:3px 8px; text-align:left; }
+  </style>
+</head>
+<body>
+  <h1>skill 结构图：解剖与逻辑包含 · All-agent · 拖拽平移 · 滚轮缩放<button id="toggle-overview" class="toggle-btn" type="button">显示说明文字<span class="state"></span></button></h1>
+  <div class="overview hidden">
+    <b>这张图是什么</b>：左半是单个 skill 的解剖（物理形态：薄壳→规约→出厂集，渐进披露发生在每个 skill 内部）；右半是 skill 群的逻辑包含层级（L0 编排 → L1 工序 → L2 共享规约 → L3 脚本 → L4 数据）。核心结论：skill 物理平铺、无目录嵌套，"大模块套小模块"是逻辑关系——靠卡上显式依赖行表达。正文对照 docs/design-sdd-flow2.md §1–2。<br>
+    <b>怎么读</b>：蓝框=普通节点；红框 🛡️=防护闸；实线=组成/编排调用（需显式声明），虚线=只读引用；暗灰虚线框=外部依赖（不在本体系治理范围）；嵌套子图=物理组成（目录内），并列子图=逻辑分层。<br>
+    <b>防护清单表</b>：
+    <table id="guard-table"><tr><th>闸</th><th>节点</th><th>防什么</th></tr>
+      <tr><td>边界闸</td><td>TLS</td><td>skill 私拉未声明依赖、越层引用</td></tr>
+      <tr><td>出厂集回归</td><td>SKFIX</td><td>指导书静默漂移——每个 skill 的行为验收档案</td></tr>
+    </table>
+    <b>节点明细表</b>：
+    <table id="node-table"><tr><th>节点 ID</th><th>干什么</th><th>为什么</th><th>下游</th></tr>
+      <tr><td>SKMD</td><td>skill 薄壳：触发面+主干路由+产物契约</td><td>第一层披露——接口必须明显比实现简单</td><td>SKREF / SKFIX</td></tr>
+      <tr><td>SKREF</td><td>本 skill 私有规约与格式模板</td><td>第二层披露——用到才读，省上下文</td><td>被 SKMD 引用</td></tr>
+      <tr><td>SKFIX</td><td>出厂集：固定输入+确定性断言</td><td>skill 没有单测，它就是测试</td><td>被 runner 跑</td></tr>
+      <tr><td>SDF2</td><td>当前唯一的编排 skill（建造流）</td><td>大框架第一环，dogfooding 对象</td><td>EXT、L1（未来）</td></tr>
+      <tr><td>AA0</td><td>未来的 All-agent 编排器</td><td>运行时路由:需求→适配器→生成器</td><td>L1 工序群</td></tr>
+      <tr><td>FE / BE / GV</td><td>前端适配器×4 / 后端生成器×5 / 治理×3</td><td>按变换类型切,不按业务域切——数量封顶 ≈12</td><td>L2 / L3</td></tr>
+      <tr><td>SHR</td><td>跨 skill 公共规约（schema 文档/卡格式/公共指导段）</td><td>引用不是包含——规则只在一处有原文</td><td>被 L0/L1 读</td></tr>
+      <tr><td>TLS</td><td>确定性脚本：schema 校验/语义 CI/出厂集 runner/边界闸</td><td>写着没闸的禁令等于不存在</td><td>L4 数据</td></tr>
+      <tr><td>DAT</td><td>本体仓 YAML/fixtures/policies/档案</td><td>唯一真源与派生物的分界线</td><td>——</td></tr>
+      <tr><td>EXT</td><td>外部底层 skill（tdd/grilling 等）</td><td>声明为外部依赖,不许私拉其内部文件</td><td>被 SDF2 调用</td></tr>
+    </table>
+  </div>
+  <div id="host" class="mermaid">
+    flowchart TB
+      subgraph ANAT["单个 skill 的解剖（物理形态:目录平铺）"]
+        SKMD["SKILL.md 薄壳——触发面 + 主干路由 + 产物契约（第一层披露）"]
+        SKREF["references/——本 skill 私有规约与模板（第二层披露,用到才读）"]
+        SKFIX["fixtures/——出厂集:固定输入+断言 🛡️ 防指导书静默漂移"]
+        SKMD -->|"细节下沉"| SKREF
+        SKMD -->|"行为由它验收"| SKFIX
+      end
+
+      subgraph TREE["skill 群的逻辑包含（依赖只许向下,同层调用显式声明）"]
+        subgraph L0G["L0 编排 skill"]
+          SDF2["sdd-flow2 编排器（当前:建造流路由）"]
+          AA0["allagent 编排器（未来:运行时路由）"]
+        end
+        subgraph L1G["L1 工序 skill——按变换类型切,封顶约 12 个"]
+          FE["前端适配器×4——需求探索/数据库逆向/代码逆向/文档萃取"]
+          BE["后端生成器×5——应用包/Skill 发布/MCP 发布/分析报告/变更影响分析"]
+          GV["治理×3——本体建模/提案池处理/元循环体检"]
+        end
+        subgraph L2G["L2 共享规约（只读,引用非包含）"]
+          SHR["公共 references:schema 文档 · 卡格式 · 指导书公共段"]
+        end
+        subgraph L3G["L3 确定性脚本"]
+          TLS["工具集:schema 校验 · 语义 CI · 出厂集 runner · 边界闸 🛡️ 防私拉依赖与越层引用"]
+        end
+        subgraph L4G["L4 数据层"]
+          DAT["本体仓 YAML · fixtures · policies · 日志与 ADR"]
+        end
+        SDF2 -->|"编排:阶段路由"| GV
+        AA0 -->|"编排:需求→适配→生成"| FE
+        AA0 -->|"编排"| BE
+        AA0 -->|"编排"| GV
+        FE -->|"读公共规约"| SHR
+        BE -->|"读公共规约"| SHR
+        GV -->|"读公共规约"| SHR
+        FE -->|"过闸才许进仓"| TLS
+        BE -->|"过闸"| TLS
+        GV -->|"过闸"| TLS
+        TLS -->|"读写"| DAT
+        FE -.->|"草案只落仓,禁直连后端"| DAT
+        BE -.->|"只读仓"| DAT
+      end
+
+      EXT["外部底层 skill（tdd/grilling 等）——声明为外部依赖,禁读其内部文件"]
+      SDF2 -.->|"显式声明后调用"| EXT
+
+      classDef guardSec fill:#3a1a1a,stroke:#f38ba8,stroke-width:2px,color:#f38ba8
+      classDef extGray fill:#262637,stroke:#6c7086,stroke-width:1px,color:#6c7086,stroke-dasharray:5 5
+      class SKFIX,TLS guardSec
+      class EXT extGray
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.2/dist/svg-pan-zoom.min.js"></script>
+  <script>
+    mermaid.initialize({ startOnLoad: false, theme: "dark",
+      themeVariables: { darkMode: true, background: "#1e1e2e", primaryColor: "#313244",
+        primaryBorderColor: "#89b4fa", primaryTextColor: "#cdd6f4", lineColor: "#89b4fa" },
+      securityLevel: "loose" });
+    mermaid.run({ querySelector: "#host" }).then(() => {
+      const svg = document.querySelector("#host svg");
+      svg.removeAttribute("height");
+      window.pz = svgPanZoom(svg, { zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true });
+    });
+  </script>
+  <script>
+    (function() {
+      var btn = document.getElementById("toggle-overview");
+      var overview = document.querySelector(".overview");
+      var stateEl = btn.querySelector(".state");
+      btn.addEventListener("click", function() {
+        var isHidden = overview.classList.toggle("hidden");
+        stateEl.textContent = isHidden ? "（已隐藏）" : "（已显示）";
+      });
+      stateEl.textContent = "（已隐藏）";
+    })();
+  </script>
+</body>
+</html>
