@@ -1,6 +1,6 @@
 # 票 07：skill semantic-service
 
-Status: todo
+Status: done
 Belongs to: specs/semantic-service.md；PRD F4
 Touches: ~/.agents/skills/semantic-service/、fixtures/semantic-service/
 
@@ -11,9 +11,9 @@ Touches: ~/.agents/skills/semantic-service/、fixtures/semantic-service/
 
 ## 验收（注源）
 
-- [ ] AC1–4 全过（源：specs/semantic-service.md）
-- [ ] 回答带 ID 引用（源：spec 行为约定）
-- [ ] 不索引 build-contract 阵营（源：卡边界）
+- [x] AC1–4 全过（源：specs/semantic-service.md）
+- [x] 回答带 ID 引用（源：spec 行为约定）
+- [x] 不索引 build-contract 阵营（源：卡边界）
 
 Blocked by: 票 03、票 04
 

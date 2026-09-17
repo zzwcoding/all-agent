@@ -50,6 +50,7 @@
 
 - 职责: 运行时语义服务——受控检索瀑布（显式锚定优先、逐级升级、可拒答）+ 口径解析 + 子图装配，供 Agent 只读消费
 - 层: 工序（运行时面）
+- 目录: 仓内 skills/semantic-service/（正本，边界闸+归档闸治理）+ ~/.agents/skills/semantic-service/（安装位，Kimi Code 路由）；两份内容必须一致
 - 触发面: "查口径/问业务对象/解析指标含义"
 - reads: `ontology/**`（经 graph_index）、模型注册表（只索引 business-core 阵营）
 - writes: 无（只读服务；回答即产出）

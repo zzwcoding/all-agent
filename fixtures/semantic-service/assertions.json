@@ -1,0 +1,70 @@
+{
+  "skill": "semantic-service（运行时语义服务，票 07）",
+  "description": "出厂集：Golden Question 集（questions/golden-questions.md 四问，各压检索瀑布一级）→ 断言参照答案的确定性结果（specs/semantic-service.md AC1–4）。问答本体=fixtures/graph_index/ontology-base（票 04 最小域，只读复用；该本体含 MU 屏是有意保留，图索引全量建图无阵营概念，阵营裁剪是 skill 工序职责，AC4 靠它实测面外拒答）。expected-answers/ 四份参照答案按 SKILL.md 工序手工产出：每份示范瀑布走到哪一级、带「本回答引用的元素 ID」清单。AC1=口径四件套（字段 dailyOutput/载体 AGG-BOHAI-002/规则 RULE-BOHAI-001/查询出口 QR-BOHAI-001，含 dictionaryRef 下钻链）；AC2=显式锚定直接命中+未走名称模糊检索+反向收集行为 ID；AC3=拒答话术+缺什么分层说明+提案流程指路，并全扫描守卫正则断言未编造 ID（答案中每个 ID 均须在白名单={QR-BOHAI-001, AGG-BOHAI-002}内，即全部是近邻指路真实 ID）；AC4=面外语说明（camp=build-contract/不在检索面/提案流程），并全扫描守卫正则断言不含任何 MU 元素细节（菜单/网格/按钮/屏类型/页面与菜单名等）。「回答带 ID 引用」（spec 行为约定）以四份答案逐一含引用清单节断言。cmd 两条为机读佐证：--impact 可复现锚定对象的引用集（含全部行为），未找到 ID 明确报错不猜（AC3 纪律的机械面）。",
+  "assertions": [
+    { "ac": "输入", "type": "file-exists", "path": "questions/golden-questions.md" },
+    { "ac": "输入（四问齐）", "type": "file-contains", "path": "questions/golden-questions.md", "contains": ["日产量口径是什么", "@AGG-BOHAI-001 有哪些行为", "月度产量汇总口径是什么", "@SCR-BOHAI-01"] },
+
+    { "ac": "AC1", "type": "file-exists", "path": "expected-answers/ac1-daily-output-caliber.md" },
+    {
+      "ac": "AC1（口径四件套 ID 命中）",
+      "type": "file-contains",
+      "path": "expected-answers/ac1-daily-output-caliber.md",
+      "contains": ["AGG-BOHAI-001", "AGG-BOHAI-002", "dailyOutput", "outputVolume", "RULE-BOHAI-001", "QR-BOHAI-001", "dictionaryRef", "DICT-BOHAI-01", "闭包装配"]
+    },
+
+    { "ac": "AC2", "type": "file-exists", "path": "expected-answers/ac2-explicit-anchor.md" },
+    {
+      "ac": "AC2（显式锚定直接命中+行为 ID）",
+      "type": "file-contains",
+      "path": "expected-answers/ac2-explicit-anchor.md",
+      "contains": ["显式锚定直接命中", "未走名称模糊检索", "AGG-BOHAI-001", "BH-BOHAI-UpdateWellStatus", "BH-BOHAI-QueryWellDailyOutput", "BH-BOHAI-RecordDailyOutput"]
+    },
+
+    { "ac": "AC3", "type": "file-exists", "path": "expected-answers/ac3-refusal-missing-concept.md" },
+    {
+      "ac": "AC3（拒答+缺什么+提案流程）",
+      "type": "file-contains",
+      "path": "expected-answers/ac3-refusal-missing-concept.md",
+      "contains": ["拒答", "仓内没有", "缺什么", "提案流程", "未找到", "QR-BOHAI-001"]
+    },
+    {
+      "ac": "AC3（未编造 ID：全文只许出现白名单近邻指路 ID）",
+      "type": "file-matches-regex",
+      "path": "expected-answers/ac3-refusal-missing-concept.md",
+      "pattern": "\\A(?:(?!(?:AGG-(?!BOHAI-002\\b)|ASSOC-|DICT-|BH-|RULE-|ACTOR-|ROLE-|PERM-|FLOW-|RPT-|SCR-|QR-(?!BOHAI-001\\b)))[\\s\\S])*\\Z"
+    },
+
+    { "ac": "AC4", "type": "file-exists", "path": "expected-answers/ac4-refusal-out-of-face.md" },
+    {
+      "ac": "AC4（面外语说明+提案流程指路）",
+      "type": "file-contains",
+      "path": "expected-answers/ac4-refusal-out-of-face.md",
+      "contains": ["camp=build-contract", "不在检索面", "拒答", "提案流程", "SCR-BOHAI-01"]
+    },
+    {
+      "ac": "AC4（不返回 MU 元素细节：菜单/网格/按钮/屏类型/页面与菜单名全禁）",
+      "type": "file-matches-regex",
+      "path": "expected-answers/ac4-refusal-out-of-face.md",
+      "pattern": "\\A(?:(?!MENU-|gridDaily|ACT-SCR|LIST_MAINTENANCE|screenType|GRID|日产量列表|单井日产量录入|产量管理|保存)[\\s\\S])*\\Z"
+    },
+
+    { "ac": "回答带 ID 引用（AC1）", "type": "file-contains", "path": "expected-answers/ac1-daily-output-caliber.md", "contains": ["本回答引用的元素 ID"] },
+    { "ac": "回答带 ID 引用（AC2）", "type": "file-contains", "path": "expected-answers/ac2-explicit-anchor.md", "contains": ["本回答引用的元素 ID"] },
+    { "ac": "回答带 ID 引用（AC3）", "type": "file-contains", "path": "expected-answers/ac3-refusal-missing-concept.md", "contains": ["本回答引用的元素 ID"] },
+    { "ac": "回答带 ID 引用（AC4）", "type": "file-contains", "path": "expected-answers/ac4-refusal-out-of-face.md", "contains": ["本回答引用的元素 ID"] },
+
+    {
+      "ac": "机读佐证（锚定对象引用集可复现：行为/规则/权限/关联全在 --impact 集）",
+      "type": "cmd-succeeds",
+      "cmd": "python3 tools/graph_index.py fixtures/graph_index/ontology-base --query AGG-BOHAI-001 --impact --json",
+      "outputContains": ["BH-BOHAI-UpdateWellStatus", "BH-BOHAI-QueryWellDailyOutput", "BH-BOHAI-RecordDailyOutput", "RULE-BOHAI-001", "PERM-BOHAI-QueryWellDailyOutput", "QR-BOHAI-001"]
+    },
+    {
+      "ac": "机读佐证（未找到不猜——可拒答的机械面）",
+      "type": "cmd-fails",
+      "cmd": "python3 tools/graph_index.py fixtures/graph_index/ontology-base --query QR-BOHAI-999",
+      "outputContains": ["未找到", "不做名称猜测"]
+    }
+  ]
+}
