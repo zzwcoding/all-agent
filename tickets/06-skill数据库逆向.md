@@ -1,6 +1,6 @@
 # 票 06：skill db-reverse
 
-Status: todo
+Status: done
 Belongs to: specs/db-reverse.md；PRD F6
 Touches: ~/.agents/skills/db-reverse/、fixtures/db-reverse/
 
@@ -11,9 +11,9 @@ Touches: ~/.agents/skills/db-reverse/、fixtures/db-reverse/
 
 ## 验收（注源）
 
-- [ ] AC1–4 全过（源：specs/db-reverse.md）
-- [ ] 草案头固定声明"证据非权威"（源：spec 行为约定）
-- [ ] 素材逐条注源 R5（源：取材锁纪律）
+- [x] AC1–4 全过（源：specs/db-reverse.md）
+- [x] 草案头固定声明"证据非权威"（源：spec 行为约定）
+- [x] 素材逐条注源 R5（源：取材锁纪律）
 
 Blocked by: 票 03
 

@@ -1,0 +1,50 @@
+{
+  "skill": "db-reverse（数据库逆向器，票 06）",
+  "description": "出厂集：渤海域 8 表 DDL 子集（input/bohai-8tables.sql，按 R5 设定书附录 A 字典忠实转写：字段级真源=字典，git 历史无 CREATE TABLE；逐字段注源见 input/source-map.md）→ 断言逆向工序产物的确定性结果（specs/db-reverse.md AC1–4）。expected-output/ 是按 SKILL.md 工序对同一输入手工产出的参照产物：对象清单 AC1（8 表全覆盖）、映射证据 AC2（字段→属性+类型映射+PK 约定）、草案过语义闸 AC3（schema 经 expected-output/schema 符号链接取自仓内 ontology/schema，单一真源不复制，同 fixtures/schema_check 手法；域 profile 取注册表组合名 v9-core）、脏特征疑点 AC4（疑点清单+草案标注，不静默吞掉）+ 草案头部固定声明「证据非权威，待 Owner 确认」（spec 行为约定）。DDL 无外键声明，草案零 ref 字段——关系推断只进疑点清单待 Owner 裁决，是「不发明 DDL 里不存在的业务语义」的机械面。",
+  "assertions": [
+    { "ac": "输入", "type": "file-exists", "path": "input/bohai-8tables.sql" },
+    {
+      "ac": "注源齐（逐表注源 R5）",
+      "type": "file-contains",
+      "path": "input/source-map.md",
+      "contains": ["R5·设定书附录 A.1", "R5·设定书附录 A.2", "R5·设定书附录 A.3", "R5·设定书附录 A.4", "R5·设定书附录 A.5", "R5·设定书附录 A.6", "R5·设定书附录 A.7", "R5·设定书附录 A.8"]
+    },
+    {
+      "ac": "AC1",
+      "type": "file-contains",
+      "path": "expected-output/object-inventory.md",
+      "contains": ["well_info", "oil_production_daily", "water_injection_daily", "well_overhaul", "well_measures", "fluid_test", "equip_status", "monthly_settlement", "AGG-BOHAI-001", "AGG-BOHAI-002", "AGG-BOHAI-003", "AGG-BOHAI-004", "AGG-BOHAI-005", "AGG-BOHAI-006", "AGG-BOHAI-007", "AGG-BOHAI-008"]
+    },
+    {
+      "ac": "AC2",
+      "type": "file-contains",
+      "path": "expected-output/mapping-evidence.md",
+      "contains": ["well_info.well_id", "oil_production_daily.oil_output", "water_injection_daily.inj_volume", "well_overhaul.overhaul_start", "well_measures.measure_type", "fluid_test.water_cut_lab", "equip_status.stop_reason_code", "monthly_settlement.net_weight", "类型映射", "主键"]
+    },
+    {
+      "ac": "AC3",
+      "type": "cmd-succeeds",
+      "cmd": "python3 tools/schema_check.py {fixture_dir}/expected-output/bohai",
+      "outputContains": ["语义闸: 全过"]
+    },
+    { "ac": "AC3", "type": "file-contains", "path": "expected-output/bohai/manifest.json", "contains": ["v9-core"] },
+    {
+      "ac": "AC4",
+      "type": "file-contains",
+      "path": "expected-output/dirty-signs.md",
+      "contains": ["吨方混写", "A/B", "重复行", "新旧编码并存", "补录", "30% 缺失", "跨月", "待 Owner 确认"]
+    },
+    {
+      "ac": "AC4（草案不静默吞掉）",
+      "type": "file-contains",
+      "path": "expected-output/bohai/m1-object-model.yaml",
+      "contains": ["吨方混写", "新旧编码并存", "待 Owner 确认"]
+    },
+    {
+      "ac": "草案头部声明（spec 行为约定）",
+      "type": "file-contains",
+      "path": "expected-output/bohai/m1-object-model.yaml",
+      "contains": ["证据非权威，待 Owner 确认"]
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "domain": "bohai",
+  "label": "渤海油田产量域（db-reverse 逆向草案）",
+  "profile": "v9-core",
+  "schemaVersion": "1.0.0",
+  "description": "db-reverse 参照产物（票 06）：从 8 表 DDL 子集逆向。证据非权威，待 Owner 确认。DDL 证据仅支撑 M1 对象层（8 聚合根），行为/规则/主体等需业务证据的模型不产文件，故 profile 取注册表最小核心组合 v9-core（M1/M2/M3/M5，M2/M3/M5 待业务正向建模补）；DDL 无外键声明，聚合关联/引用零登记，关系推断见 dirty-signs.md 待 Owner 裁决。"
+}

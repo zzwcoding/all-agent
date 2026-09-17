@@ -23,6 +23,7 @@
 
 - 职责: 数据库逆向器——DDL/库表 → 本体草案（对象/属性/映射证据），自下而上供业务 Owner 裁决
 - 层: 工序（前端适配器）
+- 目录: 仓内 skills/db-reverse/（正本，边界闸+归档闸治理）+ ~/.agents/skills/db-reverse/（安装位，Kimi Code 路由）；两份内容必须一致
 - 触发面: "把这个库/这份 DDL 逆向成本体"
 - reads: DDL 文件或库连接描述、`ontology/schema/**`
 - writes: `ontology/<域>/**` 草案 + 映射证据文件
