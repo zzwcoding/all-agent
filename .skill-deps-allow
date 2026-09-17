@@ -2,3 +2,4 @@
 fixtures/onto-modeler/**  # onto-modeler 的出厂集 Seam：已在卡「Seam 与出厂集」字段声明，闸只解析 reads/writes/data 行，故在此显式豁免（票 05）
 fixtures/db-reverse/**  # db-reverse 的出厂集 Seam：已在卡「Seam 与出厂集」字段声明，闸只解析 reads/writes/data 行，故在此显式豁免（票 06，同票 05 手法）
 fixtures/semantic-service/**  # semantic-service 的出厂集 Seam：已在卡「Seam 与出厂集」字段声明，闸只解析 reads/writes/data 行，故在此显式豁免（票 07，同票 05/06 手法）
+fixtures/impact-analyzer/**  # impact-analyzer 的出厂集 Seam：已在卡「Seam 与出厂集」字段声明，闸只解析 reads/writes/data 行，故在此显式豁免（票 08，同票 05/06/07 手法）

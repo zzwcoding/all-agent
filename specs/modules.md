@@ -37,6 +37,7 @@
 
 - 职责: 变更影响分析器——本体变更 → 影响链路（哪些对象/规则/报表/映射受波及）+ 建议落地顺序
 - 层: 工序（治理/输出两用）
+- 目录: 仓内 skills/impact-analyzer/（正本，边界闸+归档闸治理）+ ~/.agents/skills/impact-analyzer/（安装位，Kimi Code 路由）；两份内容必须一致
 - 触发面: "改 X 会影响什么/评估这个变更"
 - reads: `ontology/**`、`tools/graph_index.py` 产出的图
 - writes: 影响分析报告（落 `docs/impact/` 或对话附盘文件）

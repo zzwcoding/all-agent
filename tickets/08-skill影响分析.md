@@ -1,6 +1,6 @@
 # 票 08：skill impact-analyzer
 
-Status: todo
+Status: done
 Belongs to: specs/impact-analyzer.md；PRD F12
 Touches: ~/.agents/skills/impact-analyzer/、fixtures/impact-analyzer/、docs/impact/
 
@@ -11,8 +11,8 @@ Touches: ~/.agents/skills/impact-analyzer/、fixtures/impact-analyzer/、docs/im
 
 ## 验收（注源）
 
-- [ ] AC1–4 全过（源：specs/impact-analyzer.md）
-- [ ] 每条影响项带传播依据 ref（源：spec 行为约定）
+- [x] AC1–4 全过（源：specs/impact-analyzer.md）
+- [x] 每条影响项带传播依据 ref（源：spec 行为约定）
 
 Blocked by: 票 04
 

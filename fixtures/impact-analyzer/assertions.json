@@ -1,0 +1,89 @@
+{
+  "skill": "impact-analyzer（变更影响分析器，票 08）",
+  "description": "出厂集：固定变更输入清单（changes/change-list.md 三场景）→ 断言参照报告的确定性结果（specs/impact-analyzer.md AC1–4）。分析本体=fixtures/graph_index/ontology-base（票 04 最小域，只读复用，同票 07 手法；本出厂集不改该目录，ACTOR 无下游引用等结论已实测）。expected-output/ 三份参照报告按 SKILL.md 工序对手工产出：每份即 docs/impact/NN-*.md 的规范样例（影响链每行=受影响 ID/模型/跳数/传播依据 via 哪条 ref/建议落地顺序位次）。AC1=改 AGG-BOHAI-001 字段的影响链覆盖全部 6 个直接引用者（hops=1：AGG-BOHAI-002/ASSOC-BOHAI-001/BH-BOHAI-QueryWellDailyOutput/BH-BOHAI-UpdateWellStatus/FLOW-BOHAI-001/QR-BOHAI-001）+ 全链 14 节点；AC2=报告含建议落地顺序（先改被依赖者后改依赖者，方向依据 model-deps.json 依赖白名单）；AC3=字典停用场景含「停用不删除」纪律语 + 字典引用扫描（DICT-BOHAI-01 及其直接引用方 AGG-BOHAI-001 经 dictionaryId）；AC4=改无下游对象 ACTOR-BOHAI-001（实测 --impact 零命中）明确报「无影响」+核验方式，并全扫描守卫正则断言不硬凑——全文除变更对象 ACTOR-BOHAI-001 外禁入任何注册前缀 ID（即该报告不得出现任何受影响 ID 列表）。「每条影响项带传播依据」（spec 行为约定）以 01/02 两份报告的全扫描守卫正则断言：凡「- 」开头含 hops= 的行必须同行含 via=（cmd 断言前已正反例验证）。cmd 四条为机读佐证：--impact 对三场景全部可复现（14/15/0 节点），零命中在机读与人类读两种输出形态下均可判。",
+  "assertions": [
+    { "ac": "输入", "type": "file-exists", "path": "changes/change-list.md" },
+    { "ac": "输入（三场景齐）", "type": "file-contains", "path": "changes/change-list.md", "contains": ["C1 · 改对象字段", "C2 · 改字典项", "C3 · 改无下游对象", "AGG-BOHAI-001", "DICT-BOHAI-01", "ACTOR-BOHAI-001"] },
+
+    { "ac": "AC1", "type": "file-exists", "path": "expected-output/01-agg-bohai-001-field-change.md" },
+    {
+      "ac": "AC1（影响链覆盖全部直接引用者：hops=1 六个，各带 via=）",
+      "type": "file-contains",
+      "path": "expected-output/01-agg-bohai-001-field-change.md",
+      "contains": ["AGG-BOHAI-002", "ASSOC-BOHAI-001", "BH-BOHAI-QueryWellDailyOutput", "BH-BOHAI-UpdateWellStatus", "BH-BOHAI-RecordDailyOutput", "FLOW-BOHAI-001", "QR-BOHAI-001", "via=targetAggregate", "via=sourceAggregate", "via=ownerEntity", "via=businessObjectRefs", "via=objectRef", "hops=1"]
+    },
+    {
+      "ac": "AC1（全链 14 节点齐：间接受影响也入库）",
+      "type": "file-contains",
+      "path": "expected-output/01-agg-bohai-001-field-change.md",
+      "contains": ["PERM-BOHAI-QueryWellDailyOutput", "PERM-BOHAI-RecordDailyOutput", "SCR-BOHAI-01", "RULE-BOHAI-001", "RULE-BOHAI-002", "ROLE-BOHAI-001", "ACTOR-BOHAI-001", "hops=2", "hops=3", "hops=4", "14 个受影响节点"]
+    },
+
+    {
+      "ac": "AC2（建议落地顺序：章节+原则表述+方向依据）",
+      "type": "file-contains",
+      "path": "expected-output/01-agg-bohai-001-field-change.md",
+      "contains": ["建议落地顺序", "先改被依赖者", "后改依赖者", "model-deps.json", "顺序 1"]
+    },
+
+    { "ac": "AC3", "type": "file-exists", "path": "expected-output/02-dict-item-disable.md" },
+    {
+      "ac": "AC3（停用不删除纪律 + 字典引用扫描 DICT-BOHAI-01 及其引用方）",
+      "type": "file-contains",
+      "path": "expected-output/02-dict-item-disable.md",
+      "contains": ["停用不删除", "enabled", "DICT-BOHAI-01", "AGG-BOHAI-001", "dictionaryId", "SUSPENDED", "via=dictionaryId", "15 个受影响节点"]
+    },
+    {
+      "ac": "AC3（每条影响项带传播依据：含 hops= 的行必须同行含 via=）",
+      "type": "file-matches-regex",
+      "path": "expected-output/02-dict-item-disable.md",
+      "pattern": "\\A(?:(?!^- .*hops=(?![^\\n]*via=))[\\s\\S])*\\Z"
+    },
+
+    { "ac": "AC4", "type": "file-exists", "path": "expected-output/03-actor-no-downstream.md" },
+    {
+      "ac": "AC4（无影响明确语 + 核验方式 + 不硬凑）",
+      "type": "file-contains",
+      "path": "expected-output/03-actor-no-downstream.md",
+      "contains": ["无影响", "0 个受影响节点", "核验方式", "不硬凑", "图统计"]
+    },
+    {
+      "ac": "AC4（不硬凑守卫：全文除变更对象 ACTOR-BOHAI-001 外禁入任何注册前缀 ID——不得出现受影响 ID 列表）",
+      "type": "file-matches-regex",
+      "path": "expected-output/03-actor-no-downstream.md",
+      "pattern": "\\A(?:(?!(?:AGG-|ASSOC-|DICT-|BH-|RULE-|ACTOR-(?!BOHAI-001\\b)|ROLE-|PERM-|FLOW-|QR-|RPT-|SCR-))[\\s\\S])*\\Z"
+    },
+
+    {
+      "ac": "每条影响项带传播依据（spec 行为约定：01 报告含 hops= 的行必须同行含 via=）",
+      "type": "file-matches-regex",
+      "path": "expected-output/01-agg-bohai-001-field-change.md",
+      "pattern": "\\A(?:(?!^- .*hops=(?![^\\n]*via=))[\\s\\S])*\\Z"
+    },
+
+    {
+      "ac": "机读佐证（C1 影响链可复现：--impact 返回全部直接引用者与间接链）",
+      "type": "cmd-succeeds",
+      "cmd": "python3 tools/graph_index.py fixtures/graph_index/ontology-base --query AGG-BOHAI-001 --impact --json",
+      "outputContains": ["AGG-BOHAI-002", "ASSOC-BOHAI-001", "BH-BOHAI-QueryWellDailyOutput", "BH-BOHAI-UpdateWellStatus", "BH-BOHAI-RecordDailyOutput", "FLOW-BOHAI-001", "QR-BOHAI-001", "PERM-BOHAI-QueryWellDailyOutput", "PERM-BOHAI-RecordDailyOutput", "SCR-BOHAI-01", "RULE-BOHAI-001", "RULE-BOHAI-002", "ROLE-BOHAI-001", "ACTOR-BOHAI-001", "via"]
+    },
+    {
+      "ac": "机读佐证（C2 字典停用可复现：直接引用方经 dictionaryId）",
+      "type": "cmd-succeeds",
+      "cmd": "python3 tools/graph_index.py fixtures/graph_index/ontology-base --query DICT-BOHAI-01 --impact --json",
+      "outputContains": ["AGG-BOHAI-001", "dictionaryId", "via"]
+    },
+    {
+      "ac": "机读佐证（C3 无下游引用可复现：机读形态影响集为空数组）",
+      "type": "cmd-succeeds",
+      "cmd": "python3 tools/graph_index.py fixtures/graph_index/ontology-base --query ACTOR-BOHAI-001 --impact --json",
+      "outputContains": ["\"impact\": []"]
+    },
+    {
+      "ac": "机读佐证（C3 人类读形态：0 个受影响节点）",
+      "type": "cmd-succeeds",
+      "cmd": "python3 tools/graph_index.py fixtures/graph_index/ontology-base --query ACTOR-BOHAI-001 --impact",
+      "outputContains": ["0 个受影响节点"]
+    }
+  ]
+}
