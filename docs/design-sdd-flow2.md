@@ -89,7 +89,7 @@
 ## 6. 建造顺序（拆票预告）
 
 - 票 00：骨架 + `references/skill-module-format.md`（卡格式真源）+ sdd-flow2 自卡落 specs/modules.md
-- 票 01：`tools/skill_deps_check.py` 边界闸 + `tools/fixture_run.py` 出厂集 runner + CI 骨架
+- 票 01：`tools/skill_deps_check.py` 边界闸 + `tools/fixture_run.py` 出厂集 runner + **归档登记表 + `tools/archive_check.py` 归档闸**（验收主线 2）+ CI 骨架
 - 票 02：sdd-flow2 正文改造（§4 的 7 处 diff）
 - 票 03 起：用 sdd-flow2 造 All-agent 的第一个 skill（本体仓 schema + schema_check）
 
@@ -99,3 +99,13 @@
 2. skill 卡字段（§2）
 3. 出厂集先行纪律 + 断言确定性红线（§3.4）
 4. 改造顺序（§6）
+
+## 两条验收主线（2026-09-17 用户拍板时收敛）
+
+建造 sdd-flow2 的成败按这两条验收，先于四个拍板点：
+
+1. **结构一致**：造完的真实结构 = 本设计案的四层半。机器验证，不目测——卡与文件一一对应（无孤儿 skill、无卡外文件）、依赖只许向下（边界闸扫）、sdd-flow2 自卡齐全且第一个被治理。
+2. **统一口径归档（强力约束）**：所有文档类产物一个口径归档。
+   - **归档登记表**先行：每类产物 → 唯一路径模式 + 模板真源 + 状态字段 + 谁翻转（覆盖 skill 卡/出厂集/断言表/票/施工日志/ADR/CHANGELOG/本体 YAML）。
+   - **`archive_check` 脚本进 CI**：仓内每个文件必须对得上登记表（命名/位置/必备字段/状态合法值），对不上 = 孤儿文件，CI 红。
+   - **每票收尾**：从"回写五件齐全"升级为"过归档闸才算完"——状态翻转以归档闸绿为前提。
