@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+  <title>All-agent 大总架构图</title>
+  <style>
+    html, body { height:100%; margin:0; }
+    body { display:flex; flex-direction:column; background:#1e1e2e; color:#cdd6f4; font-family:system-ui,sans-serif; }
+    h1 { font-size:16px; padding:8px 16px; margin:0; display:flex; align-items:center; gap:12px; flex:0 0 auto; }
+    .toggle-btn { font-size:12px; padding:4px 10px; background:#313244; color:#cdd6f4; border:1px solid #89b4fa; border-radius:4px; cursor:pointer; font-family:inherit; }
+    .toggle-btn:hover { background:#45475a; }
+    .toggle-btn .state { color:#a6e3a1; margin-left:4px; }
+    .overview.hidden { display:none; }
+    #host { flex:1 1 auto; width:100vw; min-height:0; }
+    #host svg { width:100%; height:100%; display:block; }
+    .mermaid { shape-rendering: geometricPrecision; }
+    .overview { padding:0 16px 8px; font-size:12px; color:#bac2de; }
+    .overview table { border-collapse:collapse; margin-top:6px; }
+    .overview td, .overview th { border:1px solid #45475a; padding:3px 8px; text-align:left; }
+  </style>
+</head>
+<body>
+  <h1>All-agent 大总架构图（编译器架构 + 三循环） · All-agent · 拖拽平移 · 滚轮缩放<button id="toggle-overview" class="toggle-btn" type="button">显示说明文字<span class="state"></span></button></h1>
+  <div class="overview hidden">
+    <b>这张图是什么</b>：All-agent 大总架构全景——编译器架构：左端 N 个前端适配器（多输入）→ 本体仓居中（唯一真源 IR）→ 右端 M 个后端生成器（多输出），下方运行时服务面供智慧大脑只读消费；外圈三个循环（业务语义/建造/元循环）让系统自迭代。正文对照 docs/prd.md。另两张图：sdd-flow2 内部解剖（sdd-flow2.html）、skill 层组织（skill-structure.html）。<br>
+    <b>怎么读</b>：蓝框=普通节点；红框 🛡️=防护闸；实线=主流程（草案/构建/读取/消费），虚线=反馈回路/治理回路；暗灰虚线框=外部既有（Harness 用现成的 Kimi Code）。铁律：前端禁直连后端——一切经本体仓。<br>
+    <b>防护清单表</b>：
+    <table id="guard-table"><tr><th>闸</th><th>节点</th><th>防什么</th></tr>
+      <tr><td>语义 CI（五级）</td><td>GATE</td><td>非法/不一致的本体草案进仓——所有输入的公共闸门</td></tr>
+      <tr><td>MR 人审</td><td>MRG</td><td>Agent 自动改语义——自动化止于提案，责任归于 Owner</td></tr>
+    </table>
+    <b>三循环</b>：
+    <table><tr><th>循环</th><th>路径</th><th>节奏</th><th>治理对象</th></tr>
+      <tr><td>一 · 业务语义</td><td>AGT → POOL → MRG → CORE</td><td>实时/每日</td><td>业务本体（口径/对象/规则）</td></tr>
+      <tr><td>二 · 建造</td><td>SDF2 造全部件（需求→约定→开发→检查）</td><td>每票/每项目</td><td>平台自身与各 skill</td></tr>
+      <tr><td>三 · 元循环</td><td>META 探针度量 → 信号路由 → 分道修复</td><td>每月/每季</td><td>大架构自身 + 元模型</td></tr>
+    </table>
+    <b>节点明细表</b>：
+    <table id="node-table"><tr><th>节点 ID</th><th>干什么</th><th>为什么</th><th>下游</th></tr>
+      <tr><td>FE1–4</td><td>把需求/数据库/源代码/文档转成本体草案</td><td>多元输入归一成同一种 YAML</td><td>GATE</td></tr>
+      <tr><td>GATE</td><td>五级语义检查（语法→引用→SQL安全→权限→行为回归）</td><td>没有闸的规范等于不存在</td><td>CORE</td></tr>
+      <tr><td>CORE</td><td>本体仓：Git+YAML 唯一真源，Stable ID</td><td>方向之间只许通过它对话</td><td>IDX、BE 群</td></tr>
+      <tr><td>IDX</td><td>图谱索引：从仓构建，可随时重建</td><td>图是索引层不是权威源</td><td>SVC</td></tr>
+      <tr><td>SVC</td><td>运行时语义服务：检索瀑布/口径解析，只读</td><td>读路径求快，写路径求审</td><td>AGT</td></tr>
+      <tr><td>AGT</td><td>智慧大脑：问答/问数/问智 → 统筹指挥</td><td>本体运行期消费方</td><td>POOL</td></tr>
+      <tr><td>POOL</td><td>提案池：监督/自检/交互三源信号归一</td><td>一次反馈=一处根因=一个 MR</td><td>MRG</td></tr>
+      <tr><td>MRG</td><td>人工审批 MR</td><td>语义变更必须人拍板</td><td>CORE</td></tr>
+      <tr><td>BE1–5</td><td>应用包/Skill/MCP/分析报告/变更影响分析</td><td>一份本体多处消费</td><td>企业系统/平台</td></tr>
+      <tr><td>SDF2</td><td>sdd-flow2：建造与改造全部件</td><td>本体管不了的工程层由它接管</td><td>FE/BE/GATE/SVC</td></tr>
+      <tr><td>META</td><td>元循环：跨层探针+出厂集回归+信号路由表</td><td>大架构自身的体检与进化</td><td>SDF2 / CORE / MRG</td></tr>
+      <tr><td>BASE</td><td>Harness 底座：长任务/上下文/调度</td><td>不重造轮子，用现成 Kimi Code</td><td>全体 skill</td></tr>
+    </table>
+  </div>
+  <div id="host" class="mermaid">
+    flowchart LR
+      subgraph IN["输入侧 · 前端适配器（多输入归一）"]
+        FE1["需求探索器——原始需求聊清后转草案"]
+        FE2["数据库逆向器——库表结构逆转本体"]
+        FE3["代码逆向器——存量系统抽出对象行为规则"]
+        FE4["文档萃取器——资料库逆转知识本体"]
+      end
+
+      GATE["语义 CI 闸——五级:语法→引用一致→指标SQL安全→权限兼容→行为回归 🛡️ 防非法本体进仓"]
+      CORE["本体仓——Git+YAML 唯一真源 · Stable ID · 对象行为规则等模型"]
+
+      subgraph OUT["输出侧 · 后端生成器（一份本体多处消费）"]
+        BE1["应用生成器——本体+技术架构+指导书出开发包"]
+        BE2["Skill 发布器——本体封装成可对话技能"]
+        BE3["MCP 发布器——本体能力暴露成接口"]
+        BE4["分析报告生成器——指标洞察与场景分析"]
+        BE5["变更影响分析器——改动前先算影响链路"]
+      end
+
+      subgraph RT["运行时服务面（只读 · 全部派生可重建）"]
+        IDX["图谱索引——从仓构建,多跳遍历与检索加速"]
+        SVC["语义服务——检索瀑布与口径解析,只读不写"]
+      end
+      AGT["智慧大脑 Agent 群——问答/问数/问智,逐步放权到指挥"]
+      POOL["提案池——监督/自检/交互三源信号归一"]
+      MRG["MR 人审闸——语义变更人工拍板 🛡️ 防 Agent 自改语义"]
+
+      SDF2["sdd-flow2 建造循环——需求→约定→开发→检查,造全部件"]
+      META["元循环体检——跨层探针+出厂集回归+信号路由表"]
+      BASE["Harness 底座——长任务/上下文/调度（用现成 Kimi Code）"]
+
+      FE1 -->|"产出本体草案"| GATE
+      FE2 -->|"产出本体草案"| GATE
+      FE3 -->|"产出本体草案"| GATE
+      FE4 -->|"产出本体草案"| GATE
+      GATE -->|"过了才许进仓"| CORE
+      CORE -->|"构建派生,可重建"| IDX
+      IDX -->|"供索引"| SVC
+      SVC -->|"只读消费:检索与口径"| AGT
+      AGT -.->|"反馈:三源信号"| POOL
+      POOL -.->|"只提 MR,不自动合"| MRG
+      MRG -.->|"人审通过回合"| CORE
+      CORE -->|"读取唯一真源"| OUT
+      SDF2 -.->|"循环二:建造与改造"| IN
+      SDF2 -.->|"循环二:建造与改造"| OUT
+      SDF2 -.->|"循环二:建造与改造"| GATE
+      META -.->|"循环三:度量→路由→修复"| SDF2
+      META -.->|"循环三:资产层探针"| CORE
+      BASE -.->|"承载运行"| SDF2
+      BASE -.->|"承载运行"| AGT
+
+      classDef guardSec fill:#3a1a1a,stroke:#f38ba8,stroke-width:2px,color:#f38ba8
+      classDef extGray fill:#262637,stroke:#6c7086,stroke-width:1px,color:#6c7086,stroke-dasharray:5 5
+      class GATE,MRG guardSec
+      class BASE extGray
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.2/dist/svg-pan-zoom.min.js"></script>
+  <script>
+    mermaid.initialize({ startOnLoad: false, theme: "dark",
+      themeVariables: { darkMode: true, background: "#1e1e2e", primaryColor: "#313244",
+        primaryBorderColor: "#89b4fa", primaryTextColor: "#cdd6f4", lineColor: "#89b4fa" },
+      securityLevel: "loose" });
+    mermaid.run({ querySelector: "#host" }).then(() => {
+      const svg = document.querySelector("#host svg");
+      svg.removeAttribute("height");
+      window.pz = svgPanZoom(svg, { zoomEnabled: true, controlIconsEnabled: true, fit: true, center: true });
+    });
+  </script>
+  <script>
+    (function() {
+      var btn = document.getElementById("toggle-overview");
+      var overview = document.querySelector(".overview");
+      var stateEl = btn.querySelector(".state");
+      btn.addEventListener("click", function() {
+        var isHidden = overview.classList.toggle("hidden");
+        stateEl.textContent = isHidden ? "（已隐藏）" : "（已显示）";
+      });
+      stateEl.textContent = "（已隐藏）";
+    })();
+  </script>
+</body>
+</html>
