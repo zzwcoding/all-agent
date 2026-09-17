@@ -1,0 +1,28 @@
+model_type: UI
+version: "1.0.0"
+domain: bohai-fixture
+application:
+  name: 渤海油田产量管理
+  menus:
+    - menuId: MENU-01
+      name: 产量管理
+      children:
+        - menuId: MENU-01-01
+          name: 单井日产量录入
+          screenRef: SCR-BOHAI-01
+screens:
+  - screenId: SCR-BOHAI-01
+    name: 单井日产量录入
+    screenType: LIST_MAINTENANCE
+    elements:
+      - id: gridDaily
+        type: GRID
+        label: 日产量列表
+        dataSource: QR-BOHAI-001
+    actions:
+      - actionId: ACT-SCR-01-SAVE
+        name: 保存
+        actionType: BUTTON
+        behaviorRef: BH-BOHAI-RecordDailyOutput
+        permissionRef:
+          - PERM-BOHAI-RecordDailyOutput

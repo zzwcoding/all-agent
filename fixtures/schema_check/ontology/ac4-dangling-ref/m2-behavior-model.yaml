@@ -1,0 +1,43 @@
+model_type: BEHAVIOR
+version: "1.0.0"
+domain: bohai-fixture
+behaviors:
+  - id: BH-BOHAI-RecordDailyOutput
+    name: 录入单井日产量
+    ownerEntity: AGG-BOHAI-999
+    behaviorType: COMMAND
+    triggerType: USER_ACTION
+    preconditions:
+      - 井状态为在产
+    postconditions:
+      - field: dailyProduction.outputVolume
+        setValue: newOutput
+    appliedRules:
+      - RULE-BOHAI-001
+    requiredPermissions:
+      - PERM-BOHAI-RecordDailyOutput
+    syncTriggers:
+      - ruleRef: RULE-BOHAI-002
+        behaviorRef: BH-BOHAI-UpdateWellStatus
+        description: 产量录入成功后同步联动刷新井状态（下游作用于另一独立聚合）
+  - id: BH-BOHAI-UpdateWellStatus
+    name: 刷新井状态
+    ownerEntity: AGG-BOHAI-001
+    behaviorType: COMMAND
+    triggerType: SYSTEM
+    preconditions: []
+    postconditions:
+      - field: well.status
+        setValue: updatedStatus
+    appliedRules: []
+    requiredPermissions: []
+  - id: BH-BOHAI-QueryWellDailyOutput
+    name: 查询单井日产量
+    ownerEntity: AGG-BOHAI-001
+    behaviorType: QUERY
+    triggerType: USER_ACTION
+    preconditions: []
+    postconditions: []
+    appliedRules: []
+    requiredPermissions:
+      - PERM-BOHAI-QueryWellDailyOutput

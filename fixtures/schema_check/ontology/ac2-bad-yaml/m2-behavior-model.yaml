@@ -1,0 +1,5 @@
+model_type: BEHAVIOR
+version: "1.0.0"
+domain: bohai-fixture
+behaviors:
+	- id: BH-BOHAI-Broken

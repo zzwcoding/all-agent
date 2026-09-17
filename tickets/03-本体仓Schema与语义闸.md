@@ -1,6 +1,6 @@
 # 票 03：本体仓 Schema + 语义闸 + 骨架
 
-Status: todo
+Status: done
 Belongs to: specs/schema_check.md；PRD F1/F2
 Touches: ontology/schema/、tools/、fixtures/schema_check/
 

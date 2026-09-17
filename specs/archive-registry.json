@@ -1,0 +1,186 @@
+{
+  "version": 1,
+  "description": "归档登记表（项目内产物归档唯一真源，设计案「两条验收主线」主线 2）。每类产物 → 路径模式（落在 repo-layout.json 登记的目录内）+ 必备字段 + 状态字段与合法值 + 翻转人。消费方：tools/archive_check.py。本表从 sdd-flow2 票 01 版实例化到本仓：ticket 状态值 todo/doing/done；票面 NN-*.md；新增 ontology 产物类（schema 文档/注册表/域 manifest/模型 YAML，票 03）。",
+  "fieldConventions": {
+    "pathPatterns": "仓根相对的 fnmatch glob；命中的文件接受该类产物的必备字段/状态检查。",
+    "requiredFields": "必备字段。md 类为必现的行前缀或关键节名；json 类为顶层键；yaml 类为必现文本。",
+    "status": "状态字段契约：field=行前缀（md）或键（json），values=合法值，flippedBy=翻转人；无状态字段的产物为 null。",
+    "layoutDir": "该产物归属的 repo-layout.json 目录（引用，非机器校验）。"
+  },
+  "artifacts": [
+    {
+      "type": "skill-card",
+      "label": "skill 卡（specs/modules.md 内 `## skill:` 节）",
+      "layoutDir": "specs",
+      "pathPatterns": ["specs/modules.md"],
+      "template": "sdd-flow2 references/skill-module-format.md",
+      "requiredFields": ["职责"],
+      "status": null,
+      "statusNote": "卡状态流转定义在 sdd-flow2 references/skill-module-format.md，卡面无显式状态行，机器不查。本仓 requiredFields 收敛为「职责」：8 张二期占位卡按 ADR 0001 备注在二期立项卡审时才补全 9 字段，归档闸不提前判死。",
+      "producer": "阶段 2",
+      "flippedBy": "L0 总窗口（过审/验收时）"
+    },
+    {
+      "type": "ticket",
+      "label": "开发票（NN-标题.md）",
+      "layoutDir": "tickets",
+      "pathPatterns": ["tickets/*.md"],
+      "template": null,
+      "requiredFields": ["Status"],
+      "status": {
+        "field": "Status",
+        "values": ["todo", "doing", "done"],
+        "flippedBy": "L0 总窗口（核对产物与 CI 输出后关票）"
+      },
+      "producer": "阶段 4 拆票"
+    },
+    {
+      "type": "spec",
+      "label": "功能 spec（断言表/契约）",
+      "layoutDir": "specs",
+      "pathPatterns": ["specs/*.md"],
+      "template": null,
+      "requiredFields": [],
+      "status": null,
+      "producer": "阶段 3",
+      "flippedBy": "不适用（spec 变更走票/ADR 流程）"
+    },
+    {
+      "type": "reference",
+      "label": "L2 共享规约与调研落盘",
+      "layoutDir": "references",
+      "pathPatterns": ["references/*.md"],
+      "template": null,
+      "requiredFields": [],
+      "status": null,
+      "producer": "阶段 2 规约沉淀 / 各票调研",
+      "flippedBy": "不适用（规约变更走卡/ADR 流程）"
+    },
+    {
+      "type": "fixture",
+      "label": "出厂集（fixtures/<名>/）",
+      "layoutDir": "fixtures",
+      "pathPatterns": ["fixtures/*/assertions.json"],
+      "template": null,
+      "requiredFields": ["assertions"],
+      "status": null,
+      "statusNote": "出厂集没有文档状态字段；其红绿由 tools/fixture_run.py 的 CI 结果承载（设计案 §3.4 双门槛）。",
+      "producer": "各票出厂集先行",
+      "flippedBy": "CI（fixture_run 全绿才允许卡状态翻「已完成」）"
+    },
+    {
+      "type": "lesson",
+      "label": "施工日志（NN-标题.md）",
+      "layoutDir": "lessons",
+      "pathPatterns": ["lessons/*.md"],
+      "template": null,
+      "requiredFields": ["做了什么", "取舍", "坑"],
+      "status": null,
+      "producer": "各票收尾（L2 自主档）",
+      "flippedBy": "不适用（日志只增不改；出入记新篇或 ADR）"
+    },
+    {
+      "type": "adr",
+      "label": "架构决策记录",
+      "layoutDir": "docs/adr",
+      "pathPatterns": ["docs/adr/*.md"],
+      "template": null,
+      "requiredFields": ["状态", "日期", "结论"],
+      "status": {
+        "field": "状态",
+        "values": ["提案", "已采纳", "已废弃", "被取代"],
+        "flippedBy": "L0 总窗口（用户拍板后）"
+      },
+      "producer": "任何阶段，决策时"
+    },
+    {
+      "type": "diagram",
+      "label": "图表交付物（diagrams/ 下 html/md/json/png/svg）",
+      "layoutDir": "diagrams",
+      "pathPatterns": ["diagrams/*.html", "diagrams/*.md", "diagrams/*.json", "diagrams/*.png", "diagrams/*.svg"],
+      "template": null,
+      "requiredFields": [],
+      "status": null,
+      "statusNote": "图表无字段/状态检查（png 为二进制）；其验收 = 阶段 2 用户逐节点过审（记 ADR），机器只管归档位置。",
+      "producer": "阶段 2 架构图/流程图（archify/mermaid）",
+      "flippedBy": "不适用（图随过审/体检刷新）"
+    },
+    {
+      "type": "impact-report",
+      "label": "影响分析报告（docs/impact/，票 08 起）",
+      "layoutDir": "docs/impact",
+      "pathPatterns": ["docs/impact/*.md"],
+      "template": null,
+      "requiredFields": [],
+      "status": null,
+      "producer": "impact-analyzer",
+      "flippedBy": "不适用（报告随每次分析生成）"
+    },
+    {
+      "type": "ontology-schema-doc",
+      "label": "本体 schema 文档（人读）",
+      "layoutDir": "ontology/schema",
+      "pathPatterns": ["ontology/schema/*.md"],
+      "template": null,
+      "requiredFields": [],
+      "status": null,
+      "producer": "票 03",
+      "flippedBy": "schema 演进走元模型错路由（F14）→ schema 版本演进票"
+    },
+    {
+      "type": "ontology-registry",
+      "label": "本体机读表（模型注册表/依赖白名单，自登记）",
+      "layoutDir": "ontology/schema",
+      "pathPatterns": ["ontology/schema/*.json"],
+      "template": null,
+      "requiredFields": ["version"],
+      "status": null,
+      "producer": "票 03",
+      "flippedBy": "同 schema 文档；改注册表 = 同步 schema.md 与 model-deps.json"
+    },
+    {
+      "type": "ontology-manifest",
+      "label": "域 manifest（profile 声明）",
+      "layoutDir": "ontology/<域>",
+      "pathPatterns": ["ontology/**/manifest.json"],
+      "template": null,
+      "requiredFields": ["domain", "profile"],
+      "status": null,
+      "producer": "接入新域时（票 05 起）",
+      "flippedBy": "不适用（域声明随本体 MR 维护）"
+    },
+    {
+      "type": "ontology-model",
+      "label": "本体模型文件（七模型 YAML）",
+      "layoutDir": "ontology/<域>",
+      "pathPatterns": ["ontology/**/*.yaml", "ontology/**/*.yml"],
+      "template": "ontology/schema/schema.md",
+      "requiredFields": ["model_type", "version", "domain"],
+      "status": null,
+      "producer": "本体工序 skill 产草案（票 05 起），MR 过语义 CI 后进仓",
+      "flippedBy": "不适用（红绿由 tools/schema_check.py 承载）"
+    },
+    {
+      "type": "layout-table",
+      "label": "机读布局表（自登记）",
+      "layoutDir": "references",
+      "pathPatterns": ["references/repo-layout.json"],
+      "template": null,
+      "requiredFields": ["version", "profiles"],
+      "status": null,
+      "producer": "票 03（从 sdd-flow2 实例化）",
+      "flippedBy": "改布局 = 改本表 + 同步 specs/archive-registry.json 产物类"
+    },
+    {
+      "type": "archive-registry",
+      "label": "归档登记表（自登记）",
+      "layoutDir": "specs",
+      "pathPatterns": ["specs/archive-registry.json"],
+      "template": null,
+      "requiredFields": ["version", "artifacts"],
+      "status": null,
+      "producer": "票 03（从 sdd-flow2 实例化）",
+      "flippedBy": "新增产物类别 = 先登记本表，再落文件"
+    }
+  ]
+}

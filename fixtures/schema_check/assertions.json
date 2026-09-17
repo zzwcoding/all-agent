@@ -1,0 +1,48 @@
+{
+  "skill": "schema_check（语义 CI L1–L4 闸，票 03）",
+  "description": "最小域出厂集：两对象（井 AGG-BOHAI-001 + 单井日产量记录 AGG-BOHAI-002）七模型合法本体 + 各 AC 非法变体。断言 specs/schema_check.md AC1–7；schema 机读表经 {fixture_dir}/ontology/schema 符号链接取自仓内 ontology/schema（单一真源，不复制）。",
+  "assertions": [
+    {
+      "ac": "AC1",
+      "type": "cmd-succeeds",
+      "cmd": "python3 tools/schema_check.py {fixture_dir}/ontology/valid-domain",
+      "outputContains": ["语义闸: 全过"]
+    },
+    {
+      "ac": "AC2",
+      "type": "cmd-fails",
+      "cmd": "python3 tools/schema_check.py {fixture_dir}/ontology/ac2-bad-yaml",
+      "outputContains": ["yaml-syntax", "m2-behavior-model.yaml"]
+    },
+    {
+      "ac": "AC3",
+      "type": "cmd-fails",
+      "cmd": "python3 tools/schema_check.py {fixture_dir}/ontology/ac3-missing-common-field",
+      "outputContains": ["missing-common-field", "`version`"]
+    },
+    {
+      "ac": "AC4",
+      "type": "cmd-fails",
+      "cmd": "python3 tools/schema_check.py {fixture_dir}/ontology/ac4-dangling-ref",
+      "outputContains": ["dangling-ref", "AGG-BOHAI-999"]
+    },
+    {
+      "ac": "AC5",
+      "type": "cmd-fails",
+      "cmd": "python3 tools/schema_check.py {fixture_dir}/ontology/ac5-dep-whitelist",
+      "outputContains": ["dep-whitelist", "M2.queryReportRef", "M7"]
+    },
+    {
+      "ac": "AC6",
+      "type": "cmd-fails",
+      "cmd": "python3 tools/schema_check.py {fixture_dir}/ontology/ac6-profile-not-enabled",
+      "outputContains": ["profile-disabled", "未启用模型 MU"]
+    },
+    {
+      "ac": "AC7",
+      "type": "cmd-fails",
+      "cmd": "python3 tools/schema_check.py {fixture_dir}/ontology/ac7-field-redefinition",
+      "outputContains": ["field-redefinition", "producedEvents"]
+    }
+  ]
+}

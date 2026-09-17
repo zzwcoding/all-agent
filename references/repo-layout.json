@@ -1,0 +1,91 @@
+{
+  "version": 1,
+  "description": "机读布局表（唯一真源）。目录 → 用途 → 允许的文件模式 → 产生者。人类可读说明见 references/repo-layout.md（本文是机器消费真源，两文件以本文为准）。消费方：tools/archive_check.py（归档闸）。本表从 sdd-flow2 票 01 版实例化：profile=governed-project，按本仓实际补 RESOURCES.md 根条目。",
+  "patternConventions": {
+    "patterns": "相对于该目录的 fnmatch glob；* 可跨路径分隔符。文件须匹配至少一条 pattern。",
+    "nameRegex": "可选。对文件basename（或目录相对路径）施加的正则，命名纪律（如票号前缀）落在这里。",
+    "producer": "该目录产物的产生者（阶段/票/skill），文档价值。",
+    "rootEntry": "path 为空字符串的条目描述仓根允许的文件。"
+  },
+  "profiles": {
+    "governed-project": {
+      "description": "被治理项目仓（All-agent）：sdd-flow2 阶段 0 按本 profile 生成骨架，票 03 补 ontology 细则。",
+      "dirs": [
+        {
+          "path": "",
+          "purpose": "仓根：术语表、信源清单与仓级规约",
+          "patterns": ["CONTEXT.md", "AGENTS.md", "RESOURCES.md", "README.md", "LICENSE", ".gitignore", ".archive-allow", ".skill-deps-allow"],
+          "producer": "阶段 0/1"
+        },
+        {
+          "path": "docs",
+          "purpose": "PRD、设计案、ADR、影响分析报告",
+          "patterns": ["*.md", "adr/*.md", "impact/*.md"],
+          "producer": "阶段 1（PRD）/ 决策时（ADR）/ impact-analyzer（票 08 起）"
+        },
+        {
+          "path": "specs",
+          "purpose": "skill 卡集合与功能 spec + 归档登记表",
+          "patterns": ["*.md", "*.json"],
+          "producer": "阶段 2/3（specs 与登记表）/ 票 01（登记表）"
+        },
+        {
+          "path": "tickets",
+          "purpose": "开发票，NN-标题.md",
+          "patterns": ["*.md"],
+          "nameRegex": "^\\d{2}-.+\\.md$",
+          "producer": "阶段 4 拆票"
+        },
+        {
+          "path": "tools",
+          "purpose": "确定性脚本（语义闸、三闸、出厂集 runner）及 unittest 单测",
+          "patterns": ["*.py", "*.sh"],
+          "producer": "各票实现拍（脚本走 TDD）"
+        },
+        {
+          "path": "fixtures",
+          "purpose": "出厂集：fixtures/<名>/ 固定输入 + assertions.json 断言集",
+          "patterns": ["*/**"],
+          "producer": "各票出厂集先行（设计案 §3.4）"
+        },
+        {
+          "path": "skills",
+          "purpose": "L0/L1 skill 本体：skills/<名>/SKILL.md + 私件 references/（票 05 起落盘）",
+          "patterns": ["*/**"],
+          "producer": "阶段 2 骨架（卡过审即建）/ 各 skill 票"
+        },
+        {
+          "path": "policies",
+          "purpose": "L4 策略数据（门禁规则、豁免清单等机读策略）",
+          "patterns": ["*.md", "*.json", "*.yaml", "*.yml"],
+          "producer": "阶段 2/6"
+        },
+        {
+          "path": "diagrams",
+          "purpose": "架构图与流程图产物（archify/mermaid 等）",
+          "patterns": ["*.html", "*.md", "*.json", "*.png", "*.svg"],
+          "producer": "阶段 2 架构图 / 体检刷新"
+        },
+        {
+          "path": "references",
+          "purpose": "L2 共享规约与调研落盘 + 机读布局表",
+          "patterns": ["*.md", "*.json", "*.py"],
+          "producer": "阶段 2 规约沉淀 / 各票调研"
+        },
+        {
+          "path": "ontology",
+          "purpose": "L4 本体仓数据：schema/（schema 文档+模型注册表+依赖白名单）、<域>/manifest.json + 模型 YAML",
+          "patterns": ["**"],
+          "producer": "票 03（schema）/ 本体工序 skill（票 05 起）"
+        },
+        {
+          "path": "lessons",
+          "purpose": "施工日志：每票一篇，NN-标题.md",
+          "patterns": ["*.md"],
+          "nameRegex": "^\\d{2}-.+\\.md$",
+          "producer": "各票收尾（L2 自主档）"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,4 @@
+# 归档闸受管全集 = git ls-files；构建/系统噪音不入库
+.DS_Store
+__pycache__/
+*.pyc

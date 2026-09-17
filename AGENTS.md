@@ -24,8 +24,11 @@
 | `docs/design-sdd-flow2.md` | sdd-flow2 设计案（两条验收主线） |
 | `references/` | 调研落盘：omf-spec-digest（OMF 规范精读）/ existing-research-inventory（既有调研盘点）/ tech-selection（选型） |
 | `diagrams/` | 三张图：all-agent（大总架构）/ skill-structure（skill 组织）/ sdd-flow2（建造流内部） |
-| `specs/` `tickets/` `tools/` `policies/` | 骨架已立，随阶段推进填充 |
-| `ontology/` | 本体仓（规划，首个业务域=渤海油田产量域） |
+| `specs/` `tickets/` `policies/` | 骨架已立，随阶段推进填充 |
+| `ontology/` | 本体仓：schema/（七模型 schema+模型注册表+依赖白名单，票 03）；首个业务域=渤海油田产量域（bohai/manifest.json 已声明 profile，模型 YAML 票 05 起） |
+| `tools/` | 已落：schema_check（语义 CI L1–L4）+ 三闸（skill_deps/fixture_run/archive_check）+ ci.sh；graph_index 票 04 |
+| `fixtures/` | 出厂集：schema_check/（AC1–7 最小域+非法变体）；其余随票补 |
+| `lessons/` | 施工日志：每票一篇（03 起） |
 
 ## 使用方式（建成后）
 

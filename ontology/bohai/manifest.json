@@ -1,0 +1,7 @@
+{
+  "domain": "bohai",
+  "label": "渤海油田产量域",
+  "profile": "v9-full",
+  "schemaVersion": "1.0.0",
+  "description": "首个接入域（PRD 决策 3）：复用 R5（teach-petro-agent 设定书 v3）的 8 表 DDL/指标/术语作建模素材；模型文件随票 05（onto-modeler）起落盘，本 manifest 先声明 profile。"
+}

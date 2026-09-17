@@ -1,0 +1,27 @@
+model_type: ACTOR
+version: "1.0.0"
+domain: bohai-fixture
+actors:
+  - actorId: ACTOR-BOHAI-001
+    name: 采油工
+    actorType: HUMAN
+    roles:
+      - ROLE-BOHAI-001
+    attributes:
+      department: 采油作业区
+roles:
+  - roleId: ROLE-BOHAI-001
+    name: 单井产量录入员
+    inheritsFrom: []
+    permissions:
+      - PERM-BOHAI-RecordDailyOutput
+      - PERM-BOHAI-QueryWellDailyOutput
+permissions:
+  - permissionId: PERM-BOHAI-RecordDailyOutput
+    targetType: BEHAVIOR
+    targetRef: BH-BOHAI-RecordDailyOutput
+    dataScope: ALL
+  - permissionId: PERM-BOHAI-QueryWellDailyOutput
+    targetType: BEHAVIOR
+    targetRef: BH-BOHAI-QueryWellDailyOutput
+    dataScope: ALL
