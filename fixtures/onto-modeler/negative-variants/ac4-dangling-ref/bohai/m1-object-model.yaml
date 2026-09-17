@@ -1,0 +1,14 @@
+model_type: OBJECT
+version: "1.0.0"
+domain: bohai
+aggregates:
+  - id: AGG-BOHAI-001
+    name: 井
+    alias: Well
+    aggregateType: AGGREGATE_ROOT
+    attributes:
+      - name: wellCode
+        label: 井号
+        type: String
+        required: true
+        unique: true

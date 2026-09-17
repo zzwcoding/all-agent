@@ -1,0 +1,45 @@
+{
+  "skill": "onto-modeler（本体建模工序，票 05）",
+  "description": "出厂集：固定 PRD 片段（input/prd-fragment.md，渤海域口径）→ 断言 skill 工序产物的四类确定性结果（specs/onto-modeler.md AC1–4）。expected-output/ 是按 SKILL.md 工序对同一输入手工产出的参照产物（标准产出样本：profile 建议 AC1、骨架清单 AC2、草案过语义闸 AC3、引用纪律 AC4）。schema 机读表经 expected-output/schema 与 negative-variants/ac4-dangling-ref/schema 符号链接取自仓内 ontology/schema（单一真源不复制，同 fixtures/schema_check 手法）。AC4 负变体：把参照产物中的一处跨模型引用改成格式合法但未定义的 ID（AGG-BOHAI-999），语义闸必须报 dangling-ref——『引用必须落到已定义 ID，不指空』的机械面；裸文本指代（ref 字段缺失或填无前缀散文）闸无法机械识别，由工序纪律（AI 只做格式转换+待 Owner 确认）与正则断言（ref 字段值皆带前缀 ID）共同约束。",
+  "assertions": [
+    {
+      "ac": "AC1",
+      "type": "file-contains",
+      "path": "expected-output/profile-recommendation.md",
+      "contains": ["v9-full", "M1", "M2", "M3", "M5", "M6", "M7", "MU", "理由", "待 Owner 确认"]
+    },
+    {
+      "ac": "AC2",
+      "type": "file-contains",
+      "path": "expected-output/scaffold-manifest.md",
+      "contains": ["manifest.json", "m1-object-model.yaml", "m2-behavior-model.yaml", "m3-rule-model.yaml", "m5-actor-model.yaml", "m6-flow-model.yaml", "m7-report-model.yaml", "mu-ui-model.yaml"]
+    },
+    { "ac": "AC2", "type": "file-exists", "path": "expected-output/bohai/manifest.json" },
+    { "ac": "AC2", "type": "file-exists", "path": "expected-output/bohai/m1-object-model.yaml" },
+    { "ac": "AC2", "type": "file-exists", "path": "expected-output/bohai/m2-behavior-model.yaml" },
+    { "ac": "AC2", "type": "file-exists", "path": "expected-output/bohai/m3-rule-model.yaml" },
+    { "ac": "AC2", "type": "file-exists", "path": "expected-output/bohai/m5-actor-model.yaml" },
+    { "ac": "AC2", "type": "file-exists", "path": "expected-output/bohai/m6-flow-model.yaml" },
+    { "ac": "AC2", "type": "file-exists", "path": "expected-output/bohai/m7-report-model.yaml" },
+    { "ac": "AC2", "type": "file-exists", "path": "expected-output/bohai/mu-ui-model.yaml" },
+    {
+      "ac": "AC3",
+      "type": "cmd-succeeds",
+      "cmd": "python3 tools/schema_check.py {fixture_dir}/expected-output/bohai",
+      "outputContains": ["语义闸: 全过"]
+    },
+    { "ac": "AC4", "type": "file-matches-regex", "path": "expected-output/bohai/m1-object-model.yaml", "pattern": "(targetAggregate|dictionaryId): (AGG|DICT)-[A-Z]+-[0-9]+" },
+    { "ac": "AC4", "type": "file-matches-regex", "path": "expected-output/bohai/m2-behavior-model.yaml", "pattern": "ownerEntity: AGG-[A-Z]+-[0-9]+" },
+    { "ac": "AC4", "type": "file-matches-regex", "path": "expected-output/bohai/m2-behavior-model.yaml", "pattern": "^[ \t]+- (RULE|PERM)-[A-Z]+-[0-9A-Za-z]+" },
+    { "ac": "AC4", "type": "file-matches-regex", "path": "expected-output/bohai/m5-actor-model.yaml", "pattern": "targetRef: BH-[A-Z]+" },
+    { "ac": "AC4", "type": "file-matches-regex", "path": "expected-output/bohai/m6-flow-model.yaml", "pattern": "(behaviorRef: BH-[A-Z]+|roleRef: ROLE-[A-Z]+)" },
+    { "ac": "AC4", "type": "file-matches-regex", "path": "expected-output/bohai/m7-report-model.yaml", "pattern": "(behaviorRef: BH-[A-Z]+|objectRef: AGG-[A-Z]+)" },
+    { "ac": "AC4", "type": "file-matches-regex", "path": "expected-output/bohai/mu-ui-model.yaml", "pattern": "(behaviorRef: BH-[A-Z]+|dataSource: QR-[A-Z]+|screenRef: SCR-[A-Z]+)" },
+    {
+      "ac": "AC4（负变体）",
+      "type": "cmd-fails",
+      "cmd": "python3 tools/schema_check.py {fixture_dir}/negative-variants/ac4-dangling-ref/bohai",
+      "outputContains": ["dangling-ref", "AGG-BOHAI-999"]
+    }
+  ]
+}

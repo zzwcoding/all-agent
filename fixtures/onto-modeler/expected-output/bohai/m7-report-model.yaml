@@ -1,0 +1,37 @@
+model_type: REPORT
+version: "1.0.0"
+domain: bohai
+query_reports:
+  - id: QR-BOHAI-001
+    name: 单井日产量查询
+    alias: wellDailyOutputQuery
+    description: 按井号查单井当日记录（明细查询）
+    objectType: DETAIL_QUERY
+    behaviorRef: BH-BOHAI-QueryWellDailyOutput
+    sourceObjects:
+      - objectRef: AGG-BOHAI-001
+        alias: w
+        primary: true
+      - objectRef: AGG-BOHAI-002
+        alias: r
+        primary: false
+    parameters:
+      - name: wellCode
+        label: 井号
+        dataType: String
+        required: true
+        allowedOperators: [EQ, LIKE]
+    conditions:
+      - conditionId: COND-BOHAI-001
+        leftExpression: w.wellCode
+        operator: EQ
+        parameterRef: wellCode
+    resultColumns:
+      - name: wellCode
+        label: 井号
+        dataType: String
+        sourceExpression: w.wellCode
+      - name: outputVolume
+        label: 产液量
+        dataType: Decimal
+        sourceExpression: r.outputVolume

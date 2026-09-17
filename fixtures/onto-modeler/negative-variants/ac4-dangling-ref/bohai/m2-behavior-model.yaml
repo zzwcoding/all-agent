@@ -1,0 +1,15 @@
+model_type: BEHAVIOR
+version: "1.0.0"
+domain: bohai
+behaviors:
+  - id: BH-BOHAI-RecordDailyOutput
+    name: 录入单井日产量
+    ownerEntity: AGG-BOHAI-999
+    behaviorType: COMMAND
+    triggerType: USER_ACTION
+    preconditions: []
+    postconditions:
+      - field: dailyProduction.outputVolume
+        setValue: newOutput
+    appliedRules: []
+    requiredPermissions: []

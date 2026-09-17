@@ -1,0 +1,2 @@
+# skill 边界闸豁免清单（每行 `<路径模式>  # 理由`，理由必填；每轮体检复核可收回性）
+fixtures/onto-modeler/**  # onto-modeler 的出厂集 Seam：已在卡「Seam 与出厂集」字段声明，闸只解析 reads/writes/data 行，故在此显式豁免（票 05）
