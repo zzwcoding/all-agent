@@ -1,6 +1,6 @@
 # 票 18：proposal-pool skill（业务语义循环自动化核心票）
 
-Status: todo
+Status: done
 Belongs to: 第二批拆票方案（2026-09-19 用户批准）；PRD F13；CONTEXT.md 业务语义循环；收官报告 §7 建议二
 Touches: skills/proposal-pool/、tools/proposal_check.py、fixtures/proposal-pool/、specs/modules.md、.skill-deps-allow、docs/proposals/、lessons/18
 
@@ -19,9 +19,9 @@ Touches: skills/proposal-pool/、tools/proposal_check.py、fixtures/proposal-poo
 
 ## 验收（注源）
 
-- [ ] AC1–6 全过（源：本票 AC 表）
-- [ ] 卡触发面与 frontmatter 一致、边界闸无违规（源：字段纪律 1、边界铁律 4）
-- [ ] 安装位双落零漂移且注册表含 proposal-pool（源：票 15）
+- [x] AC1–6 全过（源：本票 AC 表）
+- [x] 卡触发面与 frontmatter 一致、边界闸无违规（源：字段纪律 1、边界铁律 4）
+- [x] 安装位双落零漂移且注册表含 proposal-pool（源：票 15）
 
 ## 交接包（L2 自主档）
 

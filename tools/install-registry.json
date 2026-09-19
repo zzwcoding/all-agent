@@ -5,6 +5,7 @@
     "db-reverse",
     "impact-analyzer",
     "onto-modeler",
+    "proposal-pool",
     "semantic-service"
   ]
 }

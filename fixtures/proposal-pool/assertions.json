@@ -1,0 +1,88 @@
+{
+  "skill": "proposal-pool（提案池，票 18）",
+  "description": "出厂集：正例 cases/（两份 open 提案：add RULE-BOHAI-020 渤海新规则 + modify AGG-BOHAI-002 真实元素，附证据附件与非提案 README）→ 断言 proposal_check exit 0 且只解析 PROP-*.md（AC1）；负变体 negative-variants/ 五类各一（missing-field / target-not-exist / target-already-exists / same-target-conflict / evidence-missing）另加 bad-enum（AC4 后半枚举面），各自独立目录、cmd-fails 且 outputContains 钉死对应违规码（proposal-schema / proposal-target / proposal-conflict / proposal-evidence）与关键细节（缺失字段名、非法枚举值、靶 ID、矛盾双方 change、证据文件名），红因纯净不连带。target 存在性判定打 ontology/bohai 真域（fixture_run cmd cwd=仓根，沿票 16/17 先例；RULE-BOHAI-020 未占用、AGG-BOHAI-001/002 在域，证据文件均随 fixture 落盘走提案目录相对解析）。AC 真源=tickets/18-proposal-pool-skill.md AC 表。",
+  "assertions": [
+    {
+      "ac": "输入（正例两份在档）",
+      "type": "file-exists",
+      "path": "cases/PROP-BOHAI-001.md"
+    },
+    {
+      "ac": "输入（正例两份在档）",
+      "type": "file-exists",
+      "path": "cases/PROP-BOHAI-002.md"
+    },
+    {
+      "ac": "AC1（正例 add+modify 全过：exit 0、结论全过、解析 2 份）",
+      "type": "cmd-succeeds",
+      "cmd": "python3 tools/proposal_check.py {fixture_dir}/cases",
+      "outputContains": [
+        "结论: 全过",
+        "解析提案 2 份",
+        "跳过非提案 md 文件"
+      ]
+    },
+    {
+      "ac": "AC2（modify 指向不存在元素 AGG-BOHAI-999 → proposal-target 红）",
+      "type": "cmd-fails",
+      "cmd": "python3 tools/proposal_check.py {fixture_dir}/negative-variants/target-not-exist",
+      "outputContains": [
+        "proposal-target",
+        "AGG-BOHAI-999",
+        "不存在"
+      ]
+    },
+    {
+      "ac": "AC3（add 指向已存在元素 AGG-BOHAI-002 → proposal-target 红）",
+      "type": "cmd-fails",
+      "cmd": "python3 tools/proposal_check.py {fixture_dir}/negative-variants/target-already-exists",
+      "outputContains": [
+        "proposal-target",
+        "AGG-BOHAI-002",
+        "已存在"
+      ]
+    },
+    {
+      "ac": "AC4 前半（必备字段缺失 status → proposal-schema 红）",
+      "type": "cmd-fails",
+      "cmd": "python3 tools/proposal_check.py {fixture_dir}/negative-variants/missing-field",
+      "outputContains": [
+        "proposal-schema",
+        "缺必备字段",
+        "status"
+      ]
+    },
+    {
+      "ac": "AC4 后半（枚举值非法 status=published → proposal-schema 红）",
+      "type": "cmd-fails",
+      "cmd": "python3 tools/proposal_check.py {fixture_dir}/negative-variants/bad-enum",
+      "outputContains": [
+        "proposal-schema",
+        "published",
+        "非法"
+      ]
+    },
+    {
+      "ac": "AC5（同靶 AGG-BOHAI-001 两个 open 提案 change 矛盾 modify vs deprecate → proposal-conflict 红）",
+      "type": "cmd-fails",
+      "cmd": "python3 tools/proposal_check.py {fixture_dir}/negative-variants/same-target-conflict",
+      "outputContains": [
+        "proposal-conflict",
+        "AGG-BOHAI-001",
+        "modify",
+        "deprecate",
+        "矛盾"
+      ]
+    },
+    {
+      "ac": "AC6（证据文件 ghost-note.md 不存在 → proposal-evidence 红）",
+      "type": "cmd-fails",
+      "cmd": "python3 tools/proposal_check.py {fixture_dir}/negative-variants/evidence-missing",
+      "outputContains": [
+        "proposal-evidence",
+        "ghost-note.md",
+        "不存在"
+      ]
+    }
+  ]
+}

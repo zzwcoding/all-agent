@@ -88,7 +88,17 @@
 
 ## skill: proposal-pool
 
-- 职责: 提案池处理——三源信号归一、冲突检测、起草 MR（自动化止于提案）；一期 MR 由人直接在 Git 完成
+- 职责: 提案池处理——三源信号（监督/自检/交互）归一成标准提案文件、确定性冲突预检、状态流转落痕（自动化止于提案）；真提案进仓的 MR 由人直接在 Git 完成
+- 层: L1 工序（业务语义循环闸口）
+- 目录: 仓内 skills/proposal-pool/（正本，边界闸+归档闸治理）+ ~/.agents/skills/proposal-pool/（安装位，Kimi Code 路由）；两份内容必须一致
+- 触发面: "把这条信号起草成提案/过一遍提案池/查提案池状态"
+- reads: `docs/proposals/**`（提案池现状与池内冲突面）、`ontology/**`（真域，target 存在性与 change 定型的判定依据）、`references/proposal-format.md`（提案文件格式规范，仓级共享件）+ 用户提交的信号素材
+- writes: `docs/proposals/PROP-<域>-<NNN>.md` 提案 + 既有提案的裁决落痕（只动 status 与正文裁决注记）
+- 依赖:
+  - script: `tools/proposal_check.py`
+  - data: `ontology/**`
+- Seam 与出厂集: `fixtures/proposal-pool/`——正例提案两份（add 渤海新规则 + modify 真实元素）+ 负变体（字段缺失/modify 不存在/add 已存在/同靶冲突/证据路径不存在，另加枚举非法）→ 断言 proposal_check 四类检查（AC1–6，真源=票 18 AC 表）
+- 边界: 自动化止于提案——不起 git 分支、不直改 ontology/** 已定稿本体；open→accepted/rejected 只由 Owner 裁决，skill 只代执行翻转并留痕
 
 ## skill: meta-doctor
 
@@ -118,5 +128,6 @@
 | `tools/schema_check.py` | 语义 CI 的 L1–L4 级（schema 合法/引用一致/依赖白名单/profile 合规+反向缺文件/逐元素结构性必填），断言表 specs/schema_check.md AC1–7 + GLS/CONS/REQ 套件 | 已建（票 03；票 10/11/13 演进） |
 | `tools/graph_index.py` | YAML → 内存图（多跳/闭包/影响链） | 已建（票 04） |
 | `tools/check_citations.py` | ID 引用清单逐条比对检具：答案正文↔「本回答引用的元素 ID」清单节双向差异（正文有清单无/清单有正文无），退出码 0 一致/1 不一致/2 用法；通用大写前缀 token 不绑域；断言面 fixtures/semantic-service CIT-01–05（票 13，审查一 P2） | 已建（票 13） |
+| `tools/proposal_check.py` | 提案池确定性检查：①proposal-schema 必备字段与枚举 ②proposal-target 靶存在性（modify/deprecate 在域、add 不在域，元素口径照图索引 id/*Id 定义键+已登记前缀，独立实现零耦合）③proposal-conflict 同靶 open 提案 change 矛盾 ④proposal-evidence 证据在档（仓根/提案目录相对+#锚点容许）；只解析 PROP-*.md；断言面 fixtures/proposal-pool AC1–6（票 18） | 已建（票 18） |
 | `tools/skill_deps_check.py` `tools/fixture_run.py` `tools/archive_check.py` 三闸 + `tools/ci.sh` | 从 sdd-flow2 实例化拷贝（含单测；fixture_run 新增 cmd-* 断言与占位 pending） | 已建（票 03 随迁） |
 | `tools/install_skills.py` | 安装位同步与落闸：仓内 skills/ 正本 → ~/.agents/skills/ 安装位的 sync（先清后拷，只清本 skill 目录）、--check（漂移三型 missing/modified/extra + 孤儿检测）、--prune（孤儿清除，默认 dry-run，--yes 才删）、symlink 拒跑（退出 2）；注册表 `tools/install-registry.json` 由 sync 原子维护（孤儿三要素=登记过+安装位在+正本已删）；`tools/hooks/pre-commit`（core.hooksPath 启用）提交前跑 --check 拦漂移；断言表 tickets/12 AC1–4 + tickets/15 AC1–6；不进 ci.sh 四闸（安装位是仓外环境状态） | 已建（票 12；票 15 增强） |
