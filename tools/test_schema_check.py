@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """schema_check.py 的单测（stdlib unittest + PyYAML，TDD 先行）。
 
-合成两模型（M1/M2）迷你 schema 走端到端，AC1–7 各一条（AC 对应 specs/schema_check.md 断言表）。
+合成两模型（M1/M2）迷你 schema 走端到端，AC1–7 各一条（AC 对应 specs/schema_check.md 断言表）；
+票 10 增 GLS 套件（GlossaryModel）；票 11 增 L2 一致性对套件（ConsistencyPairs，
+CONS-AC1–3 对应 tickets/11-一致性对核验.md AC 表，基座扩到 M5/M6/M7）。
 """
 
 import io
@@ -316,6 +318,274 @@ class GlossaryModel(Base):
         self.add("m1-object-model.yaml", M1)
         self.add("m2-behavior-model.yaml", M2)
         self.assertNotIn("filename-mismatch", self.kinds())
+
+
+# ---------- 票 11：L2 一致性对（M7↔M2 / M2↔M5 / M6 roleRef）----------
+
+CONS_REGISTRY = {
+    "version": 1,
+    "models": {
+        "M1": dict(REGISTRY["models"]["M1"], profiles=["full"]),
+        "M2": dict(REGISTRY["models"]["M2"], dependsOn=["M1", "M5"]),
+        "M5": {
+            "name": "主体模型", "yamlFile": "m5-actor-model.yaml",
+            "modelType": "ACTOR", "camp": "business-core",
+            "consumers": ["runtime", "build"], "profiles": ["full"],
+            "dependsOn": ["M1", "M2"], "lockedFields": {},
+        },
+        "M6": {
+            "name": "流程模型", "yamlFile": "m6-flow-model.yaml",
+            "modelType": "FLOW", "camp": "business-core",
+            "consumers": ["build"], "profiles": ["full"],
+            "dependsOn": ["M1", "M2", "M5"], "lockedFields": {},
+        },
+        "M7": {
+            "name": "查询统计与报表模型", "yamlFile": "m7-report-model.yaml",
+            "modelType": "REPORT", "camp": "business-core",
+            "consumers": ["runtime", "build"], "profiles": ["full"],
+            "dependsOn": ["M1", "M2"], "lockedFields": {},
+        },
+    },
+}
+
+CONS_DEPS = {
+    "version": 1,
+    "idPrefixes": {"AGG-": "M1", "BH-": "M2", "ROLE-": "M5", "PERM-": "M5",
+                   "FLOW-": "M6", "QR-": "M7"},
+    "refKeys": ["ownerEntity", "requiredPermissions", "roles", "permissions",
+                "targetRef", "roleRefs", "businessObjectRefs"],
+    "edges": [
+        {"from": "M2", "field": "ownerEntity", "to": ["M1"]},
+        {"from": "M2", "field": "requiredPermissions", "to": ["M5"]},
+        {"from": "M5", "field": "roles", "to": ["M5"]},
+        {"from": "M5", "field": "permissions", "to": ["M5"]},
+        {"from": "M5", "field": "targetRef", "to": ["M1", "M2"]},
+        {"from": "M6", "field": "businessObjectRefs", "to": ["M1"]},
+        {"from": "M6", "field": "roleRefs", "to": ["M5"]},
+        {"from": "M6", "field": "roleRef", "to": ["M5"]},
+        {"from": "M7", "field": "behaviorRef", "to": ["M2"]},
+    ],
+}
+
+CONS_M1 = """model_type: OBJECT
+version: "1.0.0"
+domain: demo
+aggregates:
+  - id: AGG-DEMO-001
+    name: 井
+    alias: Well
+    aggregateType: AGGREGATE_ROOT
+    attributes: []
+"""
+
+CONS_M2 = """model_type: BEHAVIOR
+version: "1.0.0"
+domain: demo
+behaviors:
+  - id: BH-DEMO-Record
+    name: 录入
+    ownerEntity: AGG-DEMO-001
+    behaviorType: COMMAND
+    triggerType: USER_ACTION
+    preconditions: []
+    postconditions: []
+    appliedRules: []
+    requiredPermissions:
+      - PERM-DEMO-Record
+  - id: BH-DEMO-Query
+    name: 查询
+    ownerEntity: AGG-DEMO-001
+    behaviorType: QUERY
+    triggerType: USER_ACTION
+    preconditions: []
+    postconditions: []
+    appliedRules: []
+    requiredPermissions: []
+"""
+
+CONS_M5 = """model_type: ACTOR
+version: "1.0.0"
+domain: demo
+roles:
+  - roleId: ROLE-DEMO-001
+    name: 录入员
+    inheritsFrom: []
+    permissions:
+      - PERM-DEMO-Record
+  - roleId: ROLE-DEMO-002
+    name: 场外角色
+    inheritsFrom: []
+    permissions: []
+permissions:
+  - permissionId: PERM-DEMO-Record
+    targetType: BEHAVIOR
+    targetRef: BH-DEMO-Record
+    dataScope: ALL
+"""
+
+CONS_M6 = """model_type: FLOW
+version: "1.0.0"
+domain: demo
+flows:
+  - id: FLOW-DEMO-001
+    name: 录入流程
+    flowType: COLLABORATION
+    businessObjectRefs:
+      - AGG-DEMO-001
+    roleRefs:
+      - ROLE-DEMO-001
+    trigger:
+      triggerType: MANUAL
+    startActivity: ACT-DEMO-001
+    endActivities:
+      - ACT-DEMO-002
+    activities:
+      - activityId: ACT-DEMO-001
+        name: 录入
+        activityType: USER_TASK
+        roleRef: ROLE-DEMO-001
+        nextActivities:
+          - ACT-DEMO-002
+      - activityId: ACT-DEMO-002
+        name: 结束
+        activityType: END
+"""
+
+CONS_M7 = """model_type: REPORT
+version: "1.0.0"
+domain: demo
+query_reports:
+  - id: QR-DEMO-001
+    name: 查询报表
+    alias: demoQuery
+    objectType: DETAIL_QUERY
+    behaviorRef: BH-DEMO-Query
+"""
+
+
+class ConsBase(Base):
+    """票 11 基座：注册表/依赖表扩到 M5/M6/M7（一致性对所需的模型面）。"""
+
+    def setUp(self):
+        super().setUp()
+        write(self.root / "schema" / "model-registry.json", json.dumps(CONS_REGISTRY))
+        write(self.root / "schema" / "model-deps.json", json.dumps(CONS_DEPS))
+
+    def add_cons_domain(self):
+        self.add("m1-object-model.yaml", CONS_M1)
+        self.add("m2-behavior-model.yaml", CONS_M2)
+        self.add("m5-actor-model.yaml", CONS_M5)
+        self.add("m6-flow-model.yaml", CONS_M6)
+        self.add("m7-report-model.yaml", CONS_M7)
+
+    def cons_kinds(self, report=None):
+        r = report or self.run_check()
+        return [v["kind"] for v in r["violations"] if v["kind"].startswith("consistency-")]
+
+
+class ConsistencyPairs(ConsBase):
+    """票 11 AC 表（CONS-AC1–3）：三对一致性检查的正例与负变体。"""
+
+    def test_consistent_domain_passes(self):
+        # 正例：三对全闭合（QR→QUERY 一对一、PERM 回指、活动角色∈流程角色）→ 无 consistency- 行
+        self.add_cons_domain()
+        report = self.run_check()
+        self.assertEqual(report["status"], "pass", report["violations"])
+        self.assertEqual(self.cons_kinds(report), [])
+
+    def test_m7_bound_to_non_query_behavior_is_redirection(self):
+        # CONS-AC1 甲：behaviorRef 指向 COMMAND 行为 → consistency-redirection（L2）
+        self.add_cons_domain()
+        self.add("m7-report-model.yaml",
+                 CONS_M7.replace("BH-DEMO-Query", "BH-DEMO-Record"))
+        report = self.run_check()
+        self.assertIn("consistency-redirection", self.cons_kinds(report))
+        v = next(v for v in report["violations"]
+                 if v["kind"] == "consistency-redirection")
+        self.assertEqual(v["level"], "L2")
+        for needle in ("QR-DEMO-001", "BH-DEMO-Record", "COMMAND", "behaviorRef"):
+            self.assertIn(needle, v["message"])
+
+    def test_shared_query_behavior_is_not_one_to_one(self):
+        # CONS-AC1 乙：同一 QUERY 行为被两个 QR 绑定 → consistency-not-one-to-one（L2），
+        # 报文含先绑者与再绑者双方 ID
+        self.add_cons_domain()
+        qr2 = """  - id: QR-DEMO-002
+    name: 查询报表二
+    alias: demoQueryTwo
+    objectType: DETAIL_QUERY
+    behaviorRef: BH-DEMO-Query
+"""
+        self.add("m7-report-model.yaml", CONS_M7 + qr2)
+        report = self.run_check()
+        self.assertIn("consistency-not-one-to-one", self.cons_kinds(report))
+        v = next(v for v in report["violations"]
+                 if v["kind"] == "consistency-not-one-to-one")
+        self.assertEqual(v["level"], "L2")
+        for needle in ("QR-DEMO-001", "QR-DEMO-002", "BH-DEMO-Query"):
+            self.assertIn(needle, v["message"])
+
+    def test_perm_target_ref_not_backlinking_is_permission_break(self):
+        # CONS-AC2：PERM 存在（dangling 不红）但 targetRef 未回指要求它的行为
+        # → consistency-permission（L2）
+        self.add_cons_domain()
+        self.add("m5-actor-model.yaml",
+                 CONS_M5.replace("targetRef: BH-DEMO-Record", "targetRef: BH-DEMO-Query"))
+        report = self.run_check()
+        self.assertIn("consistency-permission", self.cons_kinds(report))
+        v = next(v for v in report["violations"]
+                 if v["kind"] == "consistency-permission")
+        self.assertEqual(v["level"], "L2")
+        for needle in ("BH-DEMO-Record", "PERM-DEMO-Record", "BH-DEMO-Query"):
+            self.assertIn(needle, v["message"])
+
+    def test_unknown_perm_stays_dangling_ref_not_consistency(self):
+        # P2 存在性向仍归 dangling-ref（requiredPermissions 在 refKeys∪edges），
+        # 不重复报 consistency-permission——红因不混
+        self.add_cons_domain()
+        self.add("m2-behavior-model.yaml",
+                 CONS_M2.replace("PERM-DEMO-Record", "PERM-DEMO-999"))
+        report = self.run_check()
+        self.assertIn("dangling-ref", self.kinds(report))
+        self.assertNotIn("consistency-permission", self.cons_kinds(report))
+
+    def test_activity_role_outside_flow_rolerefs_is_flow_role(self):
+        # CONS-AC3：活动 roleRef 指向存在但不在流程 roleRefs 内的角色
+        # → consistency-flow-role（L2），报文含流程/活动/角色三方 ID
+        self.add_cons_domain()
+        self.add("m6-flow-model.yaml",
+                 CONS_M6.replace("roleRef: ROLE-DEMO-001", "roleRef: ROLE-DEMO-002"))
+        report = self.run_check()
+        self.assertIn("consistency-flow-role", self.cons_kinds(report))
+        v = next(v for v in report["violations"]
+                 if v["kind"] == "consistency-flow-role")
+        self.assertEqual(v["level"], "L2")
+        for needle in ("FLOW-DEMO-001", "ACT-DEMO-001", "ROLE-DEMO-002", "roleRefs"):
+            self.assertIn(needle, v["message"])
+
+    def test_json_report_carries_consistency_rows(self):
+        # 报告行可机读：--json 输出中每条一致性违规一行（level/kind/file/line/message）
+        self.add_cons_domain()
+        self.add("m7-report-model.yaml",
+                 CONS_M7.replace("BH-DEMO-Query", "BH-DEMO-Record"))
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            sc.main(["--json", str(self.root)])
+        rows = json.loads(buf.getvalue())["violations"]
+        cons = [r for r in rows if r["kind"].startswith("consistency-")]
+        self.assertTrue(cons)
+        for r in cons:
+            self.assertEqual(r["level"], "L2")
+            self.assertTrue(r["file"].endswith("m7-report-model.yaml"))
+            self.assertGreater(r["line"], 0)
+
+    def test_pairs_degenerate_without_models(self):
+        # 退化面：注册表只有 M1/M2（Base 迷你表）时一致性对静默跳过，不崩不误报
+        write(self.root / "schema" / "model-registry.json", json.dumps(REGISTRY))
+        write(self.root / "schema" / "model-deps.json", json.dumps(DEPS))
+        self.add("m1-object-model.yaml", M1)
+        self.add("m2-behavior-model.yaml", M2)
+        self.assertEqual(self.run_check()["status"], "pass")
 
 
 if __name__ == "__main__":

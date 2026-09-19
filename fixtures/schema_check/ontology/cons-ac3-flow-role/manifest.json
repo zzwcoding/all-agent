@@ -1,0 +1,6 @@
+{
+  "domain": "cons-p3",
+  "label": "一致性对负变体 CONS-AC3（票 11）：M6 活动 roleRef ∉ 流程 roleRefs → L2 consistency-flow-role",
+  "profile": "v9-full",
+  "schemaVersion": "1.0.0"
+}

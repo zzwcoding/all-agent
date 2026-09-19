@@ -1,0 +1,25 @@
+# CONS-AC1 最小域 · M2：一个 COMMAND（错绑靶子）+ 一个 QUERY（共绑靶子）
+model_type: BEHAVIOR
+version: "1.0.0"
+domain: cons-p1
+behaviors:
+  - id: BH-CONS-Record
+    name: 录入单井日产量
+    ownerEntity: AGG-CONS-001
+    behaviorType: COMMAND
+    triggerType: USER_ACTION
+    preconditions: []
+    postconditions:
+      - field: dailyProduction.outputVolume
+        setValue: newOutput
+    appliedRules: []
+    requiredPermissions: []
+  - id: BH-CONS-Query
+    name: 查询单井日产量
+    ownerEntity: AGG-CONS-001
+    behaviorType: QUERY
+    triggerType: USER_ACTION
+    preconditions: []
+    postconditions: []
+    appliedRules: []
+    requiredPermissions: []

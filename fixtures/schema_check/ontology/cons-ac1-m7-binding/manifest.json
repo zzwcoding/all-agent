@@ -1,0 +1,6 @@
+{
+  "domain": "cons-p1",
+  "label": "一致性对负变体 CONS-AC1（票 11）：M7↔M2 严格一对一破坏——QR 错绑 COMMAND 行为 + 两 QR 共绑同一 QUERY 行为 → L2 consistency-redirection / consistency-not-one-to-one",
+  "profile": "v9-full",
+  "schemaVersion": "1.0.0"
+}

@@ -1,0 +1,10 @@
+# CONS-AC1 最小域 · M1（仅为 ref 提供真实落点，防悬空杂音）
+model_type: OBJECT
+version: "1.0.0"
+domain: cons-p1
+aggregates:
+  - id: AGG-CONS-001
+    name: 井
+    alias: Well
+    aggregateType: AGGREGATE_ROOT
+    attributes: []

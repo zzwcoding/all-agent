@@ -1,6 +1,6 @@
 {
-  "skill": "schema_check（语义 CI L1–L4 闸，票 03；票 10 增 GLS 套件）",
-  "description": "最小域出厂集：两对象（井 AGG-BOHAI-001 + 单井日产量记录 AGG-BOHAI-002）七模型合法本体 + 各 AC 非法变体；票 10 增 GLS 术语模型套件（gls-valid 正变体 + gls-ac2/3/4 负变体）。基础断言 specs/schema_check.md AC1–7；GLS-AC1–4 真源=tickets/10-术语模型GLS.md AC 表；schema 机读表经 {fixture_dir}/ontology/schema 符号链接取自仓内 ontology/schema（单一真源，不复制）。",
+  "skill": "schema_check（语义 CI L1–L4 闸，票 03；票 10 增 GLS 套件；票 11 增一致性对套件）",
+  "description": "最小域出厂集：两对象（井 AGG-BOHAI-001 + 单井日产量记录 AGG-BOHAI-002）七模型合法本体 + 各 AC 非法变体；票 10 增 GLS 术语模型套件（gls-valid 正变体 + gls-ac2/3/4 负变体）；票 11 增 L2 一致性对套件（cons-ac1/2/3 负变体，对应 tickets/11-一致性对核验.md AC 表 AC1–3，标签加 CONS- 前缀防与基础套件撞号，手法沿票 10）。基础断言 specs/schema_check.md AC1–7；GLS-AC1–4 真源=tickets/10-术语模型GLS.md AC 表；CONS-AC1–3 真源=tickets/11-一致性对核验.md AC 表；schema 机读表经 {fixture_dir}/ontology/schema 符号链接取自仓内 ontology/schema（单一真源，不复制）。",
   "assertions": [
     {
       "ac": "AC1",
@@ -67,6 +67,24 @@
       "type": "cmd-fails",
       "cmd": "python3 tools/schema_check.py {fixture_dir}/ontology/gls-ac4-filename-mismatch",
       "outputContains": ["filename-mismatch", "glossary-model.yaml", "m1-object-model.yaml"]
+    },
+    {
+      "ac": "CONS-AC1",
+      "type": "cmd-fails",
+      "cmd": "python3 tools/schema_check.py {fixture_dir}/ontology/cons-ac1-m7-binding",
+      "outputContains": ["consistency-redirection", "consistency-not-one-to-one", "QR-CONS-001", "BH-CONS-Query"]
+    },
+    {
+      "ac": "CONS-AC2",
+      "type": "cmd-fails",
+      "cmd": "python3 tools/schema_check.py {fixture_dir}/ontology/cons-ac2-permission-backref",
+      "outputContains": ["consistency-permission", "BH-CONS-Record", "PERM-CONS-001"]
+    },
+    {
+      "ac": "CONS-AC3",
+      "type": "cmd-fails",
+      "cmd": "python3 tools/schema_check.py {fixture_dir}/ontology/cons-ac3-flow-role",
+      "outputContains": ["consistency-flow-role", "FLOW-CONS-001", "ROLE-CONS-002"]
     }
   ]
 }

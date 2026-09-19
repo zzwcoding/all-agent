@@ -1,0 +1,22 @@
+# CONS-AC1 最小域 · M7：两条红因各一
+#   QR-CONS-001 behaviorRef → COMMAND 行为        = consistency-redirection
+#   QR-CONS-002/003 共绑同一 QUERY 行为 BH-CONS-Query = consistency-not-one-to-one
+model_type: REPORT
+version: "1.0.0"
+domain: cons-p1
+query_reports:
+  - id: QR-CONS-001
+    name: 错绑命令行为的报表
+    alias: wrongBindingStat
+    objectType: DETAIL_QUERY
+    behaviorRef: BH-CONS-Record
+  - id: QR-CONS-002
+    name: 共绑查询行为·先
+    alias: sharedBindingFirst
+    objectType: DETAIL_QUERY
+    behaviorRef: BH-CONS-Query
+  - id: QR-CONS-003
+    name: 共绑查询行为·后
+    alias: sharedBindingSecond
+    objectType: DETAIL_QUERY
+    behaviorRef: BH-CONS-Query

@@ -1,0 +1,29 @@
+# CONS-AC2 最小域 · M2：BH-CONS-Record 要求 PERM-CONS-001（存在，但该权限
+# targetRef 指向 BH-CONS-Other——回指断裂 → consistency-permission）
+model_type: BEHAVIOR
+version: "1.0.0"
+domain: cons-p2
+behaviors:
+  - id: BH-CONS-Record
+    name: 录入单井日产量
+    ownerEntity: AGG-CONS-001
+    behaviorType: COMMAND
+    triggerType: USER_ACTION
+    preconditions: []
+    postconditions:
+      - field: dailyProduction.outputVolume
+        setValue: newOutput
+    appliedRules: []
+    requiredPermissions:
+      - PERM-CONS-001
+  - id: BH-CONS-Other
+    name: 刷新井状态
+    ownerEntity: AGG-CONS-001
+    behaviorType: COMMAND
+    triggerType: SYSTEM
+    preconditions: []
+    postconditions:
+      - field: well.status
+        setValue: updatedStatus
+    appliedRules: []
+    requiredPermissions: []

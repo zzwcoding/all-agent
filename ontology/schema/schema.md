@@ -2,7 +2,7 @@
 
 > 本文是本体 YAML 的 schema 文档（人读）；机读消费方两份：
 > `model-registry.json`（模型注册表：camp/consumers/profiles/dependsOn）、`model-deps.json`（类型层依赖白名单 + ID 前缀表）。
-> 执行闸：`tools/schema_check.py`（语义 CI L1–L4，断言表 `specs/schema_check.md` AC1–7 + 票 10 GLS-AC1–4）。
+> 执行闸：`tools/schema_check.py`（语义 CI L1–L4，断言表 `specs/schema_check.md` AC1–7 + 票 10 GLS-AC1–4 + 票 11 一致性对 §14）。
 > 蓝本：OMF v9 七模型（references/omf-spec-digest.md §0/§16，下注 `v9 §x`）；裁剪决定均注明出处。
 > GLS 术语模型为本仓自定义扩展（OMF v6/v9 均无，票 10 走"元模型错→框架版本演进"路由进 schema，演进账见 CHANGELOG.md）。
 
@@ -57,7 +57,7 @@
 - 跨模型引用一律稳定 ID 引用，字段名统一 `xxxRef` / `xxxRefs` 后缀；少数沿用 OMF 原名（`targetAggregate`、`sourceAggregate`、`ownerEntity`、`appliedRules`、`requiredPermissions`、`inheritsFrom`、`roles`、`permissions`、`dictionaryId`、`dataSource`）——全集见 `model-deps.json` 的 `refKeys`。
 - 禁止"只在 description 里写引用"：`AggregateRootRef` 类型属性必须显式 `targetAggregate`（digest §16.4）。
 - 引用不得通过名称猜测；ID 变更必须过影响分析（v6 §8.6）。
-- **依赖方向单向登记**：M7 与 M2 的严格一对一，依赖边只登记 M7→M2（M7.behaviorRef），M2 侧不设 `queryReportRef` 依赖边——本仓 M2 元素不写 `queryReportRef`，写了即 L2 依赖白名单违规（AC5 的判定依据）。一对一的双向一致性核验属 L2 一致性对清单，随图索引（票 04）落地。
+- **依赖方向单向登记**：M7 与 M2 的严格一对一，依赖边只登记 M7→M2（M7.behaviorRef），M2 侧不设 `queryReportRef` 依赖边——本仓 M2 元素不写 `queryReportRef`，写了即 L2 依赖白名单违规（AC5 的判定依据）。一对一的双向一致性核验属 L2 一致性对清单（§14，票 11 落地 `consistency-*` 检查），反向经 ref 反查、无需 M2 侧字段。
 
 ## 3. 四层规则下沉判定（照搬，digest §16.3）
 
@@ -247,3 +247,18 @@ OMF 的 M6/M7 在 v4 换义造成过沟通成本（digest §14/§16.10）。本�
 - `model-registry.json`：每模型 `camp`（business-core/integration/build-contract；一期 integration 空，MI 未引入）、`consumers`（runtime/build）、`profiles`（可用组合：v9-full/v9-core/headless）、`dependsOn`（类型层依赖白名单摘要）。消费方：profile 裁剪、检索面划界（semantic-service 只索引 business-core）、生成器在场校验三件事共用（PRD F1）。
 - `model-deps.json`：`idPrefixes`（ID 前缀→模型）+ `refKeys`（ref 字段名全集）+ `edges`（from 模型 × ref 字段 → 允许目标模型集）。AC4/AC5 的判定真源；与 registry 的 dependsOn 做一致性核对，冲突 = L1 违规。
 - 依赖白名单要点：M2 不得依赖 M7（AC5 例证，见 §2）；M1 零依赖；M6 依赖 M1/M2/M3/M5；MU 依赖 M1/M2/M3/M5/M7；GLS 只依赖 M1（relatedObjectRefs 单向边，票 10）。
+
+## 14. 一致性对清单（L2 consistency-*，票 11）
+
+OMF 规范声明的"双向一致"对（digest §16.4）是现成的 lint 清单；本仓按"每对一条 L2 违规码"落进 `tools/schema_check.py`（行前缀 `consistency-`，报文含对名/涉事 ID/依据字段/期望值，--json 每对一行可机读；确定性、零 LLM）。涉事 ID 的**存在性**由悬空引用检查（`dangling-ref`）承载——ref 扫描面 = refKeys ∪ `*Ref/*Refs` 后缀 ∪ edges 三源并集（真源 model-deps.json）；本组只补**语义闭合向**，不重复扫存在性（红因不混：指向不存在的 ID 报 dangling-ref，存在但语义断裂才报 consistency-*）。
+
+| # | 一致性对 | 违规码 | 状态 |
+|---|---|---|---|
+| P1 | M7 `behaviorRef` ↔ M2 查询行为：必指向存在且 `behaviorType=QUERY` 的行为；同一查询行为不得被第二个 M7 绑定（依赖边单向 M7→M2，反向经 ref 反查，见 §2） | `consistency-redirection` / `consistency-not-one-to-one` | **已实现**（票 11） |
+| P2 | M2 `requiredPermissions` 每项指向存在的 `PERM-*`，且该权限 `targetRef` 回指此行为（双向闭合。锚定 M2.requiredPermissions 面：M5 侧单面登记权限以承载岗位职责、而行为侧 requiredPermissions 留空，不判红——权限面是角色的职责登记，见 §7） | `consistency-permission` | **已实现**（票 11） |
+| P3 | M6 活动 `roleRef` ∈ 流程 `roleRefs`（活动级角色是流程角色集子集；USER_TASK/APPROVAL_TASK 承载 roleRef，见 §8） | `consistency-flow-role` | **已实现**（票 11） |
+| P4 | M3 `triggeredBehaviors` ↔ 下游行为 | — | **回加条件制**：`triggeredBehaviors` 为 v6 事件驱动专属，v9 移除 EVENT_DRIVEN，已列 §12 换义锁定字段——仅当事件驱动回加、字段解锁时随新字段名实现本对 |
+| P5 | M2 `producedEvents` ↔ ME `producerBehaviorRef` | — | **ME 回加时启用**（一期无 ME 事件模型，§0；`producedEvents` 已锁定，见 §12） |
+| P6 | M3 `subscribedEvents` ↔ ME `subscribers` | — | **ME 回加时启用**（同上；`subscribedEvents` 已锁定，见 §12） |
+
+正例承载：`ontology/bohai` 全域（P1 四个查询出口一对一、P2 行为侧权限全回指、P3 三流程活动角色全闭合）与出厂集 `valid-domain`；负变体：出厂集 `cons-ac1/2/3` 三个最小域（断言标签 CONS-AC1–3，真源 = tickets/11-一致性对核验.md AC 表）。新增一致对 = 本章加行 + schema_check 加同款判定 + 出厂集配负变体，三件同步。

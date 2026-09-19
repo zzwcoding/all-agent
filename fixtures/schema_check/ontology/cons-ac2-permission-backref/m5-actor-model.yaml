@@ -1,0 +1,16 @@
+# CONS-AC2 最小域 · M5：PERM-CONS-001 存在（dangling 不红）但 targetRef
+# 回指 BH-CONS-Other 而非要求它的 BH-CONS-Record → consistency-permission
+model_type: ACTOR
+version: "1.0.0"
+domain: cons-p2
+roles:
+  - roleId: ROLE-CONS-001
+    name: 单井产量录入员
+    inheritsFrom: []
+    permissions:
+      - PERM-CONS-001
+permissions:
+  - permissionId: PERM-CONS-001
+    targetType: BEHAVIOR
+    targetRef: BH-CONS-Other
+    dataScope: ALL

@@ -1,0 +1,14 @@
+# CONS-AC3 最小域 · M5：两个角色都真实存在（dangling 不红），
+# ROLE-CONS-002 只是不在流程 roleRefs 里 → consistency-flow-role
+model_type: ACTOR
+version: "1.0.0"
+domain: cons-p3
+roles:
+  - roleId: ROLE-CONS-001
+    name: 流程内角色
+    inheritsFrom: []
+    permissions: []
+  - roleId: ROLE-CONS-002
+    name: 流程外角色
+    inheritsFrom: []
+    permissions: []

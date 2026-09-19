@@ -1,0 +1,28 @@
+# CONS-AC3 最小域 · M6：USER_TASK 活动 roleRef=ROLE-CONS-002
+# 不在流程 roleRefs [ROLE-CONS-001] 内 → consistency-flow-role
+model_type: FLOW
+version: "1.0.0"
+domain: cons-p3
+flows:
+  - id: FLOW-CONS-001
+    name: 越权活动流程
+    flowType: COLLABORATION
+    businessObjectRefs:
+      - AGG-CONS-001
+    roleRefs:
+      - ROLE-CONS-001
+    trigger:
+      triggerType: MANUAL
+    startActivity: ACT-CONS-001
+    endActivities:
+      - ACT-CONS-002
+    activities:
+      - activityId: ACT-CONS-001
+        name: 越权录入
+        activityType: USER_TASK
+        roleRef: ROLE-CONS-002
+        nextActivities:
+          - ACT-CONS-002
+      - activityId: ACT-CONS-002
+        name: 结束
+        activityType: END

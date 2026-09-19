@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """schema_check.py —— 语义 CI L1–L4 闸（All-agent 票 03；spec: specs/schema_check.md AC1–7；
-票 10 增 GLS 术语模型套件 GLS-AC1–4，真源=tickets/10-术语模型GLS.md AC 表 + fixtures/schema_check/assertions.json）。
+票 10 增 GLS 术语模型套件 GLS-AC1–4；票 11 增 L2 一致性对检查组 consistency-*，真源=
+tickets/11-一致性对核验.md AC 表 + ontology/schema/schema.md §14）。
 
 对给定 ontology 目录做确定性校验：
   L1 schema 合法——YAML 可解析（AC2）、公共字段 model_type/version/domain 在场（AC3）、
@@ -9,6 +10,13 @@
      yamlFile，即"一模型一 YAML、固定文件名"约定的闸上强化）、schema 两份机读表互相一致；
   L2 引用与依赖——ref 指向的 ID 全仓有定义（AC4 悬空引用）、ref 目标模型不越
      类型层依赖白名单（AC5，真源 ontology/schema/model-deps.json + model-registry.json）；
+     一致性对（票 11，digest §16.4 本仓可行子集）：
+       consistency-redirection    M7.behaviorRef 未指向 behaviorType=QUERY 的 M2 行为
+       consistency-not-one-to-one 同一 M2 查询行为被两个 M7 对象绑定（严格一对一）
+       consistency-permission     M2.requiredPermissions 指到的 PERM.targetRef 未回指该行为
+       consistency-flow-role      M6 活动 roleRef 不在流程 roleRefs 集合内；
+     涉事元素存在性仍由 dangling-ref 承载（ref 扫描面=refKeys ∪ *Ref/Refs ∪ edges），
+     本组只补"语义闭合向"，违规 kind 一律 consistency- 前缀（schema.md §14）。
   L4 profile 合规与兼容——profile 未启用的模型文件不得出现（AC6；票 10 GLS-AC2 同款）、
      换义锁定字段（model-registry.json lockedFields）不得复用（AC7 字段换义式变更）。
 
@@ -189,6 +197,25 @@ def iter_ref_strings(value):
             yield from iter_ref_strings(item)
 
 
+def collect_elements(data, mkey: str, prefix2model: dict, ref_keys: set):
+    """收集本文件中主 ID 前缀→mkey 的元素：[(元素ID, 映射)]（票 11 一致性对用）。
+
+    元素主 ID = `id` / `*Id` 键（非 ref 键）上的字符串值——与 collect_definitions
+    同一定义面，且前缀判回本模型；嵌套结构里的非注册前缀 ID（如 M6 活动 activityId、
+    M7 条件 conditionId 不在 idPrefixes）天然不入选。
+    """
+    out = []
+    for mapping in iter_mappings(data):
+        for key, value in mapping.items():
+            if not (isinstance(key, str) and (key == "id" or key.endswith("Id"))):
+                continue
+            if is_ref_key(key, ref_keys) or not isinstance(value, str):
+                continue
+            if id_model_of(value, prefix2model) == mkey:
+                out.append((value, mapping))
+    return out
+
+
 # ---------- 主校验 ----------
 
 def run(target: Path) -> dict:
@@ -348,6 +375,123 @@ def run(target: Path) -> dict:
                             add("L2", "dangling-ref", rel, key_line(mapping, key),
                                 f"悬空引用: ref 字段「{key}」指向的 {ref} "
                                 f"在本体仓内无 ID 定义")
+
+    # ---------- 一致性对核验（票 11；digest §16.4 本仓可行子集，schema.md §14） ----------
+    # 元素收集：锚定各模型的结构性承载字段（behaviorType/targetRef/behaviorRef/
+    # activities），模型定位走注册表 modelType（脚本不硬编码模型键名）。涉事 ID 的
+    # 存在性由上方 dangling-ref 承载，此处只判语义闭合向。
+    m2_key = model_by_type.get("BEHAVIOR")
+    m5_key = model_by_type.get("ACTOR")
+    m6_key = model_by_type.get("FLOW")
+    m7_key = model_by_type.get("REPORT")
+    behaviors: dict[str, tuple[dict, str]] = {}
+    permissions: dict[str, tuple[dict, str]] = {}
+    query_reports: list[tuple[str, dict, str]] = []
+    flows: list[tuple[str, dict, str]] = []
+    if m2_key or m5_key or m6_key or m7_key:
+        for domain in domains:
+            for path in model_files(domain):
+                rel_c = str(path)
+                try:
+                    data_c = load_yaml(path)
+                except _YamlSyntaxError:
+                    continue
+                if not isinstance(data_c, dict):
+                    continue
+                mtype_c = data_c.get("model_type")
+                mkey_c = model_by_type.get(mtype_c) if isinstance(mtype_c, str) else None
+                if m2_key and mkey_c == m2_key:
+                    for eid, mapping in collect_elements(
+                            data_c, m2_key, prefix2model, ref_keys):
+                        if "behaviorType" in mapping:
+                            behaviors.setdefault(eid, (mapping, rel_c))
+                elif m5_key and mkey_c == m5_key:
+                    for eid, mapping in collect_elements(
+                            data_c, m5_key, prefix2model, ref_keys):
+                        if "targetRef" in mapping:
+                            permissions.setdefault(eid, (mapping, rel_c))
+                elif m7_key and mkey_c == m7_key:
+                    for eid, mapping in collect_elements(
+                            data_c, m7_key, prefix2model, ref_keys):
+                        if "behaviorRef" in mapping:
+                            query_reports.append((eid, mapping, rel_c))
+                elif m6_key and mkey_c == m6_key:
+                    for eid, mapping in collect_elements(
+                            data_c, m6_key, prefix2model, ref_keys):
+                        if "activities" in mapping:
+                            flows.append((eid, mapping, rel_c))
+
+    # P1 M7↔M2 严格一对一：M7.behaviorRef 必指向 behaviorType=QUERY 的行为，
+    # 且同一查询行为不得被第二个 M7 绑定（依赖边单向 M7→M2，反向经 ref 反查，
+    # schema.md §2/§9；本仓 M2 不写 queryReportRef）
+    if m2_key and m7_key:
+        first_bound: dict[str, str] = {}
+        for qr_id, qr, rel_c in query_reports:
+            bref = qr.get("behaviorRef")
+            if not isinstance(bref, str):
+                continue
+            beh = behaviors.get(bref)
+            if beh is None:
+                continue  # 指向不存在行为 = dangling-ref 已报
+            if beh[0].get("behaviorType") != "QUERY":
+                add("L2", "consistency-redirection", rel_c, key_line(qr, "behaviorRef"),
+                    f"一致性对 P1（M7↔M2 严格一对一）: 报表 {qr_id} 的 behaviorRef"
+                    f"「{bref}」指向 behaviorType={beh[0].get('behaviorType')} 的行为，"
+                    f"必须指向 behaviorType=QUERY 的 M2 行为"
+                    f"（依据 M7.behaviorRef ↔ M2.behaviorType，schema.md §14）")
+                continue
+            if bref in first_bound:
+                add("L2", "consistency-not-one-to-one", rel_c, key_line(qr, "behaviorRef"),
+                    f"一致性对 P1（M7↔M2 严格一对一）: M2 查询行为「{bref}」已被报表 "
+                    f"{first_bound[bref]} 绑定，报表 {qr_id} 再次绑定——同一行为不得被"
+                    f"两个 M7 对象共享（依据 M7.behaviorRef 反查去重，schema.md §14）")
+            else:
+                first_bound[bref] = qr_id
+
+    # P2 M2.requiredPermissions ↔ M5 双向闭合：requiredPermissions 指到的每个
+    # PERM 的 targetRef 必回指该行为（存在性=dangling-ref：requiredPermissions 在
+    # refKeys 且有 M2→M5 边）。锚定 M2.requiredPermissions 面——M5 侧单面登记权限
+    # 承载岗位职责（行为 requiredPermissions 留空）不判红（schema.md §7/§14）
+    if m2_key and m5_key:
+        for bh_id, (bh, rel_c) in behaviors.items():
+            req = bh.get("requiredPermissions")
+            if not req:
+                continue
+            for pref in iter_ref_strings(req):
+                if not isinstance(pref, str):
+                    continue
+                perm = permissions.get(pref)
+                if perm is None:
+                    continue  # 指向不存在权限 = dangling-ref 已报
+                perm_target = perm[0].get("targetRef")
+                if perm_target != bh_id:
+                    add("L2", "consistency-permission", rel_c,
+                        key_line(bh, "requiredPermissions"),
+                        f"一致性对 P2（M2.requiredPermissions↔M5）: 行为 {bh_id} 的 "
+                        f"requiredPermissions「{pref}」存在，但其 targetRef="
+                        f"{perm_target} 未回指本行为——权限须双向闭合"
+                        f"（依据 M2.requiredPermissions ↔ M5.targetRef，schema.md §14）")
+
+    # P3 M6 活动 roleRef ∈ 流程 roleRefs（活动级角色必须是流程角色集的子集，
+    # digest §16.4 P3 / v9 §6.5；ROLE 本身的存在性由 dangling-ref 承载）
+    if m6_key:
+        for flow_id, flow, rel_c in flows:
+            role_refs = {r for r in iter_ref_strings(flow.get("roleRefs") or [])
+                         if isinstance(r, str)}
+            activities = flow.get("activities")
+            if not isinstance(activities, list):
+                continue
+            for act in activities:
+                if not isinstance(act, dict):
+                    continue
+                for rref in iter_ref_strings(act.get("roleRef") or []):
+                    if not isinstance(rref, str) or rref in role_refs:
+                        continue
+                    add("L2", "consistency-flow-role", rel_c, key_line(act, "roleRef"),
+                        f"一致性对 P3（M6 活动 roleRef∈流程 roleRefs）: 流程 {flow_id} "
+                        f"活动 {act.get('activityId', '?')} 的 roleRef「{rref}」不在"
+                        f"流程 roleRefs {sorted(role_refs)} 内"
+                        f"（依据 M6.roleRef ⊆ M6.roleRefs，schema.md §14）")
 
     by_level = {lv: sum(1 for v in violations if v["level"] == lv)
                 for lv in ("L1", "L2", "L4")}
