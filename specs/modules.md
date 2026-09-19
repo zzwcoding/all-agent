@@ -126,9 +126,10 @@
 
 | 脚本 | 职责 | 状态 |
 |---|---|---|
-| `tools/schema_check.py` | 语义 CI 的 L1–L4 级（schema 合法/引用一致/依赖白名单/profile 合规+反向缺文件/逐元素结构性必填），断言表 specs/schema_check.md AC1–7 + GLS/CONS/REQ 套件 | 已建（票 03；票 10/11/13 演进） |
+| `tools/schema_check.py` | 语义 CI 的 L1–L4 级（schema 合法/引用一致/依赖白名单/profile 合规+反向缺文件/逐元素结构性必填），断言表 specs/schema_check.md AC1–7 + GLS/CONS/REQ 套件 | 已建（票 03；票 10/11/13/16 演进，16=banned-term 禁用词拦截面——上票清单外发现，票 22 补账） |
 | `tools/graph_index.py` | YAML → 内存图（多跳/闭包/影响链） | 已建（票 04） |
 | `tools/check_citations.py` | ID 引用清单逐条比对检具：答案正文↔「本回答引用的元素 ID」清单节双向差异（正文有清单无/清单有正文无），退出码 0 一致/1 不一致/2 用法；通用大写前缀 token 不绑域；断言面 fixtures/semantic-service CIT-01–05（票 13，审查一 P2） | 已建（票 13） |
 | `tools/proposal_check.py` | 提案池确定性检查：①proposal-schema 必备字段与枚举 ②proposal-target 靶存在性（modify/deprecate 在域、add 不在域，元素口径照图索引 id/*Id 定义键+已登记前缀，独立实现零耦合）③proposal-conflict 同靶 open 提案 change 矛盾 ④proposal-evidence 证据在档（仓根/提案目录相对+#锚点容许）；只解析 PROP-*.md；断言面 fixtures/proposal-pool AC1–6（票 18） | 已建（票 18） |
+| `tools/semantic_service_core.py` | 语义服务四步瀑布可机判核心+CLI：显式锚定（前缀→模型→camp 面外判定在先，先阵营后存在性）、ID/名称解析（name/alias/属性标签/GLS term+alias 确定性分层匹配，不猜不模糊）、闭包/影响装配指令、拒答三分支（面外/仓内没有+缺件分层/禁用词+替代指路）与命中 ID 集——**自然语言成稿归 skill（提纯不重写）**；图消费经 `tools/graph_index.py` 子进程 `--json`（零耦合），禁用词表自实现（读域内 GLS status 含「禁用」，与 schema_check 是两个读者同真源）；CLI 退出码 0 answered/1 refused/2 配置错误；八问真域回归接 fixtures/semantic-service CORE-01–08（票 22） | 已建（票 22） |
 | `tools/skill_deps_check.py` `tools/fixture_run.py` `tools/archive_check.py` 三闸 + `tools/ci.sh` | 从 sdd-flow2 实例化拷贝（含单测；fixture_run 新增 cmd-* 断言与占位 pending） | 已建（票 03 随迁） |
 | `tools/install_skills.py` | 安装位同步与落闸：仓内 skills/ 正本 → ~/.agents/skills/ 安装位的 sync（先清后拷，只清本 skill 目录）、--check（漂移三型 missing/modified/extra + 孤儿检测）、--prune（孤儿清除，默认 dry-run，--yes 才删）、symlink 拒跑（退出 2）；注册表 `tools/install-registry.json` 由 sync 原子维护（孤儿三要素=登记过+安装位在+正本已删）；`tools/hooks/pre-commit`（core.hooksPath 启用）提交前跑 --check 拦漂移；断言表 tickets/12 AC1–4 + tickets/15 AC1–6；不进 ci.sh 四闸（安装位是仓外环境状态） | 已建（票 12；票 15 增强） |

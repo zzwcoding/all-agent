@@ -1,6 +1,6 @@
 {
   "skill": "semantic-service（运行时语义服务，票 07）",
-  "description": "出厂集：Golden Question 集（questions/golden-questions.md 四问，各压检索瀑布一级）→ 断言参照答案的确定性结果（specs/semantic-service.md AC1–4）。问答本体=fixtures/graph_index/ontology-base（票 04 最小域，只读复用；该本体含 MU 屏是有意保留，图索引全量建图无阵营概念，阵营裁剪是 skill 工序职责，AC4 靠它实测面外拒答）。expected-answers/ 四份参照答案按 SKILL.md 工序手工产出：每份示范瀑布走到哪一级、带「本回答引用的元素 ID」清单。AC1=口径四件套（字段 dailyOutput/载体 AGG-BOHAI-002/规则 RULE-BOHAI-001/查询出口 QR-BOHAI-001，含 dictionaryRef 下钻链）；AC2=显式锚定直接命中+未走名称模糊检索+反向收集行为 ID；AC3=拒答话术+缺什么分层说明+提案流程指路，并全扫描守卫正则断言未编造 ID（答案中每个 ID 均须在白名单={QR-BOHAI-001, AGG-BOHAI-002}内，即全部是近邻指路真实 ID）；AC4=面外语说明（camp=build-contract/不在检索面/提案流程），并全扫描守卫正则断言不含任何 MU 元素细节（菜单/网格/按钮/屏类型/页面与菜单名等）。「回答带 ID 引用」（spec 行为约定）以四份答案逐一含引用清单节断言。cmd 两条为机读佐证：--impact 可复现锚定对象的引用集（含全部行为），未找到 ID 明确报错不猜（AC3 纪律的机械面）。 票 13 增引用清单比对套件 CIT-01–05：tools/check_citations.py（id-citation-format.md §3「清单是答案 ID 的完备登记」纸面纪律的机械闸，审查一 P2）对四份参照答案逐一断言正文↔清单一致，另配 citation-samples/inconsistent-answer.md 双向差异注入样本断言退出非零且列出差异（AC7 真源=tickets/13-机读必填字段闸.md AC 表）。 票 17 增术语两问 Q7/Q8（Golden Q 术语类，名称解析遇术语词先落 GLS——细则见 skill references/retrieval-waterfall.md §2）：Q7 剔检产量=二级解析落 GLS-BOHAI-002（别名净产量，术语条目即答案一部分）+ 三级闭包沿 relatedObjectRefs 指路 AGG-BOHAI-001/002 与承载规则 RULE-BOHAI-019（机读佐证 --closure 1）；Q8 老完成率=GLS 禁用词命中 → 回答=禁用说明（禁用、替代=产量完成率）+ 替代口径真实 ID 指路（RULE-BOHAI-009/QR-BOHAI-002），不得把禁用词答成可用口径——票17 AC3 守卫正则全扫描禁的是肯定表述不是词面（问题本身含「老完成率」，「还能用吗？」问句形态放行、「还能用。」陈述形态拦），正反例双向自测 24 好/23 坏全过；两份新答案各接 check_citations cmd 断言（票 13 闸）。两问解析证据取自 ontology/bohai 真域（GLS 条目在真域；票 04 最小域无 GLS，且 graph_index 出厂集锁定其图统计为精确数字，问答本体不扩文件）。AC 真源=tickets/17-GoldenQ术语问句.md AC 表。 票 20 守卫单源化：票 17 的 inline tempered 守卫正则收敛为检出正则（BAD 交替式），唯一真源落 guard-corpus/regex.txt；新增 L3 检具 tools/guard_corpus_check.py <root> 施例集回归（regex.txt+manifest.txt：good/ 7 好 nomatch、bad/ 10 坏 match，覆盖禁用话术/问句形态/否定形态/可作为/把…当作/勿采用/沿用/还能用 八覆盖点；真答案 ac8/ac7 以 nomatch 行纳入 manifest，守卫持续压真答案）。收敛对照：修复「可作为」型漏拦（旧正则放行「老完成率可作为过渡口径」，现拦）与「把…当作/勿(采用|用)/停用」型误伤（旧正则拦「不把老完成率当作可用口径」「请勿使用老完成率」，现放），并补「口径仍然有效」型漏拦；逐条对照见 lessons/20。",
+  "description": "出厂集：Golden Question 集（questions/golden-questions.md 四问，各压检索瀑布一级）→ 断言参照答案的确定性结果（specs/semantic-service.md AC1–4）。问答本体=fixtures/graph_index/ontology-base（票 04 最小域，只读复用；该本体含 MU 屏是有意保留，图索引全量建图无阵营概念，阵营裁剪是 skill 工序职责，AC4 靠它实测面外拒答）。expected-answers/ 四份参照答案按 SKILL.md 工序手工产出：每份示范瀑布走到哪一级、带「本回答引用的元素 ID」清单。AC1=口径四件套（字段 dailyOutput/载体 AGG-BOHAI-002/规则 RULE-BOHAI-001/查询出口 QR-BOHAI-001，含 dictionaryRef 下钻链）；AC2=显式锚定直接命中+未走名称模糊检索+反向收集行为 ID；AC3=拒答话术+缺什么分层说明+提案流程指路，并全扫描守卫正则断言未编造 ID（答案中每个 ID 均须在白名单={QR-BOHAI-001, AGG-BOHAI-002}内，即全部是近邻指路真实 ID）；AC4=面外语说明（camp=build-contract/不在检索面/提案流程），并全扫描守卫正则断言不含任何 MU 元素细节（菜单/网格/按钮/屏类型/页面与菜单名等）。「回答带 ID 引用」（spec 行为约定）以四份答案逐一含引用清单节断言。cmd 两条为机读佐证：--impact 可复现锚定对象的引用集（含全部行为），未找到 ID 明确报错不猜（AC3 纪律的机械面）。 票 13 增引用清单比对套件 CIT-01–05：tools/check_citations.py（id-citation-format.md §3「清单是答案 ID 的完备登记」纸面纪律的机械闸，审查一 P2）对四份参照答案逐一断言正文↔清单一致，另配 citation-samples/inconsistent-answer.md 双向差异注入样本断言退出非零且列出差异（AC7 真源=tickets/13-机读必填字段闸.md AC 表）。 票 17 增术语两问 Q7/Q8（Golden Q 术语类，名称解析遇术语词先落 GLS——细则见 skill references/retrieval-waterfall.md §2）：Q7 剔检产量=二级解析落 GLS-BOHAI-002（别名净产量，术语条目即答案一部分）+ 三级闭包沿 relatedObjectRefs 指路 AGG-BOHAI-001/002 与承载规则 RULE-BOHAI-019（机读佐证 --closure 1）；Q8 老完成率=GLS 禁用词命中 → 回答=禁用说明（禁用、替代=产量完成率）+ 替代口径真实 ID 指路（RULE-BOHAI-009/QR-BOHAI-002），不得把禁用词答成可用口径——票17 AC3 守卫正则全扫描禁的是肯定表述不是词面（问题本身含「老完成率」，「还能用吗？」问句形态放行、「还能用。」陈述形态拦），正反例双向自测 24 好/23 坏全过；两份新答案各接 check_citations cmd 断言（票 13 闸）。两问解析证据取自 ontology/bohai 真域（GLS 条目在真域；票 04 最小域无 GLS，且 graph_index 出厂集锁定其图统计为精确数字，问答本体不扩文件）。AC 真源=tickets/17-GoldenQ术语问句.md AC 表。 票 20 守卫单源化：票 17 的 inline tempered 守卫正则收敛为检出正则（BAD 交替式），唯一真源落 guard-corpus/regex.txt；新增 L3 检具 tools/guard_corpus_check.py <root> 施例集回归（regex.txt+manifest.txt：good/ 7 好 nomatch、bad/ 10 坏 match，覆盖禁用话术/问句形态/否定形态/可作为/把…当作/勿采用/沿用/还能用 八覆盖点；真答案 ac8/ac7 以 nomatch 行纳入 manifest，守卫持续压真答案）。收敛对照：修复「可作为」型漏拦（旧正则放行「老完成率可作为过渡口径」，现拦）与「把…当作/勿(采用|用)/停用」型误伤（旧正则拦「不把老完成率当作可用口径」「请勿使用老完成率」，现放），并补「口径仍然有效」型漏拦；逐条对照见 lessons/20。 票 22 增语义服务核心八问回归 CORE-01–08：tools/semantic_service_core.py（四步瀑布可机判核心，提纯不重写——成稿归 skill；图消费经 graph_index 子进程 --json 零耦合，禁用词自实现读域内 GLS status 含「禁用」）对 ontology/bohai 真域逐问钉 status 与命中 ID：Q1 日产量/Q2 月度结算/Q3 @AGG-BOHAI-001 行为/Q6 有效产量/Q7 剔检产量=cmd-succeeds（answered，钉关键 ID，Q3 钉 waterfall_level=一级·显式锚定）；Q4 桶油增产成本（refused_missing，缺件分层未建+待 Owner）/Q5 @SCR-BOHAI-01（refused_out_of_surface——前缀先判 MU camp=build-contract 即拒，节点不存在仍面外，票 22 顺序裁决）/Q8 老完成率（refused_banned，GLS-BOHAI-001+替代口径 RULE-BOHAI-009/QR-BOHAI-002 指路）=cmd-fails（拒答退出码 1 是有效裁决，票 22 CLI 契约：0 answered/1 refused/2 配置错误）。",
   "assertions": [
     {
       "ac": "输入",
@@ -294,6 +294,90 @@
       "cmd": "python3 tools/guard_corpus_check.py {fixture_dir}/guard-corpus",
       "outputContains": [
         "例集回归: 全过"
+      ]
+    },
+    {
+      "ac": "票22 CORE-01（AC1：Q1 日产量口径=answered，citations 含承载 AGG-BOHAI-002 与质检规则 RULE-BOHAI-002）",
+      "type": "cmd-succeeds",
+      "cmd": "python3 tools/semantic_service_core.py ontology/bohai --ask \"日产量口径是什么？\" --json",
+      "outputContains": [
+        "\"status\": \"answered\"",
+        "AGG-BOHAI-002",
+        "RULE-BOHAI-002"
+      ]
+    },
+    {
+      "ac": "票22 CORE-02（AC2：Q3 显式锚定直达+--impact 反向收集行为）",
+      "type": "cmd-succeeds",
+      "cmd": "python3 tools/semantic_service_core.py ontology/bohai --ask \"@AGG-BOHAI-001 有哪些行为？\" --json",
+      "outputContains": [
+        "\"status\": \"answered\"",
+        "\"waterfall_level\": \"一级·显式锚定\"",
+        "BH-BOHAI-"
+      ]
+    },
+    {
+      "ac": "票22 CORE-03（AC3：Q4 桶油增产成本=refused_missing，缺件分层未建+待 Owner+提案流程）",
+      "type": "cmd-fails",
+      "cmd": "python3 tools/semantic_service_core.py ontology/bohai --ask \"桶油增产成本的口径是什么？\" --json",
+      "outputContains": [
+        "\"status\": \"refused_missing\"",
+        "未建",
+        "待 Owner"
+      ]
+    },
+    {
+      "ac": "票22 CORE-04（AC4：Q5 @SCR-BOHAI-01=refused_out_of_surface——前缀先判 MU camp=build-contract 即拒，节点不存在仍面外）",
+      "type": "cmd-fails",
+      "cmd": "python3 tools/semantic_service_core.py ontology/bohai --ask \"@SCR-BOHAI-01 的界面细节\" --json",
+      "outputContains": [
+        "\"status\": \"refused_out_of_surface\"",
+        "\"camp\": \"build-contract\"",
+        "SCR-BOHAI-01"
+      ]
+    },
+    {
+      "ac": "票22 CORE-05（AC5：Q8 老完成率=refused_banned，GLS-BOHAI-001 命中+替代口径 RULE-BOHAI-009/QR-BOHAI-002 指路）",
+      "type": "cmd-fails",
+      "cmd": "python3 tools/semantic_service_core.py ontology/bohai --ask \"老完成率还能用吗？\" --json",
+      "outputContains": [
+        "\"status\": \"refused_banned\"",
+        "GLS-BOHAI-001",
+        "RULE-BOHAI-009",
+        "QR-BOHAI-002"
+      ]
+    },
+    {
+      "ac": "票22 CORE-06（Q7 剔检产量=answered，GLS-BOHAI-002 命中+relatedObjectRefs 指路 AGG-BOHAI-001/002+承载规则 RULE-BOHAI-019）",
+      "type": "cmd-succeeds",
+      "cmd": "python3 tools/semantic_service_core.py ontology/bohai --ask \"剔检产量是什么口径？\" --json",
+      "outputContains": [
+        "\"status\": \"answered\"",
+        "GLS-BOHAI-002",
+        "AGG-BOHAI-001",
+        "AGG-BOHAI-002",
+        "RULE-BOHAI-019"
+      ]
+    },
+    {
+      "ac": "票22 CORE-07（Q2 月度结算=answered，AGG-BOHAI-008 命中+行为/查询出口装配）",
+      "type": "cmd-succeeds",
+      "cmd": "python3 tools/semantic_service_core.py ontology/bohai --ask \"月度结算的口径是什么？\" --json",
+      "outputContains": [
+        "\"status\": \"answered\"",
+        "AGG-BOHAI-008",
+        "BH-BOHAI-QueryMonthlySettlement",
+        "QR-BOHAI-003"
+      ]
+    },
+    {
+      "ac": "票22 CORE-08（Q6 有效产量=answered 多候选列位（GLS-BOHAI-003 术语+RULE-BOHAI-019 剔检支），请锚定不合并）",
+      "type": "cmd-succeeds",
+      "cmd": "python3 tools/semantic_service_core.py ontology/bohai --ask \"有效产量的口径是什么？\" --json",
+      "outputContains": [
+        "\"status\": \"answered\"",
+        "GLS-BOHAI-003",
+        "RULE-BOHAI-019"
       ]
     }
   ]
