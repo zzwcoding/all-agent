@@ -1,0 +1,36 @@
+{
+  "skill": "mcp-publisher（MCP 发布器发布物面，票 23）",
+  "description": "出厂集：MCP capability manifest 生成器与 stdio 服务器的免疫面断言（AC 真源=tickets/23-MCP-stdio服务器与发布物.md AC 表）。CI 免疫红线：本仓不安装 mcp——出厂集对 server 只测缺 SDK 引导路径（AC4），协议面留票 24 venv 实弹。AC 映射：AC1（幂等，连跑两次字节一致）=生成器单测 tools/test_mcp_manifest_gen.py（DeterminismTest 连跑两轮 + 零时间戳断言）承载，本集 AC1+AC2 断言以 --check 模式承载「现场重生成 vs 入库副本逐字节一致」（跨运行一致性=幂等的门口实证，--check 由 mcp_manifest_gen 内建，规避 cmd 断言无 shell 算子/不落 /tmp 的约束）；AC2（防陈旧）=同一条 --check 断言——manifest 入库（exports/mcp/capability-manifest.json）但禁手改，本体演进后必须再生，陈旧即红；AC3（内容）=生成到 stdout 的 outputContains 钉四工具名与域清单（json.loads/inputSchema 结构面由生成器单测承载）；AC4（无 mcp 起 server）=cmd-fails，exit 2+stderr 安装指引；AC5（无 mcp 环境全厂集+四闸全绿）=CI 运行本身承载（bash tools/ci.sh，不可写成单条断言）。cases/ 为四工具行为一致性用例单（与 fixtures/semantic-service CORE 八问同源），供票 24 smoke client 内置断言对照。docs/mcp-server.md 存在性以 cmd-succeeds+python3 -c 承载（file-* 断言路径约定相对本出厂集目录，仓级文件不越界引用）。",
+  "assertions": [
+    {
+      "ac": "AC1+AC2",
+      "type": "cmd-succeeds",
+      "cmd": "python3 tools/mcp_manifest_gen.py ontology --check exports/mcp/capability-manifest.json",
+      "outputContains": ["再制一致"]
+    },
+    {
+      "ac": "AC3（四工具齐+domains 含 bohai）",
+      "type": "cmd-succeeds",
+      "cmd": "python3 tools/mcp_manifest_gen.py ontology",
+      "outputContains": [
+        "\"name\": \"semantic_ask\"",
+        "\"name\": \"semantic_query\"",
+        "\"name\": \"semantic_closure\"",
+        "\"name\": \"semantic_impact\"",
+        "\"domain\": \"bohai\"",
+        "\"inputSchema\""
+      ]
+    },
+    {
+      "ac": "AC4（无 mcp 起 server：exit 2+stderr 指引）",
+      "type": "cmd-fails",
+      "cmd": "python3 tools/semantic_mcp_server.py ontology/bohai",
+      "outputContains": ["pip install mcp"]
+    },
+    {
+      "ac": "消费文档在场（docs/mcp-server.md）",
+      "type": "cmd-succeeds",
+      "cmd": "python3 -c \"import pathlib, sys; sys.exit(0 if pathlib.Path('docs/mcp-server.md').is_file() else 1)\""
+    }
+  ]
+}

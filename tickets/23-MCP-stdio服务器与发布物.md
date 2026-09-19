@@ -1,6 +1,6 @@
 # 票 23：MCP stdio 服务器 + capability manifest 发布物
 
-Status: todo
+Status: done
 Belongs to: 第三批拆票方案（2026-09-19 用户批准）；PRD F11；技术栈 R3（mcp 官方 SDK，仅发布侧）
 Touches: tools/semantic_mcp_server.py、tools/mcp_manifest_gen.py、exports/、fixtures/mcp-publisher/、references/repo-layout.json、specs/archive-registry.json、docs/mcp-server.md、specs/modules.md、lessons/23
 
@@ -21,9 +21,9 @@ Touches: tools/semantic_mcp_server.py、tools/mcp_manifest_gen.py、exports/、f
 
 ## 验收（注源）
 
-- [ ] AC1–5 全过（源：本票 AC 表）
-- [ ] 无 mcp 环境四闸全绿（源：CI 免疫红线）
-- [ ] 布局表/登记表登记完整、归档闸绿（源：主线 2）
+- [x] AC1–5 全过（源：本票 AC 表）
+- [x] 无 mcp 环境四闸全绿（源：CI 免疫红线）
+- [x] 布局表/登记表登记完整、归档闸绿（源：主线 2）
 
 ## 交接包（L2 自主档）
 

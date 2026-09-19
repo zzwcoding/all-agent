@@ -1,0 +1,152 @@
+{
+  "status": "已生成",
+  "server": {
+    "name": "all-agent-semantic",
+    "title": "All-agent 语义服务 MCP 服务器",
+    "transport": "stdio",
+    "entry": "tools/semantic_mcp_server.py",
+    "run": "python3 tools/semantic_mcp_server.py <ontology目录>",
+    "sdk": "官方 mcp SDK（仅发布侧安装；本体仓构建/CI 链路不依赖）",
+    "docs": "docs/mcp-server.md"
+  },
+  "domains": [
+    {
+      "domain": "bohai",
+      "label": "渤海油田产量域",
+      "profile": "v9-full",
+      "models": [
+        {
+          "model": "M1",
+          "name": "对象模型",
+          "modelType": "OBJECT",
+          "camp": "business-core"
+        },
+        {
+          "model": "M2",
+          "name": "行为模型",
+          "modelType": "BEHAVIOR",
+          "camp": "business-core"
+        },
+        {
+          "model": "M3",
+          "name": "规则模型",
+          "modelType": "RULE",
+          "camp": "business-core"
+        },
+        {
+          "model": "M5",
+          "name": "主体模型",
+          "modelType": "ACTOR",
+          "camp": "business-core"
+        },
+        {
+          "model": "M6",
+          "name": "流程模型",
+          "modelType": "FLOW",
+          "camp": "business-core"
+        },
+        {
+          "model": "M7",
+          "name": "查询统计与报表模型",
+          "modelType": "REPORT",
+          "camp": "business-core"
+        },
+        {
+          "model": "GLS",
+          "name": "术语模型",
+          "modelType": "GLOSSARY",
+          "camp": "business-core"
+        }
+      ],
+      "schemaVersion": "1.0.0",
+      "omittedModels": [
+        {
+          "model": "MU",
+          "reason": "R5 全文无界面/屏幕/菜单素材证据，MU 不建文件——裁决记录 docs/walkthrough/step2-mr-adjudication.md，理由记 lessons/09（票 13 AC6 反向豁免登记）。"
+        }
+      ]
+    }
+  ],
+  "tools": [
+    {
+      "name": "semantic_ask",
+      "description": "语义问答（受控检索瀑布：显式锚定→ID/名称解析→闭包装配→可拒答）。返回确定性骨架回答，必带「本回答引用的元素 ID」清单（ID 可 grep 追溯）；仓内没有/检索面外/禁用词按裁决拒答并说明缺口，绝不编造；写意图一律回「走提案流程」（本服务只读）。问题可含 @元素ID 显式锚定。",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "question": {
+            "type": "string",
+            "description": "业务问题（可含 @元素ID 显式锚定）"
+          }
+        },
+        "required": [
+          "question"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "semantic_query",
+      "description": "按元素 ID 查询单个本体节点：存在性、模型归属、域、文件位置与属性简报；未找到明确报错不猜（不做名称猜测、不做近似拼写建议）。",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "element_id": {
+            "type": "string",
+            "description": "元素 ID（如 AGG-BOHAI-001）"
+          }
+        },
+        "required": [
+          "element_id"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "semantic_closure",
+      "description": "引用闭包：沿 ref 正向走 N 跳，返回该元素引用的下游节点集（逐条带引用字段与跳数；N>=1，默认 3）。",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "element_id": {
+            "type": "string",
+            "description": "元素 ID"
+          },
+          "hops": {
+            "type": "integer",
+            "minimum": 1,
+            "default": 3,
+            "description": "闭包跳数（>=1，默认 3）"
+          }
+        },
+        "required": [
+          "element_id"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "semantic_impact",
+      "description": "影响分析：沿依赖边反向走到底，返回受影响节点集（谁引用它：行为/规则/流程/查询出口等，逐条带引用字段与跳数）。",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "element_id": {
+            "type": "string",
+            "description": "元素 ID"
+          }
+        },
+        "required": [
+          "element_id"
+        ],
+        "additionalProperties": false
+      }
+    }
+  ],
+  "generatedFrom": {
+    "generator": "tools/mcp_manifest_gen.py",
+    "source": "ontology",
+    "registryVersion": "1.2.0",
+    "note": "确定性派生物：零时间戳，同本体仓任意机器重生成字节一致；禁手改，防陈旧断言=fixtures/mcp-publisher AC2（--check 再制一致）"
+  }
+}
