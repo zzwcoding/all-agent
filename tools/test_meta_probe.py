@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
-"""meta_probe.py 的单测（票 28：元循环探针）。
+"""meta_probe.py 的单测（票 28 建：元循环探针；票 29 增第 10 项与豁免复核并入）。
 
 TDD 面全部注入式（票面红线：collectors 用 tempfile 造 root + 假 runner 注入），
 对真仓一条集成冒烟（skipUnless 真仓在位——本仓开发即真仓，实跑）。
-覆盖：九项全绿 exit 0 / 硬闸红灯路径（出厂集 fail、语义闸 L1、安装位漂移、
-skill 无卡）→ exit 1 / 工具缺席与坏输出 → SKIPPED 降级不崩（AC4）/
-信息项红不判死（CORE 期望漂移、提案冲突、豁免行缺理由）/ --out 双落盘 /
-用法错误 exit 2 / 真仓冒烟（硬闸全绿 + CORE 八问分布钉死）。
+覆盖：十项全绿 exit 0 / 硬闸红灯路径（出厂集 fail、语义闸 L1、安装位漂移、
+skill 无卡、路由表坏表/坏 JSON/缺类/坏 commit/坏 PROP）→ exit 1 /
+工具缺席与坏输出 → SKIPPED 降级不崩（AC4）/ 信息项红不判死（CORE 期望漂移、
+提案冲突、豁免行缺理由）/ 豁免复核结论并入（--review 与缺省
+docs/meta/exemption-reviews.json 两条路，无结论=留空栏，坏结论文件=注记不判死）/
+--out 双落盘 / 用法错误 exit 2 / 真仓冒烟（硬闸 5/5 全绿 + CORE 八问分布钉死）。
 """
 
 import io
@@ -36,6 +38,7 @@ class FakeRepo:
         (self.root / "skills").mkdir()
         (self.root / "docs" / "proposals").mkdir(parents=True)
         (self.root / "ontology" / "bohai").mkdir(parents=True)
+        self.add_routing_table()  # 缺省绿路由表（票 29 第 10 项；坏表场景各自覆写）
 
     def cleanup(self):
         self.tmp.cleanup()
@@ -59,6 +62,41 @@ class FakeRepo:
                    f"---\nid: PROP-X-{name}\ntitle: t\nstatus: {status}\n"
                    f"source-signal:\n  kind: k\n  ref: r\ntarget:\n  model: M\n"
                    f"  element: E\nchange: add\nrationale: r\n---\n\n正文\n")
+
+    def add_routing_table(self, table=None):
+        """合法路由表 + 表内引用的 PROP 文件（默认绿表；坏表场景传 table 覆写）。"""
+        self.write("policies/signal-routing.json",
+                   json.dumps(table or TEST_ROUTING, ensure_ascii=False,
+                              indent=2))
+        for pid in ("PROP-BOHAI-005", "PROP-BOHAI-006", "PROP-BOHAI-031"):
+            self.write(f"docs/proposals/{pid}.md",
+                       f"---\nid: {pid}\ntitle: t\nstatus: open\n---\n\n正文\n")
+
+    def drop_routing_table(self):
+        (self.root / "policies" / "signal-routing.json").unlink()
+
+
+# 测试用绿路由表：三类齐、每类 2 条实例（commit 由假 git 一律验存；PROP 文件由
+# add_routing_table 落盘）——只测探针的判定逻辑，不测真表内容（真表由真仓冒烟管）。
+TEST_ROUTING = {
+    "version": 1,
+    "routes": [
+        {"kind": "业务错", "destination": "本体 MR（人审）", "mechanism": "提案池→人 merge",
+         "instances": [
+             {"desc": "落池", "ticket": "19", "commit": "aaaa111",
+              "props": ["PROP-BOHAI-006", "PROP-BOHAI-031"]},
+             {"desc": "回填", "ticket": "17", "commit": "bbbb222",
+              "props": ["PROP-BOHAI-005"]}]},
+        {"kind": "工程错", "destination": "tickets/ 票", "mechanism": "一票一提交",
+         "instances": [
+             {"desc": "图索引", "ticket": "04", "commit": "cccc333"},
+             {"desc": "camp 裁剪", "ticket": "25", "commit": "dddd444"}]},
+        {"kind": "元模型错", "destination": "schema 演进票", "mechanism": "CHANGELOG+版本号",
+         "instances": [
+             {"desc": "GLS", "ticket": "10", "commit": "eeee555"},
+             {"desc": "缺 id", "ticket": "27", "commit": "ffff666"}]},
+    ],
+}
 
 
 def fx_json(status="pass", suites=(("alpha", "pass"), ("beta", "pass"))):
@@ -103,7 +141,7 @@ def core_status_runner(status_by_ask):
 
 
 def green_routes(extra=None):
-    """九项探针的「全绿」假 runner 路由（None 槽位交给 core runner）。"""
+    """十项探针的「全绿」假 runner 路由（None 槽位交给 core runner）。"""
     routes = {
         "fixture_run": (0, fx_json(), ""),
         "schema_check": (0, SC_GREEN, ""),
@@ -111,6 +149,7 @@ def green_routes(extra=None):
         "install_skills": (0, IS_GREEN, ""),
         "proposal_check": (0, PC_GREEN, ""),
         "graph_index": (0, GI_FOUND, ""),
+        "git": (0, "0474bc8\n", ""),  # 路由表 commit 核实（一律验存）
     }
     if extra:
         routes.update(extra)
@@ -124,6 +163,8 @@ def make_runner(routes, core_runner=None):
             return core_runner(cmd)
         for key, resp in routes.items():
             if resp is not None and key in joined:
+                if callable(resp):
+                    return resp(cmd)  # 按命令细分的假响应（如坏 commit 只红特定哈希）
                 if resp == "MISSING":
                     return 127, "", f"工具缺席: {key}"
                 if resp == "GARBAGE":
@@ -157,7 +198,7 @@ class MetaProbeAllGreen(unittest.TestCase):
     def tearDown(self):
         self.repo.cleanup()
 
-    def test_nine_items_all_green_exit_zero(self):
+    def test_ten_items_all_green_exit_zero(self):
         self.repo.add_cards(["a-skill", "b-skill", "placeholder"])
         self.repo.add_skill("a-skill")
         self.repo.add_skill("b-skill")
@@ -167,14 +208,27 @@ class MetaProbeAllGreen(unittest.TestCase):
         items = run_probe(self.root, make_runner(green_routes(),
                                                  core_status_runner(ALL_EXPECT)))
         self.assertEqual([i["id"] for i in items],
-                         ["1", "2", "3", "4", "5", "6", "7", "8", "9"])
+                         ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"])
         conclusion, exit_code = mp.evaluate(items)
         self.assertEqual((conclusion, exit_code), ("PASS", 0))
         hard = [i for i in items if i["kind"] == "hard"]
-        self.assertEqual({i["id"] for i in hard}, {"1", "2", "6", "7"})
+        self.assertEqual({i["id"] for i in hard}, {"1", "2", "6", "7", "10"})
         self.assertTrue(all(i["status"] == "green" for i in hard))
 
-    def test_md_has_nine_sections_and_conclusion(self):
+    def test_routing_table_green_checks_all_pointers(self):
+        items = run_probe(self.root, make_runner(green_routes(),
+                                                 core_status_runner(ALL_EXPECT)))
+        rt = items[9]
+        self.assertEqual(rt["status"], "green")
+        self.assertEqual(rt["data"]["kindsFound"],
+                         ["业务错", "工程错", "元模型错"])
+        self.assertEqual(len(rt["data"]["commitChecks"]), 6)
+        self.assertTrue(all(c["exists"] for c in rt["data"]["commitChecks"]))
+        self.assertEqual({p["prop"] for p in rt["data"]["propChecks"]
+                          if p["exists"]},
+                         {"PROP-BOHAI-005", "PROP-BOHAI-006", "PROP-BOHAI-031"})
+
+    def test_md_has_ten_sections_and_conclusion(self):
         self.repo.add_cards(["a-skill", "b-skill"])
         self.repo.add_skill("a-skill")
         self.repo.add_skill("b-skill")
@@ -182,7 +236,7 @@ class MetaProbeAllGreen(unittest.TestCase):
                                                  core_status_runner(ALL_EXPECT)))
         md = mp.render_md(items, "PASS", Path("ontology/bohai"), self.root,
                           "2026-09-19 00:00:00")
-        for n in range(1, 10):
+        for n in range(1, 11):
             self.assertIn(f"## {n}. ", md)
         self.assertIn("结论: PASS", md)
         self.assertIn("生成时间: 2026-09-19 00:00:00", md)
@@ -254,6 +308,123 @@ class MetaProbeHardRedPaths(unittest.TestCase):
     def test_schema_tool_missing_skipped_exit0(self):
         items = self._probe(green_routes({"schema_check": "MISSING"}))
         self.assertEqual(items[1]["status"], "skipped")
+
+
+class MetaProbeSignalRoutingRed(unittest.TestCase):
+    """票 29 AC2：路由表自检（第 10 项）红灯可注入——坏表各形态 → 红 + exit 1。"""
+
+    def setUp(self):
+        self.repo = FakeRepo()
+
+    def tearDown(self):
+        self.repo.cleanup()
+
+    def _table(self):
+        return json.loads(json.dumps(TEST_ROUTING))
+
+    def _probe(self, table="KEEP", routes=None, drop=False):
+        if drop:
+            self.repo.drop_routing_table()
+        elif table != "KEEP":
+            self.repo.add_routing_table(table)
+        items = run_probe(self.repo.root,
+                          make_runner(routes or green_routes(),
+                                      core_status_runner(ALL_EXPECT)))
+        return items
+
+    def test_missing_table_red_exit1(self):
+        items = self._probe(drop=True)
+        self.assertEqual(items[9]["status"], "red")
+        self.assertIn("不存在", items[9]["summary"])
+        self.assertEqual(mp.evaluate(items), ("FAIL", 1))
+
+    def test_bad_json_red_exit1(self):
+        self.repo.write("policies/signal-routing.json", "{这不是 JSON")
+        items = self._probe()
+        self.assertEqual(items[9]["status"], "red")
+        self.assertIn("合法 JSON", items[9]["summary"])
+        self.assertEqual(mp.evaluate(items), ("FAIL", 1))
+
+    def test_routes_not_list_red(self):
+        self.repo.add_routing_table({"version": 1})
+        items = self._probe()
+        self.assertEqual(items[9]["status"], "red")
+        self.assertTrue(any("routes 不是数组" in e
+                            for e in items[9]["data"]["errors"]))
+
+    def test_missing_kind_red_exit1(self):
+        table = self._table()
+        table["routes"] = table["routes"][:2]  # 少了元模型错
+        items = self._probe(table=table)
+        self.assertEqual(items[9]["status"], "red")
+        self.assertTrue(any("缺路由类「元模型错」" in e
+                            for e in items[9]["data"]["errors"]))
+        self.assertEqual(mp.evaluate(items), ("FAIL", 1))
+
+    def test_unknown_kind_red(self):
+        table = self._table()
+        table["routes"].append({"kind": "文档错", "destination": "x",
+                                "mechanism": "y",
+                                "instances": [{"commit": "cccc333"},
+                                              {"commit": "dddd444"}]})
+        items = self._probe(table=table)
+        self.assertEqual(items[9]["status"], "red")
+        self.assertTrue(any("未知路由类" in e for e in items[9]["data"]["errors"]))
+
+    def test_bad_commit_pointer_red_exit1(self):
+        def git_split(cmd):
+            return (1, "", "fatal: 无效对象") if "dddd444" in " ".join(cmd) \
+                else (0, "ok\n", "")
+        table = self._table()
+        table["routes"][1]["instances"][1]["commit"] = "dddd444"
+        items = self._probe(table=table,
+                            routes=green_routes({"git": git_split}))
+        self.assertEqual(items[9]["status"], "red")
+        self.assertTrue(any("commit dddd444" in e
+                            for e in items[9]["data"]["errors"]))
+        ok = [c for c in items[9]["data"]["commitChecks"] if c["exists"]]
+        bad = [c for c in items[9]["data"]["commitChecks"] if not c["exists"]]
+        self.assertEqual([c["commit"] for c in bad], ["dddd444"])
+        self.assertEqual(len(ok), 5)
+        self.assertEqual(mp.evaluate(items), ("FAIL", 1))
+
+    def test_bad_prop_pointer_red(self):
+        table = self._table()
+        table["routes"][0]["instances"][0]["props"] = ["PROP-NOPE-999"]
+        items = self._probe(table=table)
+        self.assertEqual(items[9]["status"], "red")
+        self.assertTrue(any("PROP-NOPE-999 不在 docs/proposals/" in e
+                            for e in items[9]["data"]["errors"]))
+        self.assertEqual(mp.evaluate(items), ("FAIL", 1))
+
+    def test_too_few_instances_red(self):
+        table = self._table()
+        table["routes"][2]["instances"] = table["routes"][2]["instances"][:1]
+        items = self._probe(table=table)
+        self.assertEqual(items[9]["status"], "red")
+        self.assertTrue(any("实例指针不足 2 条" in e
+                            for e in items[9]["data"]["errors"]))
+
+    def test_instance_without_pointer_red(self):
+        table = self._table()
+        table["routes"][2]["instances"][1] = {"desc": "空指针"}
+        items = self._probe(table=table)
+        self.assertEqual(items[9]["status"], "red")
+        self.assertTrue(any("缺 commit/props 指针" in e
+                            for e in items[9]["data"]["errors"]))
+
+    def test_route_missing_destination_mechanism_red(self):
+        table = self._table()
+        del table["routes"][1]["mechanism"]
+        items = self._probe(table=table)
+        self.assertEqual(items[9]["status"], "red")
+        self.assertTrue(any("缺 destination/mechanism" in e
+                            for e in items[9]["data"]["errors"]))
+
+    def test_git_missing_skipped_degraded_exit0(self):
+        items = self._probe(routes=green_routes({"git": "MISSING"}))
+        self.assertEqual(items[9]["status"], "skipped")
+        self.assertEqual(mp.evaluate(items), ("DEGRADED", 0))
         self.assertEqual(mp.evaluate(items), ("DEGRADED", 0))
 
 
@@ -330,8 +501,9 @@ class MetaProbeInfoItems(unittest.TestCase):
         self.repo.add_prop("003", "accepted")
         items = self._probe()
         data = items[7]["data"]
-        self.assertEqual(data["statusCounts"], {"open": 2, "accepted": 1})
-        self.assertEqual(data["files"], 3)
+        # FakeRepo 缺省路由表自带 3 份 PROP-BOHAI-*（open），一并计入
+        self.assertEqual(data["statusCounts"], {"open": 5, "accepted": 1})
+        self.assertEqual(data["files"], 6)
         self.assertEqual(items[7]["status"], "green")
 
     def test_proposal_conflict_red_but_exit0(self):
@@ -368,6 +540,86 @@ class MetaProbeInfoItems(unittest.TestCase):
         self.assertEqual(items[6]["data"]["cardNoSkill"], ["future-card"])
 
 
+class MetaProbeReviewMerge(unittest.TestCase):
+    """票 29：豁免复核结论并入——--review 显式 / 缺省 docs/meta/exemption-reviews.json
+    两条路；无结论=留空栏；坏结论文件=注记不判死；未匹配模式=注记防漂移。"""
+
+    def setUp(self):
+        self.repo = FakeRepo()
+        self.repo.add_cards(["a-skill", "b-skill"])
+        self.repo.add_skill("a-skill")
+        self.repo.add_skill("b-skill")
+        self.repo.write(".skill-deps-allow",
+                        "fixtures/onto/**  # 出厂集 Seam（票 05）\n"
+                        "fixtures/db/**  # 出厂集 Seam（票 06）\n")
+
+    def tearDown(self):
+        self.repo.cleanup()
+
+    def _run(self, extra_argv, review_file=None):
+        review = {"reviewedBy": "L0", "reviewedAt": "2026-09-19",
+                  "entries": [
+                      {"file": "fixtures/onto/**", "verdict": "保留",
+                       "reason": "Seam 声明面闸不解析，机制性豁免"},
+                      {"file": "fixtures/db/**", "verdict": "保留",
+                       "reason": "同 Seam 机制性豁免"}]}
+        if review_file:
+            self.repo.write(review_file, json.dumps(review, ensure_ascii=False))
+        argv = ([str(self.repo.root / "ontology" / "bohai"),
+                 "--root", str(self.repo.root)] + extra_argv)
+        return run_main(argv, runner=make_runner(green_routes(),
+                                                 core_status_runner(ALL_EXPECT)))
+
+    def test_explicit_review_flag_merges_into_md(self):
+        rc, out = self._run(["--review", str(self.repo.root / "reviews.json")],
+                            review_file="reviews.json")
+        self.assertEqual(rc, 0)
+        self.assertIn("豁免复核: 本次留痕并入 2 条复核结论"
+                      "（复核人 L0，复核日期 2026-09-19", out)
+        self.assertIn("- [x] 保留（L0 2026-09-19）: "
+                      "Seam 声明面闸不解析，机制性豁免", out)
+        self.assertIn("人工复核结论（复核人 / 日期）", out)
+
+    def test_default_review_path_autoload(self):
+        rc, out = self._run([], review_file="docs/meta/exemption-reviews.json")
+        self.assertEqual(rc, 0)
+        self.assertIn("豁免复核: 本次留痕并入 2 条复核结论", out)
+
+    def test_summary_table_row_updated_not_blank(self):
+        rc, out = self._run([], review_file="docs/meta/exemption-reviews.json")
+        self.assertIn("| 边界闸豁免 | 信息 | GREEN | 2 条豁免"
+                      "（复核结论已并入 2 条，复核人 L0，复核日期 2026-09-19） |",
+                      out)
+
+    def test_list_form_accepted(self):
+        self.repo.write("docs/meta/exemption-reviews.json", json.dumps(
+            [{"file": "fixtures/onto/**", "verdict": "保留", "reason": "机制性"}],
+            ensure_ascii=False))
+        rc, out = self._run([])
+        self.assertIn("- [x] 保留（— —）: 机制性", out)
+
+    def test_no_review_file_leaves_blank_slots(self):
+        rc, out = self._run([])
+        self.assertEqual(rc, 0)
+        self.assertIn("人工复核（值留空，批收官填）", out)
+        self.assertIn("- [ ] 保留 / 可收敛: ____", out)
+
+    def test_bad_review_file_noted_not_fatal(self):
+        self.repo.write("docs/meta/exemption-reviews.json", "{坏 JSON")
+        rc, out = self._run([])
+        self.assertEqual(rc, 0)
+        self.assertIn("复核结论文件注记", out)
+        self.assertIn("- [ ] 保留 / 可收敛: ____", out)
+
+    def test_unmatched_pattern_noted(self):
+        self.repo.write("docs/meta/exemption-reviews.json", json.dumps(
+            {"reviewedBy": "L0", "reviewedAt": "2026-09-19",
+             "entries": [{"file": "fixtures/ghost/**", "verdict": "可收敛",
+                          "reason": "r"}]}, ensure_ascii=False))
+        rc, out = self._run([])
+        self.assertIn("1 条结论模式未匹配豁免清单（fixtures/ghost/**）", out)
+
+
 class MetaProbeCli(unittest.TestCase):
     def setUp(self):
         self.repo = FakeRepo()
@@ -392,7 +644,7 @@ class MetaProbeCli(unittest.TestCase):
                            runner=make_runner(green_routes(),
                                               core_status_runner(ALL_EXPECT)))
         self.assertEqual(rc, 0)
-        self.assertIn("## 9. ", out)
+        self.assertIn("## 10. ", out)
         self.assertIn("结论: PASS", out)
 
     def test_out_writes_md_and_json_pair(self):
@@ -406,7 +658,7 @@ class MetaProbeCli(unittest.TestCase):
         self.assertIn("结论: PASS", md)
         self.assertEqual(data["conclusion"], "PASS")
         self.assertEqual(data["exitCode"], 0)
-        self.assertEqual(len(data["probes"]), 9)
+        self.assertEqual(len(data["probes"]), 10)
         self.assertIn("generatedAt", data)
 
     def test_out_hard_red_exit1_files_still_written(self):
@@ -427,7 +679,8 @@ class MetaProbeCli(unittest.TestCase):
     and (REAL_ROOT / "ontology" / "bohai").is_dir(),
     "真仓不在位（tools/meta_probe.py 或 ontology/bohai 缺）")
 class MetaProbeRealRepoSmoke(unittest.TestCase):
-    """AC1 机读面：真仓实跑硬闸全绿 + CORE 八问分布钉死 + 图基线在场。"""
+    """AC1 机读面：真仓实跑硬闸 5/5 全绿 + CORE 八问分布钉死 + 图基线在场
+    + 路由表三类齐且指针全核实（票 29）。"""
 
     def test_real_repo_all_hard_green_and_core_dist(self):
         runner = mp.subprocess_runner(REAL_ROOT)
@@ -445,6 +698,12 @@ class MetaProbeRealRepoSmoke(unittest.TestCase):
         sync = next(i for i in items if i["id"] == "7")
         self.assertEqual(sync["data"]["skillNoCard"], [])
         self.assertTrue(sync["data"]["cardNoSkill"])  # 占位卡在列（不判违规）
+        rt = next(i for i in items if i["id"] == "10")
+        self.assertEqual(rt["status"], "green")
+        self.assertEqual(rt["data"]["kindsFound"], list(mp.ROUTING_KINDS))
+        self.assertTrue(all(c["exists"] for c in rt["data"]["commitChecks"]))
+        self.assertTrue(all(p["exists"] for p in rt["data"]["propChecks"]))
+        self.assertEqual(rt["data"]["errors"], [])
 
 
 if __name__ == "__main__":

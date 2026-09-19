@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
-"""meta_probe.py —— 元循环探针（票 28，PRD F14 第一件）。
+"""meta_probe.py —— 元循环探针（票 28 建；票 29 增第 10 项与豁免复核并入，PRD F14）。
 
-一键确定性体检：九项探针全部只读现有闸与文件（子进程采集 + 文件机读），
+一键确定性体检：十项探针全部只读现有闸与文件（子进程采集 + 文件机读），
 零 LLM、不新增判定真源——判定归各闸，探针只采集与呈现。
 
-九项（〔硬闸〕红 → 退出码 1；（信息）红只注记不判死）：
+十项（〔硬闸〕红 → 退出码 1；（信息）红只注记不判死）：
   1.〔硬闸〕出厂集：fixture_run --require-fixtures --json，逐套 PASS/PENDING/FAIL
   2.〔硬闸〕语义闸：schema_check <target> --json，L1/L2/L4 计数
   3.（信息）CORE 分布：八问逐条 semantic_service_core --json，status 分布+期望对照。
      八问常量表与 fixtures/semantic-service/assertions.json CORE-01–08 同步维护
      （断言 fixture 是真源，此处是探针内置副本）——改问/改期望两处一起改。
      问题集按渤海域冻结：换域跑探针时本项期望对照自然漂移（信息红，不判死）。
-  4.（信息）边界闸豁免：.skill-deps-allow 逐条列出+人工复核栏（值留空，批收官填）
+  4.（信息）边界闸豁免：.skill-deps-allow 逐条列出+人工复核栏（值留空，批收官填；
+     复核结论由 --review 或缺省 docs/meta/exemption-reviews.json 并入留痕，票 29）
   5.（信息）归档豁免：.archive-allow 同上（文件缺席=0 条，不是错）
   6.〔硬闸〕安装位：install_skills --check --json，漂移/孤儿/注册表规模
   7.〔硬闸〕skill↔卡同步：specs/modules.md `## skill:` 卡名集合 vs skills/*/SKILL.md
@@ -20,8 +21,19 @@
      （报其退出码；rc=1 有冲突/违规 → 信息红）
   9.（信息）图基线：graph_index <target> --query <ID> --json 的节点/边快照
      （对照漂移用；快照值随报告走，ID 缺 --graph-query 传）
+ 10.〔硬闸〕信号路由表（票 29）：policies/signal-routing.json 自检——合法 JSON、
+     routes 恰三类（kind 覆盖 业务错/工程错/元模型错）、每类 instances ≥2 条且
+     指针逐个核实（commit 在 git log、PROP 文件在 docs/proposals/）；任一不满足
+     =硬闸红（路由表坏=体检红；约定不落闸等于没有）。
 
-报告：MD（九节+结论行）+ 机读 JSON；--out <路径>.md 同时落同名 .json；
+豁免复核并入（票 29）：--review <JSON 路径> 指向人工复核结论文件（格式：
+[{"file":"<豁免路径模式>","verdict":"保留|可收敛|…","reason":"…"}]，或
+{"reviewedBy":"L0","reviewedAt":"2026-09-19","entries":[…同上]}）；缺省自动读
+docs/meta/exemption-reviews.json（随批更新的机读结论，协议第 9 条④）。有则并入
+报告第 4/5 节复核栏（复核人/日期进留痕），无则留空栏；结论文件缺席/不可解析
+只注记不判死（复核是人工义务，探针不代判）。
+
+报告：MD（十节+结论行）+ 机读 JSON；--out <路径>.md 同时落同名 .json；
 缺省只打 MD 到 stdout。留痕报告带生成时间戳（留痕不是 golden，确定性只要求
 "同仓快照重跑结论一致"）。
 
@@ -48,10 +60,16 @@ RC_TIMEOUT = 124
 PROBE_TITLES = {
     "1": "出厂集", "2": "语义闸", "3": "CORE 分布", "4": "边界闸豁免",
     "5": "归档豁免", "6": "安装位", "7": "skill↔卡同步", "8": "提案池",
-    "9": "图基线",
+    "9": "图基线", "10": "信号路由表",
 }
-HARD_IDS = {"1", "2", "6", "7"}
+HARD_IDS = {"1", "2", "6", "7", "10"}
 STATUS_MARK = {"green": "GREEN", "red": "RED", "skipped": "SKIPPED"}
+
+# 信号路由表契约（票 29，真源=policies/signal-routing.json；本表只定探针怎么查）
+ROUTING_TABLE_REL = Path("policies") / "signal-routing.json"
+ROUTING_KINDS = ("业务错", "工程错", "元模型错")
+ROUTING_MIN_INSTANCES = 2  # 设计裁决：三类各 ≥2 个真实实例指针
+DEFAULT_REVIEW_REL = Path("docs") / "meta" / "exemption-reviews.json"
 
 # 八问常量表（真源=fixtures/semantic-service/assertions.json CORE-01–08，
 # 票 25 冻结期望；本表是探针内置副本，同步维护，别处不立第二份）。
@@ -155,6 +173,81 @@ def _prop_status(path: Path) -> str | None:
     scope = m.group(1) if m else text
     m2 = re.search(r"^status:\s*(\S+)\s*$", scope, re.M)
     return m2.group(1) if m2 else None
+
+
+def load_reviews(path: Path | None) -> "tuple[dict | None, str | None]":
+    """豁免复核结论文件（票 29）→ (规范化 dict, 解析错误)。
+
+    接受两种形态：list[entry]（纯条目数组）或 {"reviewedBy","reviewedAt",
+    "entries":[entry]}（带署名对象）；entry = {"file":<豁免路径模式>,
+    "verdict":<结论>,"reason":<一行理由>}。文件缺席 → (None, None)（留空栏，
+    不是错）；不可解析/结构不符 → (None, 原因)（注记，不判死）。
+    """
+    if path is None or not path.is_file():
+        return None, None
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, UnicodeDecodeError) as exc:
+        return None, f"复核结论文件不可解析（忽略，留空栏）: {exc}"
+    if isinstance(data, list):
+        return {"entries": data}, None
+    if isinstance(data, dict) and isinstance(data.get("entries"), list):
+        return data, None
+    return None, "复核结论文件结构不符（需 list 或 {entries:[...]}）（忽略，留空栏）"
+
+
+def attach_reviews(root: Path, items: list[dict],
+                   review_path: Path | None) -> list[dict]:
+    """把复核结论按路径模式并入第 4/5 项 data["reviews"]（票 29）。
+
+    byPattern: 模式 → {verdict, reason, reviewedBy, reviewedAt}（entry 级署名
+    优先，缺省回落顶层）；unmatched: 结论文件里有、豁免清单里没有的模式
+    （注记，防结论文件与豁免清单漂移后静默失配）。
+    """
+    data, err = load_reviews(review_path)
+    for item in items:
+        if item["id"] in ("4", "5"):
+            item["data"]["reviews"] = {
+                "source": (str(review_path.relative_to(root))
+                           if review_path and review_path.is_relative_to(root)
+                           else (str(review_path) if review_path else None)),
+                "loaded": data is not None,
+                "reviewedBy": (data or {}).get("reviewedBy"),
+                "reviewedAt": (data or {}).get("reviewedAt"),
+                "byPattern": {},
+                "unmatched": [],
+                "error": err,
+            }
+    if data is None:
+        return items
+    top_who = data.get("reviewedBy")
+    top_date = data.get("reviewedAt")
+    by_pattern: dict = {}
+    for entry in data.get("entries", []):
+        if not isinstance(entry, dict) or not entry.get("file"):
+            continue
+        by_pattern[entry["file"]] = {
+            "verdict": entry.get("verdict", ""),
+            "reason": entry.get("reason", ""),
+            "reviewedBy": entry.get("reviewedBy", top_who),
+            "reviewedAt": entry.get("reviewedAt", top_date),
+        }
+    for item in items:
+        if item["id"] not in ("4", "5"):
+            continue
+        rv = item["data"]["reviews"]
+        patterns = [e["pattern"] for e in item["data"].get("entries", [])]
+        rv["byPattern"] = {p: c for p, c in by_pattern.items() if p in patterns}
+        rv["unmatched"] = sorted(set(by_pattern) - set(patterns))
+        if rv["byPattern"]:
+            # 摘要行同步改口，防"总表说留空、正文已填"的自相矛盾留痕
+            who = rv.get("reviewedBy") or "—"
+            when = rv.get("reviewedAt") or "—"
+            n_entries = len(item["data"].get("entries", []))
+            item["summary"] = (f"{n_entries} 条豁免（复核结论已并入 "
+                               f"{len(rv['byPattern'])} 条，复核人 {who}，"
+                               f"复核日期 {when}）")
+    return items
 
 
 # ---------- 九项采集器（全部注入式：root/runner 由调用方给） ----------
@@ -383,11 +476,109 @@ def probe_graph(root: Path, target: Path, runner: Runner,
                        "runnerExitCode": rc})
 
 
+def probe_signal_routing(root: Path, runner: Runner) -> dict:
+    """10. 信号路由表自检（硬闸，票 29）：表在、合法 JSON、恰三类、实例指针逐个真实。
+
+    (a) policies/signal-routing.json 存在且合法 JSON；(b) routes 恰三类（kind
+    覆盖 业务错/工程错/元模型错，无缺无重无多）；(c) 每类 instances ≥2 条，每条
+    指针核实——commit 走 git log 逐个验存、PROP 逐个查 docs/proposals/ 文件在池；
+    (d) 任一不满足=硬闸红。git 本身缺席 → SKIPPED 降级（环境问题不是表的问题）。
+    """
+    table = root / ROUTING_TABLE_REL
+    if not table.is_file():
+        return _hard_item("10", "red",
+                          f"路由表缺失：{ROUTING_TABLE_REL} 不存在（硬闸红）",
+                          {"table": str(ROUTING_TABLE_REL), "exists": False,
+                           "errors": ["路由表文件不存在"]})
+    try:
+        data = json.loads(table.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, UnicodeDecodeError) as exc:
+        return _hard_item("10", "red",
+                          f"路由表不是合法 JSON（硬闸红）: {exc}",
+                          {"table": str(ROUTING_TABLE_REL), "exists": True,
+                           "errors": [f"JSON 不可解析: {exc}"]})
+    if not isinstance(data, dict) or not isinstance(data.get("routes"), list):
+        return _hard_item("10", "red",
+                          "路由表结构不符：缺 routes 数组（硬闸红）",
+                          {"table": str(ROUTING_TABLE_REL), "exists": True,
+                           "errors": ["routes 不是数组（或缺顶层 routes 键）"]})
+    routes = data["routes"]
+    kinds = [r.get("kind") for r in routes if isinstance(r, dict)]
+    errors: list[str] = []
+    for k in ROUTING_KINDS:
+        if k not in kinds:
+            errors.append(f"缺路由类「{k}」")
+    for k, n in Counter(kinds).items():
+        if n > 1:
+            errors.append(f"路由类「{k}」重复 {n} 条（恰三类=不许重）")
+    for k in kinds:
+        if k not in ROUTING_KINDS:
+            errors.append(f"未知路由类「{k}」（合法: {'/'.join(ROUTING_KINDS)}）")
+
+    commit_checks: list[dict] = []
+    prop_checks: list[dict] = []
+    route_rows: list[dict] = []
+    for r in routes:
+        if not isinstance(r, dict):
+            errors.append("routes 含非对象条目")
+            continue
+        kind = r.get("kind")
+        dest, mech = r.get("destination"), r.get("mechanism")
+        if not dest or not mech:
+            errors.append(f"路由「{kind}」缺 destination/mechanism 字段")
+        instances = r.get("instances")
+        if not isinstance(instances, list) or len(instances) < ROUTING_MIN_INSTANCES:
+            errors.append(f"路由「{kind}」实例指针不足 {ROUTING_MIN_INSTANCES} 条"
+                          f"（实有 {len(instances) if isinstance(instances, list) else 0}）")
+            route_rows.append({"kind": kind, "destination": dest,
+                               "instanceCount": len(instances)
+                               if isinstance(instances, list) else 0})
+            continue
+        route_rows.append({"kind": kind, "destination": dest,
+                           "instanceCount": len(instances)})
+        for n, inst in enumerate(instances, 1):
+            if not isinstance(inst, dict) or not (inst.get("commit") or inst.get("props")):
+                errors.append(f"路由「{kind}」第 {n} 条实例缺 commit/props 指针")
+                continue
+            commit = inst.get("commit")
+            if commit:
+                rc, _out, err = runner(["git", "-C", str(root), "log",
+                                        "--format=%h", "--no-walk", "-1",
+                                        str(commit)])
+                if rc in (RC_SPAWN_FAIL, RC_TIMEOUT):
+                    return _hard_item("10", "skipped",
+                                      f"git 不可用，commit 核实降级 SKIPPED：{err.strip() or rc}",
+                                      error=err.strip() or f"rc={rc}")
+                ok = rc == 0
+                commit_checks.append({"commit": commit, "ticket": inst.get("ticket"),
+                                      "desc": inst.get("desc", ""), "exists": ok})
+                if not ok:
+                    errors.append(f"commit {commit}（{inst.get('desc', '')}）不在 git log")
+            for prop in inst.get("props") or []:
+                in_pool = (root / "docs" / "proposals" / f"{prop}.md").is_file()
+                prop_checks.append({"prop": prop, "exists": in_pool})
+                if not in_pool:
+                    errors.append(f"提案 {prop} 不在 docs/proposals/（不在池）")
+    ok = not errors
+    if ok:
+        summary = (f"三类路由齐（{'/'.join(ROUTING_KINDS)}），实例指针 "
+                   f"{len(commit_checks)} commit 全在 log + {len(prop_checks)} PROP 全在池")
+    else:
+        head = "；".join(errors[:3])
+        more = f"（等共 {len(errors)} 处）" if len(errors) > 3 else ""
+        summary = f"路由表自检红 {len(errors)} 处：{head}{more}"
+    return _hard_item("10", "green" if ok else "red", summary,
+                      {"table": str(ROUTING_TABLE_REL), "exists": True,
+                       "version": data.get("version"), "routes": route_rows,
+                       "kindsFound": kinds, "commitChecks": commit_checks,
+                       "propChecks": prop_checks, "errors": errors})
+
+
 # ---------- 汇总 / 评估 / 渲染 ----------
 
 def collect_all(root: Path, target: Path, runner: Runner,
                 graph_query: str = DEFAULT_GRAPH_QUERY) -> list[dict]:
-    """跑九项探针。单项采集异常 → 该项 SKIPPED 降级，不崩（票面 AC4）。"""
+    """跑十项探针。单项采集异常 → 该项 SKIPPED 降级，不崩（票面 AC4）。"""
     specs = [
         ("1", lambda: probe_fixtures(root, runner)),
         ("2", lambda: probe_schema(root, target, runner)),
@@ -398,6 +589,7 @@ def collect_all(root: Path, target: Path, runner: Runner,
         ("7", lambda: probe_card_sync(root)),
         ("8", lambda: probe_proposals(root, runner)),
         ("9", lambda: probe_graph(root, target, runner, graph_query)),
+        ("10", lambda: probe_signal_routing(root, runner)),
     ]
     items = []
     for pid, fn in specs:
@@ -431,19 +623,19 @@ def render_md(items: list[dict], conclusion: str, target: Path, root: Path,
     red = [i for i in hard if i["status"] == "red"]
     skipped = [i for i in hard if i["status"] == "skipped"]
     if conclusion == "PASS":
-        tail = "硬闸 4/4 全绿，信息项仅注记"
+        tail = f"硬闸 {len(hard)}/{len(hard)} 全绿，信息项仅注记"
     elif conclusion == "FAIL":
         tail = "硬闸红灯：" + "、".join(f"#{i['id']} {i['title']}" for i in red)
     else:
         tail = "硬闸全绿但 " + "、".join(f"#{i['id']} {i['title']}"
                                       for i in skipped) + " 降级 SKIPPED"
     lines += [
-        "# 元循环体检报告（meta_probe · 票 28）",
+        "# 元循环体检报告（meta_probe · 票 28/29）",
         "",
         f"- 生成时间: {generated_at}",
         f"- 本体目标: {target}",
         f"- 仓根: {root}",
-        "- 探针: 九项（零 LLM，只读现有闸与文件；判定归各闸，本报告只采集与呈现）",
+        "- 探针: 十项（零 LLM，只读现有闸与文件；判定归各闸，本报告只采集与呈现）",
         "",
         f"**结论: {conclusion}** —— {tail}。退出码 "
         f"{'1' if conclusion == 'FAIL' else '0'}。",
@@ -485,14 +677,38 @@ def render_md(items: list[dict], conclusion: str, target: Path, root: Path,
                 lines.append(f"| {r['core']}（{r['q']}） | {ask} | {r['expect']} "
                              f"| {r['actual']} | {'一致' if r['match'] else '**漂移**'} |")
         elif i["id"] in ("4", "5") and d.get("entries") is not None:
+            rv = d.get("reviews") or {}
+            rmap = rv.get("byPattern") or {}
+            if rv.get("loaded") and d["entries"]:
+                # 复核注记只落在有条目的节（零条目节如"归档豁免"不背另一节的未匹配噪音）
+                who = rv.get("reviewedBy") or "—"
+                when = rv.get("reviewedAt") or "—"
+                note = (f"豁免复核: 本次留痕并入 {len(rmap)} 条复核结论"
+                        f"（复核人 {who}，复核日期 {when}；来源 {rv.get('source')}）")
+                if rv.get("unmatched"):
+                    note += (f"；{len(rv['unmatched'])} 条结论模式未匹配豁免清单"
+                             f"（{'、'.join(rv['unmatched'])}）")
+                lines += [note, ""]
+            if rv.get("error"):
+                lines.append(f"复核结论文件注记: {rv['error']}")
+                lines.append("")
+            col = ("人工复核结论（复核人 / 日期）" if rmap
+                   else "人工复核（值留空，批收官填）")
             if not d["entries"] and not d.get("badLines"):
                 lines.append("（无豁免条目）")
             else:
-                lines += ["| # | 路径模式 | 理由 | 人工复核（值留空，批收官填） |",
+                lines += ["| # | 路径模式 | 理由 | " + col + " |",
                           "|---|---|---|---|"]
                 for n, e in enumerate(d["entries"], 1):
+                    filled = "- [ ] 保留 / 可收敛: ____"
+                    c = rmap.get(e["pattern"])
+                    if c:
+                        filled = (f"- [x] {c['verdict']}"
+                                  f"（{c.get('reviewedBy') or '—'} "
+                                  f"{c.get('reviewedAt') or '—'}）"
+                                  f": {c.get('reason') or '—'}")
                     lines.append(f"| {n} | `{e['pattern']}` | {e['reason']} "
-                                 f"| - [ ] 保留 / 可收敛: ____ |")
+                                 f"| {filled} |")
                 for n, b in enumerate(d.get("badLines", []), 1):
                     lines.append(f"| 坏{n} | — | {b} | - [ ] 修复缺理由行 |")
         elif i["id"] == "6" and d:
@@ -529,6 +745,17 @@ def render_md(items: list[dict], conclusion: str, target: Path, root: Path,
                       f"{'命中' if d.get('found') else '未命中'}）",
                       f"- 图基线快照: 节点 {d.get('nodes')} / 边 {d.get('edges')}"
                       "（对照漂移用，随本报告走）"]
+        elif i["id"] == "10" and d:
+            for r in d.get("routes", []):
+                lines.append(f"- {r.get('kind')} → {r.get('destination')}"
+                             f"（实例 {r.get('instanceCount', 0)} 条）")
+            lines += [f"- commit 核实: {sum(1 for c in d.get('commitChecks', [])
+                      if c.get('exists'))}/{len(d.get('commitChecks', []))} 在 git log",
+                      f"- PROP 在池: {sum(1 for p in d.get('propChecks', [])
+                      if p.get('exists'))}/{len(d.get('propChecks', []))}"
+                      "（docs/proposals/ 文件在场）"]
+            if d.get("errors"):
+                lines.append("- 红灯明细: " + "；".join(d["errors"]))
     lines.append("")
     return "\n".join(lines)
 
@@ -538,7 +765,7 @@ def render_json(items: list[dict], conclusion: str, exit_code: int,
                 graph_query: str) -> str:
     return json.dumps({
         "tool": "meta_probe",
-        "ticket": "28",
+        "ticket": "28/29",
         "generatedAt": generated_at,
         "root": str(root),
         "ontologyTarget": str(target),
@@ -553,7 +780,7 @@ def render_json(items: list[dict], conclusion: str, exit_code: int,
 def main(argv=None, runner: Runner | None = None) -> int:
     """runner 参数供单测注入假 runner（默认在仓根跑真子进程）。"""
     ap = argparse.ArgumentParser(
-        description="元循环探针（票 28）：九项确定性体检，MD+JSON 报告；"
+        description="元循环探针（票 28/29）：十项确定性体检，MD+JSON 报告；"
                     "退出码 0 硬闸全绿 / 1 硬闸红 / 2 用法错误")
     ap.add_argument("target", help="ontology 目录（如 ontology/bohai）")
     ap.add_argument("--out", default=None,
@@ -563,6 +790,9 @@ def main(argv=None, runner: Runner | None = None) -> int:
     ap.add_argument("--graph-query", default=DEFAULT_GRAPH_QUERY,
                     help="图基线探针查询 ID（缺省=渤海域真实聚合对象；"
                          "换域请传该域真实 ID）")
+    ap.add_argument("--review", default=None,
+                    help="豁免复核结论 JSON（票 29；缺省自动读仓根 "
+                         + str(DEFAULT_REVIEW_REL) + "，文件缺席=留空栏）")
     args = ap.parse_args(argv)
 
     root = (Path(args.root).resolve() if args.root
@@ -571,10 +801,14 @@ def main(argv=None, runner: Runner | None = None) -> int:
     if not target.is_dir():
         print(f"用法错误: 本体目录不存在: {args.target}", file=sys.stderr)
         return 2
+    review_path = (Path(args.review) if args.review
+                   else (root / DEFAULT_REVIEW_REL
+                         if (root / DEFAULT_REVIEW_REL).is_file() else None))
 
     generated_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     items = collect_all(root, target, runner or subprocess_runner(root),
                         graph_query=args.graph_query)
+    items = attach_reviews(root, items, review_path)
     conclusion, exit_code = evaluate(items)
 
     md = render_md(items, conclusion, target, root, generated_at)

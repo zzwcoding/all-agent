@@ -1,0 +1,33 @@
+{
+  "reviewedBy": "L0",
+  "reviewedAt": "2026-09-19",
+  "ticket": "29",
+  "note": "豁免复核结论（协议第 9 条④：随批更新，机读）。复核对象=.skill-deps-allow 全部 5 条（首批体检留痕 4 号探针的复核栏）；逐条结论=保留，理由均为机制性：出厂集 Seam 已在对应卡「Seam 与出厂集」字段显式声明，边界闸只解析 reads/writes/data 行、不解析 Seam 声明面，故豁免是对该机制的如实登记而非欠账；五条同构（4 条一期票 05–08 立、1 条二期票 18 立），无一具备可收敛条件。",
+  "entries": [
+    {
+      "file": "fixtures/onto-modeler/**",
+      "verdict": "保留",
+      "reason": "出厂集 Seam 声明面（卡「Seam 与出厂集」字段，票 05）闸不解析，豁免=机制性登记非欠账，保留"
+    },
+    {
+      "file": "fixtures/db-reverse/**",
+      "verdict": "保留",
+      "reason": "出厂集 Seam 声明面（卡字段，票 06 同票 05 手法）闸不解析，机制性豁免，保留"
+    },
+    {
+      "file": "fixtures/semantic-service/**",
+      "verdict": "保留",
+      "reason": "出厂集 Seam 声明面（卡字段，票 07 同票 05/06 手法）闸不解析，机制性豁免，保留"
+    },
+    {
+      "file": "fixtures/impact-analyzer/**",
+      "verdict": "保留",
+      "reason": "出厂集 Seam 声明面（卡字段，票 08 同票 05/06/07 手法）闸不解析，机制性豁免，保留"
+    },
+    {
+      "file": "fixtures/proposal-pool/**",
+      "verdict": "保留",
+      "reason": "出厂集 Seam 声明面（卡字段，票 18 二期同手法）闸不解析，机制性豁免，保留"
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "version": 1,
+  "description": "信号路由表（票 29，PRD F14，CONTEXT.md「信号路由表」词条的机读真源）：三类信号各走各的修复道，本表是唯一机读登记处；人读说明见 policies/README.md。维护纪律：改路由 = 改本 JSON + 每条实例指针先核实（commit 在 git log、PROP 文件在 docs/proposals/）再写入 + 跑 python3 tools/meta_probe.py ontology/bohai（第 10 项硬闸自检，红即回改）。实例指针字段：desc=一句话；ticket=票号；commit=短哈希（probe 逐个 git log 核实）；props=涉及的提案 ID（probe 逐个查 docs/proposals/ 文件在池）。每类路由 instances 至少 2 条真实指针。",
+  "routes": [
+    {
+      "kind": "业务错",
+      "destination": "本体 MR（人审）",
+      "mechanism": "docs/proposals/PROP-*.md → 人 merge（proposal-pool 起草，Owner 裁决 open→accepted/rejected，实现走本体 MR 过语义 CI）",
+      "instances": [
+        {
+          "desc": "裁决队列实弹落池（票 19；31 提案=5 闭环回填+26 开放待 Owner 裁决）",
+          "ticket": "19",
+          "commit": "1086c2b",
+          "props": ["PROP-BOHAI-006", "PROP-BOHAI-018", "PROP-BOHAI-031"]
+        },
+        {
+          "desc": "术语问句入 Golden Q 闭环（票 17 回填 accepted 提案）",
+          "ticket": "17",
+          "commit": "29f890b",
+          "props": ["PROP-BOHAI-005"]
+        }
+      ]
+    },
+    {
+      "kind": "工程错",
+      "destination": "tickets/ 票",
+      "mechanism": "tickets/NN-*.md 一票一提交（续跑协议串行派发，四闸绿收官）",
+      "instances": [
+        {
+          "desc": "图索引构建器（纯内存图+闭包/影响链 CLI）",
+          "ticket": "04",
+          "commit": "648e6fd"
+        },
+        {
+          "desc": "core 名称解析 camp 裁剪 P1 修复（复现用例 CORE-09 钉死）",
+          "ticket": "25",
+          "commit": "d0be9c2"
+        }
+      ]
+    },
+    {
+      "kind": "元模型错",
+      "destination": "schema 演进票",
+      "mechanism": "CHANGELOG+版本号+迁移注记（模型注册表/依赖白名单同步，schema 演进票伴随实现票）",
+      "instances": [
+        {
+          "desc": "术语模型 GLS 进 schema（版本 1.1.0+CHANGELOG+filename-mismatch 闸）",
+          "ticket": "10",
+          "commit": "0474bc8"
+        },
+        {
+          "desc": "schema_check 元素枚举去 id 锚定（缺 id 盲区修复，27 域全量绿灯零扰动）",
+          "ticket": "27",
+          "commit": "a4fb938"
+        }
+      ]
+    }
+  ]
+}
