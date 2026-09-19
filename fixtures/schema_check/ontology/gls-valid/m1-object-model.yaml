@@ -1,0 +1,15 @@
+model_type: OBJECT
+version: "1.0.0"
+domain: gls-fixture
+aggregates:
+  - id: AGG-GLSF-001
+    name: 井
+    alias: Well
+    description: GLS 正变体最小域唯一对象（票 10）：供术语 relatedObjectRefs 指向
+    aggregateType: AGGREGATE_ROOT
+    attributes:
+      - name: wellCode
+        label: 井号
+        type: String
+        required: true
+        unique: true

@@ -1,6 +1,6 @@
 # 票 10：术语模型 GLS（元模型演进）
 
-Status: todo
+Status: done
 Belongs to: 一期收官报告 §7 第一批 / §6 缺口 8；PRD F1 配套
 Touches: ontology/schema/、ontology/bohai/、fixtures/schema_check/、tools/schema_check.py、CONTEXT.md
 
@@ -17,9 +17,9 @@ Touches: ontology/schema/、ontology/bohai/、fixtures/schema_check/、tools/sch
 
 ## 验收（注源）
 
-- [ ] AC1–4 出厂集全绿（源：本票交接包 AC 表）
-- [ ] 渤海域术语 10 条进仓且语义闸全绿（源：docs/walkthrough/step5-fidelity.md 第三节）
-- [ ] schema.md/注册表/依赖表/CHANGELOG 四件一致，版本号已演进（源：信号路由表"元模型错"行）
+- [x] AC1–4 出厂集全绿（源：本票交接包 AC 表）
+- [x] 渤海域术语 10 条进仓且语义闸全绿（源：docs/walkthrough/step5-fidelity.md 第三节）
+- [x] schema.md/注册表/依赖表/CHANGELOG 四件一致，版本号已演进（源：信号路由表"元模型错"行）
 
 ## 交接包（L2 自主档）
 

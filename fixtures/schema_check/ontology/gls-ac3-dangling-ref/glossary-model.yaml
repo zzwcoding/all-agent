@@ -1,0 +1,11 @@
+model_type: GLOSSARY
+version: "1.0.0"
+domain: gls-ac3
+terms:
+  - id: GLS-GLSA-001
+    term: 悬空术语
+    aliases: []
+    definition: relatedObjectRefs 指向不存在的 AGG-GLSA-999——L2 dangling-ref（票 10 AC3）。
+    relatedObjectRefs: [AGG-GLSA-999]
+    status: 有效
+    source: 合成·票 10 出厂集

@@ -1,9 +1,10 @@
-# 本体仓 Schema · 七模型精简版（v9 蓝本 + 运行期字段预留）
+# 本体仓 Schema · 七模型精简版 + GLS 术语扩展（v9 蓝本 + 运行期字段预留）
 
 > 本文是本体 YAML 的 schema 文档（人读）；机读消费方两份：
 > `model-registry.json`（模型注册表：camp/consumers/profiles/dependsOn）、`model-deps.json`（类型层依赖白名单 + ID 前缀表）。
-> 执行闸：`tools/schema_check.py`（语义 CI L1–L4，断言表 `specs/schema_check.md` AC1–7）。
+> 执行闸：`tools/schema_check.py`（语义 CI L1–L4，断言表 `specs/schema_check.md` AC1–7 + 票 10 GLS-AC1–4）。
 > 蓝本：OMF v9 七模型（references/omf-spec-digest.md §0/§16，下注 `v9 §x`）；裁剪决定均注明出处。
+> GLS 术语模型为本仓自定义扩展（OMF v6/v9 均无，票 10 走"元模型错→框架版本演进"路由进 schema，演进账见 CHANGELOG.md）。
 
 ## 0. 定位与裁剪总则
 
@@ -18,11 +19,11 @@
 
 | 字段 | 必填 | 说明 |
 |---|---|---|
-| `model_type` | ✓ | 模型类型标签，取值见 model-registry.json 各模型 `modelType`（OBJECT/BEHAVIOR/RULE/ACTOR/FLOW/REPORT/UI） |
+| `model_type` | ✓ | 模型类型标签，取值见 model-registry.json 各模型 `modelType`（OBJECT/BEHAVIOR/RULE/ACTOR/FLOW/REPORT/UI/GLOSSARY） |
 | `version` | ✓ | 模型元文件版本（语义化三段，引号包裹） |
 | `domain` | ✓ | 所属域标识，与域 manifest.json 的 `domain` 一致 |
 
-文件命名固定：`m1-object-model.yaml` / `m2-behavior-model.yaml` / `m3-rule-model.yaml` / `m5-actor-model.yaml` / `m6-flow-model.yaml` / `m7-report-model.yaml` / `mu-ui-model.yaml`（v9 §10.3）。
+文件命名固定：`m1-object-model.yaml` / `m2-behavior-model.yaml` / `m3-rule-model.yaml` / `m5-actor-model.yaml` / `m6-flow-model.yaml` / `m7-report-model.yaml` / `mu-ui-model.yaml` / `glossary-model.yaml`（v9 §10.3；GLS 照 `mu-ui-model.yaml` 非数字先例，票 10）。文件名与 `model_type` 的对应真源 = model-registry.json 各模型 `yamlFile`，错挂 = L1 违规（票 10 AC4）。
 
 每个域一个目录（`ontology/<域>/`），目录内必须有 `manifest.json`：
 
@@ -50,6 +51,7 @@
 | M6 | `FLOW-` | 流程 |
 | M7 | `QR-` / `RPT-` | 查询 / 报表 |
 | MU | `SCR-` | 屏幕（OMF 建议 `frmXxx`；同理改用可校验前缀，此为第二处显式偏差） |
+| GLS | `GLS-` | 术语（`GLS-{域}-{Seq}`，票 10） |
 
 **ref 字段约定**：
 - 跨模型引用一律稳定 ID 引用，字段名统一 `xxxRef` / `xxxRefs` 后缀；少数沿用 OMF 原名（`targetAggregate`、`sourceAggregate`、`ownerEntity`、`appliedRules`、`requiredPermissions`、`inheritsFrom`、`roles`、`permissions`、`dictionaryId`、`dataSource`）——全集见 `model-deps.json` 的 `refKeys`。
@@ -204,7 +206,31 @@ M7 不是 BI 指标模型（无事实表/维度/Cube/ETL）；多个一对多来
 
 **ActionPoint**：`actionId/name/behaviorRef(对应 M2 行为)/actionType(BUTTON/SUBMIT/DRAFT/APPROVE/REJECT/RETURN)/permissionRef[](M5)`。审批双按钮规则：带审批流的屏幕必须同时含 DRAFT 与 SUBMIT 两个独立功能点（v9 §8.5）。
 
-## 11. 换义锁定字段（lockedFields，AC7 的机读真源）
+## 11. GLS 术语模型（GLOSSARY，本仓自定义扩展，票 10）
+
+OMF v6/v9 均无术语模型（digest §0/§16）。术语 = 业务概念的定义/别名/解释，与 M1 的 DICT（值域字典，承载枚举值域）不是一回事——本仓自定义扩展，走"元模型错→框架版本演进"路由进 schema（CHANGELOG.md + 机读表 version 1→1.1.0，本节即迁移票正文）。
+
+顶层：`terms[]`。
+
+| 字段 | 必填 | 说明 |
+|---|---|---|
+| id | ✓ | `GLS-{域}-{Seq}` |
+| term | ✓ | 术语词面（业务真源原文，不改动） |
+| aliases | 可选 | 同指异名（全称/标准名/别称），可空列表 |
+| termType | 可选 | 术语分类，沿业务真源原文（如 禁用词/别名/一词两译/黑话/缩写/术语/治理热词），不做枚举收敛——真源说什么是什么 |
+| definition | ✓ | 定义/解释；口径争议、禁用替代等注记逐字保真 |
+| relatedObjectRefs | 可选 | 关联 M1 聚合根 ID 列表。**只挂真实存在的对象，可空留空不硬挂**；依赖边 GLS→M1 单向登记（model-deps.json edges），指向悬空 = L2 红（GLS-AC3） |
+| status | 可选 | 状态/有效期（沿业务真源原文，如 `禁用（替代：×）`/`有效`/`有效（待联席裁决）`） |
+| owner | 可选 | 术语 Owner（业务部门） |
+| source | ✓ | 注源（如 `R5·设定书 §6`）——术语必须可溯源，无源不落仓 |
+| notes | 可选 | 补充注记（承载落点/未建原因等，人读追溯用，机器不检） |
+
+- camp=business-core、consumers=[runtime, build]：自动进 semantic-service 检索面（划界只看 camp）与生成器在场校验，无需改任何消费方。
+- **profile 组合：入 v9-full 与 headless，不入 v9-core**（v9-core = M1/M2/M3/M5 四模型最小核保持原样，术语属增强件；"未启用"因此可测——GLS-AC2 负变体）。
+- 旧域无 glossary-model.yaml 不红：缺在场不校验是既定行为（AC6 同款语义），旧域零改动兼容。
+- GLS→GLS（术语见术语）**不设专用依赖边**：当前业务面无此需求（最小够用）。若模型里出现指 GLS- 的 `xxxRef(s)` 形态字段，会落"未登记 edges 字段按 dependsOn 兜底"的判定路径（兜底集含自身，不白名单红；悬空检查仍然生效）——真要规模化再用时再显式登记边。
+
+## 12. 换义锁定字段（lockedFields，AC7 的机读真源）
 
 OMF 的 M6/M7 在 v4 换义造成过沟通成本（digest §14/§16.10）。本仓把"退役字段名"登记在 model-registry.json 各模型 `lockedFields`，schema_check 在 L4 强制：**模型文件内出现锁定字段名 = 兼容性违规**（新义必须新增字段名）。现行锁定表：
 
@@ -216,8 +242,8 @@ OMF 的 M6/M7 在 v4 换义造成过沟通成本（digest §14/§16.10）。本�
 | M6 | `eventRef` | v6 EVENT_WAIT/事件触发残留；v9 流程为同步编排 |
 | MU | `callChain` | v6 屏幕调用链；v9 以 actions 操作功能点替代 |
 
-## 12. 模型注册表与依赖白名单（机读）
+## 13. 模型注册表与依赖白名单（机读）
 
 - `model-registry.json`：每模型 `camp`（business-core/integration/build-contract；一期 integration 空，MI 未引入）、`consumers`（runtime/build）、`profiles`（可用组合：v9-full/v9-core/headless）、`dependsOn`（类型层依赖白名单摘要）。消费方：profile 裁剪、检索面划界（semantic-service 只索引 business-core）、生成器在场校验三件事共用（PRD F1）。
 - `model-deps.json`：`idPrefixes`（ID 前缀→模型）+ `refKeys`（ref 字段名全集）+ `edges`（from 模型 × ref 字段 → 允许目标模型集）。AC4/AC5 的判定真源；与 registry 的 dependsOn 做一致性核对，冲突 = L1 违规。
-- 依赖白名单要点：M2 不得依赖 M7（AC5 例证，见 §2）；M1 零依赖；M6 依赖 M1/M2/M3/M5；MU 依赖 M1/M2/M3/M5/M7。
+- 依赖白名单要点：M2 不得依赖 M7（AC5 例证，见 §2）；M1 零依赖；M6 依赖 M1/M2/M3/M5；MU 依赖 M1/M2/M3/M5/M7；GLS 只依赖 M1（relatedObjectRefs 单向边，票 10）。

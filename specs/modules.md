@@ -108,7 +108,7 @@
 
 | 规约 | 状态 |
 |---|---|
-| ontology/schema/（YAML schema + 模型注册表 model-registry.json + model-deps.json） | 已建（票 03） |
+| ontology/schema/（YAML schema + 模型注册表 model-registry.json + model-deps.json） | 已建（票 03）；票 10 增 GLS 术语模型 |
 | references/omf-spec-digest.md 等调研三件 | 已落盘 |
 
 ## 脚本清单（L3）

@@ -1,6 +1,6 @@
 {
-  "skill": "schema_check（语义 CI L1–L4 闸，票 03）",
-  "description": "最小域出厂集：两对象（井 AGG-BOHAI-001 + 单井日产量记录 AGG-BOHAI-002）七模型合法本体 + 各 AC 非法变体。断言 specs/schema_check.md AC1–7；schema 机读表经 {fixture_dir}/ontology/schema 符号链接取自仓内 ontology/schema（单一真源，不复制）。",
+  "skill": "schema_check（语义 CI L1–L4 闸，票 03；票 10 增 GLS 套件）",
+  "description": "最小域出厂集：两对象（井 AGG-BOHAI-001 + 单井日产量记录 AGG-BOHAI-002）七模型合法本体 + 各 AC 非法变体；票 10 增 GLS 术语模型套件（gls-valid 正变体 + gls-ac2/3/4 负变体）。基础断言 specs/schema_check.md AC1–7；GLS-AC1–4 真源=tickets/10-术语模型GLS.md AC 表；schema 机读表经 {fixture_dir}/ontology/schema 符号链接取自仓内 ontology/schema（单一真源，不复制）。",
   "assertions": [
     {
       "ac": "AC1",
@@ -43,6 +43,30 @@
       "type": "cmd-fails",
       "cmd": "python3 tools/schema_check.py {fixture_dir}/ontology/ac7-field-redefinition",
       "outputContains": ["field-redefinition", "producedEvents"]
+    },
+    {
+      "ac": "GLS-AC1",
+      "type": "cmd-succeeds",
+      "cmd": "python3 tools/schema_check.py {fixture_dir}/ontology/gls-valid",
+      "outputContains": ["语义闸: 全过"]
+    },
+    {
+      "ac": "GLS-AC2",
+      "type": "cmd-fails",
+      "cmd": "python3 tools/schema_check.py {fixture_dir}/ontology/gls-ac2-core-profile",
+      "outputContains": ["profile-disabled", "未启用模型 GLS"]
+    },
+    {
+      "ac": "GLS-AC3",
+      "type": "cmd-fails",
+      "cmd": "python3 tools/schema_check.py {fixture_dir}/ontology/gls-ac3-dangling-ref",
+      "outputContains": ["dangling-ref", "AGG-GLSA-999"]
+    },
+    {
+      "ac": "GLS-AC4",
+      "type": "cmd-fails",
+      "cmd": "python3 tools/schema_check.py {fixture_dir}/ontology/gls-ac4-filename-mismatch",
+      "outputContains": ["filename-mismatch", "glossary-model.yaml", "m1-object-model.yaml"]
     }
   ]
 }

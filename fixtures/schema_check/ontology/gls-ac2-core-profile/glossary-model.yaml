@@ -1,0 +1,11 @@
+model_type: GLOSSARY
+version: "1.0.0"
+domain: gls-ac2
+terms:
+  - id: GLS-GLSB-001
+    term: 不该出现的术语
+    aliases: []
+    definition: GLS 不入 v9-core 组合（票 10 设计裁决），本文件出现即 L4 profile 违规。
+    relatedObjectRefs: []
+    status: 有效
+    source: 合成·票 10 出厂集

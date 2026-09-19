@@ -1,0 +1,11 @@
+model_type: OBJECT
+version: "1.0.0"
+domain: gls-ac4
+terms:
+  - id: GLS-GLSD-001
+    term: 型写错的术语
+    aliases: []
+    definition: glossary 文件 model_type 写成 OBJECT（票 10 AC4 例），与文件名错挂——L1 filename-mismatch。
+    relatedObjectRefs: []
+    status: 有效
+    source: 合成·票 10 出厂集

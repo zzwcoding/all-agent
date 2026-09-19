@@ -1,13 +1,19 @@
 #!/usr/bin/env python3
-"""schema_check.py —— 语义 CI L1–L4 闸（All-agent 票 03；spec: specs/schema_check.md AC1–7）。
+"""schema_check.py —— 语义 CI L1–L4 闸（All-agent 票 03；spec: specs/schema_check.md AC1–7；
+票 10 增 GLS 术语模型套件 GLS-AC1–4，真源=tickets/10-术语模型GLS.md AC 表 + fixtures/schema_check/assertions.json）。
 
 对给定 ontology 目录做确定性校验：
   L1 schema 合法——YAML 可解析（AC2）、公共字段 model_type/version/domain 在场（AC3）、
-     域 manifest.json 在场且 profile 已登记、模型类型已知、schema 两份机读表互相一致；
+     域 manifest.json 在场且 profile 已登记、模型类型已知、文件名与注册表该模型
+     yamlFile 一致（票 10 AC4：GLS 文件名错挂/model_type 写错；真源=model-registry.json
+     yamlFile，即"一模型一 YAML、固定文件名"约定的闸上强化）、schema 两份机读表互相一致；
   L2 引用与依赖——ref 指向的 ID 全仓有定义（AC4 悬空引用）、ref 目标模型不越
      类型层依赖白名单（AC5，真源 ontology/schema/model-deps.json + model-registry.json）；
-  L4 profile 合规与兼容——profile 未启用的模型文件不得出现（AC6）、
+  L4 profile 合规与兼容——profile 未启用的模型文件不得出现（AC6；票 10 GLS-AC2 同款）、
      换义锁定字段（model-registry.json lockedFields）不得复用（AC7 字段换义式变更）。
+
+模型类型/文件名/前缀/依赖判定全部走两份机读表（model-registry.json + model-deps.json），
+本脚本不硬编码任何模型清单——新增模型=机读表加条目。
 
 只读不写 YAML；失败输出含文件+行级定位（行号取自 YAML node start_mark）；
 --json 供 CI 消费。依赖：Python3 stdlib + PyYAML（safe 装载，PRD 技术栈唯一第三方）。
@@ -280,6 +286,12 @@ def run(target: Path) -> dict:
                 continue
             if mkey is None:
                 continue
+            yaml_file = models[mkey].get("yamlFile")
+            if yaml_file and path.name != yaml_file:  # 票 10 AC4：文件名与 model_type 错挂
+                add("L1", "filename-mismatch", rel, data.line,
+                    f"文件名「{path.name}」与 model_type「{mtype}」的注册文件名"
+                    f"「{yaml_file}」不符（一模型一 YAML、固定文件名，"
+                    f"真源 model-registry.json yamlFile）")
             if mkey not in enabled:  # AC6
                 add("L4", "profile-disabled", rel, data.line,
                     f"profile「{profile}」未启用模型 {mkey}，但出现其文件"

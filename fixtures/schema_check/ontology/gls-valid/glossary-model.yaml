@@ -1,0 +1,28 @@
+model_type: GLOSSARY
+version: "1.0.0"
+domain: gls-fixture
+terms:
+  - id: GLS-GLSF-001
+    term: 生产井
+    aliases: [油井]
+    termType: 术语
+    definition: 正在采油的井（合成最小域术语，票 10 出厂集）。
+    relatedObjectRefs: [AGG-GLSF-001]
+    status: 有效
+    source: 合成·票 10 出厂集
+  - id: GLS-GLSF-002
+    term: 躺井
+    aliases: [停产待检泵]
+    termType: 黑话
+    definition: 作业区口语，指停产待检泵的井。
+    relatedObjectRefs: []
+    status: 有效（限作业区语境）
+    source: 合成·票 10 出厂集
+  - id: GLS-GLSF-003
+    term: 老口径
+    aliases: []
+    termType: 禁用词
+    definition: 已废弃的旧口径，禁用；替代口径=新口径。
+    relatedObjectRefs: []
+    status: 禁用（替代：新口径）
+    source: 合成·票 10 出厂集

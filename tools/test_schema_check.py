@@ -46,14 +46,24 @@ REGISTRY = {
             "profiles": ["full"],
             "dependsOn": ["M1"], "lockedFields": {},
         },
+        "GLS": {
+            "name": "术语模型", "yamlFile": "glossary-model.yaml",
+            "modelType": "GLOSSARY", "camp": "business-core",
+            "consumers": ["runtime", "build"],
+            "profiles": ["full"],
+            "dependsOn": ["M1"], "lockedFields": {},
+        },
     },
 }
 
 DEPS = {
     "version": 1,
-    "idPrefixes": {"AGG-": "M1", "BH-": "M2"},
-    "refKeys": ["ownerEntity"],
-    "edges": [{"from": "M2", "field": "ownerEntity", "to": ["M1"]}],
+    "idPrefixes": {"AGG-": "M1", "BH-": "M2", "GLS-": "GLS"},
+    "refKeys": ["ownerEntity", "relatedObjectRefs"],
+    "edges": [
+        {"from": "M2", "field": "ownerEntity", "to": ["M1"]},
+        {"from": "GLS", "field": "relatedObjectRefs", "to": ["M1"]},
+    ],
 }
 
 M1 = """model_type: OBJECT
@@ -233,6 +243,79 @@ class Misc(Base):
         v = next(v for v in report["violations"] if v["kind"] == "dangling-ref")
         # ownerEntity 行是 M2 文本的第 7 行
         self.assertEqual(v["line"], 7)
+
+
+GLOSSARY = """model_type: GLOSSARY
+version: "1.0.0"
+domain: demo
+terms:
+  - id: GLS-DEMO-001
+    term: 生产井
+    aliases: [油井]
+    definition: 正在采油的井。
+    relatedObjectRefs: [AGG-DEMO-001]
+"""
+
+
+class GlossaryModel(Base):
+    """票 10：GLS 术语模型进 schema（元模型演进）——GLS-AC1…AC4 的单测面。"""
+
+    def test_valid_glossary_passes(self):
+        # GLS-AC1：合法 glossary + relatedObjectRefs 指向真实 M1 对象 → 全过
+        self.add("m1-object-model.yaml", M1)
+        self.add("glossary-model.yaml", GLOSSARY)
+        report = self.run_check()
+        self.assertEqual(report["status"], "pass", report["violations"])
+
+    def test_gls_in_disabled_profile_is_l4(self):
+        # GLS-AC2：GLS 不入 mini 组合（对应真仓 v9-core），文件出现 → L4 红
+        write(self.root / "demo" / "manifest.json", json.dumps(
+            {"domain": "demo", "profile": "mini", "schemaVersion": "1.0.0"}))
+        self.add("glossary-model.yaml", GLOSSARY)
+        report = self.run_check()
+        v = next(v for v in report["violations"] if v["kind"] == "profile-disabled")
+        self.assertEqual(v["level"], "L4")
+        self.assertIn("GLS", v["message"])
+
+    def test_gls_dangling_object_ref_is_l2(self):
+        # GLS-AC3：relatedObjectRefs 指向不存在的 AGG- → L2 悬空引用红
+        self.add("m1-object-model.yaml", M1)
+        self.add("glossary-model.yaml", GLOSSARY.replace("AGG-DEMO-001", "AGG-DEMO-999"))
+        report = self.run_check()
+        v = next(v for v in report["violations"] if v["kind"] == "dangling-ref")
+        self.assertEqual(v["level"], "L2")
+        self.assertIn("AGG-DEMO-999", v["message"])
+        self.assertIn("glossary-model.yaml", v["file"])
+
+    def test_gls_dep_whitelist_allows_m1(self):
+        # 依赖边 GLS.relatedObjectRefs→[M1] 已登记：指向真实 M1 不触发白名单违规
+        self.add("m1-object-model.yaml", M1)
+        self.add("glossary-model.yaml", GLOSSARY)
+        self.assertNotIn("dep-whitelist", self.kinds())
+
+    def test_filename_model_type_mismatch_is_l1(self):
+        # GLS-AC4 甲：glossary 文件 model_type 写错（如 OBJECT）→ L1 filename-mismatch
+        self.add("m1-object-model.yaml", M1)
+        self.add("glossary-model.yaml", GLOSSARY.replace("GLOSSARY", "OBJECT"))
+        report = self.run_check()
+        v = next(v for v in report["violations"] if v["kind"] == "filename-mismatch")
+        self.assertEqual(v["level"], "L1")
+        self.assertIn("glossary-model.yaml", v["file"])
+        self.assertIn("m1-object-model.yaml", v["message"])
+
+    def test_gls_content_in_wrong_filename_is_l1(self):
+        # GLS-AC4 乙：GLS 内容错挂 m1 文件名 → L1 filename-mismatch
+        self.add("m1-object-model.yaml", GLOSSARY)
+        report = self.run_check()
+        v = next(v for v in report["violations"] if v["kind"] == "filename-mismatch")
+        self.assertEqual(v["level"], "L1")
+        self.assertIn("glossary-model.yaml", v["message"])
+
+    def test_existing_correct_filenames_still_pass(self):
+        # 红线：filename 检查对既有合规文件（m1/m2 按注册表 yamlFile 命名）零扰动
+        self.add("m1-object-model.yaml", M1)
+        self.add("m2-behavior-model.yaml", M2)
+        self.assertNotIn("filename-mismatch", self.kinds())
 
 
 if __name__ == "__main__":

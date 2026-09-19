@@ -1,7 +1,7 @@
 {
-  "version": 1,
-  "description": "模型注册表（schema 的目录页，机读，PRD F1）。每模型四字段：camp（business-core/integration/build-contract）、consumers（runtime/build）、profiles（可用组合）、dependsOn（类型层依赖白名单摘要）。另含 modelType（模型文件 model_type 字段合法值）与 lockedFields（换义锁定字段，AC7 机读真源，见 ontology/schema/schema.md §11）。profile 组合由各模型 profiles 字段取并集反推（单一真源）。消费方：tools/schema_check.py（AC5/AC6/AC7 + 与 model-deps.json 一致性核对）；semantic-service 检索面划界（只索引 business-core）；生成器在场校验。",
-  "profileNote": "可用组合：v9-full=M1/M2/M3/M5/M6/M7/MU；v9-core=M1/M2/M3/M5；headless=M1/M2/M3/M5/M7（无 UI）。",
+  "version": "1.1.0",
+  "description": "模型注册表（schema 的目录页，机读，PRD F1）。每模型四字段：camp（business-core/integration/build-contract）、consumers（runtime/build）、profiles（可用组合）、dependsOn（类型层依赖白名单摘要）。另含 modelType（模型文件 model_type 字段合法值）与 lockedFields（换义锁定字段，AC7 机读真源，见 ontology/schema/schema.md §12）。profile 组合由各模型 profiles 字段取并集反推（单一真源）。消费方：tools/schema_check.py（AC5/AC6/AC7 + 与 model-deps.json 一致性核对）；semantic-service 检索面划界（只索引 business-core）；生成器在场校验。版本演进账见 ontology/schema/CHANGELOG.md。",
+  "profileNote": "可用组合：v9-full=M1/M2/M3/M5/M6/M7/MU/GLS；v9-core=M1/M2/M3/M5（四模型最小核，术语属增强件不入）；headless=M1/M2/M3/M5/M7/GLS（无 UI）。",
   "models": {
     "M1": {
       "name": "对象模型",
@@ -83,6 +83,16 @@
       "lockedFields": {
         "callChain": "v6 屏幕调用链（callChain 步骤机）；v9 以 actions 操作功能点替代——复用即换义"
       }
+    },
+    "GLS": {
+      "name": "术语模型",
+      "yamlFile": "glossary-model.yaml",
+      "modelType": "GLOSSARY",
+      "camp": "business-core",
+      "consumers": ["runtime", "build"],
+      "profiles": ["v9-full", "headless"],
+      "dependsOn": ["M1"],
+      "lockedFields": {}
     }
   }
 }

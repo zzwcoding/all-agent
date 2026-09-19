@@ -1,0 +1,11 @@
+model_type: GLOSSARY
+version: "1.0.0"
+domain: gls-ac4
+terms:
+  - id: GLS-GLSD-002
+    term: 名挂错的术语
+    aliases: []
+    definition: GLS 内容挂在 m1-object-model.yaml 文件名上（票 10 AC4「GLS 文件名错挂」）——L1 filename-mismatch。
+    relatedObjectRefs: []
+    status: 有效
+    source: 合成·票 10 出厂集
