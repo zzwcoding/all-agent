@@ -37,14 +37,14 @@
       <tr><td>ST0</td><td>识别项目类型为 skill+脚本，选配 CI 形态</td><td>无构建链，CI 内容不同</td><td>ST2</td></tr>
       <tr><td>ST2</td><td>把 skill 当深模块划卡：触发面/reads/writes/依赖/边界</td><td>skill 一多就必须有卡，否则边界全靠自觉</td><td>SPEC、ST3</td></tr>
       <tr><td>ST3</td><td>验收测试表换成出厂集断言表</td><td>AI 工序没法写单测，断言必须确定性可判</td><td>FIXT</td></tr>
-      <tr><td>ST5</td><td>实现双轨：脚本走 TDD，skill 出厂集先行</td><td>出厂集先行 = skill 界的测试先行</td><td>EXT、FIXT</td></tr>
+      <tr><td>ST5</td><td>实现双轨：脚本走 TDD，skill 出厂集先行；票级 code-review 由外部审查窗替代（多路只读深审+L0 复跑，报告落盘 docs/reviews/ → 整改票闭环，ADR 0002）</td><td>出厂集先行 = skill 界的测试先行；审查独立于施工窗</td><td>EXT、FIXT</td></tr>
       <tr><td>ST6</td><td>CI 四闸：脚本单测+出厂集回归+边界闸+schema 校验</td><td>写着没闸的禁令等于不存在</td><td>DEP/FIX/SCH</td></tr>
       <tr><td>ST7</td><td>体检加 skill 腐烂检测：漂移/久未跑/段落雷同</td><td>skill 资产会腐，需定期对账</td><td>候选清单回阶段 4</td></tr>
       <tr><td>FMT</td><td>skill 卡格式真源</td><td>规则只在一处有原文</td><td>ST2 读</td></tr>
       <tr><td>INH</td><td>继承 sdd-flow 的七件规约</td><td>分叉不重写，能继承就继承</td><td>各阶段读</td></tr>
       <tr><td>SPEC</td><td>skill 卡集合（含 sdd-flow2 自卡）</td><td>卡是唯一真源</td><td>DEP 读</td></tr>
       <tr><td>FIXT</td><td>出厂集：固定输入+断言</td><td>skill 行为的可判验收物</td><td>FIX 读</td></tr>
-      <tr><td>LOG</td><td>施工日志/ADR/CHANGELOG</td><td>产物即状态，跨会话恢复靠它</td><td>ST7 读</td></tr>
+      <tr><td>LOG</td><td>施工日志/ADR/CHANGELOG/审查报告（docs/reviews/）</td><td>产物即状态，跨会话恢复靠它</td><td>ST7 读</td></tr>
       <tr><td>EXT</td><td>外部底层 skill（tdd/grilling 等）</td><td>声明为外部依赖，不许私拉</td><td>被 ST5 调用</td></tr>
     </table>
   </div>
@@ -57,7 +57,7 @@
         ST0["阶段 0 初始化——识别 skill+脚本项目类型,选配 CI 形态"]
         ST2["阶段 2 划分——产出 skill 卡:触发面+reads/writes+依赖行+边界"]
         ST3["阶段 3 规格——验收测试表换成出厂集断言表,每条确定性可判"]
-        ST5["阶段 5 实现——双轨:脚本走 TDD · skill 出厂集先行"]
+        ST5["阶段 5 实现——双轨:脚本走 TDD · skill 出厂集先行 · 票级 review 由外部审查窗替代(批级深审,报告落盘 docs/reviews/→整改票)"]
         ST6["阶段 6 CI——四闸齐跑:脚本单测+出厂集回归+边界闸+schema 校验"]
         ST7["阶段 7 体检——新增 skill 腐烂检测:漂移/久未跑/段落雷同"]
       end
@@ -73,7 +73,7 @@
       subgraph L4["L4 数据与档案"]
         SPEC["skill 卡集合(含 sdd-flow2 自卡)"]
         FIXT["出厂集:固定输入+断言集"]
-        LOG["施工日志+ADR+CHANGELOG"]
+        LOG["施工日志+ADR+CHANGELOG+审查报告(docs/reviews/)"]
       end
       EXT["外部底层 skill 群——声明为外部依赖,不许私拉"]
 

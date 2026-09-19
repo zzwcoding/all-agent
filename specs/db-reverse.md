@@ -2,6 +2,8 @@
 
 触及: skill `db-reverse`
 
+> 断言真源（2026-09-19 起）：tickets/06 票面 AC 表 + fixtures/db-reverse/assertions.json；本表为一期原始基线。
+
 ## 出厂集断言表
 
 | 断言 | 给定 | 期望 |

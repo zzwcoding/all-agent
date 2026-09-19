@@ -28,6 +28,8 @@
     <b>防护清单表</b>：
     <table id="guard-table"><tr><th>闸</th><th>节点</th><th>防什么</th></tr>
       <tr><td>语义 CI（五级）</td><td>GATE</td><td>非法/不一致的本体草案进仓——所有输入的公共闸门</td></tr>
+      <tr><td>语义 CI 子闸群：必填/一致性对/禁用词</td><td>GATE</td><td>结构性必填缺失/引用双向不一致/禁用话术回流进仓</td></tr>
+      <tr><td>citations 对账 + guard-corpus 守卫</td><td>SVC</td><td>答案正文与「引用元素 ID」清单不符/守卫例集失守（禁用话术从回答面回归）</td></tr>
       <tr><td>MR 人审</td><td>MRG</td><td>Agent 自动改语义——自动化止于提案，责任归于 Owner</td></tr>
     </table>
     <b>三循环</b>：
@@ -44,9 +46,9 @@
       <tr><td>IDX</td><td>图谱索引：从仓构建，可随时重建</td><td>图是索引层不是权威源</td><td>SVC</td></tr>
       <tr><td>SVC</td><td>运行时语义服务：检索瀑布/口径解析，只读</td><td>读路径求快，写路径求审</td><td>AGT</td></tr>
       <tr><td>AGT</td><td>智慧大脑：问答/问数/问智 → 统筹指挥</td><td>本体运行期消费方</td><td>POOL</td></tr>
-      <tr><td>POOL</td><td>提案池：监督/自检/交互三源信号归一</td><td>一次反馈=一处根因=一个 MR</td><td>MRG</td></tr>
+      <tr><td>POOL</td><td>提案池：监督/自检/交互三源信号归一（proposal-pool skill：归一标准提案+确定性冲突预检，自动化止于提案）</td><td>一次反馈=一处根因=一个 MR</td><td>MRG</td></tr>
       <tr><td>MRG</td><td>人工审批 MR</td><td>语义变更必须人拍板</td><td>CORE</td></tr>
-      <tr><td>BE1–5</td><td>应用包/Skill/MCP/分析报告/变更影响分析</td><td>一份本体多处消费</td><td>企业系统/平台</td></tr>
+      <tr><td>BE1–5</td><td>应用包/Skill/MCP（已建：semantic_mcp_server stdio 服务器+exports/mcp/capability-manifest.json，消费文档 docs/mcp-server.md）/分析报告/变更影响分析</td><td>一份本体多处消费</td><td>企业系统/平台</td></tr>
       <tr><td>SDF2</td><td>sdd-flow2：建造与改造全部件</td><td>本体管不了的工程层由它接管</td><td>FE/BE/GATE/SVC</td></tr>
       <tr><td>META</td><td>元循环：跨层探针+出厂集回归+信号路由表</td><td>大架构自身的体检与进化</td><td>SDF2 / CORE / MRG</td></tr>
       <tr><td>BASE</td><td>Harness 底座：长任务/上下文/调度</td><td>不重造轮子，用现成 Kimi Code</td><td>全体 skill</td></tr>
@@ -67,7 +69,7 @@
       subgraph OUT["输出侧 · 后端生成器（一份本体多处消费）"]
         BE1["应用生成器——本体+技术架构+指导书出开发包"]
         BE2["Skill 发布器——本体封装成可对话技能"]
-        BE3["MCP 发布器——本体能力暴露成接口"]
+        BE3["MCP 发布器——本体能力暴露成接口（已建:stdio 服务器+capability manifest）"]
         BE4["分析报告生成器——指标洞察与场景分析"]
         BE5["变更影响分析器——改动前先算影响链路"]
       end
@@ -77,7 +79,7 @@
         SVC["语义服务——检索瀑布与口径解析,只读不写"]
       end
       AGT["智慧大脑 Agent 群——问答/问数/问智,逐步放权到指挥"]
-      POOL["提案池——监督/自检/交互三源信号归一"]
+      POOL["提案池——监督/自检/交互三源信号归一（proposal-pool:标准化提案+冲突预检,自动化止于提案）"]
       MRG["MR 人审闸——语义变更人工拍板 🛡️ 防 Agent 自改语义"]
 
       SDF2["sdd-flow2 建造循环——需求→约定→开发→检查,造全部件"]

@@ -29,6 +29,7 @@
     <table id="guard-table"><tr><th>闸</th><th>节点</th><th>防什么</th></tr>
       <tr><td>边界闸</td><td>TLS</td><td>skill 私拉未声明依赖、越层引用</td></tr>
       <tr><td>出厂集回归</td><td>SKFIX</td><td>指导书静默漂移——每个 skill 的行为验收档案</td></tr>
+      <tr><td>安装位闸</td><td>TLS</td><td>仓内 skills/ 正本与 ~/.agents/skills/ 安装位漂移、孤儿 skill（install_skills --check + pre-commit 拦截）</td></tr>
     </table>
     <b>节点明细表</b>：
     <table id="node-table"><tr><th>节点 ID</th><th>干什么</th><th>为什么</th><th>下游</th></tr>
@@ -37,9 +38,9 @@
       <tr><td>SKFIX</td><td>出厂集：固定输入+确定性断言</td><td>skill 没有单测，它就是测试</td><td>被 runner 跑</td></tr>
       <tr><td>SDF2</td><td>当前唯一的编排 skill（建造流）</td><td>大框架第一环，dogfooding 对象</td><td>EXT、L1（未来）</td></tr>
       <tr><td>AA0</td><td>未来的 All-agent 编排器</td><td>运行时路由:需求→适配器→生成器</td><td>L1 工序群</td></tr>
-      <tr><td>FE / BE / GV</td><td>前端适配器×4 / 后端生成器×5 / 治理×3</td><td>按变换类型切,不按业务域切——数量封顶 ≈12</td><td>L2 / L3</td></tr>
+      <tr><td>FE / BE / GV</td><td>前端适配器×4 / 后端生成器×5 / 治理×3（本体建模/提案池处理/元循环体检）</td><td>按变换类型切,不按业务域切——数量封顶 ≈12</td><td>L2 / L3</td></tr>
       <tr><td>SHR</td><td>跨 skill 公共规约（schema 文档/卡格式/公共指导段）</td><td>引用不是包含——规则只在一处有原文</td><td>被 L0/L1 读</td></tr>
-      <tr><td>TLS</td><td>确定性脚本：schema 校验/语义 CI/出厂集 runner/边界闸</td><td>写着没闸的禁令等于不存在</td><td>L4 数据</td></tr>
+      <tr><td>TLS</td><td>确定性脚本：schema 校验/语义 CI/出厂集 runner/边界闸/安装位同步</td><td>写着没闸的禁令等于不存在；skill 双位置（仓内 skills/ 正本 + ~/.agents/skills/ 安装位，同内容）靠它同步与拦截</td><td>L4 数据</td></tr>
       <tr><td>DAT</td><td>本体仓 YAML/fixtures/policies/档案</td><td>唯一真源与派生物的分界线</td><td>——</td></tr>
       <tr><td>EXT</td><td>外部底层 skill（tdd/grilling 等）</td><td>声明为外部依赖,不许私拉其内部文件</td><td>被 SDF2 调用</td></tr>
     </table>
@@ -62,13 +63,13 @@
         subgraph L1G["L1 工序 skill——按变换类型切,封顶约 12 个"]
           FE["前端适配器×4——需求探索/数据库逆向/代码逆向/文档萃取"]
           BE["后端生成器×5——应用包/Skill 发布/MCP 发布/分析报告/变更影响分析"]
-          GV["治理×3——本体建模/提案池处理/元循环体检"]
+          GV["治理×3——本体建模/提案池处理(proposal-pool:信号归一+冲突预检,自动化止于提案)/元循环体检"]
         end
         subgraph L2G["L2 共享规约（只读,引用非包含）"]
           SHR["公共 references:schema 文档 · 卡格式 · 指导书公共段"]
         end
         subgraph L3G["L3 确定性脚本"]
-          TLS["工具集:schema 校验 · 语义 CI · 出厂集 runner · 边界闸 🛡️ 防私拉依赖与越层引用"]
+          TLS["工具集:schema 校验 · 语义 CI · 出厂集 runner · 边界闸 · 安装位同步 🛡️ 防私拉依赖/越层引用/安装位漂移"]
         end
         subgraph L4G["L4 数据层"]
           DAT["本体仓 YAML · fixtures · policies · 日志与 ADR"]

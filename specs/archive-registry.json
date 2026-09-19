@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "description": "归档登记表（项目内产物归档唯一真源，设计案「两条验收主线」主线 2）。每类产物 → 路径模式（落在 repo-layout.json 登记的目录内）+ 必备字段 + 状态字段与合法值 + 翻转人。消费方：tools/archive_check.py。本表从 sdd-flow2 票 01 版实例化到本仓：ticket 状态值 todo/doing/done；票面 NN-*.md；新增 ontology 产物类（schema 文档/注册表/域 manifest/模型 YAML，票 03）；票 23 增 MCP capability manifest 产物类（exports/mcp/，派生物禁手改）。",
+  "description": "归档登记表（项目内产物归档唯一真源，设计案「两条验收主线」主线 2）。每类产物 → 路径模式（落在 repo-layout.json 登记的目录内）+ 必备字段 + 状态字段与合法值 + 翻转人。消费方：tools/archive_check.py。本表从 sdd-flow2 票 01 版实例化到本仓：ticket 状态值 todo/doing/done；票面 NN-*.md；新增 ontology 产物类（schema 文档/注册表/域 manifest/模型 YAML，票 03）；票 23 增 MCP capability manifest 产物类（exports/mcp/，派生物禁手改）；票 26 增 proposal/walkthrough/review 三类（第四轮审查账目清偿，必备字段以实跑驱动收敛）。",
   "fieldConventions": {
     "pathPatterns": "仓根相对的 fnmatch glob；命中的文件接受该类产物的必备字段/状态检查。",
     "requiredFields": "必备字段。md 类为必现的行前缀或关键节名；json 类为顶层键；yaml 类为必现文本。",
@@ -115,6 +115,46 @@
       "status": null,
       "producer": "impact-analyzer",
       "flippedBy": "不适用（报告随每次分析生成）"
+    },
+    {
+      "type": "proposal",
+      "label": "提案（docs/proposals/PROP-*.md，票 18 起）",
+      "layoutDir": "docs/proposals",
+      "pathPatterns": ["docs/proposals/PROP-*.md"],
+      "template": "references/proposal-format.md（与 tools/proposal_check.py 头注一字不差对齐）",
+      "requiredFields": ["id", "title", "status", "source-signal", "target", "change", "rationale"],
+      "status": {
+        "field": "status",
+        "values": ["draft", "open", "accepted", "rejected"],
+        "flippedBy": "Owner 裁决（proposal-pool skill 只代执行翻转并留痕）"
+      },
+      "statusNote": "七必备字段=proposal-format.md §2 YAML 头；深度校验（枚举/靶存在性/池内冲突/证据在档）由 tools/proposal_check.py 承载，归档闸只查字段在场与状态合法值（md 类=行前缀子串级）。",
+      "producer": "proposal-pool skill（票 18 起）",
+      "flippedBy": "Owner 裁决（open→accepted/rejected 只由 Owner，skill 代执行留痕）"
+    },
+    {
+      "type": "walkthrough",
+      "label": "端到端走查记录（docs/walkthrough/，票 09/24 起）",
+      "layoutDir": "docs/walkthrough",
+      "pathPatterns": ["docs/walkthrough/**"],
+      "template": null,
+      "requiredFields": [],
+      "status": null,
+      "statusNote": "走查记录为不可变存档（只增不改），无状态字段；结论语义在文内（每步自带可复现取证块）。实跑驱动结论：现存各步文件形态异质（走查步骤记录与草案目录并存）无公共字段行，硬立状态/日期/结论会逼出假字段——验收真源在对应票面 AC 表与出厂集（归档闸实跑全绿收敛，票 26）。",
+      "producer": "端到端走查票（票 09 工序①–⑦ / 票 24 step7）",
+      "flippedBy": "不适用（存档只增不改）"
+    },
+    {
+      "type": "review",
+      "label": "外部审查报告（docs/reviews/，票 26 起登记；ADR 0002）",
+      "layoutDir": "docs/reviews",
+      "pathPatterns": ["docs/reviews/*.md"],
+      "template": null,
+      "requiredFields": [],
+      "status": null,
+      "statusNote": "审查报告为不可变存档（append-only，勘误以附录补记），无状态字段；verdict/结论语义在文内（phase 系列头注带 verdict 与 L0 复核附录，对账系列带结论速览）。实跑驱动结论：7 份存量报告无公共字段行，硬立状态/日期行会对存量造假——字段约束由报告头注与整改票引用承载（票 26；协议第 7 条：审查报告必落盘 docs/reviews/）。",
+      "producer": "外部审查窗（ADR 0002）+ L0 复核附录",
+      "flippedBy": "不适用（存档只增不改；勘误走附录/整改票）"
     },
     {
       "type": "mcp-manifest",

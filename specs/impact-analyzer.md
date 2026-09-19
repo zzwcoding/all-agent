@@ -2,6 +2,8 @@
 
 触及: skill `impact-analyzer`
 
+> 断言真源（2026-09-19 起）：tickets/08 票面 AC 表 + fixtures/impact-analyzer/assertions.json；本表为一期原始基线。
+
 ## 出厂集断言表
 
 | 断言 | 给定 | 期望 |

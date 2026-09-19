@@ -6,10 +6,10 @@
 
 ## 前提
 
-- **Python 3.10+**（官方 mcp SDK 要求）。
-- **安装 mcp SDK（仅发布侧）**：`pip install mcp`。本体仓的构建/CI 链路**不安装也不依赖它**——未装 SDK 时起服会打印安装指引并以退出码 2 结束（四闸照常全绿，这是票 23 的 CI 免疫红线）。
-- **建议 venv 隔离**：`python3 -m venv .venv-mcp && .venv-mcp/bin/pip install mcp`，之后一律用 `.venv-mcp/bin/python` 起 server（票 24 实弹方案，用户已批）。
-- 既有工具侧依赖（PyYAML）按仓内惯例已具备。
+- **Python 3.10+**（官方 mcp SDK 要求；票 24 实测 Python 3.11）。
+- **安装 mcp SDK（仅发布侧）**：`pip install "mcp==2.2.0"`。版本钉：票 24 实测组合为 **mcp 2.2.0 + Python 3.11**，升级 SDK 版本须重跑票 24 smoke（`tools/mcp_smoke_client.py`）复验行为一致。本体仓的构建/CI 链路**不安装也不依赖它**——未装 SDK 时起服会打印安装指引并以退出码 2 结束（四闸照常全绿，这是票 23 的 CI 免疫红线）。
+- **PyYAML（server 子进程链需要，勿漏装）**：server 经子进程调 core/graph_index，二者解析本体 YAML 要用 PyYAML——**它不在 mcp SDK 的依赖树里**（票 26 实测 mcp 2.2.0 的 Requires 无 pyyaml），隔离环境须显式安装 `pip install pyyaml`（票 24 的 .venv-mcp 实测装有 PyYAML 6.0.3）。
+- **建议 venv 隔离**：`python3 -m venv .venv-mcp && .venv-mcp/bin/pip install "mcp==2.2.0" pyyaml`，之后一律用 `.venv-mcp/bin/python` 起 server（票 24 实弹方案，用户已批）。
 
 ## 运行
 

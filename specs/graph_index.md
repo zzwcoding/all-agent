@@ -2,6 +2,8 @@
 
 触及: tools/graph_index.py（L3 脚本）；契约: CLI `graph_index <ontology目录> --query <id> [--closure N] [--impact] [--json]`
 
+> 断言真源（2026-09-19 起）：tickets/04 票面 AC 表 + fixtures/graph_index/assertions.json；本表为一期原始基线。
+
 ## 出厂集断言表
 
 | 断言 | 给定 | 期望 |
