@@ -1,6 +1,6 @@
 # 票 24：MCP 端到端实弹走查（venv + 官方 SDK）
 
-Status: todo
+Status: done
 Belongs to: 第三批拆票方案（2026-09-19 用户批准，venv 方案已批）；PRD F11
 Touches: .gitignore、tools/mcp_smoke_client.py、docs/walkthrough/、lessons/24
 
@@ -20,9 +20,9 @@ Touches: .gitignore、tools/mcp_smoke_client.py、docs/walkthrough/、lessons/24
 
 ## 验收（注源）
 
-- [ ] AC1–4 全过（源：本票 AC 表）
-- [ ] venv 不入库（git status 干净、归档闸不看它）（源：派生物纪律）
-- [ ] `bash tools/ci.sh` 四闸绿且未引入 mcp 依赖（源：CI 免疫红线）
+- [x] AC1–4 全过（源：本票 AC 表）
+- [x] venv 不入库（git status 干净、归档闸不看它）（源：派生物纪律）
+- [x] `bash tools/ci.sh` 四闸绿且未引入 mcp 依赖（源：CI 免疫红线）
 
 ## 交接包（L2 自主档）
 
