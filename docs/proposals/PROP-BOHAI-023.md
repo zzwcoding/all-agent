@@ -1,0 +1,29 @@
+---
+id: PROP-BOHAI-023
+title: 批次受理提取件二规则 13–20 判据（RULE-BOHAI-026 占位）
+status: open
+source-signal:
+  kind: 对账缺口
+  ref: docs/walkthrough/step2-mr-adjudication.md#四-提取件二8条规则
+target:
+  model: M3
+  element: RULE-BOHAI-026
+change: add
+rationale: "R5·§4 规则库共 20 条：质量类规则 2–12 已建或下沉 M1，规则 13–20 八条判据在仓外「提取件二」，不在素材面——无判据不硬译（proposal-pool 纪律：C 级证据先转录落盘才可作依据）。本提案作批次占位与受理登记：预留 RULE-BOHAI-026..033 八个号位；Owner 将提取件二转录入仓后逐条拆分为正式 add 提案（引用本占位号），或明确不引入则本提案 rejected 归档。占位元素草案只登记编号与来源，不发明任何判据——本提案的裁决点是「提取件二给不给、给多少」，可二选一。"
+---
+
+## 草案内容（拟新增元素，进仓走 MR，非已定稿本体）
+
+```yaml
+- id: RULE-BOHAI-026
+  name: 提取件二规则 13（占位——判据转录后命名）
+  ruleType: 待定
+  description: "R5·§4 规则 13 判据在提取件二（仓外材料，未转录入仓）。占位即受理登记：判据转录入仓前不落表达式、不定 ruleType——不发明语义。同批预留 RULE-BOHAI-027..033（对应 §4 规则 14–20）。"
+```
+
+## 证据展开
+
+- 信号原文：`docs/walkthrough/step2-mr-adjudication.md` §四——裁决遗留「提取件二 8 条规则」；§三 M3 行——「未建：……13–20（判据在提取件二，不在素材面）」。
+- B 级：`docs/一期收官报告.md` §6 业务面 10（§4 规则 13–20 未建）；`ontology/bohai/m3-rule-model.yaml` 头注（未建清单同源）。
+- 靶 ID 核对：RULE-BOHAI-026..033 均未占用（m3 现有 001–019，grep 核实；020–025 已由本池 PROP-006/007/009/010/015/016 先占，无重号）。
+- 影响面：占位不改任何既有元素；拆分提案与占位的取舍是 Owner 裁决点。
