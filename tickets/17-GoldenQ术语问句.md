@@ -1,6 +1,6 @@
 # 票 17：Golden Q 术语问句（semantic-service 扩展）
 
-Status: todo
+Status: done
 Belongs to: 第二批拆票方案（2026-09-19 用户批准）；票 10 遗留
 Touches: skills/semantic-service/、fixtures/semantic-service/、lessons/17
 
@@ -20,9 +20,9 @@ Touches: skills/semantic-service/、fixtures/semantic-service/、lessons/17
 
 ## 验收（注源）
 
-- [ ] AC1–4 全过（源：本票 AC 表）
-- [ ] 卡触发面/薄壳未变，改动只在 references 与 fixtures（源：字段纪律 1）
-- [ ] 安装位与正本零漂移（源：票 15 --check）
+- [x] AC1–4 全过（源：本票 AC 表）
+- [x] 卡触发面/薄壳未变，改动只在 references 与 fixtures（源：字段纪律 1）
+- [x] 安装位与正本零漂移（源：票 15 --check）
 
 ## 交接包（L2 自主档）
 

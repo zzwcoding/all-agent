@@ -1,6 +1,6 @@
 {
   "skill": "semantic-service（运行时语义服务，票 07）",
-  "description": "出厂集：Golden Question 集（questions/golden-questions.md 四问，各压检索瀑布一级）→ 断言参照答案的确定性结果（specs/semantic-service.md AC1–4）。问答本体=fixtures/graph_index/ontology-base（票 04 最小域，只读复用；该本体含 MU 屏是有意保留，图索引全量建图无阵营概念，阵营裁剪是 skill 工序职责，AC4 靠它实测面外拒答）。expected-answers/ 四份参照答案按 SKILL.md 工序手工产出：每份示范瀑布走到哪一级、带「本回答引用的元素 ID」清单。AC1=口径四件套（字段 dailyOutput/载体 AGG-BOHAI-002/规则 RULE-BOHAI-001/查询出口 QR-BOHAI-001，含 dictionaryRef 下钻链）；AC2=显式锚定直接命中+未走名称模糊检索+反向收集行为 ID；AC3=拒答话术+缺什么分层说明+提案流程指路，并全扫描守卫正则断言未编造 ID（答案中每个 ID 均须在白名单={QR-BOHAI-001, AGG-BOHAI-002}内，即全部是近邻指路真实 ID）；AC4=面外语说明（camp=build-contract/不在检索面/提案流程），并全扫描守卫正则断言不含任何 MU 元素细节（菜单/网格/按钮/屏类型/页面与菜单名等）。「回答带 ID 引用」（spec 行为约定）以四份答案逐一含引用清单节断言。cmd 两条为机读佐证：--impact 可复现锚定对象的引用集（含全部行为），未找到 ID 明确报错不猜（AC3 纪律的机械面）。 票 13 增引用清单比对套件 CIT-01–05：tools/check_citations.py（id-citation-format.md §3「清单是答案 ID 的完备登记」纸面纪律的机械闸，审查一 P2）对四份参照答案逐一断言正文↔清单一致，另配 citation-samples/inconsistent-answer.md 双向差异注入样本断言退出非零且列出差异（AC7 真源=tickets/13-机读必填字段闸.md AC 表）。",
+  "description": "出厂集：Golden Question 集（questions/golden-questions.md 四问，各压检索瀑布一级）→ 断言参照答案的确定性结果（specs/semantic-service.md AC1–4）。问答本体=fixtures/graph_index/ontology-base（票 04 最小域，只读复用；该本体含 MU 屏是有意保留，图索引全量建图无阵营概念，阵营裁剪是 skill 工序职责，AC4 靠它实测面外拒答）。expected-answers/ 四份参照答案按 SKILL.md 工序手工产出：每份示范瀑布走到哪一级、带「本回答引用的元素 ID」清单。AC1=口径四件套（字段 dailyOutput/载体 AGG-BOHAI-002/规则 RULE-BOHAI-001/查询出口 QR-BOHAI-001，含 dictionaryRef 下钻链）；AC2=显式锚定直接命中+未走名称模糊检索+反向收集行为 ID；AC3=拒答话术+缺什么分层说明+提案流程指路，并全扫描守卫正则断言未编造 ID（答案中每个 ID 均须在白名单={QR-BOHAI-001, AGG-BOHAI-002}内，即全部是近邻指路真实 ID）；AC4=面外语说明（camp=build-contract/不在检索面/提案流程），并全扫描守卫正则断言不含任何 MU 元素细节（菜单/网格/按钮/屏类型/页面与菜单名等）。「回答带 ID 引用」（spec 行为约定）以四份答案逐一含引用清单节断言。cmd 两条为机读佐证：--impact 可复现锚定对象的引用集（含全部行为），未找到 ID 明确报错不猜（AC3 纪律的机械面）。 票 13 增引用清单比对套件 CIT-01–05：tools/check_citations.py（id-citation-format.md §3「清单是答案 ID 的完备登记」纸面纪律的机械闸，审查一 P2）对四份参照答案逐一断言正文↔清单一致，另配 citation-samples/inconsistent-answer.md 双向差异注入样本断言退出非零且列出差异（AC7 真源=tickets/13-机读必填字段闸.md AC 表）。 票 17 增术语两问 Q7/Q8（Golden Q 术语类，名称解析遇术语词先落 GLS——细则见 skill references/retrieval-waterfall.md §2）：Q7 剔检产量=二级解析落 GLS-BOHAI-002（别名净产量，术语条目即答案一部分）+ 三级闭包沿 relatedObjectRefs 指路 AGG-BOHAI-001/002 与承载规则 RULE-BOHAI-019（机读佐证 --closure 1）；Q8 老完成率=GLS 禁用词命中 → 回答=禁用说明（禁用、替代=产量完成率）+ 替代口径真实 ID 指路（RULE-BOHAI-009/QR-BOHAI-002），不得把禁用词答成可用口径——票17 AC3 守卫正则全扫描禁的是肯定表述不是词面（问题本身含「老完成率」，「还能用吗？」问句形态放行、「还能用。」陈述形态拦），正反例双向自测 24 好/23 坏全过；两份新答案各接 check_citations cmd 断言（票 13 闸）。两问解析证据取自 ontology/bohai 真域（GLS 条目在真域；票 04 最小域无 GLS，且 graph_index 出厂集锁定其图统计为精确数字，问答本体不扩文件）。AC 真源=tickets/17-GoldenQ术语问句.md AC 表。",
   "assertions": [
     {
       "ac": "输入",
@@ -201,6 +201,98 @@
         "QR-BOHAI-999",
         "不一致"
       ]
+    },
+    {
+      "ac": "输入（术语两问齐，票 17）",
+      "type": "file-contains",
+      "path": "questions/golden-questions.md",
+      "contains": [
+        "剔检产量是什么口径",
+        "老完成率还能用吗"
+      ]
+    },
+    {
+      "ac": "票17 AC1",
+      "type": "file-exists",
+      "path": "expected-answers/ac7-term-caliber.md"
+    },
+    {
+      "ac": "票17 AC1（Q7 GLS 解析+术语条目即答案+关联指路）",
+      "type": "file-contains",
+      "path": "expected-answers/ac7-term-caliber.md",
+      "contains": [
+        "GLS-BOHAI-002",
+        "净产量",
+        "relatedObjectRefs",
+        "AGG-BOHAI-001",
+        "AGG-BOHAI-002",
+        "RULE-BOHAI-019",
+        "闭包装配",
+        "本回答引用的元素 ID",
+        "解析自 bohai 真域"
+      ]
+    },
+    {
+      "ac": "票17 AC1（机读佐证：GLS 术语闭包沿 relatedObjectRefs 指路关联对象，可复现）",
+      "type": "cmd-succeeds",
+      "cmd": "python3 tools/graph_index.py ontology/bohai --query GLS-BOHAI-002 --closure 1",
+      "outputContains": [
+        "命中: GLS-BOHAI-002",
+        "AGG-BOHAI-001",
+        "AGG-BOHAI-002",
+        "relatedObjectRefs"
+      ]
+    },
+    {
+      "ac": "引用清单比对 CIT-06（票 17，AC1 正例）",
+      "type": "cmd-succeeds",
+      "cmd": "python3 tools/check_citations.py {fixture_dir}/expected-answers/ac7-term-caliber.md",
+      "outputContains": [
+        "结论: 一致"
+      ]
+    },
+    {
+      "ac": "票17 AC2",
+      "type": "file-exists",
+      "path": "expected-answers/ac8-banned-term-disposal.md"
+    },
+    {
+      "ac": "票17 AC2（Q8 禁用说明+替代口径真实 ID 指路）",
+      "type": "file-contains",
+      "path": "expected-answers/ac8-banned-term-disposal.md",
+      "contains": [
+        "GLS-BOHAI-001",
+        "禁用",
+        "产量完成率",
+        "RULE-BOHAI-009",
+        "QR-BOHAI-002",
+        "本回答引用的元素 ID",
+        "解析自 bohai 真域"
+      ]
+    },
+    {
+      "ac": "票17 AC2（机读佐证：GLS 禁用词条目状态可复现）",
+      "type": "cmd-succeeds",
+      "cmd": "python3 tools/graph_index.py ontology/bohai --query GLS-BOHAI-001",
+      "outputContains": [
+        "命中: GLS-BOHAI-001",
+        "禁用词",
+        "禁用（替代：产量完成率）"
+      ]
+    },
+    {
+      "ac": "引用清单比对 CIT-07（票 17，AC2 正例）",
+      "type": "cmd-succeeds",
+      "cmd": "python3 tools/check_citations.py {fixture_dir}/expected-answers/ac8-banned-term-disposal.md",
+      "outputContains": [
+        "结论: 一致"
+      ]
+    },
+    {
+      "ac": "票17 AC3（禁用词不得被答成可用口径：守卫正则全扫描——禁肯定表述，不禁词面）",
+      "type": "file-matches-regex",
+      "path": "expected-answers/ac8-banned-term-disposal.md",
+      "pattern": "\\A(?:(?!老完成率[^。\\n]{0,24}(?<![不未没无非别莫再作])[是为属][^。\\n]{0,4}(?:有效|可用|现行|合法|标准|正式)(?:的)?(?:口径|做法|指标|算法|标准)?|老完成率口径(?:仍|依然|仍旧)(?:有效|可用|适用|成立|现行|在用|好用)|老完成率口径(?:为|是|即|=|＝)(?:有效|可用|现行|合法|标准|正式)|老完成率(?:作为|视为|当作|看作|当成)(?:有效|可用|现行|合法|标准|正式)|老完成率[^。\\n]{0,6}(?<![不未没无])(?:被当作|被视为|被看作|被用(?:作|成))(?:有效|可用|现行|合法|标准|正式)|老完成率[^。\\n]{0,8}(?:仍可|可继续|可以继续|还能继续|照常|照旧|继续(?:使用|采用|按|以|沿用)|沿用|接着用)|老完成率还能用(?![吗?？])|(?:(?<![不未禁止得免再非无莫别])(?:使用|采用|沿用|改用|换用|用回|按)|(?<![不未禁止得免再非无莫别再])(?<!使)(?<!采)(?<!沿)(?<!改)(?<!换)(?<!回)(?:用))老完成率)[\\s\\S])*\\Z"
     }
   ]
 }
