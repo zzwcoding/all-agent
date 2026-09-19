@@ -17,6 +17,7 @@ description: 运行时语义服务——查口径/问业务对象/解析指标�
 - reads：`ontology/**`——经 `tools/graph_index.py` 建图检索；检索面划界依据 `ontology/schema/model-registry.json` 的 camp 字段（操作法见 references/retrieval-waterfall.md §5）。
 - writes：无——回答即产出，只读服务，不产文件、不改仓。
 - 依赖脚本：`tools/graph_index.py`（`--query` 存在性确认 / `--closure` 正向闭包 / `--impact` 反向引用集 / `--json` 机读）。
+- 可机判判定已提纯于 `tools/semantic_service_core.py`（MCP 服务器与出厂集共用同一核心），本 skill 工序语义与其保持一致，改判定先改 core 再对齐正文。
 
 ## 检索面（先划界，再检索）
 

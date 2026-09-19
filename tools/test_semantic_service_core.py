@@ -126,7 +126,7 @@ terms:
     term: 老口径
     aliases: []
     termType: 禁用词
-    definition: v1 口径已废弃，替代口径=新口径。
+    definition: v1 口径已废弃，替代口径=新口径。界面侧替代口径=对象甲管理屏。
     relatedObjectRefs: []
     status: 禁用（替代：新口径）
   - id: GLS-DEMO-002
@@ -255,6 +255,41 @@ class DemoDomainCase(unittest.TestCase):
         self.assertEqual(0, rc)
         self.assertEqual("answered", v["status"])
         self.assertIn("GLS-DEMO-002", [h["id"] for h in v["hits"]])
+
+    # -- 票 25 R1：名称解析候选集 camp 裁剪（面外不进 hits/citations/装配指令） --
+
+    def test_name_resolution_trims_out_of_surface_candidates(self):
+        """R1（票 25）：MU 屏名即使 t1 全等也必须被裁——面外 ID 不进
+        hits/citations/scaffold_commands，business-core 命中照常保留。"""
+        rc, v = self.verdict("对象甲管理屏")
+        self.assertEqual(0, rc)
+        self.assertEqual("answered", v["status"])
+        ids = [h["id"] for h in v["hits"]]
+        self.assertNotIn("SCR-DEMO-01", ids)
+        self.assertNotIn("SCR-DEMO-01", v["citations"])
+        self.assertNotIn("SCR-DEMO-01", " ".join(v["scaffold_commands"]))
+        self.assertIn("AGG-DEMO-001", ids)   # 面内承载照常命中（t2）
+
+    def test_banned_replacement_pointers_trim_out_of_surface(self):
+        """R1（票 25）：禁用词替代指路的候选 ID 同样过 camp 裁剪——替代名
+        恰为 MU 屏名时，指路集不得带出面外 ID，面内替代照常指路。"""
+        rc, v = self.verdict("老口径还能用吗")
+        self.assertEqual(1, rc)
+        self.assertEqual("refused_banned", v["status"])
+        self.assertNotIn("SCR-DEMO-01", v["citations"])
+        self.assertIn("RULE-DEMO-009", v["citations"])   # 面内替代照常指路
+
+    def test_anchor_path_unaffected_by_candidate_trimming(self):
+        """票 25 回归：@锚定路径与候选裁剪共用同一 in_surface 判定后行为
+        不变——面外拒答带阵营说明，面内锚定照常直达。"""
+        rc, v = self.verdict("@SCR-DEMO-01 的界面细节")
+        self.assertEqual(1, rc)
+        self.assertEqual("refused_out_of_surface", v["status"])
+        self.assertEqual("build-contract", v["camp"]["camp"])
+        rc, v = self.verdict("@AGG-DEMO-001 有哪些行为")
+        self.assertEqual(0, rc)
+        self.assertEqual("answered", v["status"])
+        self.assertIn("显式锚定", v["waterfall_level"])
 
     # -- CLI/配置 --
 

@@ -1,6 +1,6 @@
 # 票 25：core 名称解析补 camp 裁剪（P1 功能正确性尾款）
 
-Status: todo
+Status: done
 Belongs to: docs/reviews/2026-09-19-phase3-review-tickets20-24-and-sddflow2-audit.md P1；R1 检索面纪律（瀑布 §0）
 Touches: tools/semantic_service_core.py、tools/test_semantic_service_core.py、fixtures/semantic-service/、skills/semantic-service/、specs/modules.md、lessons/25
 
@@ -21,10 +21,10 @@ Touches: tools/semantic_service_core.py、tools/test_semantic_service_core.py、
 
 ## 验收（注源）
 
-- [ ] AC1 复现用例翻绿：同问同域 hits/citations 无 SCR-BOHAI-01（源：本票 AC 表）
-- [ ] AC2 CORE-01–08 集相等断言全过（源：本票 AC 表）
-- [ ] AC3 单源声明双向：卡依赖登记、skill 正文有声明、sync 零漂移（源：字段纪律 3）
-- [ ] AC4 四闸绿、既有断言零倒（源：CI）
+- [x] AC1 复现用例翻绿：同问同域 hits/citations 无 SCR-BOHAI-01（源：本票 AC 表）
+- [x] AC2 CORE-01–08 集相等断言全过（源：本票 AC 表）
+- [x] AC3 单源声明双向：卡依赖登记、skill 正文有声明、sync 零漂移（源：字段纪律 3）
+- [x] AC4 四闸绿、既有断言零倒（源：CI）
 
 ## 交接包（L2 自主档）
 

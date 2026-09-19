@@ -28,6 +28,9 @@ CLI 契约（票 22 L0）:
   检索面裁剪在先（§0/§5）：@ID 前缀→模型（model-deps.json idPrefixes）→camp
   （model-registry.json），camp=business-core 之外一律面外拒答——**先判阵营后查
   存在性**（SCR-BOHAI-01 在真域不存在，仍按前缀判 MU 面外即拒，票 22 裁决）。
+  票 25 起 R1 裁剪收敛到 Surface.in_surface 单一判定，并覆盖**名称解析候选
+  产生处**：面外节点不进候选集，故不进 hits/citations/装配指令；命中集全为
+  面外时按既有「未找到」（R2）语义如实拒答。
   之后：禁用词扫问面 → 一级锚定（--impact 反向收行为）→ 二级名称解析
   （候选词对 name/alias/属性标签/GLS term+alias 的确定性分层匹配，不猜不模糊）
   → 三级闭包装配 → 四级可拒答（R2 缺件分层 + 近邻指路）。
@@ -138,6 +141,13 @@ class Surface:
     def camp_of(self, element_id: str) -> str | None:
         model = self.model_of(element_id)
         return self.model2camp.get(model) if model else None
+
+    def in_surface(self, element_id: str) -> bool:
+        """R1 检索面判定（唯一判定链：前缀→模型→camp，瀑布 §0/§5）——
+        @锚定拒答、名称解析候选、缺件近邻、替代指路、引用装配共用本函数，
+        面外（camp≠business-core 或前缀无模型）一律 False。票 25。"""
+        model = self.model_of(element_id)
+        return bool(model) and self.model2camp.get(model) == "business-core"
 
     def type_of(self, element_id: str) -> str | None:
         model = self.model_of(element_id)
@@ -307,9 +317,14 @@ def match_tier(token: str, text: str) -> int | None:
 
 
 def resolve_names(concepts: list[str], surface: Surface) -> list[dict]:
-    """全量候选面扫描：每节点取最优分层，按（层, 字段长, ID）稳定排序。"""
+    """全量候选面扫描：每节点取最优分层，按（层, 字段长, ID）稳定排序。
+    R1 裁剪在候选产生处（票 25）：面外节点（camp≠business-core）不进候选集，
+    面外 ID 不出现在 hits/citations/装配指令；命中集全为面外=等价未命中，
+    走既有 R2「仓内没有」语义，不另行报错。"""
     best: dict[str, tuple] = {}
     for node in surface.index.values():
+        if not surface.in_surface(node["id"]):
+            continue
         for kind, text in node_fields(node):
             for token in concepts:
                 tier = match_tier(token, text)
@@ -349,6 +364,8 @@ def scan_layers(concepts: list[str], surface: Surface) -> tuple[dict, list[dict]
     for label, types in layer_specs:
         found = []
         for node in surface.index.values():
+            if not surface.in_surface(node["id"]):  # R1：面外不进缺件/近邻（票 25）
+                continue
             if surface.type_of(node["id"]) not in types:
                 continue
             texts = [t for _k, t in node_fields(node)]
@@ -369,10 +386,9 @@ def scan_layers(concepts: list[str], surface: Surface) -> tuple[dict, list[dict]
 
 
 def _citation_ok(surface: Surface, element_id: str) -> bool:
-    model = surface.model_of(element_id)
-    if model is None or surface.model2camp.get(model) != "business-core":
+    if not surface.in_surface(element_id):  # R1 camp 裁剪（票 25 收敛到同一判定）
         return False
-    return surface.model2type.get(model) in CITATION_MODEL_TYPES
+    return surface.model2type.get(surface.model_of(element_id)) in CITATION_MODEL_TYPES
 
 
 def _scaffold(target_display: str, query_id: str, extra: str = "") -> str:
@@ -445,6 +461,8 @@ def replacement_pointers(entry: dict, surface: Surface) -> list[str]:
             continue
         exact, partial = [], []
         for node in surface.index.values():
+            if not surface.in_surface(node["id"]):  # R1：面外不进指路集（票 25）
+                continue
             for _kind, text_field in node_fields(node):
                 if text_field == name:
                     exact.append(node["id"])
@@ -471,11 +489,12 @@ def answer(target: Path, question: str, surface: Surface,
         return verdict
 
     # —— 显式锚定：先按前缀判阵营（camp 裁剪在先，瀑布 §0/§5），后查存在性 ——
+    # （判定用 Surface.in_surface 同一函数，票 25 收敛；拒绝时仍展开阵营细 Struct）
     anchors = ANCHOR_RE.findall(question)
     for anchor in anchors:
         model = surface.model_of(anchor)
-        camp = surface.model2camp.get(model) if model else None
-        if model and camp != "business-core":
+        camp = surface.model2camp.get(model) if model else None  # 载荷展示用
+        if model and not surface.in_surface(anchor):
             return base(
                 STATUS_OUT_OF_SURFACE, "一级·显式锚定（检索面外）",
                 anchor=anchor,
@@ -483,7 +502,8 @@ def answer(target: Path, question: str, surface: Surface,
                                      if anchor.startswith(p)),
                       "model": model,
                       "model_name": surface.model2name.get(model, model),
-                      "camp": camp, "anchor_exists": anchor in surface.index},
+                      "camp": surface.model2camp.get(model),
+                      "anchor_exists": anchor in surface.index},
                 reason=f"不在检索面：锚定 {anchor} 前缀 → 模型 {model}"
                        f"（{surface.model2name.get(model, model)}），camp={camp}；"
                        f"本服务只答 business-core。建造契约由 build 侧消费方在建造"

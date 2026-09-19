@@ -58,6 +58,7 @@
 - writes: 无（只读服务；回答即产出）
 - 依赖:
   - script: `tools/graph_index.py`
+  - script: `tools/semantic_service_core.py`（可机判判定核心，票 22 提纯；票 25 单源声明双向化）
   - data: `ontology/**`
 - Seam 与出厂集: `fixtures/semantic-service/`——Golden Question 集：固定问题 → 断言命中的对象 ID 集与拒答行为
 - 边界: 只读（写意图一律转提案池流程，二期）；不索引 build-contract 阵营模型
