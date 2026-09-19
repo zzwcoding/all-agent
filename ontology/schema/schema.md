@@ -8,10 +8,10 @@
 
 ## 0. 定位与裁剪总则
 
-- 一模型一 YAML、固定文件名、文件内 `model_type/version/domain` 三公共字段——照搬 OMF 文件约定（digest §16.1）。
-- 一期不做 ME 事件/M4 场景/MM 映射/MI 接口（v9 同款裁剪：先同步世界，异步需求实证后回加，PRD F1；digest §16.6）。
-- 字段换义宁可新增字段不复用旧名（digest §16.10）；被换义退役的字段名进 `model-registry.json` 各模型的 `lockedFields`，闸在 L4 强制（AC7）。
-- 字典项停用不删除（digest §16.9）：`enabled: false` 保留行，删除走影响分析。
+- 一模型一 YAML、固定文件名、文件内 `model_type/version/domain` 三公共字段——照搬 OMF 文件约定（digest §16 第 1 条）。
+- 一期不做 ME 事件/M4 场景/MM 映射/MI 接口（v9 同款裁剪：先同步世界，异步需求实证后回加，PRD F1；digest §16 第 6 条）。
+- 字段换义宁可新增字段不复用旧名（digest §16 第 10 条）；被换义退役的字段名进 `model-registry.json` 各模型的 `lockedFields`，闸在 L4 强制（AC7）。
+- 字典项停用不删除（digest §16 第 9 条）：`enabled: false` 保留行，删除走影响分析。
 
 ## 1. 公共字段与文件约定
 
@@ -36,13 +36,13 @@
 **元素级运行期预留字段（全模型可选，一期只定义不消费，PRD F1「运行期四外衣」）**：
 - 元素级 `version`（String）：元素独立版本，供运行期消费方做兼容判断。
 - 元素级 `validFrom`（ISO 日期）：有效期起点，供运行期判断"当前可消费版本"。
-- 预留字段闸只做"存在即放行"，不做语义消费——防止 schema 二次断裂（R7、digest §16.10）。正例实测承载：出厂集 `req-ac4-reserved-fields`（元素级 version/validFrom + M2 contract/riskLevel/idempotent + M3 narrative，票 13 REQ-AC4）。
+- 预留字段闸只做"存在即放行"，不做语义消费——防止 schema 二次断裂（R7、digest §16 第 10 条）。正例实测承载：出厂集 `req-ac4-reserved-fields`（元素级 version/validFrom + M2 contract/riskLevel/idempotent + M3 narrative，票 13 REQ-AC4）。
 
 **元素级结构性必填（票 13，机读真源 = model-registry.json 各模型 `requiredElementFields`）**：口径 = 身份（id/name，含各模型具名 ID 键）+ 类型判别（behaviorType 等）+ 检查锚点（一致性对/引用扫描依赖、缺失即静默跳过的字段）+ 载荷容器（attributes/activities 等空壳即红的容器）；闸 = schema_check L1 `required-field`（含空壳文件判定）。schema.md 全字段集（preconditions 等）**不在**必填闸（缺口清单留后续演进票）；逐模型推导表与证据见 `lessons/13-机读必填字段闸.md`。
 
 ## 2. ID 前缀与 ref 命名约定
 
-**前缀即类型标签**：所有元素 ID 必须带模型前缀，使 ref 无需 schema 外知识即可机械校验指向（digest §16.2）。前缀→模型映射的真源在 `model-deps.json` 的 `idPrefixes`：
+**前缀即类型标签**：所有元素 ID 必须带模型前缀，使 ref 无需 schema 外知识即可机械校验指向（digest §16 第 2 条）。该条并注明双向一致对详见 digest §12.1/§12.2——**一致对清单权威出处=digest §12.2**（本仓落点见 §14；票 11 曾误引 §16.4，勘误 2026-09-19，见 docs/reviews/2026-09-19-phase2-batch1-tickets10-12.md）。前缀→模型映射的真源在 `model-deps.json` 的 `idPrefixes`：
 
 | 模型 | ID 前缀 | 元素 |
 |---|---|---|
@@ -57,11 +57,11 @@
 
 **ref 字段约定**：
 - 跨模型引用一律稳定 ID 引用，字段名统一 `xxxRef` / `xxxRefs` 后缀；少数沿用 OMF 原名（`targetAggregate`、`sourceAggregate`、`ownerEntity`、`appliedRules`、`requiredPermissions`、`inheritsFrom`、`roles`、`permissions`、`dictionaryId`、`dataSource`）——全集见 `model-deps.json` 的 `refKeys`。
-- 禁止"只在 description 里写引用"：`AggregateRootRef` 类型属性必须显式 `targetAggregate`（digest §16.4）。
+- 禁止"只在 description 里写引用"：`AggregateRootRef` 类型属性必须显式 `targetAggregate`（digest §16 第 4 条）。
 - 引用不得通过名称猜测；ID 变更必须过影响分析（v6 §8.6）。
 - **依赖方向单向登记**：M7 与 M2 的严格一对一，依赖边只登记 M7→M2（M7.behaviorRef），M2 侧不设 `queryReportRef` 依赖边——本仓 M2 元素不写 `queryReportRef`，写了即 L2 依赖白名单违规（AC5 的判定依据）。一对一的双向一致性核验属 L2 一致性对清单（§14，票 11 落地 `consistency-*` 检查），反向经 ref 反查、无需 M2 侧字段。
 
-## 3. 四层规则下沉判定（照搬，digest §16.3）
+## 3. 四层规则下沉判定（照搬，digest §16 第 3 条）
 
 约束放哪，按判定逐级下沉，不许上跳：
 
@@ -191,7 +191,7 @@
 | resultColumns | ✓ | `{name/label/dataType/sourceExpression/aggregateFunction(NONE/COUNT/COUNT_DISTINCT/SUM/AVG/MIN/MAX)/...}` |
 | groupBy / having / orderBy / pagination | 可选 | 同 v9 §7.4 |
 | reportOptions | objectType=REPORT 必填 | 其他类型应为空；layout 仅 TABLE |
-| referenceSql | 可选 | **v9 降为可选**：语义定义是稳定层，SQL 是实现层，不进真源（digest §16.7） |
+| referenceSql | 可选 | **v9 降为可选**：语义定义是稳定层，SQL 是实现层，不进真源（digest §16 第 7 条） |
 | version / validFrom | 可选 | 运行期预留 |
 
 M7 不是 BI 指标模型（无事实表/维度/Cube/ETL）；多个一对多来源同时聚合必须 preAggregation，禁止 `SUM(DISTINCT amount)`。
@@ -234,7 +234,7 @@ OMF v6/v9 均无术语模型（digest §0/§16）。术语 = 业务概念的定�
 
 ## 12. 换义锁定字段（lockedFields，AC7 的机读真源）
 
-OMF 的 M6/M7 在 v4 换义造成过沟通成本（digest §14/§16.10）。本仓把"退役字段名"登记在 model-registry.json 各模型 `lockedFields`，schema_check 在 L4 强制：**模型文件内出现锁定字段名 = 兼容性违规**（新义必须新增字段名）。现行锁定表：
+OMF 的 M6/M7 在 v4 换义造成过沟通成本（digest §14/§16 第 10 条）。本仓把"退役字段名"登记在 model-registry.json 各模型 `lockedFields`，schema_check 在 L4 强制：**模型文件内出现锁定字段名 = 兼容性违规**（新义必须新增字段名）。现行锁定表：
 
 | 模型 | 锁定字段 | 旧义（禁止复用的理由） |
 |---|---|---|
@@ -252,11 +252,11 @@ OMF 的 M6/M7 在 v4 换义造成过沟通成本（digest §14/§16.10）。本�
 
 ## 14. 一致性对清单（L2 consistency-*，票 11）
 
-OMF 规范声明的"双向一致"对（digest §16.4）是现成的 lint 清单；本仓按"每对一条 L2 违规码"落进 `tools/schema_check.py`（行前缀 `consistency-`，报文含对名/涉事 ID/依据字段/期望值，--json 每对一行可机读；确定性、零 LLM）。涉事 ID 的**存在性**由悬空引用检查（`dangling-ref`）承载——ref 扫描面 = refKeys ∪ `*Ref/*Refs` 后缀 ∪ edges 三源并集（真源 model-deps.json）；本组只补**语义闭合向**，不重复扫存在性（红因不混：指向不存在的 ID 报 dangling-ref，存在但语义断裂才报 consistency-*）。
+OMF 规范声明的"双向一致"对（源：digest §12.2；勘误 2026-09-19：票 11 曾误引 §16.4，权威出处 digest §12.2，见 docs/reviews/2026-09-19-phase2-batch1-tickets10-12.md）是现成的 lint 清单；本仓按"每对一条 L2 违规码"落进 `tools/schema_check.py`（行前缀 `consistency-`，报文含对名/涉事 ID/依据字段/期望值，--json 每对一行可机读；确定性、零 LLM）。涉事 ID 的**存在性**由悬空引用检查（`dangling-ref`）承载——ref 扫描面 = refKeys ∪ `*Ref/*Refs` 后缀 ∪ edges 三源并集（真源 model-deps.json）；本组只补**语义闭合向**，不重复扫存在性（红因不混：指向不存在的 ID 报 dangling-ref，存在但语义断裂才报 consistency-*）。
 
 | # | 一致性对 | 违规码 | 状态 |
 |---|---|---|---|
-| P1 | M7 `behaviorRef` ↔ M2 查询行为：必指向存在且 `behaviorType=QUERY` 的行为；同一查询行为不得被第二个 M7 绑定（依赖边单向 M7→M2，反向经 ref 反查，见 §2） | `consistency-redirection` / `consistency-not-one-to-one` | **已实现**（票 11） |
+| P1 | M7 `behaviorRef` → M2 查询行为：**M7 侧单射 + 指向合法**——behaviorRef 必指向存在且 `behaviorType=QUERY` 的行为（`consistency-redirection`）；同一 M2 查询行为不得被第二个 M7 绑定（`consistency-not-one-to-one`，依赖边单向 M7→M2，反向经 ref 反查，见 §2。注：不查"QUERY 行为必被 M7 绑定"——反向在 OMF 语境未必成立，避免逼出假报表） | `consistency-redirection` / `consistency-not-one-to-one` | **已实现**（票 11） |
 | P2 | M2 `requiredPermissions` 每项指向存在的 `PERM-*`，且该权限 `targetRef` 回指此行为（双向闭合。锚定 M2.requiredPermissions 面：M5 侧单面登记权限以承载岗位职责、而行为侧 requiredPermissions 留空，不判红——权限面是角色的职责登记，见 §7） | `consistency-permission` | **已实现**（票 11） |
 | P3 | M6 活动 `roleRef` ∈ 流程 `roleRefs`（活动级角色是流程角色集子集；USER_TASK/APPROVAL_TASK 承载 roleRef，见 §8） | `consistency-flow-role` | **已实现**（票 11） |
 | P4 | M3 `triggeredBehaviors` ↔ 下游行为 | — | **回加条件制**：`triggeredBehaviors` 为 v6 事件驱动专属，v9 移除 EVENT_DRIVEN，已列 §12 换义锁定字段——仅当事件驱动回加、字段解锁时随新字段名实现本对 |
@@ -264,3 +264,5 @@ OMF 规范声明的"双向一致"对（digest §16.4）是现成的 lint 清单�
 | P6 | M3 `subscribedEvents` ↔ ME `subscribers` | — | **ME 回加时启用**（同上；`subscribedEvents` 已锁定，见 §12） |
 
 正例承载：`ontology/bohai` 全域（P1 四个查询出口一对一、P2 行为侧权限全回指、P3 三流程活动角色全闭合）与出厂集 `valid-domain`；负变体：出厂集 `cons-ac1/2/3` 三个最小域（断言标签 CONS-AC1–3，真源 = tickets/11-一致性对核验.md AC 表）。新增一致对 = 本章加行 + schema_check 加同款判定 + 出厂集配负变体，三件同步。
+
+**对账注记（2026-09-19，票 14）**：PRD F2 所称「8 组一致对」经 digest 全文核查仅得 **6 对**（§12.2，即上表 P1–P6 的规范出处；§16 第 2 条亦回指 §12.1/§12.2），第 7/8 组出处未找到。全仓按 **6 对**执行；Owner 若找到第 7/8 组出处，走演进票回加（加行进本表 + 检查器同款判定 + 出厂集负变体）。互指注记见 docs/prd.md F2 行。

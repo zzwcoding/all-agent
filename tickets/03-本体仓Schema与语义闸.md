@@ -14,9 +14,9 @@ Touches: ontology/schema/、tools/、fixtures/schema_check/
 
 ## 验收（注源）
 
-- [ ] AC1–7 全过（源：specs/schema_check.md）
-- [ ] 模型注册表含 camp/consumers/profiles/dependsOn 四字段（源：PRD F1）
-- [ ] ci.sh 四闸绿（源：设计案主线 2）
-- [ ] 归档闸过（本仓文件全合规）
+- [x] AC1–7 全过（源：specs/schema_check.md）
+- [x] 模型注册表含 camp/consumers/profiles/dependsOn 四字段（源：PRD F1）
+- [x] ci.sh 四闸绿（源：设计案主线 2）
+- [x] 归档闸过（本仓文件全合规）
 
 Blocked by: 无
