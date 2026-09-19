@@ -1,0 +1,9 @@
+model_type: OBJECT
+version: "1.0.0"
+domain: mid-ac1
+aggregates:
+  - id: AGG-MID-001
+    name: 井
+    alias: Well
+    aggregateType: AGGREGATE_ROOT
+    attributes: []

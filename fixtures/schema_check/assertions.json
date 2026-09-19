@@ -1,6 +1,6 @@
 {
-  "skill": "schema_check（语义 CI L1–L4 闸，票 03；票 10 增 GLS 套件；票 11 增一致性对套件；票 13 增必填闸套件；票 16 增禁用词拦截面套件）",
-  "description": "最小域出厂集：两对象（井 AGG-BOHAI-001 + 单井日产量记录 AGG-BOHAI-002）七模型合法本体 + 各 AC 非法变体；票 10 增 GLS 术语模型套件（gls-valid 正变体 + gls-ac2/3/4 负变体）；票 11 增 L2 一致性对套件（cons-ac1/2/3 负变体，对应 tickets/11-一致性对核验.md AC 表 AC1–3，标签加 CONS- 前缀防与基础套件撞号，手法沿票 10）；票 13 增必填闸套件（req-ac4-reserved-fields 预留字段正例 + req-ac1/2/3a/3b 必填负变体 + req-ac5/6 AC6 反向无/有豁免对，标签加 REQ- 前缀防撞，真源=tickets/13-机读必填字段闸.md AC 表）；票 16 增禁用词拦截面套件（ban-ac1-name-hit / ban-ac2-alias-hit 负变体 + ban-ac4-valid-term-in-name 防误报正例，BAN-AC3 直接挂真仓 ontology/bohai——RULE-BOHAI-009 description 提及禁用词正是本闸不误报的活体证明；真源=tickets/16-禁用词拦截面.md AC 表）。既有极简域/负变体域的 manifest 于票 13 升级登记 omittedModels（AC6 反向豁免机制），红因保持唯一。基础断言 specs/schema_check.md AC1–7；GLS-AC1–4 真源=tickets/10-术语模型GLS.md AC 表；CONS-AC1–3 真源=tickets/11-一致性对核验.md AC 表；REQ-* 真源=tickets/13-机读必填字段闸.md AC 表；BAN-* 真源=tickets/16-禁用词拦截面.md AC 表；schema 机读表经 {fixture_dir}/ontology/schema 符号链接取自仓内 ontology/schema（单一真源，不复制）。",
+  "skill": "schema_check（语义 CI L1–L4 闸，票 03；票 10 增 GLS 套件；票 11 增一致性对套件；票 13 增必填闸套件；票 16 增禁用词拦截面套件；票 27 增缺 id 盲区套件）",
+  "description": "最小域出厂集：两对象（井 AGG-BOHAI-001 + 单井日产量记录 AGG-BOHAI-002）七模型合法本体 + 各 AC 非法变体；票 10 增 GLS 术语模型套件（gls-valid 正变体 + gls-ac2/3/4 负变体）；票 11 增 L2 一致性对套件（cons-ac1/2/3 负变体，对应 tickets/11-一致性对核验.md AC 表 AC1–3，标签加 CONS- 前缀防与基础套件撞号，手法沿票 10）；票 13 增必填闸套件（req-ac4-reserved-fields 预留字段正例 + req-ac1/2/3a/3b 必填负变体 + req-ac5/6 AC6 反向无/有豁免对，标签加 REQ- 前缀防撞，真源=tickets/13-机读必填字段闸.md AC 表）；票 16 增禁用词拦截面套件（ban-ac1-name-hit / ban-ac2-alias-hit 负变体 + ban-ac4-valid-term-in-name 防误报正例，BAN-AC3 直接挂真仓 ontology/bohai——RULE-BOHAI-009 description 提及禁用词正是本闸不误报的活体证明；真源=tickets/16-禁用词拦截面.md AC 表）；票 27 增缺 id 盲区套件（mid-ac1-mixed-missing-id 混入形态：合法元素+无 id 元素且引用全有效——修前整域静默全绿逃逸，修后无 id 元素被 required-field 报缺 id；mid-ac2-pure-missing-id 纯无 id 域：修前每文件被空壳守卫一条吞掉，修后逐元素报缺 id；标签加 MID- 前缀防撞，真源=tickets/27-缺id盲区演进票.md AC 表；AC3 零扰动由 valid-domain/REQ-AC4/BAN-AC3 等既有绿断言承载，AC4 空壳语义不回退由 REQ-AC3b 承载）。既有极简域/负变体域的 manifest 于票 13 升级登记 omittedModels（AC6 反向豁免机制），红因保持唯一。基础断言 specs/schema_check.md AC1–7；GLS-AC1–4 真源=tickets/10-术语模型GLS.md AC 表；CONS-AC1–3 真源=tickets/11-一致性对核验.md AC 表；REQ-* 真源=tickets/13-机读必填字段闸.md AC 表；BAN-* 真源=tickets/16-禁用词拦截面.md AC 表；MID-* 真源=tickets/27-缺id盲区演进票.md AC 表；schema 机读表经 {fixture_dir}/ontology/schema 符号链接取自仓内 ontology/schema（单一真源，不复制）。",
   "assertions": [
     {
       "ac": "AC1",
@@ -151,6 +151,18 @@
       "type": "cmd-succeeds",
       "cmd": "python3 tools/schema_check.py {fixture_dir}/ontology/ban-ac4-valid-term-in-name",
       "outputContains": ["语义闸: 全过"]
+    },
+    {
+      "ac": "MID-AC1",
+      "type": "cmd-fails",
+      "cmd": "python3 tools/schema_check.py {fixture_dir}/ontology/mid-ac1-mixed-missing-id",
+      "outputContains": ["required-field", "无id行为", "缺必填字段「id」"]
+    },
+    {
+      "ac": "MID-AC2",
+      "type": "cmd-fails",
+      "cmd": "python3 tools/schema_check.py {fixture_dir}/ontology/mid-ac2-pure-missing-id",
+      "outputContains": ["required-field", "无id对象", "无id行为甲", "无id行为乙"]
     }
   ]
 }

@@ -1,0 +1,10 @@
+{
+  "domain": "mid-ac1",
+  "label": "缺id盲区负变体 MID-AC1（票 27）：合法行为 BH-MID-001 混入无 id 行为（其余字段与引用全有效）→ 修前整域静默全绿（逃逸形态），修后无 id 元素被 L1 required-field 报缺必填字段 id，合法元素零扰动",
+  "profile": "v9-core",
+  "schemaVersion": "1.2.0",
+  "omittedModels": [
+    { "model": "M3", "reason": "MID-AC1 负变体极简域：仅 M1/M2 入镜验混入形态，票 27。" },
+    { "model": "M5", "reason": "MID-AC1 负变体极简域：仅 M1/M2 入镜验混入形态，票 27。" }
+  ]
+}

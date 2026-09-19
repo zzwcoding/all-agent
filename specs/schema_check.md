@@ -54,12 +54,21 @@ GLS 套件（票 10，真源 = tickets/10-术语模型GLS.md AC 表）：
 | BAN-AC3 | bohai 全量（RULE-BOHAI-009 description 提及禁用词「老完成率」） | exit 0 全绿——description 不扫（文档提及合法） |
 | BAN-AC4 | 元素 name 撞 status=有效术语 + description 提及禁用词 + GLS 自身 term 承载禁用词（ban-ac4-valid-term-in-name 防误报对照） | exit 0 全绿——只拦禁用 status；匹配面=name/alias；GLS 不自匹配 |
 
+缺 id 盲区套件（票 27，真源 = tickets/27-缺id盲区演进票.md AC 表；元素枚举去 id 锚定，空壳守卫收窄为「主集合键缺失或集合为空」）：
+
+| 断言 | 给定 | 期望 |
+|---|---|---|
+| MID-AC1 | 合法元素+无 id 元素混入且引用全有效（mid-ac1-mixed-missing-id：BH-MID-001 + 无 id 行为） | 报 L1 required-field 缺必填字段「id」红，红因可指认到无 id 元素（修前此形态整域静默全绿=唯一逃逸形态）；合法元素零扰动 |
+| MID-AC2 | 纯无 id 域（mid-ac2-pure-missing-id：M1/M2 主集合字典全无 id 键） | 逐元素报 L1 required-field 缺 id 红（修前每文件被空壳守卫一条吞掉），不再是空壳一条 |
+| MID-AC3 | bohai / valid-domain / 全部出厂集域副本（attributes 等嵌套字典无 id 是合法形态） | 全绿零扰动（由既有 AC1/GLS-AC1/REQ-AC4/BAN-AC3/AC4 等绿断言承载） |
+| MID-AC4 | `terms: []` 纯空集合（=REQ-AC3b） | 仍报空壳红——空壳语义不回退（断言 REQ-AC3b 承载，零改动） |
+
 ## 违规码总表
 
 | 级别 | kind | 判定真源 |
 |---|---|---|
 | L1 | yaml-syntax / missing-common-field / unknown-model-type / filename-mismatch / missing-manifest / missing-manifest-field / unknown-profile / deps-registry-conflict | schema.md §1 + model-registry.json |
-| L1 | required-field（票 13：缺结构性必填字段/空壳文件；文件名错挂的文件跳过本闸） | model-registry.json 各模型 requiredElementFields |
+| L1 | required-field（票 13：缺结构性必填字段；票 27：主集合逐字典枚举——无 id 元素报缺必填身份字段，空壳判定收窄为「主集合键缺失或集合为空」；文件名错挂的文件跳过本闸） | model-registry.json 各模型 requiredElementFields |
 | L1 | unknown-omitted-model / bad-omitted-model（票 13：omittedModels 引用未注册模型/条目缺 model） | model-registry.json models |
 | L2 | dangling-ref / dep-whitelist | model-deps.json（refKeys ∪ *Ref/Refs ∪ edges） |
 | L2 | consistency-redirection / consistency-not-one-to-one / consistency-permission / consistency-flow-role | schema.md §14（票 11） |

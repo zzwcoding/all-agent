@@ -40,6 +40,8 @@
 
 **元素级结构性必填（票 13，机读真源 = model-registry.json 各模型 `requiredElementFields`）**：口径 = 身份（id/name，含各模型具名 ID 键）+ 类型判别（behaviorType 等）+ 检查锚点（一致性对/引用扫描依赖、缺失即静默跳过的字段）+ 载荷容器（attributes/activities 等空壳即红的容器）；闸 = schema_check L1 `required-field`（含空壳文件判定）。schema.md 全字段集（preconditions 等）**不在**必填闸（缺口清单留后续演进票）；逐模型推导表与证据见 `lessons/13-机读必填字段闸.md`。
 
+**违规语义注记（票 27，2026-09-19）：元素枚举去 id 锚定**——`required-field` 闸对模型文件主集合（aggregates/behaviors/rules/actors/roles/permissions/flows/query_reports/screens/terms 等顶层 list-of-dicts 集合键）内的**每个字典**按元素枚举，不再以「有 id 键」为枚举前提：无 id 元素报缺必填身份字段（id 已在各模型必填集首位；M5=actorId/roleId/permissionId、MU=screenId 同判），修掉「无 id 元素混入合法元素即静默逃逸」盲区。**空壳判定随之收窄**为「主集合键缺失或集合为空」——集合里有字典就逐元素报缺 id，空壳不再兜底；纯空集合（`terms: []`）语义不变仍报空壳。嵌套子结构（attributes[]/refRules[]/activities[] 等）不是元素、不进枚举（由 ref 扫描与字段检查覆盖，其字典无 id 合法）。负变体出厂集：`mid-ac1-mixed-missing-id`（混入形态）/ `mid-ac2-pure-missing-id`（纯无 id 域），断言 MID-AC1/2。
+
 ## 2. ID 前缀与 ref 命名约定
 
 **前缀即类型标签**：所有元素 ID 必须带模型前缀，使 ref 无需 schema 外知识即可机械校验指向（digest §16 第 2 条）。该条并注明双向一致对详见 digest §12.1/§12.2——**一致对清单权威出处=digest §12.2**（本仓落点见 §14；票 11 曾误引 §16.4，勘误 2026-09-19，见 docs/reviews/2026-09-19-phase2-batch1-tickets10-12.md）。前缀→模型映射的真源在 `model-deps.json` 的 `idPrefixes`：

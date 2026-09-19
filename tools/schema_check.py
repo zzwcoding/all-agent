@@ -6,7 +6,9 @@ tickets/11-一致性对核验.md AC 表 + ontology/schema/schema.md §14；票 1
 L4 AC6 反向闸 missing-model-file（profile 启用却缺文件，经 manifest omittedModels
 带理由豁免）；票 16 增 L4 禁用词拦截面 banned-term（真源=域内 GLS 术语 status 含
 「禁用」条目的 term+aliases，匹配面=递归收集键恰为 name/alias 的字符串值子串命中，
-description/notes 不扫=文档自由）。
+description/notes 不扫=文档自由）；票 27 元素枚举去 id 锚定——主集合每个字典即元素
+（无 id 也枚举，报缺必填身份字段，修"混入合法元素即静默逃逸"盲区），空壳守卫收窄为
+「主集合键缺失或集合为空」。
 
 对给定 ontology 目录做确定性校验：
   L1 schema 合法——YAML 可解析（AC2）、公共字段 model_type/version/domain 在场（AC3）、
@@ -14,7 +16,8 @@ description/notes 不扫=文档自由）。
      yamlFile 一致（票 10 AC4：GLS 文件名错挂/model_type 写错；真源=model-registry.json
      yamlFile，即"一模型一 YAML、固定文件名"约定的闸上强化）、schema 两份机读表互相一致、
      逐元素结构性必填字段在场（票 13 required-field：身份/类型判别/检查锚点/载荷容器四类，
-     口径与逐模型推导表见 lessons/13；空壳文件——不含任何本模型元素——同报 required-field）；
+     口径与逐模型推导表见 lessons/13；票 27：主集合逐字典枚举，无 id 元素报缺必填身份
+     字段；空壳守卫收窄为「主集合键缺失或集合为空」，同报 required-field）；
   L2 引用与依赖——ref 指向的 ID 全仓有定义（AC4 悬空引用）、ref 目标模型不越
      类型层依赖白名单（AC5，真源 ontology/schema/model-deps.json + model-registry.json）；
      一致性对（票 11，digest §12.2 本仓可行子集）：
@@ -225,6 +228,47 @@ def collect_elements(data, mkey: str, prefix2model: dict, ref_keys: set):
     return out
 
 
+def iter_collection_items(data):
+    """主集合元素枚举（票 27）：模型文件顶层「列表」值里的每个字典=一个元素候选。
+
+    不再以「有 id 键」为枚举前提（无 id 也枚举——修缺 id 盲区：无 id 元素混入
+    合法元素时旧版静默逃逸，纯无 id 域被空壳守卫一条吞掉）。实测边界（票 27 盘点
+    全仓模型文件）：顶层 list-of-dicts 键恰为各模型元素主集合（M1 aggregates/
+    data_dictionaries/aggregate_associations、M5 actors/roles/permissions、
+    GLS terms、MU screens 等），MU application 为顶层映射不入枚举；嵌套子结构
+    （attributes[]/refRules[]/activities[]/types[].items 等）不在顶层、天然不入
+    枚举——它们由 ref 扫描与字段检查覆盖，属性/活动字典无 id 是合法形态。
+    """
+    if not isinstance(data, dict):
+        return
+    for value in data.values():
+        if isinstance(value, list):
+            for item in value:
+                if isinstance(item, dict):
+                    yield item
+
+
+def element_identity(item, mkey: str, prefix2model: dict, ref_keys: set):
+    """元素身份判定（票 27）：返回 (matched, stray)。
+
+    matched = `id`/`*Id` 键（非 ref 键）字符串值判回本模型注册前缀的首个 (键, 值)
+    ——有它即既有逐字段闸（requiredElementFields）覆盖；stray = 有 id 形但值不判
+    回本模型的首个 (键, 值)（集合里挂了别家模型的 ID，旧版此处恰被空壳误吞）；
+    两者皆无 = (None, None)，即缺 id 元素。
+    """
+    stray = None
+    for key, value in item.items():
+        if not (isinstance(key, str) and (key == "id" or key.endswith("Id"))):
+            continue
+        if is_ref_key(key, ref_keys) or not isinstance(value, str):
+            continue
+        if id_model_of(value, prefix2model) == mkey:
+            return (key, value), None
+        if stray is None:
+            stray = (key, value)
+    return None, stray
+
+
 # ---------- 禁用词拦截面（票 16：GLS×schema_check 联动闸） ----------
 
 NAME_ALIAS_KEYS = ("name", "alias")
@@ -417,11 +461,6 @@ def run(target: Path) -> dict:
             req_map = models[mkey].get("requiredElementFields") or {}
             if req_map and not name_mismatch:
                 elements = collect_elements(data, mkey, prefix2model, ref_keys)
-                if not elements:
-                    add("L1", "required-field", rel, data.line,
-                        f"模型 {mkey} 文件不含任何本模型元素（空壳文件：主集合为空"
-                        f"或缺失）——结构性必填闸（票 13），真源 model-registry.json "
-                        f"{mkey}.requiredElementFields")
                 for eid, mapping in elements:
                     for prefix, fields in req_map.items():
                         if not eid.startswith(prefix):
@@ -434,6 +473,34 @@ def run(target: Path) -> dict:
                                     f"（结构性必填：身份/类型判别/检查锚点/载荷容器，"
                                     f"缺失会使一致性对与引用扫描静默跳过；真源 "
                                     f"model-registry.json {mkey}.requiredElementFields）")
+
+                # 主集合逐字典枚举（票 27）：无 id 也枚举，报缺必填身份字段——
+                # 修"无 id 元素混入合法元素即静默逃逸"盲区。空壳守卫收窄为
+                # 「主集合键缺失或集合为空」：集合里有字典就逐元素报缺 id，
+                # 不再报空壳一条吞掉；纯空集合（terms:[]，REQ-AC3b）语义不变仍走空壳。
+                items = list(iter_collection_items(data))
+                if not items:
+                    add("L1", "required-field", rel, data.line,
+                        f"模型 {mkey} 文件主集合键缺失或集合为空（空壳文件：不含任何"
+                        f"本模型元素）——结构性必填闸（票 13），真源 model-registry.json "
+                        f"{mkey}.requiredElementFields；票 27 收窄：集合内有字典即逐元素"
+                        f"枚举、无 id 元素改报缺必填字段，空壳不再兜底")
+                id_fields = sorted({f for fields in req_map.values()
+                                    for f in fields if f == "id" or f.endswith("Id")})
+                for item in items:
+                    matched, stray = element_identity(
+                        item, mkey, prefix2model, ref_keys)
+                    if matched:
+                        continue  # 有本模型身份：上方逐字段闸已覆盖
+                    hint = next((f"（{k}={item[k]}）" for k in ("name", "term")
+                                 if isinstance(item.get(k), str) and item[k]), "")
+                    stray_note = (f"；其「{stray[0]}」值「{stray[1]}」不判回本模型"
+                                  f"注册前缀" if stray else "")
+                    add("L1", "required-field", rel,
+                        getattr(item, "line", 0) or data.line,
+                        f"主集合元素{hint}缺必填字段「{'/'.join(id_fields)}」"
+                        f"{stray_note}（元素枚举不再以有 id 为前提——票 27 修缺 id "
+                        f"盲区；真源 model-registry.json {mkey}.requiredElementFields）")
 
             if mkey not in enabled:  # AC6
                 add("L4", "profile-disabled", rel, data.line,

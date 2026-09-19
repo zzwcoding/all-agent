@@ -1,0 +1,15 @@
+model_type: BEHAVIOR
+version: "1.0.0"
+domain: mid-ac1
+behaviors:
+  - id: BH-MID-001
+    name: 录入
+    ownerEntity: AGG-MID-001
+    behaviorType: COMMAND
+    appliedRules: []
+    requiredPermissions: []
+  - name: 无id行为
+    ownerEntity: AGG-MID-001
+    behaviorType: COMMAND
+    appliedRules: []
+    requiredPermissions: []

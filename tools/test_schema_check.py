@@ -921,5 +921,186 @@ class BannedTerm(Base):
         self.assertNotIn("banned-term", self.kinds(report))
 
 
+# ---------- 票 27：主集合逐字典枚举（缺 id 盲区修复；出厂断言 MID-AC1/2）----------
+
+MID_REGISTRY = {
+    "version": "1.2.0",
+    "models": {
+        "M1": dict(REGISTRY["models"]["M1"], profiles=["full"],
+                   requiredElementFields={
+                       "AGG-": ["id", "name", "alias", "aggregateType",
+                                "attributes"]}),
+        "M2": dict(REGISTRY["models"]["M2"], profiles=["full"],
+                   requiredElementFields={
+                       "BH-": ["id", "name", "ownerEntity", "behaviorType"]}),
+        "GLS": dict(REGISTRY["models"]["GLS"], profiles=["full"],
+                    requiredElementFields={
+                        "GLS-": ["id", "term", "definition", "source"]}),
+    },
+}
+
+
+MID_DEPS = {
+    "version": "1.2.0",
+    "idPrefixes": {"AGG-": "M1", "BH-": "M2", "GLS-": "GLS"},
+    "refKeys": ["ownerEntity", "relatedObjectRefs"],
+    "edges": [
+        {"from": "M2", "field": "ownerEntity", "to": ["M1"]},
+        {"from": "GLS", "field": "relatedObjectRefs", "to": ["M1"]},
+    ],
+}
+
+
+class ElementIdEnumeration(ReqBase):
+    """票 27 单测面：元素枚举去 id 锚定——主集合每个字典即元素（无 id 也枚举）。
+
+    三形态（混入逃逸/纯无 id/空集合）+ 嵌套合法形态（attributes 字典无 id 不报）
+    + 错前缀红因迁移 + 禁用词族回归抽查；真源 = tickets/27 AC 表（MID-AC1/2/3/4）。
+    空壳守卫收窄为「主集合键缺失或集合为空」，集合内有字典就逐元素报缺身份字段。
+    """
+
+    def setUp(self):
+        super().setUp()
+        write(self.root / "schema" / "model-registry.json", json.dumps(MID_REGISTRY))
+        write(self.root / "schema" / "model-deps.json", json.dumps(MID_DEPS))
+        write(self.root / "demo" / "manifest.json", json.dumps(
+            {"domain": "demo", "profile": "full", "schemaVersion": "1.2.0",
+             "omittedModels": [
+                 {"model": k, "reason": "单测基座：模型文件按需加装"}
+                 for k in ("M1", "M2", "GLS")]}))
+
+    def req_rows(self, report=None):
+        return [v for v in (report or self.run_check())["violations"]
+                if v["kind"] == "required-field"]
+
+    def test_mixed_valid_and_idless_element_flags_only_idless(self):
+        # MID-AC1 混入形态：合法 BH-DEMO-Record + 无 id 行为（引用全有效）→
+        # 修前整域静默全绿（逃逸），修后仅无 id 元素报缺 id，合法元素零扰动
+        self.add("m1-object-model.yaml", M1)
+        self.add("m2-behavior-model.yaml", M2 + """  - name: 无id行为
+    ownerEntity: AGG-DEMO-001
+    behaviorType: COMMAND
+""")
+        report = self.run_check()
+        rows = self.req_rows(report)
+        self.assertEqual(len(rows), 1, report["violations"])
+        self.assertIn("无id行为", rows[0]["message"])
+        self.assertIn("缺必填字段「id」", rows[0]["message"])
+        self.assertNotIn("BH-DEMO-Record", rows[0]["message"])
+        self.assertGreater(rows[0]["line"], 0)
+
+    def test_pure_idless_file_reports_per_element_not_empty_shell(self):
+        # MID-AC2 纯无 id 形态：两个无 id 行为 → 逐元素两行缺 id（name 提示可指认），
+        # 不再被空壳一条吞
+        self.add("m2-behavior-model.yaml",
+                 """model_type: BEHAVIOR
+version: "1.0.0"
+domain: demo
+behaviors:
+  - name: 无id行为甲
+    behaviorType: COMMAND
+  - name: 无id行为乙
+    behaviorType: QUERY
+""")
+        rows = self.req_rows()
+        self.assertEqual(len(rows), 2, rows)
+        msgs = " ".join(v["message"] for v in rows)
+        self.assertIn("无id行为甲", msgs)
+        self.assertIn("无id行为乙", msgs)
+        self.assertNotIn("空壳", msgs)
+
+    def test_gls_pure_idless_terms_report_per_element(self):
+        # MID-AC2 GLS 版：术语字典无 id → 逐元素缺 id（term 键提示），空壳不背锅
+        self.add("glossary-model.yaml",
+                 """model_type: GLOSSARY
+version: "1.0.0"
+domain: demo
+terms:
+  - term: 悬空术语甲
+    definition: 无 id 术语甲。
+    source: 合成·票 27
+  - term: 悬空术语乙
+    definition: 无 id 术语乙。
+    source: 合成·票 27
+""")
+        rows = self.req_rows()
+        self.assertEqual(len(rows), 2, rows)
+        msgs = " ".join(v["message"] for v in rows)
+        self.assertIn("悬空术语甲", msgs)
+        self.assertIn("悬空术语乙", msgs)
+        self.assertNotIn("空壳", msgs)
+
+    def test_empty_terms_still_empty_shell(self):
+        # MID-AC4（=REQ-AC3b 语义）：terms:[] 仍红——空壳守卫收窄后只管
+        # 「主集合键缺失或集合为空」，纯空集合形态语义不回退
+        self.add("glossary-model.yaml",
+                 "model_type: GLOSSARY\nversion: \"1.0.0\"\ndomain: demo\nterms: []\n")
+        rows = self.req_rows()
+        self.assertEqual(len(rows), 1, rows)
+        self.assertIn("空壳", rows[0]["message"])
+        self.assertIn("GLS", rows[0]["message"])
+
+    def test_missing_collection_key_is_empty_shell(self):
+        # 收窄后另一支：主集合键整个缺失（无 behaviors 键）同样是空壳
+        self.add("m2-behavior-model.yaml",
+                 "model_type: BEHAVIOR\nversion: \"1.0.0\"\ndomain: demo\n")
+        rows = self.req_rows()
+        self.assertEqual(len(rows), 1, rows)
+        self.assertIn("空壳", rows[0]["message"])
+
+    def test_nested_attributes_without_id_not_enumerated(self):
+        # MID-AC3 嵌套不误伤：attributes[] 子结构字典无 id 是合法形态，不进元素
+        # 枚举（由 ref 扫描与字段检查覆盖）——对象域照旧全绿
+        m1_nested = M1.replace(
+            "    attributes: []",
+            """    attributes:
+      - name: wellCode
+        label: 井号
+        type: String
+      - name: status
+        label: 井状态
+        type: String""")
+        self.add("m1-object-model.yaml", m1_nested)
+        self.add("m2-behavior-model.yaml", M2)
+        report = self.run_check()
+        self.assertEqual(report["status"], "pass", report["violations"])
+        self.assertEqual(self.req_rows(report), [])
+
+    def test_stray_prefix_id_migrates_from_empty_shell_to_identity(self):
+        # 红因迁移：集合内 id 前缀不判回本模型（如 M2 集合挂 AGG- id）→
+        # 修前=空壳一条（误吞），修后=缺身份字段（红因可指认，不留新盲区）
+        self.add("m2-behavior-model.yaml",
+                 """model_type: BEHAVIOR
+version: "1.0.0"
+domain: demo
+behaviors:
+  - id: AGG-DEMO-001
+    name: 错前缀行为
+    behaviorType: COMMAND
+""")
+        rows = self.req_rows()
+        self.assertEqual(len(rows), 1, rows)
+        self.assertIn("错前缀行为", rows[0]["message"])
+        self.assertIn("AGG-DEMO-001", rows[0]["message"])
+        self.assertNotIn("空壳", rows[0]["message"])
+
+    def test_banned_term_scan_unaffected_by_idless_element(self):
+        # 禁用词族回归抽查：无 id 元素的 name 照样进禁用词匹配面（拦截面不依赖
+        # id）——与必填闸同域并行，两闸各自出红互不遮蔽
+        self.add("m1-object-model.yaml", M1)
+        self.add("m2-behavior-model.yaml",
+                 """model_type: BEHAVIOR
+version: "1.0.0"
+domain: demo
+behaviors:
+  - name: 录入老完成率
+    behaviorType: COMMAND
+""")
+        self.add("glossary-model.yaml", BAN_GLS)
+        kinds = self.kinds()
+        self.assertIn("banned-term", kinds)
+        self.assertIn("required-field", kinds)
+
+
 if __name__ == "__main__":
     unittest.main()

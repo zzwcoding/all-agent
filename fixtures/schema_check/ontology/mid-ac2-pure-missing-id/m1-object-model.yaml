@@ -1,0 +1,8 @@
+model_type: OBJECT
+version: "1.0.0"
+domain: mid-ac2
+aggregates:
+  - name: 无id对象
+    alias: NoIdObject
+    aggregateType: AGGREGATE_ROOT
+    attributes: []

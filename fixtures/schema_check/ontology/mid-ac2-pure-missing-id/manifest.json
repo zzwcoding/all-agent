@@ -1,0 +1,10 @@
+{
+  "domain": "mid-ac2",
+  "label": "缺id盲区负变体 MID-AC2（票 27）：纯无 id 域（M1/M2 主集合字典全无 id 键）→ 修前每文件被空壳守卫一条吞掉，修后逐元素报缺必填字段 id（空壳守卫收窄为「主集合键缺失或集合为空」，不再兜底）",
+  "profile": "v9-core",
+  "schemaVersion": "1.2.0",
+  "omittedModels": [
+    { "model": "M3", "reason": "MID-AC2 负变体极简域：仅 M1/M2 入镜验纯无 id 形态，票 27。" },
+    { "model": "M5", "reason": "MID-AC2 负变体极简域：仅 M1/M2 入镜验纯无 id 形态，票 27。" }
+  ]
+}
