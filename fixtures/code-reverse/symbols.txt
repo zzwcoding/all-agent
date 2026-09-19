@@ -1,0 +1,32 @@
+# 出厂集符号覆盖清单（票 31）：输入代码公开符号逐行列出——类/函数/常量约束/字面量集。
+# 格式：`符号  文件:行号  素材类别`（首列符号=覆盖探针的核对键；行号=输入源码声明位，
+# 输入侧机判断言逐条核「符号叶名在该行可指认」）。覆盖不变量：每符号必须落三处之一
+# （草案元素 / 疑点清单 / 明示不逆向清单），落点见 expected-output/lending-调用链素材.md
+# 末节「符号覆盖对照表」；缺一条 = 漏覆盖，探针 exit 1。
+MAX_BORROW_LIMIT  library.py:6  常量约束
+BookStatus  library.py:7  字面量集
+Book  library.py:11  类
+Book.book_id  library.py:13  字段
+Book.title  library.py:14  字段
+Book.status  library.py:15  字段
+Book.mark_borrowed  library.py:16  方法
+Book.mark_available  library.py:18  方法
+Reader  library.py:20  类
+Reader.reader_id  library.py:22  字段
+Reader.name  library.py:23  字段
+Reader.can_borrow  library.py:24  方法
+Loan  library.py:26  类
+Loan.loan_id  library.py:28  字段
+Loan.book  library.py:29  字段
+Loan.reader  library.py:30  字段
+Loan.due_date  library.py:31  字段
+Loan.return_date  library.py:32  字段
+Loan.close  library.py:33  方法
+ReaderStatus  billing.py:6  字面量集
+MAX_OVERDUE_DAYS  billing.py:9  常量约束
+FINE_PER_DAY  billing.py:10  常量约束
+SUSPEND_FINE  billing.py:11  常量约束
+overdue_days  billing.py:12  函数
+calc_fine  billing.py:14  函数
+refresh_status  billing.py:18  函数
+settle_return  billing.py:23  函数

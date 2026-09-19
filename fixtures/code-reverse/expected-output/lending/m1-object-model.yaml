@@ -1,0 +1,69 @@
+# =====================================================================
+# 图书借阅域草案 · M1 对象模型（code-reverse 参照产物，票 31）
+# 输入: fixtures/code-reverse/input/（library.py + billing.py，出厂集固定输入·合成）
+# ────────────────────────────────────────────────────────────────
+# 证据非权威，待 Owner 确认。
+# 证据等级: 元素结构=源码直译（D 级：类/字段/字面量集/常量直证）；类型占位与
+#   字典 label=推断（I 级，逐条标待 Owner 确认）。方法级行为素材一律挂起
+#   （manifest omittedModels M2）；引用关系只从字段引用推导（Loan.book/Loan.reader，
+#   library.py:29-30），真实调用链见 expected-output/lending-调用链素材.md，
+#   调用不产生关联。符号覆盖对照表见调用链素材末节。
+# =====================================================================
+model_type: OBJECT
+version: "1.0.0"
+domain: lending
+aggregates:
+  # [library.py:11] class Book → 书目（一类一候选聚合根）
+  - id: AGG-LENDING-001
+    name: 书目
+    alias: Book
+    description: "源码 class Book（源码 library.py:11）直译。疑点：bookId 语义为标识符但源码无唯一性约束声明，unique 不标、待 Owner 确认；mark_borrowed 零调用点（孤儿方法，借出动作缺失于调用图）见调用链素材疑点 D3——均待 Owner 确认。"
+    aggregateType: AGGREGATE_ROOT
+    attributes:
+      - { name: bookId, label: 书目编号, type: String, required: true }
+      - { name: title, label: 书名, type: String, required: true }
+      - { name: status, label: 书目状态, type: DictionaryRef, required: true, dictionaryRef: { dictionaryId: DICT-LENDING-001, typeCode: book_status } }
+  # [library.py:20] class Reader → 读者（一类一候选聚合根）
+  - id: AGG-LENDING-002
+    name: 读者
+    alias: Reader
+    description: "源码 class Reader（源码 library.py:20）直译。疑点：status 构造器未声明、仅 billing.py:19/21 从外部写入（声明/写入分离，属性按写入点证据立候选，I 级）——见调用链素材疑点 D1；can_borrow 只判数量上限、暂停状态不参与借阅判定（疑点 D5）——均待 Owner 确认。"
+    aggregateType: AGGREGATE_ROOT
+    attributes:
+      - { name: readerId, label: 读者编号, type: String, required: true }
+      - { name: name, label: 姓名, type: String, required: true }
+      - { name: status, label: 读者状态, type: DictionaryRef, dictionaryRef: { dictionaryId: DICT-LENDING-002, typeCode: reader_status } }
+  # [library.py:26] class Loan → 借阅单（一类一候选聚合根；book/reader 为字段引用 → 引用属性）
+  - id: AGG-LENDING-003
+    name: 借阅单
+    alias: Loan
+    description: "源码 class Loan（源码 library.py:26）直译。book/reader 为构造器字段引用（源码 library.py:29-30）→ AggregateRootRef，方向/基数按字段直译、关联语义待 Owner 确认；dueDate/returnDate 无类型注解，Date 为使用点推断（源码 billing.py:13 日期差取天数），I 级——见调用链素材疑点 D4。close（源码 library.py:33）有状态改写但无权限/主体语义，行为挂起（manifest omittedModels M2），调用链见调用链素材 链1。"
+    aggregateType: AGGREGATE_ROOT
+    attributes:
+      - { name: loanId, label: 借阅单编号, type: String, required: true }
+      - { name: book, label: 借出书目, type: AggregateRootRef, required: true, targetAggregate: AGG-LENDING-001 }
+      - { name: reader, label: 借阅读者, type: AggregateRootRef, required: true, targetAggregate: AGG-LENDING-002 }
+      - { name: dueDate, label: 应还日期, type: Date }
+      - { name: returnDate, label: 归还日期, type: Date }
+# [billing.py:6] class ReaderStatus 字面量集 → 读者状态字典（值集逐字直译；label 为直译 I 级）
+data_dictionaries:
+  - id: DICT-LENDING-001
+    name: 书目状态字典
+    types:
+      - typeCode: book_status
+        typeName: 书目状态
+        items:
+          - { code: AVAILABLE, label: 可借, enabled: true, sortOrder: 1 }
+          - { code: BORROWED, label: 已借出, enabled: true, sortOrder: 2 }
+          - { code: LOST, label: 丢失, enabled: true, sortOrder: 3 }
+  - id: DICT-LENDING-002
+    name: 读者状态字典
+    types:
+      - typeCode: reader_status
+        typeName: 读者状态
+        items:
+          - { code: ACTIVE, label: 在用, enabled: true, sortOrder: 1 }
+          - { code: SUSPENDED, label: 暂停借阅, enabled: true, sortOrder: 2 }
+# 无 aggregate_associations：引用关系只从字段引用推导（Loan.book/Loan.reader →
+#   AggregateRootRef 属性，方向按字段直译）；源码无其他引用/关联证据，调用链不产生
+#   关联推断（红线）——关联想象见 lending-调用链素材.md 疑点清单，待 Owner 裁决。

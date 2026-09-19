@@ -2,6 +2,7 @@
   "version": 1,
   "description": "本仓管理的安装位 skill 名清单（tools/install_skills.py sync 原子维护；孤儿三要素=登记过+安装位在+正本已删，票 15）",
   "skills": [
+    "code-reverse",
     "db-reverse",
     "impact-analyzer",
     "onto-modeler",

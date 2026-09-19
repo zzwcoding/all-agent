@@ -1,0 +1,17 @@
+{
+  "domain": "lending",
+  "label": "图书借阅域（code-reverse 逆向草案）",
+  "profile": "v9-core",
+  "schemaVersion": "1.0.0",
+  "description": "code-reverse 参照产物（票 31）：从合成迷你代码库（fixtures/code-reverse/input/ 两文件）逆向。证据非权威，待 Owner 确认。源码结构证据支撑 M1 对象层（3 聚合根 + 2 数据字典）+ M3 规则候选（3 条：常量约束+比较点直译）；方法级行为有状态改写与真实调用、但零权限/触发主体/时机证据——M2 结构性必填 requiredPermissions 无从填立，不发明，方法清单与调用链留痕于 lending-调用链素材.md；源码零操作主体/角色证据 M5 不产文件（omittedModels 带理由豁免）。符号覆盖对照见 expected-output/lending-调用链素材.md 末节。",
+  "omittedModels": [
+    {
+      "model": "M2",
+      "reason": "源码方法（Book.mark_borrowed / Book.mark_available / Loan.close / settle_return / refresh_status）有状态改写与真实调用，但无触发主体/权限/时机语义，M2 结构性必填 requiredPermissions 无证据可填——行为素材挂起不产文件，调用链逐跳注源见 lending-调用链素材.md（票 31 参照产物）。"
+    },
+    {
+      "model": "M5",
+      "reason": "源码零操作主体/角色/权限证据（Reader/Book 在代码里是被操作的数据对象，不是操作者），主体候选无从立——不发明（票 31 参照产物）。"
+    }
+  ]
+}

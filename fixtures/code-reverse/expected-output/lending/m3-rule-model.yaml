@@ -1,0 +1,45 @@
+# =====================================================================
+# 图书借阅域草案 · M3 规则模型（code-reverse 参照产物，票 31）
+# 输入: fixtures/code-reverse/input/（library.py + billing.py，出厂集固定输入·合成）
+# ────────────────────────────────────────────────────────────────
+# 证据非权威，待 Owner 确认。
+# 常量约束→规则候选逐条映射（常量定义+比较点两处直证才立，只有常量定义无比较点的
+#   进疑点清单）：
+#   MAX_BORROW_LIMIT（library.py:6）+ 判定点 can_borrow（library.py:24-25）→ RULE-LENDING-001；
+#   MAX_OVERDUE_DAYS/FINE_PER_DAY（billing.py:9-10）+ 使用点 calc_fine（billing.py:14-17）→ RULE-LENDING-002；
+#   SUSPEND_FINE（billing.py:11）+ 判定点 refresh_status（billing.py:18-22）→ RULE-LENDING-003。
+# reusedBy 全空：M2 未产文件（manifest omittedModels，行为挂起），规则无挂接点
+#   不发明挂接（同票 30 手法）。表达式一律 narrative 占位，判定实现待 Owner 确认。
+# =====================================================================
+model_type: RULE
+version: "1.0.0"
+domain: lending
+rules:
+  # [源码 library.py:6 + library.py:24-25] 在借上限
+  - id: RULE-LENDING-001
+    name: 借阅上限校验
+    ruleType: VALIDATION
+    description: "源码常量 MAX_BORROW_LIMIT=5（源码 library.py:6）与判定点 Reader.can_borrow（源码 library.py:24-25，active_loans < MAX_BORROW_LIMIT）直译：同读者在借数达上限即不可再借。activeLoans 是方法入参非持久属性（无 sourceField），在借数的统计口径源码未给——待 Owner 确认。"
+    inputParams:
+      - { name: activeLoans, type: Integer, required: true }
+    outputType: Boolean
+    narrative: 在借借阅单数达到上限 5 即判不可借（返回 true）
+  # [源码 billing.py:9-10 + billing.py:14-17，天数口径 billing.py:12-13] 逾期罚款
+  - id: RULE-LENDING-002
+    name: 逾期罚款计算
+    ruleType: CALCULATION
+    description: "源码函数 calc_fine（源码 billing.py:14-17）与常量 MAX_OVERDUE_DAYS=30（源码 billing.py:9）、FINE_PER_DAY=0.5（源码 billing.py:10）直译：超期天数超过 30 按封顶计，罚款=封顶后天数×日罚。天数口径 overdue_days（源码 billing.py:12-13，日期差取整、负值归零）。罚款是否实收、有无减免口径源码未给——待 Owner 确认。"
+    inputParams:
+      - { name: dueDate, type: Date, sourceField: loan.dueDate, required: true }
+      - { name: returnDate, type: Date, required: true }
+    outputType: Decimal
+    narrative: 超期天数=归还日−到期日（负值归零）；超过 30 天按 30 封顶；罚款=天数×0.5
+  # [源码 billing.py:11 + billing.py:18-22] 欠罚暂停线
+  - id: RULE-LENDING-003
+    name: 欠罚暂停借阅判定
+    ruleType: VALIDATION
+    description: "源码函数 refresh_status（源码 billing.py:18-22）与常量 SUSPEND_FINE=20.0（源码 billing.py:11）直译：未缴罚款达到 20.0 即置读者状态为 SUSPENDED，否则恢复 ACTIVE。「未缴罚款」的账目来源源码未给；状态改写动作属行为素材，M2 挂起（manifest omittedModels）——均待 Owner 确认。"
+    inputParams:
+      - { name: unpaidFine, type: Decimal, required: true }
+    outputType: Boolean
+    narrative: 未缴罚款 ≥ 20.0 判为达暂停线（返回 true），读者状态置暂停

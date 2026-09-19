@@ -1,0 +1,53 @@
+{
+  "skill": "code-reverse（代码逆向器，票 31）",
+  "description": "出厂集：合成迷你代码库（input/library.py + input/billing.py，中性通用域「图书借阅管理」，零现实业务域专名）→ 断言逆向工序产物的确定性结果（AC 真源=tickets/31-代码逆向器.md AC 表）。输入侧四类素材齐：类与字段（Book/Reader/Loan 三类→聚合根/属性候选）、方法间真实调用（settle_return→Loan.close→Book.mark_available 跨文件调用链）、常量约束（MAX_BORROW_LIMIT/MAX_OVERDUE_DAYS/FINE_PER_DAY/SUSPEND_FINE+if 比较点→规则候选）、状态字面量集合（BookStatus/ReaderStatus→字典候选）；另埋两处真实脏特征（Reader.status 声明/写入分离、mark_borrowed 孤儿方法零调用点）供疑点清单不静默吞。symbols.txt=符号覆盖不变量的输入侧（27 公开符号逐行带 file:line）；expected-output/ 是按 SKILL.md 工序对同一输入手工产出的参照产物：草案域目录 lending/（manifest+M1/M3 两件，schema 经 expected-output/schema 符号链接取自仓内 ontology/schema 单一真源，同 fixtures/db-reverse 手法；profile 取注册表最小核心组合 v9-core，M2/M5 缺权限/主体证据挂 omittedModels 带理由豁免，方法级行为素材进调用链素材挂起）+ lending-调用链素材.md（代码符号→草案元素逐条映射+源码 file:line 证据+调用链+疑点/明示不逆向清单，实际运行落位 docs/code-reverse/<域>-调用链素材.md，出厂集按镜像路径存放）。AC1=草案过语义闸+符号覆盖探针正例 exit 0（symbols.txt ⊆ 映射文件末节对照表）；AC2=草案与映射文件头部固定声明「证据非权威，待 Owner 确认」+file:line 注源计数；AC3=负变体 negative-variants/lending-调用链素材.md 删 SUSPEND_FINE 一行对照（注入说明在头部——探针只扫对照表节）→探针 exit 1 报缺符号。",
+  "assertions": [
+    { "ac": "输入（两源文件在位）", "type": "file-exists", "path": "input/library.py" },
+    { "ac": "输入（两源文件在位）", "type": "file-exists", "path": "input/billing.py" },
+    {
+      "ac": "输入（符号覆盖清单逐符号在源码声明位可指认：叶名命中 文件:行号 该行——覆盖不变量输入侧机判，符号清单与代码对不上后面全白做）",
+      "type": "cmd-succeeds",
+      "cmd": "python3 -c \"import pathlib,sys; fx=pathlib.Path('{fixture_dir}'); src={p.name:p.read_text(encoding='utf-8').splitlines() for p in (fx/'input').glob('*.py')}; rows=[l.split() for l in (fx/'symbols.txt').read_text(encoding='utf-8').splitlines() if l.strip() and not l.startswith('#')]; bad=[r[0] for r in rows if r[1].split(':')[0] not in src or int(r[1].split(':')[1])>len(src[r[1].split(':')[0]]) or r[0].split('.')[-1] not in src[r[1].split(':')[0]][int(r[1].split(':')[1])-1]]; print('符号数',len(rows),'缺位',bad); sys.exit(1 if bad or len(rows)<20 else 0)\"",
+      "outputContains": ["符号数 27", "缺位 []"]
+    },
+    {
+      "ac": "AC1（草案域过语义闸）",
+      "type": "cmd-succeeds",
+      "cmd": "python3 tools/schema_check.py {fixture_dir}/expected-output/lending",
+      "outputContains": ["语义闸: 全过"]
+    },
+    { "ac": "AC1（草案 profile=注册表最小核心组合 v9-core，M2/M5 挂 omittedModels）", "type": "file-contains", "path": "expected-output/lending/manifest.json", "contains": ["v9-core", "omittedModels"] },
+    {
+      "ac": "AC2（草案头部固定声明「证据非权威，待 Owner 确认」·M1/M3 两件逐一）",
+      "type": "file-contains",
+      "path": "expected-output/lending/m1-object-model.yaml",
+      "contains": ["证据非权威，待 Owner 确认"]
+    },
+    { "ac": "AC2（草案头部固定声明·M3）", "type": "file-contains", "path": "expected-output/lending/m3-rule-model.yaml", "contains": ["证据非权威，待 Owner 确认"] },
+    {
+      "ac": "AC2（草案 file:line 注源 ≥3 条：M1+M3 全文 源码 library.py:/billing.py: 计数）",
+      "type": "cmd-succeeds",
+      "cmd": "python3 -c \"import pathlib,sys; d=pathlib.Path('{fixture_dir}/expected-output/lending'); t=''.join(p.read_text(encoding='utf-8') for p in sorted(d.glob('*.yaml'))); n=t.count('library.py:')+t.count('billing.py:'); print('草案注源数',n); sys.exit(0 if n>=3 else 1)\"",
+      "outputContains": ["草案注源数"]
+    },
+    {
+      "ac": "AC2（映射文件头部声明+覆盖载体四节齐：调用链/疑点/明示不逆向/符号覆盖对照表）",
+      "type": "file-contains",
+      "path": "expected-output/lending-调用链素材.md",
+      "contains": ["证据非权威，待 Owner 确认", "## 调用链素材", "## 疑点清单", "## 明示不逆向清单", "## 符号覆盖对照表"]
+    },
+    {
+      "ac": "AC1（符号覆盖探针·正例：27 符号全落对照表，exit 0）",
+      "type": "cmd-succeeds",
+      "cmd": "python3 -c \"import pathlib,sys; fx=pathlib.Path('{fixture_dir}'); syms=[l.split()[0] for l in (fx/'symbols.txt').read_text(encoding='utf-8').splitlines() if l.strip() and not l.startswith('#')]; t=(fx/'expected-output'/'lending-调用链素材.md').read_text(encoding='utf-8'); i=t.find('## 符号覆盖对照表'); sect=t[i:] if i>=0 else ''; miss=[s for s in syms if ('`'+s+'`') not in sect]; print('覆盖探针: 符号数',len(syms),'未覆盖',miss); sys.exit(1 if miss or i<0 else 0)\"",
+      "outputContains": ["未覆盖 []"]
+    },
+    {
+      "ac": "AC3（符号覆盖探针·负变体：对照表缺 SUSPEND_FINE 一行=红 exit 1）",
+      "type": "cmd-fails",
+      "cmd": "python3 -c \"import pathlib,sys; fx=pathlib.Path('{fixture_dir}'); syms=[l.split()[0] for l in (fx/'symbols.txt').read_text(encoding='utf-8').splitlines() if l.strip() and not l.startswith('#')]; t=(fx/'negative-variants'/'lending-调用链素材.md').read_text(encoding='utf-8'); i=t.find('## 符号覆盖对照表'); sect=t[i:] if i>=0 else ''; miss=[s for s in syms if ('`'+s+'`') not in sect]; print('覆盖探针: 符号数',len(syms),'未覆盖',miss); sys.exit(1 if miss or i<0 else 0)\"",
+      "outputContains": ["未覆盖 ['SUSPEND_FINE']"]
+    },
+    { "ac": "AC3（负变体可追溯：注入说明在头部——探针只扫对照表节，不扫头部）", "type": "file-contains", "path": "negative-variants/lending-调用链素材.md", "contains": ["缺覆盖注入"] }
+  ]
+}
