@@ -1,0 +1,322 @@
+{
+  "tool": "meta_probe",
+  "ticket": "28",
+  "generatedAt": "2026-09-19 22:20:23",
+  "root": "/Users/divh/Downloads/All-agent",
+  "ontologyTarget": "ontology/bohai",
+  "graphQuery": "AGG-BOHAI-001",
+  "conclusion": "PASS",
+  "exitCode": 0,
+  "hardProbeIds": [
+    "1",
+    "2",
+    "6",
+    "7"
+  ],
+  "probes": [
+    {
+      "id": "1",
+      "title": "出厂集",
+      "kind": "hard",
+      "status": "green",
+      "summary": "8/8 套全过（pending 0，fail 0）",
+      "data": {
+        "suites": [
+          {
+            "name": "db-reverse",
+            "status": "pass"
+          },
+          {
+            "name": "graph_index",
+            "status": "pass"
+          },
+          {
+            "name": "impact-analyzer",
+            "status": "pass"
+          },
+          {
+            "name": "mcp-publisher",
+            "status": "pass"
+          },
+          {
+            "name": "onto-modeler",
+            "status": "pass"
+          },
+          {
+            "name": "proposal-pool",
+            "status": "pass"
+          },
+          {
+            "name": "schema_check",
+            "status": "pass"
+          },
+          {
+            "name": "semantic-service",
+            "status": "pass"
+          }
+        ],
+        "counts": {
+          "pass": 8
+        },
+        "runnerExitCode": 0,
+        "reportStatus": "pass"
+      },
+      "error": null
+    },
+    {
+      "id": "2",
+      "title": "语义闸",
+      "kind": "hard",
+      "status": "green",
+      "summary": "L1/L2/L4 全 0（pass），检查文件 7",
+      "data": {
+        "status": "pass",
+        "levels": {
+          "L1": 0,
+          "L2": 0,
+          "L4": 0
+        },
+        "violationCount": 0,
+        "fileCount": 7,
+        "runnerExitCode": 0
+      },
+      "error": null
+    },
+    {
+      "id": "3",
+      "title": "CORE 分布",
+      "kind": "info",
+      "status": "green",
+      "summary": "answered 5/8，拒答 3/8（missing 1 / banned 1 / out_of_surface 1）",
+      "data": {
+        "dist": {
+          "answered": 5,
+          "refused_missing": 1,
+          "refused_out_of_surface": 1,
+          "refused_banned": 1
+        },
+        "questions": [
+          {
+            "core": "CORE-01",
+            "q": "Q1",
+            "ask": "日产量口径是什么？",
+            "expect": "answered",
+            "actual": "answered",
+            "match": true
+          },
+          {
+            "core": "CORE-02",
+            "q": "Q3",
+            "ask": "@AGG-BOHAI-001 有哪些行为？",
+            "expect": "answered",
+            "actual": "answered",
+            "match": true
+          },
+          {
+            "core": "CORE-03",
+            "q": "Q4",
+            "ask": "桶油增产成本的口径是什么？",
+            "expect": "refused_missing",
+            "actual": "refused_missing",
+            "match": true
+          },
+          {
+            "core": "CORE-04",
+            "q": "Q5",
+            "ask": "@SCR-BOHAI-01 的界面细节",
+            "expect": "refused_out_of_surface",
+            "actual": "refused_out_of_surface",
+            "match": true
+          },
+          {
+            "core": "CORE-05",
+            "q": "Q8",
+            "ask": "老完成率还能用吗？",
+            "expect": "refused_banned",
+            "actual": "refused_banned",
+            "match": true
+          },
+          {
+            "core": "CORE-06",
+            "q": "Q7",
+            "ask": "剔检产量是什么口径？",
+            "expect": "answered",
+            "actual": "answered",
+            "match": true
+          },
+          {
+            "core": "CORE-07",
+            "q": "Q2",
+            "ask": "月度结算的口径是什么？",
+            "expect": "answered",
+            "actual": "answered",
+            "match": true
+          },
+          {
+            "core": "CORE-08",
+            "q": "Q6",
+            "ask": "有效产量的口径是什么？",
+            "expect": "answered",
+            "actual": "answered",
+            "match": true
+          }
+        ],
+        "answered": 5,
+        "refused": 3,
+        "mismatched": []
+      },
+      "error": null
+    },
+    {
+      "id": "4",
+      "title": "边界闸豁免",
+      "kind": "info",
+      "status": "green",
+      "summary": "5 条豁免（复核栏留空待批收官填）",
+      "data": {
+        "file": ".skill-deps-allow",
+        "entries": [
+          {
+            "pattern": "fixtures/onto-modeler/**",
+            "reason": "onto-modeler 的出厂集 Seam：已在卡「Seam 与出厂集」字段声明，闸只解析 reads/writes/data 行，故在此显式豁免（票 05）"
+          },
+          {
+            "pattern": "fixtures/db-reverse/**",
+            "reason": "db-reverse 的出厂集 Seam：已在卡「Seam 与出厂集」字段声明，闸只解析 reads/writes/data 行，故在此显式豁免（票 06，同票 05 手法）"
+          },
+          {
+            "pattern": "fixtures/semantic-service/**",
+            "reason": "semantic-service 的出厂集 Seam：已在卡「Seam 与出厂集」字段声明，闸只解析 reads/writes/data 行，故在此显式豁免（票 07，同票 05/06 手法）"
+          },
+          {
+            "pattern": "fixtures/impact-analyzer/**",
+            "reason": "impact-analyzer 的出厂集 Seam：已在卡「Seam 与出厂集」字段声明，闸只解析 reads/writes/data 行，故在此显式豁免（票 08，同票 05/06/07 手法）"
+          },
+          {
+            "pattern": "fixtures/proposal-pool/**",
+            "reason": "proposal-pool 的出厂集 Seam：已在卡「Seam 与出厂集」字段声明，闸只解析 reads/writes/data 行，故在此显式豁免（票 18，同票 05/06/07/08 手法）"
+          }
+        ],
+        "badLines": [],
+        "reviewSlots": 5
+      },
+      "error": null
+    },
+    {
+      "id": "5",
+      "title": "归档豁免",
+      "kind": "info",
+      "status": "green",
+      "summary": "0 条豁免（豁免文件不存在，0 条——不是错）",
+      "data": {
+        "file": ".archive-allow",
+        "exists": false,
+        "entries": [],
+        "badLines": [],
+        "reviewSlots": 0
+      },
+      "error": null
+    },
+    {
+      "id": "6",
+      "title": "安装位",
+      "kind": "hard",
+      "status": "green",
+      "summary": "零漂移零孤儿，5 个 skill 双位置一致（注册表规模 5）",
+      "data": {
+        "registrySize": 5,
+        "consistent": [
+          "db-reverse",
+          "impact-analyzer",
+          "onto-modeler",
+          "proposal-pool",
+          "semantic-service"
+        ],
+        "drift": [],
+        "driftByType": {},
+        "driftCount": 0,
+        "orphans": [],
+        "orphanCount": 0,
+        "runnerExitCode": 0
+      },
+      "error": null
+    },
+    {
+      "id": "7",
+      "title": "skill↔卡同步",
+      "kind": "hard",
+      "status": "green",
+      "summary": "卡 12 : skill 5；有 skill 无卡 0（违规向）；有卡无 skill 7（占位卡待建，不判违规）",
+      "data": {
+        "cards": [
+          "onto-modeler",
+          "db-reverse",
+          "impact-analyzer",
+          "semantic-service",
+          "requirement-explorer",
+          "code-reverse",
+          "doc-extractor",
+          "app-generator",
+          "skill-publisher",
+          "mcp-publisher",
+          "proposal-pool",
+          "meta-doctor"
+        ],
+        "skills": [
+          "db-reverse",
+          "impact-analyzer",
+          "onto-modeler",
+          "proposal-pool",
+          "semantic-service"
+        ],
+        "skillNoCard": [],
+        "cardNoSkill": [
+          "app-generator",
+          "code-reverse",
+          "doc-extractor",
+          "mcp-publisher",
+          "meta-doctor",
+          "requirement-explorer",
+          "skill-publisher"
+        ]
+      },
+      "error": null
+    },
+    {
+      "id": "8",
+      "title": "提案池",
+      "kind": "info",
+      "status": "green",
+      "summary": "31 份提案（status: accepted×5 open×26）；proposal_check rc=0（violations 0）",
+      "data": {
+        "files": 31,
+        "statusCounts": {
+          "accepted": 5,
+          "open": 26
+        },
+        "unparsed": [],
+        "proposalCheck": {
+          "exitCode": 0,
+          "status": "pass",
+          "violations": 0
+        }
+      },
+      "error": null
+    },
+    {
+      "id": "9",
+      "title": "图基线",
+      "kind": "info",
+      "status": "green",
+      "summary": "查询 AGG-BOHAI-001（命中）：节点 79 / 边 118",
+      "data": {
+        "query": "AGG-BOHAI-001",
+        "found": true,
+        "nodes": 79,
+        "edges": 118,
+        "runnerExitCode": 0
+      },
+      "error": null
+    }
+  ]
+}
