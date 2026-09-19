@@ -1,0 +1,71 @@
+# =====================================================================
+# 数据管理制度域草案 · GLS 术语模型（doc-extractor 参照产物，票 32）
+# 输入: fixtures/doc-extractor/input/terms.md（合成制度文档·术语定义段）
+# ────────────────────────────────────────────────────────────────
+# 证据非权威，待 Owner 确认。
+# 定义句→术语候选逐条映射：terms.md 六条定义全收（T1–T6 ↔ GLS-DATAGOV-001~006），
+#   每条 source 注 `文档 terms.md#锚点`。
+# 状态判定照 GLS status 纪律如实标注、不洗白：T5 文档明示废弃 → status「废弃（替代：
+#   数据 Owner）」；T6 文档明示仅限安全审计语境 → status「有效（限安全审计语境）」。
+# relatedObjectRefs 全空：本草案零 M1 承载对象（manifest omittedModels——文档只有术语
+#   定义与规则条款，无对象/字段证据），不硬挂引用，Owner 补对象证据后再挂。
+# owner 文档未给，统一「待 Owner 确认」。
+# =====================================================================
+model_type: GLOSSARY
+version: "1.0.0"
+domain: datagov
+terms:
+  - id: GLS-DATAGOV-001
+    term: 数据 Owner
+    aliases: []
+    termType: 术语
+    definition: 对某一数据资产全生命周期的质量与合规负第一责任的岗位（或指定角色）；每项数据资产有且仅有一个数据 Owner。
+    relatedObjectRefs: []              # 无 M1 承载对象——不硬挂（草案零对象证据）
+    status: 有效
+    owner: 待 Owner 确认
+    source: 文档 terms.md#T1
+  - id: GLS-DATAGOV-002
+    term: 质量阈值
+    aliases: []
+    termType: 口径词
+    definition: 衡量数据质量是否达标的量化下限，含完整率、准确率、及时率三个分项，各分项阈值由数据 Owner 按资产级别设定；完整率分项被 RULE-DATAGOV-002 引为判据（95%）。
+    relatedObjectRefs: []              # 无 M1 承载对象——不硬挂（草案零对象证据）
+    status: 有效
+    owner: 待 Owner 确认
+    source: 文档 terms.md#T2
+  - id: GLS-DATAGOV-003
+    term: 备份策略
+    aliases: []
+    termType: 术语
+    definition: 对数据资产执行备份的频率、保留期与恢复要求的规则集；核心数据必须有备份策略。
+    relatedObjectRefs: []              # 无 M1 承载对象——不硬挂（草案零对象证据）
+    status: 有效
+    owner: 待 Owner 确认
+    source: 文档 terms.md#T3
+  - id: GLS-DATAGOV-004
+    term: 数据分级
+    aliases: []
+    termType: 口径词
+    definition: 按敏感程度对数据资产划分等级，分为公开、内部、敏感、核心四级；四级值集为 RULE-DATAGOV-001/005 的条件判据。
+    relatedObjectRefs: []              # 无 M1 承载对象——不硬挂（草案零对象证据）
+    status: 有效
+    owner: 待 Owner 确认
+    source: 文档 terms.md#T4
+  - id: GLS-DATAGOV-005
+    term: 数据管理员
+    aliases: []
+    termType: 禁用词
+    definition: 数据 Owner 的旧称，自 2026 年起废弃，全部职责并入数据 Owner；现行文档一律使用「数据 Owner」，不得再以「数据管理员」指称。
+    relatedObjectRefs: []              # 无 M1 承载对象——不硬挂（草案零对象证据）
+    status: 废弃（替代：数据 Owner）
+    owner: 待 Owner 确认
+    source: 文档 terms.md#T5
+  - id: GLS-DATAGOV-006
+    term: 红线数据
+    aliases: []
+    termType: 术语
+    definition: 仅限安全审计语境使用的称谓，指一经泄露即引发监管处罚的数据子集；日常治理文档与对外材料不得使用该称谓。
+    relatedObjectRefs: []              # 无 M1 承载对象——不硬挂（草案零对象证据）
+    status: 有效（限安全审计语境）
+    owner: 待 Owner 确认
+    source: 文档 terms.md#T6

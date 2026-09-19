@@ -1,0 +1,66 @@
+# =====================================================================
+# 数据管理制度域草案 · M3 规则模型（doc-extractor 参照产物，票 32）
+# 输入: fixtures/doc-extractor/input/rules.md（合成制度文档·规则条款段）
+# ────────────────────────────────────────────────────────────────
+# 证据非权威，待 Owner 确认。
+# 条款→规则候选逐条映射（rules.md 七条）：R1–R5 可条件化（IF/超限/必填形态判据齐）
+#   → RULE-DATAGOV-001~005，每条 description 注源 `文档 rules.md#锚点`；
+#   R6–R7 纯叙述性（「应加强/应推进」，无可判定条件与阈值）——不硬转规则，
+#   进证据索引疑点清单（D1/D2），收敛出判据后由 Owner 裁决再立。
+# reusedBy 全空：文档无行为语义（触发/前置/状态变更均缺），M2 未产文件
+#   （manifest omittedModels）——不发明挂接。判定式一律 narrative 占位，
+#   判定实现待 Owner 确认；inputParams 不写 sourceField——草案零对象证据，
+#   字段承载不硬指（同 relatedObjectRefs 不硬挂口径）。
+# =====================================================================
+model_type: RULE
+version: "1.0.0"
+domain: datagov
+rules:
+  # [文档 rules.md#R1] IF 核心 → 备份频率/保留期双阈值
+  - id: RULE-DATAGOV-001
+    name: 核心数据备份合规校验
+    ruleType: VALIDATION
+    description: "文档 rules.md#R1 直译：「若数据分级为核心，则备份频率不得低于每日一次，且备份保留期不得少于 90 天」。IF+双阈值判据齐、可条件化；「执行备份」属行为面（M2 未产文件），本规则只判合规不触发动作；数据分级值集见 GLS-DATAGOV-004。"
+    inputParams:
+      - { name: level, type: Enum, required: true }
+      - { name: backupIntervalDays, type: Integer, required: true }
+      - { name: retentionDays, type: Integer, required: true }
+    outputType: Boolean
+    narrative: 数据分级为核心且（备份间隔天数大于 1 或保留期天数不足 90）判不合规，返回 true
+  # [文档 rules.md#R2] 超限形态：完整率低于阈值
+  - id: RULE-DATAGOV-002
+    name: 完整率阈值校验
+    ruleType: VALIDATION
+    description: "文档 rules.md#R2 直译：「数据完整率低于 95% 的，判为质量不达标」。超限形态判据齐；95% 为文档给的完整率分项缺省阈值（质量阈值定义见 GLS-DATAGOV-002——其余分项阈值文档明示由数据 Owner 按资产级别设定，未给统一值）。"
+    inputParams:
+      - { name: completenessRate, type: Decimal, required: true }
+    outputType: Boolean
+    narrative: 完整率低于 95% 判质量不达标，返回 true
+  # [文档 rules.md#R3] 必填形态：登记时 Owner 不得为空
+  - id: RULE-DATAGOV-003
+    name: 资产登记数据 Owner 必填校验
+    ruleType: VALIDATION
+    description: "文档 rules.md#R3 直译：「新建数据资产登记时，数据 Owner 字段不得为空；未指定数据 Owner 的登记申请不予通过」。必填形态判据齐；数据 Owner 定义见 GLS-DATAGOV-001。"
+    inputParams:
+      - { name: ownerAssigned, type: Boolean, required: true }
+    outputType: Boolean
+    narrative: 新建登记申请未指定数据 Owner（为空）判不予通过，返回 true
+  # [文档 rules.md#R4] 超限形态：演练间隔超期
+  - id: RULE-DATAGOV-004
+    name: 备份演练超期校验
+    ruleType: VALIDATION
+    description: "文档 rules.md#R4 直译：「备份恢复演练间隔超过 180 天的，判为演练超期」。超限形态判据齐；「最近一次演练日期」的承载文档未给，起算口径待 Owner 确认。"
+    inputParams:
+      - { name: drillIntervalDays, type: Integer, required: true }
+    outputType: Boolean
+    narrative: 备份恢复演练间隔天数超过 180 判演练超期，返回 true
+  # [文档 rules.md#R5] IF 敏感/核心 → 日志留存下限
+  - id: RULE-DATAGOV-005
+    name: 敏感数据日志留存校验
+    ruleType: VALIDATION
+    description: "文档 rules.md#R5 直译：「若数据分级为敏感或核心，则访问日志留存时长不得少于 3 年，不足 3 年判为不合规」。IF+阈值判据齐；数据分级值集见 GLS-DATAGOV-004。"
+    inputParams:
+      - { name: level, type: Enum, required: true }
+      - { name: logRetentionYears, type: Decimal, required: true }
+    outputType: Boolean
+    narrative: 数据分级为敏感或核心且访问日志留存时长不足 3 年判不合规，返回 true

@@ -1,0 +1,18 @@
+# 出厂集萃取覆盖清单（票 32）：输入文档标记条目逐行列出——术语/规则/叙述三类。
+# 格式：`编号  类型  锚点`（首列编号=覆盖探针的核对键；锚点=文件#条目号，条目号与
+# input/ 文档内【】标记一一对应）。覆盖不变量：每条必须落两处之一——草案元素
+# （证据索引可指认 ID）/ 疑点清单（叙述性/含糊条款不硬萃）；落点登记面 =
+# expected-output/datagov-证据索引.md 末节「覆盖对照表」；缺一条 = 漏覆盖，探针 exit 1。
+T1  术语  terms.md#T1
+T2  术语  terms.md#T2
+T3  术语  terms.md#T3
+T4  术语  terms.md#T4
+T5  术语  terms.md#T5
+T6  术语  terms.md#T6
+R1  规则  rules.md#R1
+R2  规则  rules.md#R2
+R3  规则  rules.md#R3
+R4  规则  rules.md#R4
+R5  规则  rules.md#R5
+R6  叙述  rules.md#R6
+R7  叙述  rules.md#R7

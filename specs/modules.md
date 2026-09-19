@@ -93,7 +93,17 @@
 
 ## skill: doc-extractor
 
-- 职责: 文档萃取器——资料库 → 概念/术语/规则草案；细节二期
+- 职责: 文档萃取器——成文文档/资料库 → 概念/术语/规则草案（定义句→GLS 术语候选/可条件化条款→M3 规则候选，文档的本体形态就是术语与规则）+ 证据索引（每条候选→文档 file#锚点 逐条证据）
+- 层: 工序（前端适配器）
+- 目录: 仓内 skills/doc-extractor/（正本，边界闸+归档闸治理）+ ~/.agents/skills/doc-extractor/（安装位，Kimi Code 路由）；两份内容必须一致
+- 触发面: "从这些文档萃取概念/术语/规则草案"
+- reads: 用户提供的成文文档/资料库（含随输入落盘的标记条目清单：编号+类型+锚点）、`ontology/schema/**`
+- writes: `ontology/<域>/**` 草案（GLS 术语 + M3 规则为主，零证据的整模型挂 omittedModels 带理由豁免；只产草案，进仓走 MR）、`docs/doc-extractor/*.md`（证据索引：候选清单逐条注源+状态判定+疑点清单+状态标注留痕，末节覆盖对照表=覆盖探针判定面）
+- 依赖:
+  - script: `tools/schema_check.py`
+  - data: `ontology/**`
+- Seam 与出厂集: `fixtures/doc-extractor/`——合成制度文档两份（中性域：术语定义 6 条含 1 明示废弃+1 明示限语境，可条件化条款 5 条+纯叙述性条款 2 条）→ 断言草案过语义闸+萃取覆盖探针正例 exit 0（AC1）、草案头部声明与 file#锚点 注源+证据索引 ≥7 条且逐条含锚点（AC2）、覆盖对照表缺一条的负变体 exit 1（AC3，真源=票 32 AC 表）
+- 边界: 同 onto-modeler；草案头部必须标注"证据非权威，待 Owner 确认"；状态不洗白——文档明示废弃/仅限某语境的条目照 GLS status 纪律如实标注不丢弃；规则必须条件化——纯叙述性条款进疑点清单不硬转；每条候选注源 `文档 file#锚点`；零对象/行为/主体/界面证据不产 M1/M2 文件（omittedModels 带理由），relatedObjectRefs 无承载不硬挂
 
 ## skill: app-generator
 

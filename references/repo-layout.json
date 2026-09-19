@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "description": "机读布局表（唯一真源）。目录 → 用途 → 允许的文件模式 → 产生者。人类可读说明见 references/repo-layout.md（本文是机器消费真源，两文件以本文为准）。消费方：tools/archive_check.py（归档闸）。本表从 sdd-flow2 票 01 版实例化：profile=governed-project，按本仓实际补 RESOURCES.md 根条目；票 23 增 exports/（MCP 发布物派生物，禁手改）；票 28 增 docs/meta/（元循环体检留痕）——布局条目按顶层目录匹配，故以 docs 条目内 meta/*.md、meta/*.json 模式登记（子目录独立条目是死配置），派生物可由 tools/meta_probe.py 重生成；票 30 增 docs 条目内 requirements/*.md（需求细稿，requirement-explorer 实际运行落位，实跑归档闸驱动）；票 31 增 docs 条目内 code-reverse/*.md（调用链素材，code-reverse 实际运行落位，实跑归档闸驱动，同票 30 手法）。",
+  "description": "机读布局表（唯一真源）。目录 → 用途 → 允许的文件模式 → 产生者。人类可读说明见 references/repo-layout.md（本文是机器消费真源，两文件以本文为准）。消费方：tools/archive_check.py（归档闸）。本表从 sdd-flow2 票 01 版实例化：profile=governed-project，按本仓实际补 RESOURCES.md 根条目；票 23 增 exports/（MCP 发布物派生物，禁手改）；票 28 增 docs/meta/（元循环体检留痕）——布局条目按顶层目录匹配，故以 docs 条目内 meta/*.md、meta/*.json 模式登记（子目录独立条目是死配置），派生物可由 tools/meta_probe.py 重生成；票 30 增 docs 条目内 requirements/*.md（需求细稿，requirement-explorer 实际运行落位，实跑归档闸驱动）；票 31 增 docs 条目内 code-reverse/*.md（调用链素材，code-reverse 实际运行落位，实跑归档闸驱动，同票 30 手法）；票 32 增 docs 条目内 doc-extractor/*.md（文档萃取证据索引，doc-extractor 实际运行落位，实跑归档闸驱动，同票 30/31 手法）。",
   "patternConventions": {
     "patterns": "相对于该目录的 fnmatch glob；* 可跨路径分隔符。文件须匹配至少一条 pattern。",
     "nameRegex": "可选。对文件basename（或目录相对路径）施加的正则，命名纪律（如票号前缀）落在这里。",
@@ -19,9 +19,9 @@
         },
         {
           "path": "docs",
-          "purpose": "PRD、设计案、ADR、影响分析报告；requirements/（需求细稿，requirement-explorer 产物，票 30 起）；code-reverse/（调用链素材，code-reverse 产物，票 31 起）；meta/（元循环体检留痕，票 28 起，派生物可重建）",
-          "patterns": ["*.md", "adr/*.md", "impact/*.md", "requirements/*.md", "code-reverse/*.md", "meta/*.md", "meta/*.json"],
-          "producer": "阶段 1（PRD）/ 决策时（ADR）/ impact-analyzer（票 08 起）/ requirement-explorer（票 30 起，细稿实际运行落位）/ code-reverse（票 31 起，调用链素材实际运行落位）/ tools/meta_probe.py 首跑与体检留痕（票 28 起）"
+          "purpose": "PRD、设计案、ADR、影响分析报告；requirements/（需求细稿，requirement-explorer 产物，票 30 起）；code-reverse/（调用链素材，code-reverse 产物，票 31 起）；doc-extractor/（文档萃取证据索引，doc-extractor 产物，票 32 起）；meta/（元循环体检留痕，票 28 起，派生物可重建）",
+          "patterns": ["*.md", "adr/*.md", "impact/*.md", "requirements/*.md", "code-reverse/*.md", "doc-extractor/*.md", "meta/*.md", "meta/*.json"],
+          "producer": "阶段 1（PRD）/ 决策时（ADR）/ impact-analyzer（票 08 起）/ requirement-explorer（票 30 起，细稿实际运行落位）/ code-reverse（票 31 起，调用链素材实际运行落位）/ doc-extractor（票 32 起，证据索引实际运行落位）/ tools/meta_probe.py 首跑与体检留痕（票 28 起）"
         },
         {
           "path": "specs",
