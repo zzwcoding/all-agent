@@ -1,0 +1,11 @@
+model_type: GLOSSARY
+version: "1.0.0"
+domain: ban-fixture
+terms:
+  - id: GLS-BAN-001
+    term: 老完成率
+    aliases: [废弃口径]
+    termType: 禁用词
+    definition: v1 口径，已废弃；禁用旧称，替代口径=产量完成率。
+    status: 禁用（替代：产量完成率）
+    source: 合成·票 16 出厂集

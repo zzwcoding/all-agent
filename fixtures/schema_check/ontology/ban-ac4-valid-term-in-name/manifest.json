@@ -1,0 +1,32 @@
+{
+  "domain": "ban-fixture",
+  "label": "禁用词拦截面防误报对照 BAN-AC4（票 16）：name 撞 status=有效术语 + description 提及禁用旧称 + GLS 自身 term 承载禁用词——三者都必须绿（AC3/AC4 出厂承载）",
+  "profile": "v9-full",
+  "schemaVersion": "1.0.0",
+  "omittedModels": [
+    {
+      "model": "M2",
+      "reason": "BAN 判定专用极简域（票 16，沿票 13 豁免机制）"
+    },
+    {
+      "model": "M3",
+      "reason": "BAN 判定专用极简域（票 16，沿票 13 豁免机制）"
+    },
+    {
+      "model": "M5",
+      "reason": "BAN 判定专用极简域（票 16，沿票 13 豁免机制）"
+    },
+    {
+      "model": "M6",
+      "reason": "BAN 判定专用极简域（票 16，沿票 13 豁免机制）"
+    },
+    {
+      "model": "M7",
+      "reason": "BAN 判定专用极简域（票 16，沿票 13 豁免机制）"
+    },
+    {
+      "model": "MU",
+      "reason": "BAN 判定专用极简域（票 16，沿票 13 豁免机制）"
+    }
+  ]
+}

@@ -4,7 +4,9 @@
 tickets/11-一致性对核验.md AC 表 + ontology/schema/schema.md §14；票 13 增 L1 元素级
 结构性必填闸 required-field（真源=model-registry.json 每模型 requiredElementFields）与
 L4 AC6 反向闸 missing-model-file（profile 启用却缺文件，经 manifest omittedModels
-带理由豁免）。
+带理由豁免）；票 16 增 L4 禁用词拦截面 banned-term（真源=域内 GLS 术语 status 含
+「禁用」条目的 term+aliases，匹配面=递归收集键恰为 name/alias 的字符串值子串命中，
+description/notes 不扫=文档自由）。
 
 对给定 ontology 目录做确定性校验：
   L1 schema 合法——YAML 可解析（AC2）、公共字段 model_type/version/domain 在场（AC3）、
@@ -223,6 +225,60 @@ def collect_elements(data, mkey: str, prefix2model: dict, ref_keys: set):
     return out
 
 
+# ---------- 禁用词拦截面（票 16：GLS×schema_check 联动闸） ----------
+
+NAME_ALIAS_KEYS = ("name", "alias")
+
+
+def load_yaml_from_text(text: str):
+    """文本直载（单测构造带行号数据用，与 load_yaml 同一 LineLoader）。"""
+    import io
+    return yaml.load(io.StringIO(text), Loader=LineLoader)
+
+
+def iter_name_alias_values(data):
+    """递归收集键恰为 name/alias 的字符串值：[(值, 所在映射, 键名)]。
+
+    匹配面口径（票 16 L0 定稿）：所有字典中键**恰为** `name`/`alias` 的字符串值，
+    通用口径递归全仓（不逐模型硬列挂点）。不入面的：label/definition/notes 等
+    其他键（文档提及合法）、复数 `aliases` 键（那是 GLS 禁用词表的**来源**字段，
+    不是匹配面）、非字符串值。GLS 条目以 `term` 键承载词面——天然不在匹配面
+    （禁用词表不会自匹配，专测钉死）。
+    """
+    for mapping in iter_mappings(data):
+        for key in NAME_ALIAS_KEYS:
+            value = mapping.get(key) if isinstance(mapping, dict) else None
+            if isinstance(value, str):
+                yield value, mapping, key
+
+
+def collect_banned_terms(data) -> list[tuple[str, str, str]]:
+    """从 GLS 术语数据收集禁用词表：[(词, 条目ID, status 原文)]。
+
+    判定（票 16 设计裁决，宽进严出）：条目 `status` 字段值**包含**「禁用」子串
+    即入表（不枚举状态值——「禁用（替代：×）」「已禁用待复核」同拦）；
+    禁用词成员 = term 字段值 + aliases 列表成员。
+    """
+    out: list[tuple[str, str, str]] = []
+    terms = data.get("terms")
+    if not isinstance(terms, list):
+        return out
+    for entry in terms:
+        if not isinstance(entry, dict):
+            continue
+        status = entry.get("status")
+        if not (isinstance(status, str) and "禁用" in status):
+            continue
+        gls_id = entry.get("id", "?")
+        term = entry.get("term")
+        if isinstance(term, str) and term:
+            out.append((term, gls_id, status))
+        for alias in iter_ref_strings(entry.get("aliases") or []):
+            if isinstance(alias, str) and alias:
+                out.append((alias, gls_id, status))
+    return out
+
+
 # ---------- 主校验 ----------
 
 def run(target: Path) -> dict:
@@ -410,6 +466,52 @@ def run(target: Path) -> dict:
             for ref_id, loc in collect_definitions(
                     data, ref_keys, prefix2model).items():
                 definitions.setdefault(ref_id, (rel, loc))
+
+        # 禁用词拦截面（票 16）：域内 GLS 术语 status 含「禁用」条目的 term+aliases
+        # = 机读禁用词表（闸位在 schema_check L4，真源唯一=GLS；运行时拒答是消费侧，
+        # 票 17）。对全域文件 name/alias 做子串匹配，命中 = L4 banned-term。
+        # GLS 无文件（未建模/旧域）时表为空、闸静默——禁用词拦截随术语表在场而启用。
+        glossary_key = model_by_type.get("GLOSSARY")
+        if glossary_key:
+            banned: list[tuple[str, str, str]] = []
+            for path in files:
+                try:
+                    data_b = load_yaml(path)
+                except _YamlSyntaxError:
+                    continue  # 语法错误由 L1 yaml-syntax 管辖
+                if not isinstance(data_b, dict):
+                    continue
+                mtype_b = data_b.get("model_type")
+                if isinstance(mtype_b, str) and \
+                        model_by_type.get(mtype_b) == glossary_key:
+                    banned.extend(collect_banned_terms(data_b))
+            if banned:
+                for path in files:
+                    rel_b = str(path)
+                    try:
+                        data_m = load_yaml(path)
+                    except _YamlSyntaxError:
+                        continue
+                    if not isinstance(data_m, dict):
+                        continue
+                    mtype_m = data_m.get("model_type")
+                    mkey_m = (model_by_type.get(mtype_m)
+                              if isinstance(mtype_m, str) else None)
+                    if mkey_m is None:
+                        continue
+                    yaml_file_m = models[mkey_m].get("yamlFile")
+                    if yaml_file_m and path.name != yaml_file_m:
+                        continue  # filename-mismatch 管辖面，不叠禁用词红因（沿票 13 先例）
+                    for value, mapping, key in iter_name_alias_values(data_m):
+                        for word, gls_id, status in banned:
+                            if word in value:
+                                add("L4", "banned-term", rel_b,
+                                    key_line(mapping, key),
+                                    f"{key}「{value}」命中禁用词「{word}」"
+                                    f"（{gls_id}，status={status}）——禁用术语不得"
+                                    f"进元素 name/alias（description/notes 提及合法"
+                                    f"=文档自由）；真源=域内 GLS 术语表 status 含"
+                                    f"「禁用」条目（票 16）")
 
         # AC6 反向（票 13）：profile 启用的模型缺文件且无带理由豁免 = L4 红。
         # profile 未知时 enabled 为空、不触发（unknown-profile 已单独红）。

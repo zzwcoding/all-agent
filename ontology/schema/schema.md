@@ -2,7 +2,7 @@
 
 > 本文是本体 YAML 的 schema 文档（人读）；机读消费方两份：
 > `model-registry.json`（模型注册表：camp/consumers/profiles/dependsOn）、`model-deps.json`（类型层依赖白名单 + ID 前缀表）。
-> 执行闸：`tools/schema_check.py`（语义 CI L1–L4，断言表 `specs/schema_check.md` AC1–7 + 票 10 GLS-AC1–4 + 票 11 一致性对 §14 + 票 13 必填闸 REQ-AC1–6）。
+> 执行闸：`tools/schema_check.py`（语义 CI L1–L4，断言表 `specs/schema_check.md` AC1–7 + 票 10 GLS-AC1–4 + 票 11 一致性对 §14 + 票 13 必填闸 REQ-AC1–6 + 票 16 禁用词拦截面 BAN-AC1–4）。
 > 蓝本：OMF v9 七模型（references/omf-spec-digest.md §0/§16，下注 `v9 §x`）；裁剪决定均注明出处。
 > GLS 术语模型为本仓自定义扩展（OMF v6/v9 均无，票 10 走"元模型错→框架版本演进"路由进 schema，演进账见 CHANGELOG.md）。
 
@@ -231,6 +231,7 @@ OMF v6/v9 均无术语模型（digest §0/§16）。术语 = 业务概念的定�
 - **profile 组合：入 v9-full 与 headless，不入 v9-core**（v9-core = M1/M2/M3/M5 四模型最小核保持原样，术语属增强件；"未启用"因此可测——GLS-AC2 负变体）。
 - 旧域无 glossary-model.yaml 不红：缺在场不校验是既定行为（AC6 同款语义），旧域零改动兼容。
 - GLS→GLS（术语见术语）**不设专用依赖边**：当前业务面无此需求（最小够用）。若模型里出现指 GLS- 的 `xxxRef(s)` 形态字段，会落"未登记 edges 字段按 dependsOn 兜底"的判定路径（兜底集含自身，不白名单红；悬空检查仍然生效）——真要规模化再用时再显式登记边。
+- **禁用词拦截面（票 16，L4 `banned-term`）**：`status` 值包含「禁用」子串的术语条目（如 `禁用（替代：产量完成率）`）为机读禁用真源——其 `term` 与 `aliases` 成员构成域内禁用词表；全域元素 **name/alias** 键的字符串值子串命中即红（闸在 schema_check，真源唯一=GLS；运行时拒答是消费侧行为）。**description/notes 不扫**——文档提及合法（RULE-BOHAI-009 描述注记「禁用旧称老完成率」即活体证明），这是拦截面与文档自由的分界线。GLS 条目以 `term` 键承载词面、不在 name/alias 匹配面，禁用词表不自匹配。负变体/正例：出厂集 `ban-ac1/ac2/ac4`（BAN-AC1–4）。
 
 ## 12. 换义锁定字段（lockedFields，AC7 的机读真源）
 

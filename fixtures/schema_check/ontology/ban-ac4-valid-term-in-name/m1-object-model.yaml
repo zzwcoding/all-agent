@@ -1,0 +1,10 @@
+model_type: OBJECT
+version: "1.0.0"
+domain: ban-fixture
+aggregates:
+  - id: AGG-BAN-001
+    name: 产量完成率
+    alias: Well
+    description: 禁用词拦截面防误报对照（票 16 AC3/AC4 合成版）：name 撞的是 status=有效术语；禁用旧称「老完成率」仅在本 description 提及（文档用途合法）——两者都必须绿。
+    aggregateType: AGGREGATE_ROOT
+    attributes: []

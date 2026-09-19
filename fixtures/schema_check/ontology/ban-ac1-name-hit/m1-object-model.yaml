@@ -1,0 +1,10 @@
+model_type: OBJECT
+version: "1.0.0"
+domain: ban-fixture
+aggregates:
+  - id: AGG-BAN-001
+    name: 老完成率（v1 口径）
+    alias: OldCompletionRate
+    description: 禁用词拦截面负变体 AC1（票 16）：元素 name 撞禁用词 → L4 banned-term。
+    aggregateType: AGGREGATE_ROOT
+    attributes: []

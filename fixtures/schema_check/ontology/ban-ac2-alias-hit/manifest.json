@@ -1,0 +1,32 @@
+{
+  "domain": "ban-fixture",
+  "label": "禁用词拦截面负变体 BAN-AC2（票 16）：元素 alias 撞禁用词（禁用条目 aliases 成员也是禁用词表成员）→ L4 banned-term",
+  "profile": "v9-full",
+  "schemaVersion": "1.0.0",
+  "omittedModels": [
+    {
+      "model": "M2",
+      "reason": "BAN 判定专用极简域（票 16，沿票 13 豁免机制）"
+    },
+    {
+      "model": "M3",
+      "reason": "BAN 判定专用极简域（票 16，沿票 13 豁免机制）"
+    },
+    {
+      "model": "M5",
+      "reason": "BAN 判定专用极简域（票 16，沿票 13 豁免机制）"
+    },
+    {
+      "model": "M6",
+      "reason": "BAN 判定专用极简域（票 16，沿票 13 豁免机制）"
+    },
+    {
+      "model": "M7",
+      "reason": "BAN 判定专用极简域（票 16，沿票 13 豁免机制）"
+    },
+    {
+      "model": "MU",
+      "reason": "BAN 判定专用极简域（票 16，沿票 13 豁免机制）"
+    }
+  ]
+}

@@ -45,6 +45,15 @@ GLS 套件（票 10，真源 = tickets/10-术语模型GLS.md AC 表）：
 | REQ-AC5 | v9-full 域缺 MU 文件、manifest 无豁免 | 报 L4 missing-model-file 红 |
 | REQ-AC6 | 同 REQ-AC5 但 omittedModels 带理由豁免 | exit 0，报"全过" |
 
+禁用词拦截面套件（票 16，真源 = tickets/16-禁用词拦截面.md AC 表）：
+
+| 断言 | 给定 | 期望 |
+|---|---|---|
+| BAN-AC1 | 元素 name 含禁用词（ban-ac1-name-hit：GLS status=禁用 的 term=老完成率） | 报 L4 banned-term 红，含 GLS 条目 ID 与命中词 |
+| BAN-AC2 | 元素 alias 含禁用词（ban-ac2-alias-hit：撞禁用条目的 aliases 成员） | 报 L4 banned-term 红 |
+| BAN-AC3 | bohai 全量（RULE-BOHAI-009 description 提及禁用词「老完成率」） | exit 0 全绿——description 不扫（文档提及合法） |
+| BAN-AC4 | 元素 name 撞 status=有效术语 + description 提及禁用词 + GLS 自身 term 承载禁用词（ban-ac4-valid-term-in-name 防误报对照） | exit 0 全绿——只拦禁用 status；匹配面=name/alias；GLS 不自匹配 |
+
 ## 违规码总表
 
 | 级别 | kind | 判定真源 |
@@ -56,6 +65,7 @@ GLS 套件（票 10，真源 = tickets/10-术语模型GLS.md AC 表）：
 | L2 | consistency-redirection / consistency-not-one-to-one / consistency-permission / consistency-flow-role | schema.md §14（票 11） |
 | L4 | profile-disabled / field-redefinition | model-registry.json profiles / lockedFields |
 | L4 | missing-model-file（票 13：profile 启用却缺文件且 omittedModels 无带理由豁免；豁免条目缺 reason 视为无效） | manifest.json omittedModels + model-registry.json profiles |
+| L4 | banned-term（票 16：域内 GLS 术语 status 含「禁用」条目的 term+aliases 进禁用词表，全域元素 name/alias 键子串命中即红；description/notes 不扫=文档自由；GLS 以 term 承载词面不自匹配；文件名错挂的文件跳过本闸） | 域内 glossary-model.yaml 术语 status |
 
 ## 行为约定
 
@@ -63,3 +73,4 @@ GLS 套件（票 10，真源 = tickets/10-术语模型GLS.md AC 表）：
 - 依赖白名单、模型注册表与逐元素必填表来自 `ontology/schema/model-registry.json` + `model-deps.json`，不硬编码
 - 域 manifest 可选 `omittedModels: [{model, reason}]`（票 13）：登记 profile 启用但有意不建文件的模型及理由（bohai 的 MU 即此形态）；reason 缺失/空串 = 无效豁免
 - 结构性必填口径与逐模型推导表见 lessons/13；schema.md 全字段集（preconditions 等）不在必填闸内（缺口清单留后续演进票）
+- 禁用词拦截面（票 16）按域生效：禁用词表=本域 GLS 术语 status 含「禁用」条目的 term+aliases（宽进严出，不枚举状态值）；匹配面=递归收集所有字典中键恰为 `name`/`alias` 的字符串值（通用口径，不逐模型硬列挂点）；GLS 无文件的域表为空、闸静默

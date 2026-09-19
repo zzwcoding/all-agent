@@ -789,5 +789,137 @@ class MissingModelFile(ReqBase):
         self.assertNotIn("missing-model-file", kinds)
 
 
+# ---------- 票 16：L4 禁用词拦截面（GLS×schema_check 联动闸，BAN-* 出厂断言）----------
+
+BAN_GLS = """model_type: GLOSSARY
+version: "1.0.0"
+domain: demo
+terms:
+  - id: GLS-DEMO-001
+    term: 老完成率
+    aliases: []
+    termType: 禁用词
+    definition: v1 口径，已废弃；禁用旧称，替代=新完成率。
+    status: 禁用（替代：新完成率）
+    source: 合成·票 16 出厂集
+  - id: GLS-DEMO-002
+    term: 剔检产量
+    aliases: [净产量]
+    termType: 别名
+    definition: 剔除检修井口径的产量。
+    status: 有效
+    source: 合成·票 16 出厂集
+"""
+
+
+class BannedTerm(Base):
+    """票 16 AC 表（AC1–4）：禁用词拦截面。真源=域内 GLS 术语 status 含「禁用」
+    条目的 term+aliases；匹配面=全文件递归收集键恰为 name/alias 的字符串值
+    （description/notes 不扫=文档自由）。防误报对照（AC4/描述提及/GLS 自身 term
+    不自匹配）是本套件的灵魂断言——钉死匹配面，防止未来放大。"""
+
+    def test_name_containing_banned_term_is_l4(self):
+        # AC1：元素 name 含禁用词（子串）→ L4 banned-term，报文含 GLS 条目 ID 与命中词
+        self.add("m1-object-model.yaml", M1.replace("name: 井", "name: 老完成率（v1 口径）"))
+        self.add("glossary-model.yaml", BAN_GLS)
+        report = self.run_check()
+        self.assertIn("banned-term", self.kinds(report))
+        v = next(v for v in report["violations"] if v["kind"] == "banned-term")
+        self.assertEqual(v["level"], "L4")
+        self.assertIn("GLS-DEMO-001", v["message"])
+        self.assertIn("老完成率", v["message"])
+        self.assertIn("m1-object-model.yaml", v["file"])
+        self.assertGreater(v["line"], 0)
+
+    def test_alias_containing_banned_term_is_l4(self):
+        # AC2：元素 alias 撞禁用词 → L4 banned-term
+        self.add("m1-object-model.yaml", M1.replace("alias: Well", "alias: Well老完成率"))
+        self.add("glossary-model.yaml", BAN_GLS)
+        report = self.run_check()
+        self.assertIn("banned-term", self.kinds(report))
+        v = next(v for v in report["violations"] if v["kind"] == "banned-term")
+        self.assertEqual(v["level"], "L4")
+
+    def test_alias_of_banned_entry_is_also_banned(self):
+        # 禁用条目的 aliases 也是禁用词表成员（设计裁决：term 与 aliases 都算）
+        gls = BAN_GLS.replace("    aliases: []", "    aliases: [废弃口径]")
+        self.add("m1-object-model.yaml", M1.replace("name: 井", "name: 废弃口径"))
+        self.add("glossary-model.yaml", gls)
+        report = self.run_check()
+        self.assertIn("banned-term", self.kinds(report))
+        v = next(v for v in report["violations"] if v["kind"] == "banned-term")
+        self.assertIn("废弃口径", v["message"])
+
+    def test_status_substring_wide_gate(self):
+        # 宽进严出：status 值含「禁用」子串即入表（不枚举状态值）——
+        # 「已禁用待复核」这类非「禁用（替代…）」形态照样拦
+        self.add("m1-object-model.yaml", M1.replace("name: 井", "name: 老完成率"))
+        self.add("glossary-model.yaml",
+                 BAN_GLS.replace("status: 禁用（替代：新完成率）", "status: 已禁用待复核"))
+        self.assertIn("banned-term", self.kinds())
+
+    def test_valid_status_term_in_name_passes(self):
+        # AC4 防误报对照：status=有效的 GLS 术语出现在 name → 必须绿
+        #（只拦禁用 status，不拦全部术语）
+        self.add("m1-object-model.yaml", M1.replace("name: 井", "name: 剔检产量"))
+        self.add("glossary-model.yaml", BAN_GLS)
+        report = self.run_check()
+        self.assertNotIn("banned-term", self.kinds(report))
+        self.assertEqual(report["status"], "pass", report["violations"])
+
+    def test_description_mention_passes(self):
+        # AC3 单域版：description 提及禁用词合法（文档自由）——拦截面只在 name/alias
+        self.add("m1-object-model.yaml",
+                 M1 + "    description: 禁用旧称「老完成率」——v1 口径，2024 年废弃。\n")
+        self.add("glossary-model.yaml", BAN_GLS)
+        report = self.run_check()
+        self.assertNotIn("banned-term", self.kinds(report))
+        self.assertEqual(report["status"], "pass", report["violations"])
+
+    def test_gls_own_terms_do_not_self_match(self):
+        # 防自匹配：禁用词表来自 GLS term 值，匹配面是 name/alias 键——
+        # GLS 条目以 term/aliases 承载词面，不在匹配面 → 域内仅 GLS 也全绿
+        self.add("glossary-model.yaml", BAN_GLS)
+        report = self.run_check()
+        self.assertNotIn("banned-term", self.kinds(report))
+        self.assertEqual(report["status"], "pass", report["violations"])
+
+    def test_matching_face_is_exactly_name_and_alias_keys(self):
+        # 匹配面钉死：键恰为 name/alias 的字符串值——label/definition/notes 等
+        # 同持禁用词的键不入面（函数级直测，防匹配面悄悄放大成全字段）
+        data = sc.load_yaml_from_text(
+            "a:\n"
+            "  name: 老完成率\n"
+            "  alias: 老完成率别名\n"
+            "  label: 老完成率标签\n"
+            "  definition: 提及老完成率\n"
+            "  notes: 老完成率\n"
+            "  aliases: [老完成率]\n")
+        hits = [v for v, _m, _k in sc.iter_name_alias_values(data)]
+        self.assertEqual(hits, ["老完成率", "老完成率别名"])
+
+    def test_nested_name_face_is_matched(self):
+        # 通用口径递归收集：M2 behaviors[].name 撞禁用词同红（不逐模型硬列挂点）
+        self.add("m1-object-model.yaml", M1)
+        self.add("m2-behavior-model.yaml", M2.replace("name: 录入", "name: 录入老完成率"))
+        self.add("glossary-model.yaml", BAN_GLS)
+        report = self.run_check()
+        self.assertIn("banned-term", self.kinds(report))
+        v = next(v for v in report["violations"] if v["kind"] == "banned-term")
+        self.assertIn("m2-behavior-model.yaml", v["file"])
+
+    def test_filename_mismatch_file_skips_banned_face(self):
+        # 红因纯净（沿票 13 先例）：文件名与 model_type 错挂的文件跳过禁用词匹配面，
+        # 让位 filename-mismatch，不叠杂音红因
+        self.add("m1-object-model.yaml", M1)
+        self.add("glossary-model.yaml", BAN_GLS)
+        self.add("m2-behavior-model.yaml",
+                 M2.replace("model_type: BEHAVIOR", "model_type: OBJECT")
+                 .replace("name: 录入", "name: 录入老完成率"))
+        report = self.run_check()
+        self.assertIn("filename-mismatch", self.kinds(report))
+        self.assertNotIn("banned-term", self.kinds(report))
+
+
 if __name__ == "__main__":
     unittest.main()

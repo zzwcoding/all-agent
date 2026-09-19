@@ -1,0 +1,10 @@
+model_type: OBJECT
+version: "1.0.0"
+domain: ban-fixture
+aggregates:
+  - id: AGG-BAN-001
+    name: 井
+    alias: 废弃口径
+    description: 禁用词拦截面负变体 AC2（票 16）：元素 alias 撞禁用条目的 aliases 成员 → L4 banned-term。
+    aggregateType: AGGREGATE_ROOT
+    attributes: []
