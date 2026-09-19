@@ -119,4 +119,4 @@
 | `tools/graph_index.py` | YAML → 内存图（多跳/闭包/影响链） | 已建（票 04） |
 | `tools/check_citations.py` | ID 引用清单逐条比对检具：答案正文↔「本回答引用的元素 ID」清单节双向差异（正文有清单无/清单有正文无），退出码 0 一致/1 不一致/2 用法；通用大写前缀 token 不绑域；断言面 fixtures/semantic-service CIT-01–05（票 13，审查一 P2） | 已建（票 13） |
 | `tools/skill_deps_check.py` `tools/fixture_run.py` `tools/archive_check.py` 三闸 + `tools/ci.sh` | 从 sdd-flow2 实例化拷贝（含单测；fixture_run 新增 cmd-* 断言与占位 pending） | 已建（票 03 随迁） |
-| `tools/install_skills.py` | 安装位同步：仓内 skills/ 正本 → ~/.agents/skills/ 安装位的 sync（先清后拷，只清本 skill 目录）与 --check（逐文件 diff，漂移三型 missing/modified/extra）；断言表 tickets/12 AC1–4；不进 ci.sh 四闸（安装位是仓外环境状态） | 已建（票 12） |
+| `tools/install_skills.py` | 安装位同步与落闸：仓内 skills/ 正本 → ~/.agents/skills/ 安装位的 sync（先清后拷，只清本 skill 目录）、--check（漂移三型 missing/modified/extra + 孤儿检测）、--prune（孤儿清除，默认 dry-run，--yes 才删）、symlink 拒跑（退出 2）；注册表 `tools/install-registry.json` 由 sync 原子维护（孤儿三要素=登记过+安装位在+正本已删）；`tools/hooks/pre-commit`（core.hooksPath 启用）提交前跑 --check 拦漂移；断言表 tickets/12 AC1–4 + tickets/15 AC1–6；不进 ci.sh 四闸（安装位是仓外环境状态） | 已建（票 12；票 15 增强） |

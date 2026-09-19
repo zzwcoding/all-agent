@@ -38,8 +38,8 @@
         },
         {
           "path": "tools",
-          "purpose": "确定性脚本（语义闸、三闸、出厂集 runner）及 unittest 单测",
-          "patterns": ["*.py", "*.sh"],
+          "purpose": "确定性脚本（语义闸、三闸、出厂集 runner）及 unittest 单测 + 脚本自维护机读表（install-registry.json，票 15）+ git 钩子（hooks/pre-commit）",
+          "patterns": ["*.py", "*.sh", "*.json", "hooks/*"],
           "producer": "各票实现拍（脚本走 TDD）"
         },
         {

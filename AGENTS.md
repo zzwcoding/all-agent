@@ -34,6 +34,7 @@
 
 新窗口接续流水线时：
 
+0. 新 clone 一次性 setup：`git config core.hooksPath tools/hooks`——启用 pre-commit 安装位漂移拦截（票 15；钩子只跑 `install_skills --check`，漂移/孤儿即拒提交；不配置本项则钩子静默不生效，对其他 clone 无副作用）。
 1. 读 `tickets/NN-*.md` 找 Status: todo 的最小票号——交接包在票面内（自包含，不依赖旧窗口记忆）。
 2. 严格串行：一派一验一提交。派发用票面交接包原文；验收 = L0 自己跑 `bash tools/ci.sh`（必须四闸全绿）+ 逐条核票面验收；过了翻 `Status: done` 再 `git commit`（一票一提交）；不过打回（附红灯输出）。
 3. 同一任务连续两次不合格 → 主窗口接管自写并记原因。

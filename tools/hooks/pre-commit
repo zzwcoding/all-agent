@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# pre-commit · 安装位漂移拦截（All-agent 票 15）
+#
+# 只管一件事：提交前核对仓内 skills/ 正本与 ~/.agents/skills/ 安装位一致
+# （install_skills --check，毫秒级全量），漂移/孤儿即拒绝提交。
+# 其余检查归 ci.sh 四闸，本钩子不塞（票 15 裁决：极简确定性，不做短路缓存）。
+#
+# 启用（新 clone 一次性 setup，见 AGENTS.md 流水线续跑协议）:
+#   git config core.hooksPath tools/hooks
+# 未配置本项的 clone 不会执行本脚本，无副作用。
+# 确需跳过本次检查: git commit --no-verify
+set -u
+cd "$(git rev-parse --show-toplevel)" || exit 1
+if ! python3 tools/install_skills.py --check; then
+  {
+    echo ""
+    echo "pre-commit: 安装位与仓内正本不一致（漂移或孤儿），提交被拦截。"
+    echo "  修复漂移:   python3 tools/install_skills.py sync"
+    echo "  清理孤儿:   python3 tools/install_skills.py --prune --yes  （先 --prune 看清单）"
+    echo "  确需跳过:   git commit --no-verify"
+  } >&2
+  exit 1
+fi
