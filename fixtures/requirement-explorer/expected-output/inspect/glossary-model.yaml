@@ -1,0 +1,33 @@
+# =====================================================================
+# 设备巡检管理域草案 · GLS 术语模型（requirement-explorer 参照产物，票 30）
+# 输入: fixtures/requirement-explorer/input/prd-fragment.md（粗 PRD 固定片段）
+# ────────────────────────────────────────────────────────────────
+# AI 只做格式转换，业务必须人确认。
+# 名词→术语候选逐条映射：口径词（业务规则里承载口径、可复述判据的名词）入 GLS。
+#   巡检周期→GLS-INSPECT-001、超期单→GLS-INSPECT-002。
+# 粗 PRD 的含糊表述不进术语表——含糊词进开放问题，术语只收口径已可复述的词；
+#   判别边界未给的概念进明示不建模清单（见细稿三节之三）。
+# relatedObjectRefs 只挂本草案真实存在的聚合根；owner 粗 PRD 未给，统一「待 Owner 确认」。
+# =====================================================================
+model_type: GLOSSARY
+version: "1.0.0"
+domain: inspect
+terms:
+  - id: GLS-INSPECT-001
+    term: 巡检周期
+    aliases: []
+    termType: 口径词
+    definition: 同一台设备两次计划巡检的间隔；粗 PRD 仅「按巡检周期定期巡检」一句，计量单位与缺省值未给——候选口径，待 Owner 确认。
+    relatedObjectRefs: [AGG-INSPECT-001]
+    status: 有效
+    owner: 待 Owner 确认
+    source: fixtures/requirement-explorer/input/prd-fragment.md ·业务规则（粗）
+  - id: GLS-INSPECT-002
+    term: 超期单
+    aliases: [超期工单]
+    termType: 口径词
+    definition: 超过计划巡检日期仍未完成的巡检工单；判定判据见 RULE-INSPECT-001，「仍未完成」以工单状态=待执行为准（口径占位，待 Owner 确认）。
+    relatedObjectRefs: [AGG-INSPECT-002]
+    status: 有效
+    owner: 待 Owner 确认
+    source: fixtures/requirement-explorer/input/prd-fragment.md ·业务规则（粗）

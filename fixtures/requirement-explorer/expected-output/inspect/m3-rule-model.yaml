@@ -1,0 +1,38 @@
+# =====================================================================
+# 设备巡检管理域草案 · M3 规则模型（requirement-explorer 参照产物，票 30）
+# 输入: fixtures/requirement-explorer/input/prd-fragment.md（粗 PRD 固定片段）
+# ────────────────────────────────────────────────────────────────
+# AI 只做格式转换，业务必须人确认。
+# 约束→规则候选逐条映射（「业务规则（粗）」三条）：
+#   第 1 条（按周期巡检，超期算超期单）→ RULE-INSPECT-001；
+#   第 2 条（紧急缺陷当天必须上报）→ RULE-INSPECT-002；
+#   第 3 条（处理时限表述含糊，粗 PRD 自述各单位不一样）→ 含糊表述，不硬化成规则，
+#     转开放问题 Q2——时限口径收敛前无判据可立。
+# reusedBy 全空：粗 PRD 无行为语义（触发/前置/状态变更均缺），M2 未产文件
+#   （manifest omittedModels）——不发明行为证据。表达式一律 narrative 占位，
+#   判定实现与触发时机待 Owner 确认。
+# =====================================================================
+model_type: RULE
+version: "1.0.0"
+domain: inspect
+rules:
+  # [输入·业务规则 1] 周期巡检 + 超期判定
+  - id: RULE-INSPECT-001
+    name: 巡检周期超期校验
+    ruleType: VALIDATION
+    description: "粗 PRD 业务规则第 1 条直译：「工单超过计划巡检日期仍未完成的，算超期单」。「仍未完成」按工单状态=待执行判定（口径占位，待 Owner 确认）；巡检周期本身见 GLS-INSPECT-001，超期单术语见 GLS-INSPECT-002。"
+    inputParams:
+      - { name: planDate, type: Date, sourceField: inspectionWorkOrder.planDate, required: true }
+      - { name: status, type: Enum, sourceField: inspectionWorkOrder.status, required: true }
+    outputType: Boolean
+    narrative: 工单状态仍为待执行且当前日期已过计划巡检日期，判为超期单（返回 true）
+  # [输入·业务规则 2] 紧急缺陷当日上报
+  - id: RULE-INSPECT-002
+    name: 紧急缺陷当日上报校验
+    ruleType: VALIDATION
+    description: "粗 PRD 业务规则第 2 条直译：「缺陷等级为紧急的，当天必须上报」。「上报」的载体与状态字段粗 PRD 未给（上报动作属行为候选，M2 未产文件）——校验判据本身清晰，先立规则候选，挂接执行行为待收敛后补。"
+    inputParams:
+      - { name: level, type: Enum, sourceField: defectRecord.level, required: true }
+      - { name: foundDate, type: Date, sourceField: defectRecord.foundDate, required: true }
+    outputType: Boolean
+    narrative: 缺陷等级为紧急且发现日期已不是当天，判为违规（返回 true）

@@ -66,7 +66,16 @@
 ## skill: requirement-explorer
 
 - 职责: 需求探索器——粗 PRD 反问收敛 → 细稿 + 本体草案（正向输入）
-- 层: 工序（前端适配器）；触发面/reads/writes/依赖/Seam/边界：待二期立项时填充（格式同 db-reverse）
+- 层: 工序（前端适配器）
+- 目录: 仓内 skills/requirement-explorer/（正本，边界闸+归档闸治理）+ ~/.agents/skills/requirement-explorer/（安装位，Kimi Code 路由）；两份内容必须一致
+- 触发面: "从粗需求/粗 PRD 反问收敛出细稿与本体草案"
+- reads: 域素材（粗需求/粗 PRD，含标记关键词清单）、`ontology/schema/**`
+- writes: `docs/requirements/*.md`（细稿：收敛结论+开放问题清单+明示不建模清单，三节缺一不可，末节附关键词×三落点对照表）、`ontology/<域>/**` 草案（只产草案，进仓走 MR）
+- 依赖:
+  - script: `tools/schema_check.py`
+  - data: `ontology/**`
+- Seam 与出厂集: `fixtures/requirement-explorer/`——固定粗 PRD 片段（中性域，【】标记关键词，含故意含糊表述）→ 断言细稿三节齐、问题三字段结构完备、草案过语义闸、草案头部声明（AC1）+ 覆盖不变量探针：关键词×（草案 YAML+细稿两节）双向核对，正例 exit 0、漏覆盖负变体 exit 1（AC2，真源=票 30 AC 表）
+- 边界: 同 onto-modeler；草案头部必须标注"AI 只做格式转换，业务必须人确认"；含糊表述只进开放问题不硬建模——未覆盖必须变成问题
 
 ## skill: code-reverse
 

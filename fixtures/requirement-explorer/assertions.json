@@ -1,0 +1,53 @@
+{
+  "skill": "requirement-explorer（需求探索器，票 30）",
+  "description": "出厂集：固定粗 PRD 片段（input/prd-fragment.md，合成·中性设备巡检管理域，【】标记实体/口径关键词，含两处故意含糊表述「及时处理」「相关部门」）→ 断言正向收敛产物的确定性结果（AC 真源=tickets/30-需求探索器.md AC 表）。expected-output/ 是按 SKILL.md 工序对同一输入手工产出的参照产物：细稿三节（收敛结论/开放问题清单/明示不建模清单，实际运行落位 docs/requirements/<域>-细稿.md，出厂集按镜像路径存放）+ 草案域目录 inspect/（manifest+M1/M3/GLS 三文件，schema 经 expected-output/schema 符号链接取自仓内 ontology/schema，单一真源不复制，同 fixtures/db-reverse 手法；profile 取 headless，M2/M5/M7 缺证据挂 omittedModels 带理由豁免）。AC1=细稿三节齐+问题三字段结构完备+草案过语义闸+草案头部固定声明「AI 只做格式转换，业务必须人确认」（PRD F5 纪律）；AC2=覆盖不变量探针（本票机判核心）：keywords.txt 逐词双向核对——(a) 草案域 YAML 全文含该词→覆盖（草案元素落点，ID 对照表见细稿末节）(b) 细稿开放问题/明示不建模两节含该词→覆盖（问题/不建模落点）(c) 两处皆无→exit 1 报词，「未覆盖必须变成问题」从工序纪律变机判断言；负变体 negative-variants/inspect-细稿.md=参照细稿删除「及时处理」的全部落点（开放问题 Q2+对照表行，注入说明在头部——探针只扫两节，不扫头部与对照表）+ 草案无该词→探针 exit 1 报词（漏覆盖=红）。问题质量人审不进断言；机判面=清单结构完备（每问三字段）+覆盖不变量+草案过闸。",
+  "assertions": [
+    { "ac": "输入", "type": "file-exists", "path": "input/prd-fragment.md" },
+    {
+      "ac": "输入（关键词表≥6 且逐词在 PRD 带【】标记，覆盖不变量的输入侧）",
+      "type": "cmd-succeeds",
+      "cmd": "python3 -c \"import pathlib,sys; fx=pathlib.Path('{fixture_dir}'); ks=[l.strip() for l in (fx/'keywords.txt').read_text(encoding='utf-8').splitlines() if l.strip()]; prd=(fx/'input'/'prd-fragment.md').read_text(encoding='utf-8'); miss=[k for k in ks if ('【'+k+'】') not in prd]; print('关键词数',len(ks),'未标记',miss); sys.exit(1 if len(ks)<6 or miss else 0)\"",
+      "outputContains": ["关键词数 10", "未标记 []"]
+    },
+    {
+      "ac": "AC1（细稿三节齐+草案头部声明）",
+      "type": "file-contains",
+      "path": "expected-output/inspect-细稿.md",
+      "contains": ["## 收敛结论", "## 开放问题清单", "## 明示不建模清单", "AI 只做格式转换，业务必须人确认"]
+    },
+    {
+      "ac": "AC1（问题三字段结构完备：问题/为什么问/影响哪个候选元素，每问齐）",
+      "type": "cmd-succeeds",
+      "cmd": "python3 -c \"import pathlib,sys; t=pathlib.Path('{fixture_dir}/expected-output/inspect-细稿.md').read_text(encoding='utf-8'); i=t.find('## 开放问题清单'); k=t.find('## 关键词'); s=t[i:k] if 0<=i<k else ''; q=s.count('### Q'); a=s.count('- 为什么问：'); b=s.count('- 影响哪个候选元素：'); print('问数',q,'三字段',a,b); sys.exit(0 if q>=3 and q==a==b else 1)\"",
+      "outputContains": ["问数 3 三字段 3 3"]
+    },
+    {
+      "ac": "AC1（草案域过语义闸）",
+      "type": "cmd-succeeds",
+      "cmd": "python3 tools/schema_check.py {fixture_dir}/expected-output/inspect",
+      "outputContains": ["语义闸: 全过"]
+    },
+    { "ac": "AC1（草案 profile=headless，M2/M5/M7 缺证据挂 omittedModels）", "type": "file-contains", "path": "expected-output/inspect/manifest.json", "contains": ["headless", "omittedModels"] },
+    {
+      "ac": "AC1（草案头部固定声明，PRD F5 纪律，M1/M3/GLS 三件逐一）",
+      "type": "file-contains",
+      "path": "expected-output/inspect/m1-object-model.yaml",
+      "contains": ["AI 只做格式转换，业务必须人确认"]
+    },
+    { "ac": "AC1（草案头部固定声明·M3）", "type": "file-contains", "path": "expected-output/inspect/m3-rule-model.yaml", "contains": ["AI 只做格式转换，业务必须人确认"] },
+    { "ac": "AC1（草案头部固定声明·GLS）", "type": "file-contains", "path": "expected-output/inspect/glossary-model.yaml", "contains": ["AI 只做格式转换，业务必须人确认"] },
+    {
+      "ac": "AC2（覆盖不变量探针·正例：关键词全落三处之一，exit 0）",
+      "type": "cmd-succeeds",
+      "cmd": "python3 -c \"import pathlib,sys; fx=pathlib.Path('{fixture_dir}'); dom=fx/'expected-output'/'inspect'; ks=[l.strip() for l in (fx/'keywords.txt').read_text(encoding='utf-8').splitlines() if l.strip()]; ys=''.join(p.read_text(encoding='utf-8') for p in sorted(dom.glob('*.yaml'))); t=(fx/'expected-output'/'inspect-细稿.md').read_text(encoding='utf-8'); i=t.find('## 开放问题清单'); k=t.find('## 关键词'); sect=t[i:k] if 0<=i<k else ''; miss=[w for w in ks if w not in ys and w not in sect]; print('覆盖探针: 关键词数',len(ks),'未覆盖',miss); sys.exit(1 if miss or i<0 else 0)\"",
+      "outputContains": ["未覆盖 []"]
+    },
+    {
+      "ac": "AC2（覆盖不变量探针·负变体：细稿漏一个关键词落点且草案无该词=红 exit 1）",
+      "type": "cmd-fails",
+      "cmd": "python3 -c \"import pathlib,sys; fx=pathlib.Path('{fixture_dir}'); dom=fx/'expected-output'/'inspect'; ks=[l.strip() for l in (fx/'keywords.txt').read_text(encoding='utf-8').splitlines() if l.strip()]; ys=''.join(p.read_text(encoding='utf-8') for p in sorted(dom.glob('*.yaml'))); t=(fx/'negative-variants'/'inspect-细稿.md').read_text(encoding='utf-8'); i=t.find('## 开放问题清单'); k=t.find('## 关键词'); sect=t[i:k] if 0<=i<k else ''; miss=[w for w in ks if w not in ys and w not in sect]; print('覆盖探针: 关键词数',len(ks),'未覆盖',miss); sys.exit(1 if miss or i<0 else 0)\"",
+      "outputContains": ["未覆盖 ['及时处理']"]
+    },
+    { "ac": "AC2（负变体可追溯：注入说明在头部——探针只扫两节，不扫头部与对照表）", "type": "file-contains", "path": "negative-variants/inspect-细稿.md", "contains": ["漏覆盖注入"] }
+  ]
+}

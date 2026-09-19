@@ -4,3 +4,4 @@ fixtures/db-reverse/**  # db-reverse 的出厂集 Seam：已在卡「Seam 与出
 fixtures/semantic-service/**  # semantic-service 的出厂集 Seam：已在卡「Seam 与出厂集」字段声明，闸只解析 reads/writes/data 行，故在此显式豁免（票 07，同票 05/06 手法）
 fixtures/impact-analyzer/**  # impact-analyzer 的出厂集 Seam：已在卡「Seam 与出厂集」字段声明，闸只解析 reads/writes/data 行，故在此显式豁免（票 08，同票 05/06/07 手法）
 fixtures/proposal-pool/**  # proposal-pool 的出厂集 Seam：已在卡「Seam 与出厂集」字段声明，闸只解析 reads/writes/data 行，故在此显式豁免（票 18，同票 05/06/07/08 手法）
+fixtures/requirement-explorer/**  # requirement-explorer 的出厂集 Seam：已在卡「Seam 与出厂集」字段声明，闸只解析 reads/writes/data 行，故在此显式豁免（票 30，同票 05/06/07/08/18 手法）

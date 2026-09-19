@@ -1,0 +1,21 @@
+{
+  "domain": "inspect",
+  "label": "设备巡检管理域（requirement-explorer 正向草案）",
+  "profile": "headless",
+  "schemaVersion": "1.0.0",
+  "description": "requirement-explorer 参照产物（票 30）：从粗 PRD 固定片段正向收敛。AI 只做格式转换，业务必须人确认。粗 PRD 证据支撑 M1 对象层（3 聚合根）+ M3 规则候选（2 条）+ GLS 术语（2 条）；行为/主体/查询统计证据不足——含糊表述（处理时限口径/相关部门/主体粒度）进开放问题清单（细稿三节之二），收敛后由业务确认再补文件，故 profile 取 headless，M2/M5/M7 挂 omittedModels 带理由豁免。覆盖不变量对照表见 expected-output/inspect-细稿.md 末节。",
+  "omittedModels": [
+    {
+      "model": "M2",
+      "reason": "粗 PRD 无触发/前置/状态变更的完整行为语义（「上报」「派工」「关闭」均短语级提及）；闭环流转是开放问题 Q3，候选行为待收敛——不发明行为证据（票 30 参照产物）。"
+    },
+    {
+      "model": "M5",
+      "reason": "「巡检员」「班组长」「相关部门」只有称谓，无粒度与职责边界；主体建模粒度是开放问题 Q1，部门归属是开放问题 Q3——收敛前不建主体文件（票 30 参照产物）。"
+    },
+    {
+      "model": "M7",
+      "reason": "粗 PRD「未提及」节自述界面/报表/通知不做假设——零查询报表证据，不建文件（票 30 参照产物）。"
+    }
+  ]
+}
