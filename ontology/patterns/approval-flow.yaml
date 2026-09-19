@@ -1,0 +1,75 @@
+# =====================================================================
+# 模式件 · 审批流（首批五件之一，票 33）
+# ────────────────────────────────────────────────────────────────
+# 模式件是素材不是域：本文件不进 schema_check 域校验（无 manifest、无
+# 公共字段），结构纪律由 fixtures/pattern-library/ 结构探针承载；
+# 组合纪律见 skills/onto-modeler/references/pattern-usage.md。
+# fragment 内占位符一律 {{双花括号}} 且必须双引号包裹（裸 {{ 会落
+# YAML 流解析）；组合时逐个替换为域实例。
+# =====================================================================
+pattern_id: approval-flow
+name: 审批流
+description: >-
+  审批类流程的标准建模形态：M6 流程（flowType=APPROVAL）+ APPROVAL_TASK
+  审批活动（roleRef 指角色 + approvalOutcomes [APPROVE, REJECT]）与 M5 角色
+  组合——活动 roleRef 必须落在流程 roleRefs 集合内（一致性对 P3），角色是
+  M6 人工任务的唯一参与人类型；拒绝分支的回退路径用 GATEWAY 判定活动分流，
+  不隐含吞分支。
+applies_when: >-
+  素材出现任一信号即可组合：① 流程中出现「审批/复核/批准/驳回」环节及
+  审批角色；② 素材描述提交→审核→通过的链式步骤且通过与否走向不同；
+  ③ 制度文档有签批权限与岗位归口的表述。
+fragment:
+  roles:
+    - roleId: "ROLE-{{域前缀}}-{{角色序号}}"
+      name: "{{审批角色名}}"
+      inheritsFrom: []
+      permissions: []
+  flows:
+    - id: "FLOW-{{域前缀}}-{{流程序号}}"
+      name: "{{流程名}}"
+      description: "{{流程描述}}（组合自 patterns/approval-flow）"
+      flowType: APPROVAL
+      businessObjectRefs:
+        - "AGG-{{域前缀}}-{{业务对象序号}}"
+      roleRefs:
+        - "ROLE-{{域前缀}}-{{角色序号}}"
+      trigger:
+        triggerType: MANUAL
+      startActivity: "ACT-{{域前缀}}-{{活动序号}}1"
+      endActivities:
+        - "ACT-{{域前缀}}-{{活动序号}}3"
+      activities:
+        - activityId: "ACT-{{域前缀}}-{{活动序号}}1"
+          name: "{{提交活动名}}"
+          activityType: USER_TASK
+          roleRef: "ROLE-{{域前缀}}-{{角色序号}}"
+          nextActivities:
+            - "ACT-{{域前缀}}-{{活动序号}}2"
+        - activityId: "ACT-{{域前缀}}-{{活动序号}}2"
+          name: "{{审批活动名}}"
+          activityType: APPROVAL_TASK
+          roleRef: "ROLE-{{域前缀}}-{{角色序号}}"
+          approvalOutcomes: [APPROVE, REJECT]
+          nextActivities:
+            - "ACT-{{域前缀}}-{{活动序号}}3"
+        - activityId: "ACT-{{域前缀}}-{{活动序号}}3"
+          name: 结束
+          activityType: END
+compose_notes: >-
+  组合纪律：① 占位符全部替换为域实例——{{活动序号}} 在三个 activityId 中
+  共用（同一流程活动同段编号，尾号 1/2/3 区分）；② 元素 description 注记
+  「组合自 patterns/approval-flow」（fragment 内已预埋，替换时保留）；
+  ③ 产物仍是草案走人审。硬约束自查：审批活动 roleRef 与提交活动 roleRef
+  都必须 ∈ 流程 roleRefs（一致性对 P3；提交与审批可以是不同角色——素材有
+  分岗证据时给提交环节单设角色并双双登记进 roleRefs）；startActivity 有且
+  仅有一个、endActivities ≥1 且指向 END 活动。本件必须与承载业务对象的
+  聚合根同域组合（businessObjectRefs 指向已定义 AGG-，单独组合 = 悬空引用
+  过不了 L2）。拒绝分支按域素材决定：REJECT 回退到某活动时插入 GATEWAY
+  判定活动（conditionExpression 写判定依据，nextActivities 列两条去向），
+  素材没给回退依据就挂「待 Owner 确认」不硬造；审批通过的后续行为
+  （BEHAVIOR_CALL）有 M2 行为证据才接。roleRef 不能靠名称猜——素材未指名
+  执行角色时按口径 Owner 归位并挂「待 Owner 确认」。
+source: L0 授权自创（票 33 设计裁决；组合形态参照 schema.md §8 流程/活动
+  字段表 + §8 roleRef 与 approvalOutcomes 约定 + §14 一致性对 P3，
+  不含任何业务域词）

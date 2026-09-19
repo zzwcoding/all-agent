@@ -1,0 +1,69 @@
+# =====================================================================
+# 模式件 · 状态机生命周期（首批五件之一，票 33）
+# ────────────────────────────────────────────────────────────────
+# 模式件是素材不是域：本文件不进 schema_check 域校验（无 manifest、无
+# 公共字段），结构纪律由 fixtures/pattern-library/ 结构探针承载；
+# 组合纪律见 skills/onto-modeler/references/pattern-usage.md。
+# fragment 内占位符一律 {{双花括号}} 且必须双引号包裹（裸 {{ 会落
+# YAML 流解析）；组合时逐个替换为域实例。
+# =====================================================================
+pattern_id: state-machine-lifecycle
+name: 状态机生命周期
+description: >-
+  对象有状态流转时的标准建模形态：聚合根带 lifecycle 状态列表 + 状态属性挂
+  DictionaryRef 指向状态字典（lifecycle+status 字典组合）。状态值集唯一真源 =
+  字典 items，lifecycle 是状态机快捷视图，两者必须逐一对齐；状态迁移合法性
+  （谁→谁合法）不是值域问题，按四层下沉判定进 M3 规则，本件不含、组合后按
+  域素材证据决定建不建。
+applies_when: >-
+  素材出现任一信号即可组合：① 对象有明确状态字段且状态值 ≥3 个；② 素材提及
+  状态流转/状态机/生命周期（形如「投入→停用→报废」的链式表述）；③ 状态字段
+  值集在源数据里以码表形态存在（码+名成对、可增改）而非固定裸枚举。
+fragment:
+  aggregates:
+    - id: "AGG-{{域前缀}}-{{聚合序号}}"
+      name: "{{实体名}}"
+      alias: "{{实体别名}}"
+      description: "{{实体描述}}（组合自 patterns/state-machine-lifecycle）"
+      aggregateType: AGGREGATE_ROOT
+      lifecycle: ["{{状态值1}}", "{{状态值2}}", "{{状态值3}}"]
+      attributes:
+        - name: "{{状态字段名}}"
+          label: "{{状态字段标签}}"
+          type: DictionaryRef
+          required: true
+          dictionaryRef:
+            dictionaryId: "DICT-{{域前缀}}-{{字典序号}}"
+            typeCode: "{{状态字典类型码}}"
+  data_dictionaries:
+    - id: "DICT-{{域前缀}}-{{字典序号}}"
+      name: "{{状态字典名}}"
+      types:
+        - typeCode: "{{状态字典类型码}}"
+          typeName: "{{状态字典类型名}}"
+          items:
+            - code: "{{状态码1}}"
+              label: "{{状态值1}}"
+              enabled: true
+              sortOrder: 1
+            - code: "{{状态码2}}"
+              label: "{{状态值2}}"
+              enabled: true
+              sortOrder: 2
+            - code: "{{状态码3}}"
+              label: "{{状态值3}}"
+              enabled: true
+              sortOrder: 3
+compose_notes: >-
+  组合纪律：① 占位符全部替换为域实例——{{状态值N}} 必须与字典 items 的
+  label 逐一对齐，对不上即组合错误；② 元素 description 注记
+  「组合自 patterns/state-machine-lifecycle」（fragment 内已预埋，替换时保留）；
+  ③ 产物仍是草案走人审，业务裁决交 Owner。改名注意：{{状态字段名}} 按域命名
+  习惯取驼峰；{{状态码N}} 用稳定大写存储码（码不改、label 可改）；状态值超
+  3 个时 items 照 sortOrder 顺延并同步 lifecycle 列表。组合后补两件事（本件
+  不含，按域素材证据决定）：① 状态迁移合法性校验 = M3 规则
+  （RULE-{域}-{Seq}，VALIDATION，双入参 fromStatus/toStatus，合法迁移表素材
+  没给就挂「待 Owner 确认」不硬造）；② 状态字段展示控件映射
+  （DictionaryRef→COMBO）属 MU 层，组合屏幕时才落。
+source: L0 授权自创（票 33 设计裁决；组合形态参照 schema.md §4 聚合根
+  lifecycle 字段 + §4 数据字典 + §3 四层下沉判定，不含任何业务域词）

@@ -208,12 +208,35 @@
       "type": "ontology-model",
       "label": "本体模型文件（七模型 YAML）",
       "layoutDir": "ontology/<域>",
-      "pathPatterns": ["ontology/**/*.yaml", "ontology/**/*.yml"],
+      "pathPatterns": [
+        "ontology/*/m1-object-model.yaml",
+        "ontology/*/m2-behavior-model.yaml",
+        "ontology/*/m3-rule-model.yaml",
+        "ontology/*/m5-actor-model.yaml",
+        "ontology/*/m6-flow-model.yaml",
+        "ontology/*/m7-report-model.yaml",
+        "ontology/*/mu-ui-model.yaml",
+        "ontology/*/glossary-model.yaml",
+        "ontology/**/*.yml"
+      ],
       "template": "ontology/schema/schema.md",
       "requiredFields": ["model_type", "version", "domain"],
       "status": null,
+      "statusNote": "pathPatterns 按域文件名单枚举（票 33）：模型文件名单真源=model-registry.json 各模型 yamlFile（一模型一 YAML、固定文件名），patterns/ 模式件目录由 ontology-pattern 类接管——新增模型 = 注册表加 yamlFile 条目 + 本类同步补名，漏补则该模型文件逃出本类检查（登记耦合，体检复核点）。",
       "producer": "本体工序 skill 产草案（票 05 起），MR 过语义 CI 后进仓",
       "flippedBy": "不适用（红绿由 tools/schema_check.py 承载）"
+    },
+    {
+      "type": "ontology-pattern",
+      "label": "本体模式件（可复用建模片段，非域模型）",
+      "layoutDir": "ontology/patterns",
+      "pathPatterns": ["ontology/patterns/*.yaml"],
+      "template": "skills/onto-modeler/references/pattern-usage.md",
+      "requiredFields": ["pattern_id", "name", "description", "applies_when", "fragment", "compose_notes", "source"],
+      "status": null,
+      "statusNote": "模式件是素材不是域（票 33）：无 manifest 不进 schema_check 域校验，fragment 用 {{占位符}} 且占位符必须引号包裹（裸 {{ 会落 YAML 流解析）；七必备头字段=票 33 设计裁决，结构纪律的机判面在 fixtures/pattern-library/ 结构探针（本类只管头字段在场与登记位置）。",
+      "producer": "票 33 首批五件（source=L0 授权自创）；后续扩充走 L0 裁决，建模工序只消费不新增",
+      "flippedBy": "不适用（红绿由 fixtures/pattern-library 结构探针承载）"
     },
     {
       "type": "layout-table",

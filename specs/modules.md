@@ -12,12 +12,12 @@
 - 层: L1 工序
 - 目录: 仓内 skills/onto-modeler/（正本，边界闸+归档闸治理）+ ~/.agents/skills/onto-modeler/（安装位，Kimi Code 路由）；两份内容必须一致
 - 触发面: "给某域建本体/修整本体草案/加模型元素"
-- reads: `ontology/schema/**`（schema+模型注册表）、`ontology/patterns/**`（模式件库，二期）、域素材
+- reads: `ontology/schema/**`（schema+模型注册表）、`ontology/patterns/**`（模式件库，票 33 首批五件，工序步骤 2.5 消费）、域素材
 - writes: `ontology/<域>/**` 草案（只产草案，进仓走 MR）
 - 依赖:
   - script: `tools/schema_check.py`
   - data: `ontology/**`
-- Seam 与出厂集: `fixtures/onto-modeler/`——固定 PRD 片段 → 断言产出的 profile 建议与骨架文件清单
+- Seam 与出厂集: `fixtures/onto-modeler/`——固定 PRD 片段 → 断言产出的 profile 建议与骨架文件清单；`fixtures/pattern-library/`——模式件结构探针（首批五件+负变体）与组合示例域过语义闸（票 33）
 - 边界: 不读生成器 skill 私件；不直改仓内已定稿本体（只产草案）
 
 ## skill: db-reverse

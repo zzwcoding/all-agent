@@ -14,7 +14,7 @@ description: 本体建模工序——给某域建本体/修整本体草案/加�
 
 ## 输入输出契约
 
-- reads：`ontology/schema/**`（schema 文档与两份机读表：模型注册表、依赖白名单）；用户提供的域素材（PRD 片段/文档/口述要点）。
+- reads：`ontology/schema/**`（schema 文档与两份机读表：模型注册表、依赖白名单）；`ontology/patterns/`（模式件库，工序 2.5 消费）；用户提供的域素材（PRD 片段/文档/口述要点）。
 - writes：`ontology/<域>/**` 草案——域 manifest.json、一模型一文件的模型 YAML，以及两份工序产物文档：profile 建议、骨架文件清单。只产草案，进仓走 MR。
 - 依赖脚本：`tools/schema_check.py`（语义闸，修整步的判定器）。
 
@@ -22,6 +22,7 @@ description: 本体建模工序——给某域建本体/修整本体草案/加�
 
 1. **推荐 profile**：通读域素材，按 references/profile-selection.md 的「信号 → 模型」规则列出应启用模型集，对照 `ontology/schema/model-registry.json` 的 profiles 组合选最小覆盖组合；产出《profile 建议》文档：启用模型清单 + 每模型一条理由（引素材原文信号）+ 待 Owner 确认项。
 2. **脚手架骨架**：按建议的 profile 生成域目录骨架——manifest.json（domain / label / profile / schemaVersion，profile 必须取注册表组合名）+ 一模型一文件（固定文件名与公共字段约定见 `ontology/schema/schema.md` §1）；产出《骨架文件清单》文档。未启用的模型不得建文件。
+2.5. **查模式件库**：若 `ontology/patterns/` 存在，逐件对照其 applies_when 与域素材信号；匹配的模式件按其 fragment 组合进草案——占位符全部替换为域实例、按 compose_notes 落实改名与对齐注意、元素 description 注记「组合自 patterns/<pattern_id>」；组合产物仍是草案，业务语义须人审（AI 只做格式转换，业务必须人确认）。无匹配则跳过本步，不硬凑。格式与组合纪律见 references/pattern-usage.md。
 3. **填草案**：逐模型填充元素。铁律：
    - 公共字段 model_type / version / domain 必填（version 三段语义化、引号包裹）；
    - 元素 ID 一律带模型前缀——「前缀即类型标签」，前缀表见 `ontology/schema/model-deps.json`；
@@ -41,8 +42,9 @@ description: 本体建模工序——给某域建本体/修整本体草案/加�
 
 - references/profile-selection.md——profile 推荐规则（信号→模型→最小覆盖组合）
 - references/rule-placement.md——四层规则下沉判定与硬约束
+- references/pattern-usage.md——模式件格式与组合纪律（模式件是素材不是域；占位符替换/注记/人审三纪律）
 - references/schema-pointer.md——schema 真源索引（只指路，不复制内容，防双真源）
 
 ## 出厂集（Seam）
 
-`fixtures/onto-modeler/`——固定 PRD 片段 → 断言 profile 建议内容（AC1）、骨架清单命名（AC2）、草案过语义闸（AC3）、引用纪律含指空负变体（AC4）。改本 skill 工序描述前，先确认出厂集仍绿。
+`fixtures/onto-modeler/`——固定 PRD 片段 → 断言 profile 建议内容（AC1）、骨架清单命名（AC2）、草案过语义闸（AC3）、引用纪律含指空负变体（AC4）；`fixtures/pattern-library/`——模式件结构探针（首批五件 + 负变体）与组合示例域过语义闸（票 33）。改本 skill 工序描述前，先确认出厂集仍绿。

@@ -1,0 +1,71 @@
+# =====================================================================
+# 模式件 · 主从聚合（首批五件之一，票 33）
+# ────────────────────────────────────────────────────────────────
+# 模式件是素材不是域：本文件不进 schema_check 域校验（无 manifest、无
+# 公共字段），结构纪律由 fixtures/pattern-library/ 结构探针承载；
+# 组合纪律见 skills/onto-modeler/references/pattern-usage.md。
+# fragment 内占位符一律 {{双花括号}} 且必须双引号包裹（裸 {{ 会落
+# YAML 流解析）；组合时逐个替换为域实例。
+# =====================================================================
+pattern_id: master-detail-aggregate
+name: 主从聚合
+description: >-
+  一对多主从关系的标准建模形态：主表聚合根 + 从表聚合根，从表带
+  AggregateRootRef 属性（显式 targetAggregate 指回主表）+ aggregate_associations
+  登记关联（ONE_TO_MANY + referenceField 双落）。禁止只在 description 里用
+  名字指代主从关系；多对多不经本件直连，须先经关系实体展开为两条一对多。
+applies_when: >-
+  素材出现任一信号即可组合：① 源数据有主子表形态（子表键含主表键，一行主表
+  对多行子表）；② 素材表述「A 下的 B」「A 的明细 B」「B 隶属 A」；③ 逆向
+  素材中子表逐行都要归属到某个主实体才能解释。
+fragment:
+  aggregates:
+    - id: "AGG-{{域前缀}}-{{主表序号}}"
+      name: "{{主表实体名}}"
+      alias: "{{主表实体别名}}"
+      description: "{{主表实体描述}}（组合自 patterns/master-detail-aggregate）"
+      aggregateType: AGGREGATE_ROOT
+      attributes:
+        - name: "{{主表业务键}}"
+          label: "{{主表业务键标签}}"
+          type: String
+          required: true
+          unique: true
+    - id: "AGG-{{域前缀}}-{{从表序号}}"
+      name: "{{从表实体名}}"
+      alias: "{{从表实体别名}}"
+      description: "{{从表实体描述}}（组合自 patterns/master-detail-aggregate）"
+      aggregateType: AGGREGATE_ROOT
+      attributes:
+        - name: "{{外键引用字段}}"
+          label: "{{外键引用标签}}"
+          type: AggregateRootRef
+          required: true
+          targetAggregate: "AGG-{{域前缀}}-{{主表序号}}"
+        - name: "{{从表业务键}}"
+          label: "{{从表业务键标签}}"
+          type: String
+          required: true
+  aggregate_associations:
+    - id: "ASSOC-{{域前缀}}-{{关联序号}}"
+      sourceAggregate: "AGG-{{域前缀}}-{{主表序号}}"
+      targetAggregate: "AGG-{{域前缀}}-{{从表序号}}"
+      associationType: REFERENCE
+      sourceRole: "{{主表角色名}}"
+      targetRole: "{{从表角色名}}"
+      cardinality: ONE_TO_MANY
+      referenceField: "{{外键引用字段}}"
+compose_notes: >-
+  组合纪律：① 占位符全部替换为域实例——{{外键引用字段}} 一名两用（从表属性
+  name 与关联 referenceField 必须同名，两处对不上即组合错误）；
+  ② 元素 description 注记「组合自 patterns/master-detail-aggregate」
+  （fragment 内已预埋，替换时保留）；③ 产物仍是草案走人审。改名注意：
+  {{主表业务键}}/{{从表业务键}} 取域内稳定业务标识；associationType 按语义取
+  REFERENCE（从表归属主表语境）或 DEPENDENCY（纯关系挂接），拿不准挂
+  「待 Owner 确认」。从逆向素材组合时两件事按证据决定：① 子表若残留主表物理
+  键列（键结构保真），语义引用与物理键列是否合并待 Owner 确认，不静默吞掉；
+  ② 从表聚合不变量（如「明细行必须挂主表」invariants ON_CREATE）有素材
+  证据才建。多对多素材须先经关系实体展开为两条一对多再各自套用本件。
+source: L0 授权自创（票 33 设计裁决；组合形态参照 schema.md §4 聚合关联
+  AggregateAssociation 字段表 + §2「禁止只在 description 里写引用」纪律，
+  不含任何业务域词）

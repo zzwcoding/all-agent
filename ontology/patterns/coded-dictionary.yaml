@@ -1,0 +1,68 @@
+# =====================================================================
+# 模式件 · 编码字典（首批五件之一，票 33）
+# ────────────────────────────────────────────────────────────────
+# 模式件是素材不是域：本文件不进 schema_check 域校验（无 manifest、无
+# 公共字段），结构纪律由 fixtures/pattern-library/ 结构探针承载；
+# 组合纪律见 skills/onto-modeler/references/pattern-usage.md。
+# fragment 内占位符一律 {{双花括号}} 且必须双引号包裹（裸 {{ 会落
+# YAML 流解析）；组合时逐个替换为域实例。
+# =====================================================================
+pattern_id: coded-dictionary
+name: 编码字典
+description: >-
+  编码类字段走值域字典的标准建模形态：属性 type=DictionaryRef（显式
+  dictionaryRef: {dictionaryId, typeCode}）+ data_dictionaries 字典条目
+  （DICT- / types[] / items[]，item = 稳定存储码 code + 可改展示名 label +
+  enabled 停用位 + sortOrder）。与 Enum 的分界：值集会增改、或码与展示名
+  需要分离的，用字典不用 Enum（二者不得并存于同一属性）。
+applies_when: >-
+  素材出现任一信号即可组合：① 源数据有独立码表/字典表；② 字段取值是
+  「码 + 展示名」成对且展示名会调整；③ 值集需要运营期增改而非改代码；
+  ④ 多个对象共享同一值集。
+fragment:
+  aggregates:
+    - id: "AGG-{{域前缀}}-{{聚合序号}}"
+      name: "{{实体名}}"
+      alias: "{{实体别名}}"
+      description: "{{实体描述}}（组合自 patterns/coded-dictionary）"
+      aggregateType: AGGREGATE_ROOT
+      attributes:
+        - name: "{{编码字段名}}"
+          label: "{{编码字段标签}}"
+          type: DictionaryRef
+          required: true
+          dictionaryRef:
+            dictionaryId: "DICT-{{域前缀}}-{{字典序号}}"
+            typeCode: "{{字典类型码}}"
+  data_dictionaries:
+    - id: "DICT-{{域前缀}}-{{字典序号}}"
+      name: "{{字典名}}"
+      types:
+        - typeCode: "{{字典类型码}}"
+          typeName: "{{字典类型名}}"
+          items:
+            - code: "{{编码1}}"
+              label: "{{编码1展示名}}"
+              enabled: true
+              sortOrder: 1
+            - code: "{{编码2}}"
+              label: "{{编码2展示名}}"
+              enabled: true
+              sortOrder: 2
+            - code: "{{编码3}}"
+              label: "{{编码3展示名}}"
+              enabled: true
+              sortOrder: 3
+compose_notes: >-
+  组合纪律：① 占位符全部替换为域实例——dictionaryId/typeCode 与字典条目的
+  id/typeCode 必须精确一致，对不上即组合错误（L2 悬空引用）；② 元素
+  description 注记「组合自 patterns/coded-dictionary」（fragment 内已预埋，
+  替换时保留）；③ 产物仍是草案走人审。改名注意：{{编码字段名}} 按域命名
+  习惯取驼峰；item 的 code 是稳定存储值（进库进引用，组合后不改）、label 是
+  展示名（可改），code 与 label 的这条分界要在组合时保持；平级结构不定义
+  parentCode（字典无层级）。与其他模式件组合进同一聚合根时，description
+  注记并列（「组合自 patterns/A；组合自 patterns/B」）。值集素材不全时
+  不硬凑满 items，已证实的先落、缺口挂「待 Owner 确认」。
+source: L0 授权自创（票 33 设计裁决；组合形态参照 schema.md §4 属性
+  dictionaryRef 约定 + §4 数据字典结构 + §0「字典项停用不删除」纪律，
+  不含任何业务域词）

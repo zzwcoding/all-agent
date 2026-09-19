@@ -1,0 +1,65 @@
+# =====================================================================
+# 模式件 · 有效期版本（首批五件之一，票 33）
+# ────────────────────────────────────────────────────────────────
+# 模式件是素材不是域：本文件不进 schema_check 域校验（无 manifest、无
+# 公共字段），结构纪律由 fixtures/pattern-library/ 结构探针承载；
+# 组合纪律见 skills/onto-modeler/references/pattern-usage.md。
+# fragment 内占位符一律 {{双花括号}} 且必须双引号包裹（裸 {{ 会落
+# YAML 流解析）；组合时逐个替换为域实例。
+# =====================================================================
+pattern_id: validity-versioning
+name: 有效期版本
+description: >-
+  元素生命周期治理的标准建模形态：元素级 version（语义化版本，供运行期做
+  兼容判断）+ 元素级 validFrom（ISO 日期有效期起点，供运行期判断当前可消费
+  版本），配合停用不删除纪律——字典项停用置 enabled: false 保留行，语义变更
+  换新元素不换义旧字段。有效期与版本是运行期预留字段：一期只定义不消费，
+  存在即放行，闸不做语义消费。
+applies_when: >-
+  素材出现任一信号即可组合：① 元素有明确生效/失效日期或版本概念（口径
+  「自某日起按新口径」）；② 同一字段名在不同时期语义不同（旧义退役新义
+  上线）；③ 值集条目有停用但历史数据仍引用（停用≠删除）。
+fragment:
+  aggregates:
+    - id: "AGG-{{域前缀}}-{{聚合序号}}"
+      name: "{{实体名}}"
+      alias: "{{实体别名}}"
+      description: "{{实体描述}}（组合自 patterns/validity-versioning）"
+      aggregateType: AGGREGATE_ROOT
+      version: "{{元素版本号}}"
+      validFrom: "{{生效日期}}"
+      attributes:
+        - name: "{{业务字段名}}"
+          label: "{{业务字段标签}}"
+          type: String
+          required: true
+  data_dictionaries:
+    - id: "DICT-{{域前缀}}-{{字典序号}}"
+      name: "{{字典名}}"
+      types:
+        - typeCode: "{{字典类型码}}"
+          typeName: "{{字典类型名}}"
+          items:
+            - code: "{{现行码}}"
+              label: "{{现行标签}}"
+              enabled: true
+              sortOrder: 1
+            - code: "{{停用码}}"
+              label: "{{停用标签}}"
+              enabled: false
+              sortOrder: 2
+compose_notes: >-
+  组合纪律：① 占位符全部替换为域实例——version 取三段语义化版本并引号包裹、
+  validFrom 取 ISO 日期（YYYY-MM-DD）；② 元素 description 注记
+  「组合自 patterns/validity-versioning」（fragment 内已预埋，替换时保留）；
+  ③ 产物仍是草案走人审。停用纪律：{{停用码}} 条目组合时置 enabled: false
+  保留行、绝不删除——历史数据仍引用停用码，删除走影响分析；停用条目的
+  换新走「新增条目 + 旧条目停用」，禁止改旧条目的 code 换义。版本纪律：
+  元素级 version/validFrom 是运行期预留（一期只定义不消费），字段换义宁可
+  新增字段名并登记 lockedFields，不得复用旧名。有效期素材只有起点没有
+  终点时只填 validFrom，不硬造失效字段。与其他模式件组合进同一聚合根时，
+  description 注记并列；本件字段（version/validFrom/enabled: false）可与
+  任意 M1 模式件叠加。
+source: L0 授权自创（票 33 设计裁决；组合形态参照 schema.md §1 元素级
+  validFrom 运行期预留 + §0「字典项停用不删除/字段换义宁可新增不复用」
+  纪律，不含任何业务域词）
