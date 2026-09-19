@@ -13,7 +13,7 @@ Touches: ontology/schema/、ontology/bohai/、fixtures/schema_check/、tools/sch
 ## 设计裁决（L0 已定，写入票防漂移）
 
 - **独立模型而非 M1 扩展**：术语是业务概念的定义/别名/解释，与 M1 的 DICT（值域字典）不是一回事；OMF v6/v9 均无此模型，属本仓自定义扩展——正因如此走"元模型错→框架版本演进"路由：CHANGELOG + 版本号 + 本票即迁移票。
-- 文件命名 `glossary-model.yaml`（照 `mu-ui-model.yaml` 非数字先例）；ID `GLS-{域}-{Seq}`；camp=business-core、consumers=[runtime, build]、三 profile 组合全入（组合由各模型 profiles 并集反推，旧域无 GLS 文件不红——缺在场不校验是既定行为）。
+- 文件命名 `glossary-model.yaml`（照 `mu-ui-model.yaml` 非数字先例）；ID `GLS-{域}-{Seq}`；camp=business-core、consumers=[runtime, build]；**profile 组合：入 v9-full 与 headless，不入 v9-core**（v9-core=四模型最小核保持原样，术语属增强件；这样"未启用"才有可测负变体——AC2 依赖此裁决）。旧域无 GLS 文件不红——缺在场不校验是既定行为。
 
 ## 验收（注源）
 
@@ -36,6 +36,6 @@ Touches: ontology/schema/、ontology/bohai/、fixtures/schema_check/、tools/sch
 | 断言 | 给定 | 期望 |
 |---|---|---|
 | AC1 | fixtures 最小域 + 合法 glossary-model.yaml（2–3 条术语） | 语义闸全过 |
-| AC2 | GLS 文件出现在未启用 GLS 的 profile 组合域 | L4 profile 违规，红 |
+| AC2 | GLS 文件出现在 profile=v9-core 的域（GLS 不入该组合） | L4 profile 违规，红 |
 | AC3 | 术语 relatedObjectRefs 指向不存在对象（GLS-xxx 悬空指 AGG- 不存在 ID） | L2 dangling-ref，红 |
 | AC4 | glossary 文件 model_type 写错（如 OBJECT）或 GLS 文件名错挂 | L1 违规，红 |
