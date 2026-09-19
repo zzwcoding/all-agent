@@ -1,0 +1,18 @@
+# REQ-AC4 正例域 · M2（票 13）：元素级 version/validFrom + 运行期四外衣
+# 预留字段 contract/riskLevel/idempotent（schema.md §5，一期只定义不消费）。
+model_type: BEHAVIOR
+version: "1.0.0"
+domain: req-ac4
+behaviors:
+  - id: BH-REQ-004
+    name: 录入单井日产量
+    ownerEntity: AGG-REQ-004
+    behaviorType: COMMAND
+    appliedRules:
+      - RULE-REQ-004
+    requiredPermissions: []
+    contract: "录入成功返回新日产量记录 ID；失败返回原因码（运行期预留示例）"
+    riskLevel: LOW
+    idempotent: true
+    version: "1.1.0"
+    validFrom: "2026-01-01"

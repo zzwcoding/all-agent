@@ -1,0 +1,28 @@
+model_type: FLOW
+version: "1.0.0"
+domain: req-ac5
+flows:
+  - id: FLOW-BOHAI-001
+    name: 单井日产量录入流程
+    flowType: COLLABORATION
+    businessObjectRefs:
+      - AGG-BOHAI-002
+      - AGG-BOHAI-001
+    roleRefs:
+      - ROLE-BOHAI-001
+    trigger:
+      triggerType: MANUAL
+    startActivity: ACT-BOHAI-001
+    endActivities:
+      - ACT-BOHAI-002
+    activities:
+      - activityId: ACT-BOHAI-001
+        name: 录入产量
+        activityType: USER_TASK
+        roleRef: ROLE-BOHAI-001
+        behaviorRef: BH-BOHAI-RecordDailyOutput
+        nextActivities:
+          - ACT-BOHAI-002
+      - activityId: ACT-BOHAI-002
+        name: 结束
+        activityType: END

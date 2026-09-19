@@ -1,0 +1,16 @@
+# REQ-AC4 正例域 · M1（票 13）：元素级 version/validFrom 预留字段——
+# schema.md §1「预留字段存在即放行」的实测承载：带预留字段的元素全过闸。
+model_type: OBJECT
+version: "1.0.0"
+domain: req-ac4
+aggregates:
+  - id: AGG-REQ-004
+    name: 井
+    alias: Well
+    aggregateType: AGGREGATE_ROOT
+    version: "1.1.0"        # 元素级预留字段（运行期兼容判断用，一期不消费）
+    validFrom: "2026-01-01" # 元素级预留字段（运行期有效期起点，一期不消费）
+    attributes:
+      - name: wellCode
+        label: 井号
+        type: String

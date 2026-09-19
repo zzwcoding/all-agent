@@ -1,0 +1,10 @@
+# REQ-AC2 最小域 · M1（sourceObjects.objectRef 落点，防悬空杂音）
+model_type: OBJECT
+version: "1.0.0"
+domain: req-ac2
+aggregates:
+  - id: AGG-REQ-002
+    name: 单井日产量记录
+    alias: DailyProductionRecord
+    aggregateType: AGGREGATE_ROOT
+    attributes: []

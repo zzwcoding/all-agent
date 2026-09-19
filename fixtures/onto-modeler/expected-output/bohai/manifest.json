@@ -2,5 +2,11 @@
   "domain": "bohai",
   "label": "渤海油田产量域",
   "profile": "v9-full",
-  "schemaVersion": "1.0.0"
+  "schemaVersion": "1.0.0",
+  "omittedModels": [
+    {
+      "model": "GLS",
+      "reason": "onto-modeler 参照产物先于 GLS 扩展（票 10）——工序标准样本不建术语文件（票 13 升级登记）。"
+    }
+  ]
 }

@@ -1,0 +1,10 @@
+# REQ-AC1 最小域 · M1（ownerEntity 落点，防悬空杂音）
+model_type: OBJECT
+version: "1.0.0"
+domain: req-ac1
+aggregates:
+  - id: AGG-REQ-001
+    name: 井
+    alias: Well
+    aggregateType: AGGREGATE_ROOT
+    attributes: []

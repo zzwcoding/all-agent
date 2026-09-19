@@ -2,5 +2,27 @@
   "domain": "cons-p3",
   "label": "一致性对负变体 CONS-AC3（票 11）：M6 活动 roleRef ∉ 流程 roleRefs → L2 consistency-flow-role",
   "profile": "v9-full",
-  "schemaVersion": "1.0.0"
+  "schemaVersion": "1.0.0",
+  "omittedModels": [
+    {
+      "model": "M2",
+      "reason": "CONS-AC3 负变体极简域：仅 M1/M5/M6 入镜验一致性对 P3（票 11），票 13 豁免登记。"
+    },
+    {
+      "model": "M3",
+      "reason": "CONS-AC3 负变体极简域：仅 M1/M5/M6 入镜验一致性对 P3（票 11），票 13 豁免登记。"
+    },
+    {
+      "model": "M7",
+      "reason": "CONS-AC3 负变体极简域：仅 M1/M5/M6 入镜验一致性对 P3（票 11），票 13 豁免登记。"
+    },
+    {
+      "model": "MU",
+      "reason": "CONS-AC3 负变体极简域：仅 M1/M5/M6 入镜验一致性对 P3（票 11），票 13 豁免登记。"
+    },
+    {
+      "model": "GLS",
+      "reason": "CONS-AC3 负变体极简域：仅 M1/M5/M6 入镜验一致性对 P3（票 11），票 13 豁免登记。"
+    }
+  ]
 }

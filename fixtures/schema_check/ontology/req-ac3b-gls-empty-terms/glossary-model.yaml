@@ -1,0 +1,6 @@
+# REQ-AC3b 最小域 · GLS（票 13）：terms 空列表 = 空壳文件——
+# reviews-phase2 P1 实锤场景（terms: [] 照样全绿），断言元素级必填闸红（空壳判定）。
+model_type: GLOSSARY
+version: "1.0.0"
+domain: req-ac3b
+terms: []

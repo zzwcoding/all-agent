@@ -3,7 +3,9 @@
 
 合成两模型（M1/M2）迷你 schema 走端到端，AC1–7 各一条（AC 对应 specs/schema_check.md 断言表）；
 票 10 增 GLS 套件（GlossaryModel）；票 11 增 L2 一致性对套件（ConsistencyPairs，
-CONS-AC1–3 对应 tickets/11-一致性对核验.md AC 表，基座扩到 M5/M6/M7）。
+CONS-AC1–3 对应 tickets/11-一致性对核验.md AC 表，基座扩到 M5/M6/M7）；
+票 13 增必填闸套件（RequiredFields：L1 required-field 元素级闸）与 AC6 反向套件
+（MissingModelFile：L4 missing-model-file + omittedModels 豁免）。
 """
 
 import io
@@ -101,8 +103,16 @@ class Base(unittest.TestCase):
         self.root = Path(self.tmp.name) / "onto"
         write(self.root / "schema" / "model-registry.json", json.dumps(REGISTRY))
         write(self.root / "schema" / "model-deps.json", json.dumps(DEPS))
+        # 票 13 起 manifest 预置 omittedModels（覆盖注册表全模型）：本基座各测试
+        # 只加部分模型文件是常态，AC6 反向闸（missing-model-file）不该改变老测试
+        # 语义——反向闸的正负变体由 MissingModelFile 专类用自管 manifest 覆盖。
         write(self.root / "demo" / "manifest.json", json.dumps(
-            {"domain": "demo", "profile": "full", "schemaVersion": "1.0.0"}))
+            {"domain": "demo", "profile": "full", "schemaVersion": "1.0.0",
+             "omittedModels": [
+                 {"model": "M1", "reason": "单测基座：模型文件按需加装"},
+                 {"model": "M2", "reason": "单测基座：模型文件按需加装"},
+                 {"model": "GLS", "reason": "单测基座：模型文件按需加装"},
+             ]}))
 
     def tearDown(self):
         self.tmp.cleanup()
@@ -470,6 +480,13 @@ class ConsBase(Base):
         super().setUp()
         write(self.root / "schema" / "model-registry.json", json.dumps(CONS_REGISTRY))
         write(self.root / "schema" / "model-deps.json", json.dumps(CONS_DEPS))
+        # omittedModels 与本基座注册表对齐（票 13：引用未注册模型 = L1 红）
+        write(self.root / "demo" / "manifest.json", json.dumps(
+            {"domain": "demo", "profile": "full", "schemaVersion": "1.0.0",
+             "omittedModels": [
+                 {"model": k, "reason": "单测基座：模型文件按需加装"}
+                 for k in ("M1", "M2", "M5", "M6", "M7")
+             ]}))
 
     def add_cons_domain(self):
         self.add("m1-object-model.yaml", CONS_M1)
@@ -581,11 +598,195 @@ class ConsistencyPairs(ConsBase):
 
     def test_pairs_degenerate_without_models(self):
         # 退化面：注册表只有 M1/M2（Base 迷你表）时一致性对静默跳过，不崩不误报
+        # （manifest 同步回 Base 基座形态，票 13：omittedModels 须引用注册模型）
         write(self.root / "schema" / "model-registry.json", json.dumps(REGISTRY))
         write(self.root / "schema" / "model-deps.json", json.dumps(DEPS))
+        write(self.root / "demo" / "manifest.json", json.dumps(
+            {"domain": "demo", "profile": "full", "schemaVersion": "1.0.0",
+             "omittedModels": [
+                 {"model": "M1", "reason": "单测基座：模型文件按需加装"},
+                 {"model": "M2", "reason": "单测基座：模型文件按需加装"},
+                 {"model": "GLS", "reason": "单测基座：模型文件按需加装"},
+             ]}))
         self.add("m1-object-model.yaml", M1)
         self.add("m2-behavior-model.yaml", M2)
         self.assertEqual(self.run_check()["status"], "pass")
+
+# ---------- 票 13：L1 元素级必填闸 + L4 AC6 反向（missing-model-file/omittedModels）----------
+
+REQ_REGISTRY = {
+    "version": "1.2.0",
+    "models": {
+        "M1": dict(REGISTRY["models"]["M1"], profiles=["full"]),
+        "M2": dict(REGISTRY["models"]["M2"], profiles=["full"],
+                   requiredElementFields={
+                       "BH-": ["id", "name", "ownerEntity", "behaviorType"]}),
+        "M7": {
+            "name": "查询统计与报表模型", "yamlFile": "m7-report-model.yaml",
+            "modelType": "REPORT", "camp": "business-core",
+            "consumers": ["runtime", "build"], "profiles": ["full"],
+            "dependsOn": ["M1", "M2"], "lockedFields": {},
+            "requiredElementFields": {
+                "QR-": ["id", "name", "behaviorRef"]},
+        },
+    },
+}
+
+REQ_DEPS = {
+    "version": "1.2.0",
+    "idPrefixes": {"AGG-": "M1", "BH-": "M2", "QR-": "M7"},
+    "refKeys": ["ownerEntity", "behaviorRef"],
+    "edges": [
+        {"from": "M2", "field": "ownerEntity", "to": ["M1"]},
+        {"from": "M7", "field": "behaviorRef", "to": ["M2"]},
+    ],
+}
+
+
+class ReqBase(Base):
+    """票 13 基座：M1/M2/M7 迷你注册表，M2/M7 带 requiredElementFields。"""
+
+    def setUp(self):
+        super().setUp()
+        write(self.root / "schema" / "model-registry.json", json.dumps(REQ_REGISTRY))
+        write(self.root / "schema" / "model-deps.json", json.dumps(REQ_DEPS))
+        write(self.root / "demo" / "manifest.json", json.dumps(
+            {"domain": "demo", "profile": "full", "schemaVersion": "1.2.0",
+             "omittedModels": [
+                 {"model": "M1", "reason": "单测基座：模型文件按需加装"},
+                 {"model": "M2", "reason": "单测基座：模型文件按需加装"},
+                 {"model": "M7", "reason": "单测基座：模型文件按需加装"},
+             ]}))
+
+    def req_violations(self, report=None, kind="required-field"):
+        r = report or self.run_check()
+        return [v for v in r["violations"] if v["kind"] == kind]
+
+
+class RequiredFields(ReqBase):
+    """票 13 AC 表 AC1/AC2 的单测面：元素级结构性必填闸。"""
+
+    def test_all_required_fields_present_passes(self):
+        self.add("m1-object-model.yaml", M1)
+        self.add("m2-behavior-model.yaml", M2 + """  - id: BH-DEMO-Query
+    name: 查询
+    ownerEntity: AGG-DEMO-001
+    behaviorType: QUERY
+""")
+        self.add("m7-report-model.yaml", CONS_M7)
+        self.assertEqual(self.run_check()["status"], "pass",
+                         self.run_check()["violations"])
+
+    def test_missing_type_discriminator_is_required_field(self):
+        # AC1：M2 行为缺 behaviorType（一致性锚点）→ L1 required-field 红（不再静默跳过）
+        self.add("m1-object-model.yaml", M1)
+        self.add("m2-behavior-model.yaml",
+                 "\n".join(l for l in M2.splitlines()
+                           if not l.startswith("    behaviorType")))
+        report = self.run_check()
+        vs = self.req_violations(report)
+        self.assertTrue(vs)
+        v = vs[0]
+        self.assertEqual(v["level"], "L1")
+        self.assertIn("BH-DEMO-Record", v["message"])
+        self.assertIn("behaviorType", v["message"])
+        self.assertIn("requiredElementFields", v["message"])
+        self.assertGreater(v["line"], 0)
+
+    def test_missing_anchor_field_reports_element_and_field(self):
+        # AC2 同款：M7 报表缺 behaviorRef → L1 required-field 红
+        self.add("m7-report-model.yaml",
+                 "\n".join(l for l in CONS_M7.splitlines()
+                           if not l.startswith("    behaviorRef")))
+        vs = self.req_violations()
+        self.assertTrue(vs)
+        self.assertIn("QR-DEMO-001", vs[0]["message"])
+        self.assertIn("behaviorRef", vs[0]["message"])
+
+    def test_empty_shell_file_is_required_field(self):
+        # AC3 同款：behaviors 空列表 = 空壳文件 → L1 required-field 红
+        self.add("m2-behavior-model.yaml",
+                 "model_type: BEHAVIOR\nversion: \"1.0.0\"\ndomain: demo\nbehaviors: []\n")
+        vs = self.req_violations()
+        self.assertTrue(vs)
+        self.assertIn("空壳", vs[0]["message"])
+        self.assertIn("M2", vs[0]["message"])
+
+    def test_filename_mismatch_skips_required_gate(self):
+        # 红因纯净：文件名与 model_type 错挂时内容与模型锚已断，必填闸让位给
+        # filename-mismatch，不叠加空壳红因（gls-ac4 形态，lessons/13）
+        self.add("m1-object-model.yaml",
+                 "model_type: BEHAVIOR\nversion: \"1.0.0\"\ndomain: demo\nbehaviors: []\n")
+        report = self.run_check()
+        self.assertEqual(self.req_violations(report), [])
+        self.assertIn("filename-mismatch", self.kinds(report))
+
+
+class MissingModelFile(ReqBase):
+    """票 13 AC 表 AC5/AC6 的单测面：AC6 反向 + omittedModels 豁免机制。"""
+
+    def test_enabled_model_without_file_is_l4(self):
+        # AC5：profile 启用 M2 但域内无文件、无豁免 → L4 missing-model-file 红
+        write(self.root / "demo" / "manifest.json", json.dumps(
+            {"domain": "demo", "profile": "full", "schemaVersion": "1.2.0"}))
+        self.add("m1-object-model.yaml", M1)
+        report = self.run_check()
+        vs = self.req_violations(report, kind="missing-model-file")
+        self.assertTrue(vs)
+        v = vs[0]
+        self.assertEqual(v["level"], "L4")
+        self.assertIn("M2", v["message"])
+        self.assertIn("omittedModels", v["message"])
+
+    def test_waived_model_with_reason_passes(self):
+        # AC6：同上但 omittedModels 带理由豁免 → 不红
+        write(self.root / "demo" / "manifest.json", json.dumps(
+            {"domain": "demo", "profile": "full", "schemaVersion": "1.2.0",
+             "omittedModels": [
+                 {"model": "M2", "reason": "无素材证据，有意裁剪"},
+                 {"model": "M7", "reason": "无素材证据，有意裁剪"},
+             ]}))
+        self.add("m1-object-model.yaml", M1)
+        report = self.run_check()
+        self.assertEqual(report["status"], "pass", report["violations"])
+
+    def test_waiver_without_reason_is_not_exemption(self):
+        # 豁免条目缺 reason / reason 空串 = 无效豁免，缺文件照红
+        for reason in (None, "", "   "):
+            entry = {"model": "M2"}
+            if reason is not None:
+                entry["reason"] = reason
+            write(self.root / "demo" / "manifest.json", json.dumps(
+                {"domain": "demo", "profile": "full", "schemaVersion": "1.2.0",
+                 "omittedModels": [entry]}))
+            self.add("m1-object-model.yaml", M1)
+            vs = self.req_violations(self.run_check(), kind="missing-model-file")
+            self.assertTrue(vs, f"reason={reason!r} 不应构成有效豁免")
+            self.assertIn("M2", vs[0]["message"])
+
+    def test_waiver_referencing_unknown_model_is_l1(self):
+        # omittedModels 引用未注册模型 = 配置错误，L1 红（防错别字静默失效）
+        write(self.root / "demo" / "manifest.json", json.dumps(
+            {"domain": "demo", "profile": "full", "schemaVersion": "1.2.0",
+             "omittedModels": [{"model": "MX", "reason": "手滑写错模型键"}]}))
+        self.add("m1-object-model.yaml", M1)
+        self.assertIn("unknown-omitted-model", self.kinds())
+
+    def test_malformed_waiver_entry_is_l1(self):
+        # omittedModels 条目缺 model 键 = 配置错误，L1 红
+        write(self.root / "demo" / "manifest.json", json.dumps(
+            {"domain": "demo", "profile": "full", "schemaVersion": "1.2.0",
+             "omittedModels": [{"reason": "不是合法条目"}]}))
+        self.add("m1-object-model.yaml", M1)
+        self.assertIn("bad-omitted-model", self.kinds())
+
+    def test_unknown_profile_does_not_trigger_missing_check(self):
+        # profile 未知时 enabled 为空，反向闸不触发（unknown-profile 已单独红）
+        write(self.root / "demo" / "manifest.json", json.dumps(
+            {"domain": "demo", "profile": "nope", "schemaVersion": "1.2.0"}))
+        kinds = self.kinds()
+        self.assertIn("unknown-profile", kinds)
+        self.assertNotIn("missing-model-file", kinds)
 
 
 if __name__ == "__main__":

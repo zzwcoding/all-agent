@@ -1,0 +1,13 @@
+{
+  "domain": "req-ac3a",
+  "label": "必填闸负变体 REQ-AC3a（票 13）：GLS 术语缺必填字段 definition → L1 required-field 红",
+  "profile": "headless",
+  "schemaVersion": "1.2.0",
+  "omittedModels": [
+    { "model": "M1", "reason": "REQ-AC3a 负变体极简域：仅 GLS 入镜验必填闸（relatedObjectRefs 可空留空不硬挂），票 13。" },
+    { "model": "M2", "reason": "REQ-AC3a 负变体极简域：仅 GLS 入镜验必填闸，票 13。" },
+    { "model": "M3", "reason": "REQ-AC3a 负变体极简域：仅 GLS 入镜验必填闸，票 13。" },
+    { "model": "M5", "reason": "REQ-AC3a 负变体极简域：仅 GLS 入镜验必填闸，票 13。" },
+    { "model": "M7", "reason": "REQ-AC3a 负变体极简域：仅 GLS 入镜验必填闸，票 13。" }
+  ]
+}

@@ -2,7 +2,7 @@
 
 > 本文是本体 YAML 的 schema 文档（人读）；机读消费方两份：
 > `model-registry.json`（模型注册表：camp/consumers/profiles/dependsOn）、`model-deps.json`（类型层依赖白名单 + ID 前缀表）。
-> 执行闸：`tools/schema_check.py`（语义 CI L1–L4，断言表 `specs/schema_check.md` AC1–7 + 票 10 GLS-AC1–4 + 票 11 一致性对 §14）。
+> 执行闸：`tools/schema_check.py`（语义 CI L1–L4，断言表 `specs/schema_check.md` AC1–7 + 票 10 GLS-AC1–4 + 票 11 一致性对 §14 + 票 13 必填闸 REQ-AC1–6）。
 > 蓝本：OMF v9 七模型（references/omf-spec-digest.md §0/§16，下注 `v9 §x`）；裁剪决定均注明出处。
 > GLS 术语模型为本仓自定义扩展（OMF v6/v9 均无，票 10 走"元模型错→框架版本演进"路由进 schema，演进账见 CHANGELOG.md）。
 
@@ -31,12 +31,14 @@
 {"domain": "bohai", "label": "渤海油田产量域", "profile": "v9-full", "schemaVersion": "1.0.0"}
 ```
 
-`profile` 引用 model-registry.json 的 profile 组合名；未启用的模型文件出现 = L4 违规（AC6）。
+`profile` 引用 model-registry.json 的 profile 组合名；未启用的模型文件出现 = L4 违规（AC6）。反向同理（票 13）：**profile 启用的模型缺文件且 manifest 无豁免 = L4 `missing-model-file` 违规**。豁免走 manifest 可选清单 `omittedModels: [{"model": "MU", "reason": "…"}]`——条目必须带非空 reason（无理由 = 无效豁免照红），引用未注册模型 = L1 红。适用场景：素材证据不支撑某模型、经裁决有意不建（如 bohai 的 MU，理由引裁决记录）。
 
 **元素级运行期预留字段（全模型可选，一期只定义不消费，PRD F1「运行期四外衣」）**：
 - 元素级 `version`（String）：元素独立版本，供运行期消费方做兼容判断。
 - 元素级 `validFrom`（ISO 日期）：有效期起点，供运行期判断"当前可消费版本"。
-- 预留字段闸只做"存在即放行"，不做语义消费——防止 schema 二次断裂（R7、digest §16.10）。
+- 预留字段闸只做"存在即放行"，不做语义消费——防止 schema 二次断裂（R7、digest §16.10）。正例实测承载：出厂集 `req-ac4-reserved-fields`（元素级 version/validFrom + M2 contract/riskLevel/idempotent + M3 narrative，票 13 REQ-AC4）。
+
+**元素级结构性必填（票 13，机读真源 = model-registry.json 各模型 `requiredElementFields`）**：口径 = 身份（id/name，含各模型具名 ID 键）+ 类型判别（behaviorType 等）+ 检查锚点（一致性对/引用扫描依赖、缺失即静默跳过的字段）+ 载荷容器（attributes/activities 等空壳即红的容器）；闸 = schema_check L1 `required-field`（含空壳文件判定）。schema.md 全字段集（preconditions 等）**不在**必填闸（缺口清单留后续演进票）；逐模型推导表与证据见 `lessons/13-机读必填字段闸.md`。
 
 ## 2. ID 前缀与 ref 命名约定
 
@@ -244,7 +246,7 @@ OMF 的 M6/M7 在 v4 换义造成过沟通成本（digest §14/§16.10）。本�
 
 ## 13. 模型注册表与依赖白名单（机读）
 
-- `model-registry.json`：每模型 `camp`（business-core/integration/build-contract；一期 integration 空，MI 未引入）、`consumers`（runtime/build）、`profiles`（可用组合：v9-full/v9-core/headless）、`dependsOn`（类型层依赖白名单摘要）。消费方：profile 裁剪、检索面划界（semantic-service 只索引 business-core）、生成器在场校验三件事共用（PRD F1）。
+- `model-registry.json`：每模型 `camp`（business-core/integration/build-contract；一期 integration 空，MI 未引入）、`consumers`（runtime/build）、`profiles`（可用组合：v9-full/v9-core/headless）、`dependsOn`（类型层依赖白名单摘要）、`requiredElementFields`（票 13：逐元素结构性必填字段机读表，前缀→字段键列表；闸 L1 required-field）。消费方：profile 裁剪、必填闸、检索面划界（semantic-service 只索引 business-core）、生成器在场校验四件事共用（PRD F1）。
 - `model-deps.json`：`idPrefixes`（ID 前缀→模型）+ `refKeys`（ref 字段名全集）+ `edges`（from 模型 × ref 字段 → 允许目标模型集）。AC4/AC5 的判定真源；与 registry 的 dependsOn 做一致性核对，冲突 = L1 违规。
 - 依赖白名单要点：M2 不得依赖 M7（AC5 例证，见 §2）；M1 零依赖；M6 依赖 M1/M2/M3/M5；MU 依赖 M1/M2/M3/M5/M7；GLS 只依赖 M1（relatedObjectRefs 单向边，票 10）。
 

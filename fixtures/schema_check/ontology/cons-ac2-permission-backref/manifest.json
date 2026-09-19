@@ -2,5 +2,27 @@
   "domain": "cons-p2",
   "label": "一致性对负变体 CONS-AC2（票 11）：M2.requiredPermissions↔M5 回指断裂——PERM 存在但 targetRef 指向另一行为，未回指要求它的行为 → L2 consistency-permission",
   "profile": "v9-full",
-  "schemaVersion": "1.0.0"
+  "schemaVersion": "1.0.0",
+  "omittedModels": [
+    {
+      "model": "M3",
+      "reason": "CONS-AC2 负变体极简域：仅 M1/M2/M5 入镜验一致性对 P2（票 11），票 13 豁免登记。"
+    },
+    {
+      "model": "M6",
+      "reason": "CONS-AC2 负变体极简域：仅 M1/M2/M5 入镜验一致性对 P2（票 11），票 13 豁免登记。"
+    },
+    {
+      "model": "M7",
+      "reason": "CONS-AC2 负变体极简域：仅 M1/M2/M5 入镜验一致性对 P2（票 11），票 13 豁免登记。"
+    },
+    {
+      "model": "MU",
+      "reason": "CONS-AC2 负变体极简域：仅 M1/M2/M5 入镜验一致性对 P2（票 11），票 13 豁免登记。"
+    },
+    {
+      "model": "GLS",
+      "reason": "CONS-AC2 负变体极简域：仅 M1/M2/M5 入镜验一致性对 P2（票 11），票 13 豁免登记。"
+    }
+  ]
 }

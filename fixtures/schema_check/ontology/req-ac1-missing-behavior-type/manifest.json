@@ -1,0 +1,10 @@
+{
+  "domain": "req-ac1",
+  "label": "必填闸负变体 REQ-AC1（票 13）：M2 行为缺类型判别字段 behaviorType（一致性锚点）→ L1 required-field 红（不再静默跳过）",
+  "profile": "v9-core",
+  "schemaVersion": "1.2.0",
+  "omittedModels": [
+    { "model": "M3", "reason": "REQ-AC1 负变体极简域：仅 M1/M2 入镜验必填闸，票 13。" },
+    { "model": "M5", "reason": "REQ-AC1 负变体极简域：仅 M1/M2 入镜验必填闸，票 13。" }
+  ]
+}

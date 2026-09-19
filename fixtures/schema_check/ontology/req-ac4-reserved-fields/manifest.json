@@ -1,0 +1,11 @@
+{
+  "domain": "req-ac4",
+  "label": "预留字段正例 REQ-AC4（票 13）：元素级 version/validFrom + M2 四外衣（contract/riskLevel/idempotent）+ M3 narrative 写法——「存在即放行」全过",
+  "profile": "headless",
+  "schemaVersion": "1.2.0",
+  "omittedModels": [
+    { "model": "M5", "reason": "REQ-AC4 正例极简域：仅 M1/M2/M3 入镜验预留字段，票 13。" },
+    { "model": "M7", "reason": "REQ-AC4 正例极简域：仅 M1/M2/M3 入镜验预留字段，票 13。" },
+    { "model": "GLS", "reason": "REQ-AC4 正例极简域：仅 M1/M2/M3 入镜验预留字段，票 13。" }
+  ]
+}

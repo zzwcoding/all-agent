@@ -1,0 +1,12 @@
+# REQ-AC1 最小域 · M2（票 13）：行为缺类型判别字段 behaviorType——
+# 一致性对 P1 的收集面（`if "behaviorType" in mapping`）会静默跳过该行为，
+# 本变体断言元素级必填闸使其不再静默（L1 required-field 红，红因唯一）。
+model_type: BEHAVIOR
+version: "1.0.0"
+domain: req-ac1
+behaviors:
+  - id: BH-REQ-001
+    name: 录入单井日产量
+    ownerEntity: AGG-REQ-001
+    appliedRules: []
+    requiredPermissions: []

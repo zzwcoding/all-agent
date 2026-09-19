@@ -115,7 +115,8 @@
 
 | 脚本 | 职责 | 状态 |
 |---|---|---|
-| `tools/schema_check.py` | 语义 CI 的 L1–L4 级（schema 合法/引用一致/依赖白名单/profile 合规），断言表 specs/schema_check.md AC1–7 | 已建（票 03） |
+| `tools/schema_check.py` | 语义 CI 的 L1–L4 级（schema 合法/引用一致/依赖白名单/profile 合规+反向缺文件/逐元素结构性必填），断言表 specs/schema_check.md AC1–7 + GLS/CONS/REQ 套件 | 已建（票 03；票 10/11/13 演进） |
 | `tools/graph_index.py` | YAML → 内存图（多跳/闭包/影响链） | 已建（票 04） |
+| `tools/check_citations.py` | ID 引用清单逐条比对检具：答案正文↔「本回答引用的元素 ID」清单节双向差异（正文有清单无/清单有正文无），退出码 0 一致/1 不一致/2 用法；通用大写前缀 token 不绑域；断言面 fixtures/semantic-service CIT-01–05（票 13，审查一 P2） | 已建（票 13） |
 | `tools/skill_deps_check.py` `tools/fixture_run.py` `tools/archive_check.py` 三闸 + `tools/ci.sh` | 从 sdd-flow2 实例化拷贝（含单测；fixture_run 新增 cmd-* 断言与占位 pending） | 已建（票 03 随迁） |
 | `tools/install_skills.py` | 安装位同步：仓内 skills/ 正本 → ~/.agents/skills/ 安装位的 sync（先清后拷，只清本 skill 目录）与 --check（逐文件 diff，漂移三型 missing/modified/extra）；断言表 tickets/12 AC1–4；不进 ci.sh 四闸（安装位是仓外环境状态） | 已建（票 12） |

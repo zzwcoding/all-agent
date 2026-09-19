@@ -1,0 +1,14 @@
+# REQ-AC3a 最小域 · GLS（票 13）：术语缺必填字段 definition——
+# 语义服务检索面拿不到口径正文（reviews-phase2 P1 实锤场景），断言 L1 required-field 红。
+model_type: GLOSSARY
+version: "1.0.0"
+domain: req-ac3a
+terms:
+  - id: GLS-REQ-001
+    term: 有效产量
+    aliases: [净产量]
+    termType: 一词两译
+    relatedObjectRefs: []
+    status: 有效
+    owner: 开发室
+    source: 合成·票 13 出厂集

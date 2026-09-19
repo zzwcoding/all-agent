@@ -2,5 +2,31 @@
   "domain": "gls-ac3",
   "label": "GLS 负变体 AC3（票 10）：术语 relatedObjectRefs 悬空指 AGG- 不存在 ID → L2 红",
   "profile": "v9-full",
-  "schemaVersion": "1.0.0"
+  "schemaVersion": "1.0.0",
+  "omittedModels": [
+    {
+      "model": "M2",
+      "reason": "GLS-AC3 负变体极简域：仅 M1+GLS 入镜验 dangling-ref（票 10），票 13 豁免登记。"
+    },
+    {
+      "model": "M3",
+      "reason": "GLS-AC3 负变体极简域：仅 M1+GLS 入镜验 dangling-ref（票 10），票 13 豁免登记。"
+    },
+    {
+      "model": "M5",
+      "reason": "GLS-AC3 负变体极简域：仅 M1+GLS 入镜验 dangling-ref（票 10），票 13 豁免登记。"
+    },
+    {
+      "model": "M6",
+      "reason": "GLS-AC3 负变体极简域：仅 M1+GLS 入镜验 dangling-ref（票 10），票 13 豁免登记。"
+    },
+    {
+      "model": "M7",
+      "reason": "GLS-AC3 负变体极简域：仅 M1+GLS 入镜验 dangling-ref（票 10），票 13 豁免登记。"
+    },
+    {
+      "model": "MU",
+      "reason": "GLS-AC3 负变体极简域：仅 M1+GLS 入镜验 dangling-ref（票 10），票 13 豁免登记。"
+    }
+  ]
 }

@@ -1,0 +1,15 @@
+# REQ-AC2 最小域 · M7（票 13）：报表缺一致性锚点字段 behaviorRef——
+# 一致性对 P1（M7↔M2 严格一对一）会静默跳过该对象，本变体断言元素级
+# 必填闸使其红（L1 required-field，红因唯一）。
+model_type: REPORT
+version: "1.0.0"
+domain: req-ac2
+query_reports:
+  - id: QR-REQ-001
+    name: 单井日产量查询
+    alias: wellDailyOutputQuery
+    objectType: DETAIL_QUERY
+    sourceObjects:
+      - objectRef: AGG-REQ-002
+        alias: d
+        primary: true

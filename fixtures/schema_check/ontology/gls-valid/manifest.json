@@ -2,5 +2,31 @@
   "domain": "gls-fixture",
   "label": "GLS 正变体最小域（票 10 GLS-AC1）：井对象 1 个 + 合法术语 3 条",
   "profile": "v9-full",
-  "schemaVersion": "1.0.0"
+  "schemaVersion": "1.0.0",
+  "omittedModels": [
+    {
+      "model": "M2",
+      "reason": "GLS 判定专用极简域，票 13"
+    },
+    {
+      "model": "M3",
+      "reason": "GLS 判定专用极简域，票 13"
+    },
+    {
+      "model": "M5",
+      "reason": "GLS 判定专用极简域，票 13"
+    },
+    {
+      "model": "M6",
+      "reason": "GLS 判定专用极简域，票 13"
+    },
+    {
+      "model": "M7",
+      "reason": "GLS 判定专用极简域，票 13"
+    },
+    {
+      "model": "MU",
+      "reason": "GLS 判定专用极简域，票 13"
+    }
+  ]
 }

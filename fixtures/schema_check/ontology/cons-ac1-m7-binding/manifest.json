@@ -2,5 +2,27 @@
   "domain": "cons-p1",
   "label": "一致性对负变体 CONS-AC1（票 11）：M7↔M2 严格一对一破坏——QR 错绑 COMMAND 行为 + 两 QR 共绑同一 QUERY 行为 → L2 consistency-redirection / consistency-not-one-to-one",
   "profile": "v9-full",
-  "schemaVersion": "1.0.0"
+  "schemaVersion": "1.0.0",
+  "omittedModels": [
+    {
+      "model": "M3",
+      "reason": "CONS-AC1 负变体极简域：仅 M1/M2/M7 入镜验一致性对 P1（票 11），票 13 豁免登记。"
+    },
+    {
+      "model": "M5",
+      "reason": "CONS-AC1 负变体极简域：仅 M1/M2/M7 入镜验一致性对 P1（票 11），票 13 豁免登记。"
+    },
+    {
+      "model": "M6",
+      "reason": "CONS-AC1 负变体极简域：仅 M1/M2/M7 入镜验一致性对 P1（票 11），票 13 豁免登记。"
+    },
+    {
+      "model": "MU",
+      "reason": "CONS-AC1 负变体极简域：仅 M1/M2/M7 入镜验一致性对 P1（票 11），票 13 豁免登记。"
+    },
+    {
+      "model": "GLS",
+      "reason": "CONS-AC1 负变体极简域：仅 M1/M2/M7 入镜验一致性对 P1（票 11），票 13 豁免登记。"
+    }
+  ]
 }

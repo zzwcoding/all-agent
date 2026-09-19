@@ -1,0 +1,79 @@
+model_type: OBJECT
+version: "1.0.0"
+domain: req-ac6
+aggregates:
+  - id: AGG-BOHAI-001
+    name: 井
+    alias: Well
+    description: 渤海域最小域对象甲：生产井
+    aggregateType: AGGREGATE_ROOT
+    lifecycle: [钻进中, 在产, 停产, 注销]
+    attributes:
+      - name: wellCode
+        label: 井号
+        type: String
+        required: true
+        unique: true
+      - name: status
+        label: 井状态
+        type: DictionaryRef
+        required: true
+        dictionaryRef:
+          dictionaryId: DICT-BOHAI-01
+          typeCode: WELL_STATUS
+      - name: dailyOutput
+        label: 日产量
+        type: Decimal
+        refRules:
+          - name: 产量非负
+            expression: value >= 0
+            violationMessage: 日产量不得为负
+            enforcedAt: ALWAYS
+  - id: AGG-BOHAI-002
+    name: 单井日产量记录
+    alias: DailyProductionRecord
+    description: 渤海域最小域对象乙：单井日产量记录
+    aggregateType: AGGREGATE_ROOT
+    attributes:
+      - name: wellRef
+        label: 所属井
+        type: AggregateRootRef
+        required: true
+        targetAggregate: AGG-BOHAI-001
+      - name: outputVolume
+        label: 产液量
+        type: Decimal
+        required: true
+    invariants:
+      - name: 记录必须挂井
+        expression: wellRef != null
+        violationMessage: 日产量记录必须关联一口井
+        enforcedAt: ON_CREATE
+data_dictionaries:
+  - id: DICT-BOHAI-01
+    name: 井状态字典
+    types:
+      - typeCode: WELL_STATUS
+        typeName: 井状态
+        items:
+          - code: DRILLING
+            label: 钻进中
+            enabled: true
+            sortOrder: 1
+          - code: PRODUCING
+            label: 在产
+            enabled: true
+            sortOrder: 2
+          - code: SUSPENDED
+            label: 停产
+            enabled: false
+            sortOrder: 3
+aggregate_associations:
+  - id: ASSOC-BOHAI-001
+    sourceAggregate: AGG-BOHAI-001
+    targetAggregate: AGG-BOHAI-002
+    associationType: DEPENDENCY
+    sourceRole: 井
+    targetRole: 日产量记录
+    cardinality: ONE_TO_MANY
+    referenceField: wellRef

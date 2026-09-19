@@ -1,0 +1,12 @@
+# REQ-AC4 正例域 · M3（票 13）：narrative 写法（expression 的二选一双写法之一，
+# schema.md §6 运行期预留）+ 元素级 version/validFrom——「人话口径」存在即放行。
+model_type: RULE
+version: "1.0.0"
+domain: req-ac4
+rules:
+  - id: RULE-REQ-004
+    name: 日产量不得为负
+    ruleType: VALIDATION
+    narrative: 录入产量时校验产液量非负，负值判不通过（运行期 Agent 消费的人话口径示例）
+    version: "1.1.0"
+    validFrom: "2026-01-01"

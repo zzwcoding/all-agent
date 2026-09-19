@@ -2,5 +2,11 @@
   "domain": "bohai-fixture",
   "label": "语义闸最小域（两对象：井 + 单井日产量记录，七模型各一文件）",
   "profile": "v9-full",
-  "schemaVersion": "1.0.0"
+  "schemaVersion": "1.0.0",
+  "omittedModels": [
+    {
+      "model": "GLS",
+      "reason": "AC4 负变体七模型最小域先于 GLS 扩展（票 10），票 13 豁免登记。"
+    }
+  ]
 }

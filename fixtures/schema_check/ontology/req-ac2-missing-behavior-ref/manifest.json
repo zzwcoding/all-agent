@@ -1,0 +1,12 @@
+{
+  "domain": "req-ac2",
+  "label": "必填闸负变体 REQ-AC2（票 13）：M7 报表缺一致性锚点字段 behaviorRef → L1 required-field 红",
+  "profile": "headless",
+  "schemaVersion": "1.2.0",
+  "omittedModels": [
+    { "model": "M2", "reason": "REQ-AC2 负变体极简域：仅 M1/M7 入镜验必填闸，票 13。" },
+    { "model": "M3", "reason": "REQ-AC2 负变体极简域：仅 M1/M7 入镜验必填闸，票 13。" },
+    { "model": "M5", "reason": "REQ-AC2 负变体极简域：仅 M1/M7 入镜验必填闸，票 13。" },
+    { "model": "GLS", "reason": "REQ-AC2 负变体极简域：仅 M1/M7 入镜验必填闸，票 13。" }
+  ]
+}

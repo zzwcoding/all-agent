@@ -10,13 +10,25 @@ query_reports:
     alias: wrongBindingStat
     objectType: DETAIL_QUERY
     behaviorRef: BH-CONS-Record
+    sourceObjects:
+      - objectRef: AGG-CONS-001
+        alias: w
+        primary: true
   - id: QR-CONS-002
     name: 共绑查询行为·先
     alias: sharedBindingFirst
     objectType: DETAIL_QUERY
     behaviorRef: BH-CONS-Query
+    sourceObjects:
+      - objectRef: AGG-CONS-001
+        alias: w
+        primary: true
   - id: QR-CONS-003
     name: 共绑查询行为·后
     alias: sharedBindingSecond
     objectType: DETAIL_QUERY
     behaviorRef: BH-CONS-Query
+    sourceObjects:
+      - objectRef: AGG-CONS-001
+        alias: w
+        primary: true

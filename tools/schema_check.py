@@ -1,13 +1,18 @@
 #!/usr/bin/env python3
 """schema_check.py —— 语义 CI L1–L4 闸（All-agent 票 03；spec: specs/schema_check.md AC1–7；
 票 10 增 GLS 术语模型套件 GLS-AC1–4；票 11 增 L2 一致性对检查组 consistency-*，真源=
-tickets/11-一致性对核验.md AC 表 + ontology/schema/schema.md §14）。
+tickets/11-一致性对核验.md AC 表 + ontology/schema/schema.md §14；票 13 增 L1 元素级
+结构性必填闸 required-field（真源=model-registry.json 每模型 requiredElementFields）与
+L4 AC6 反向闸 missing-model-file（profile 启用却缺文件，经 manifest omittedModels
+带理由豁免）。
 
 对给定 ontology 目录做确定性校验：
   L1 schema 合法——YAML 可解析（AC2）、公共字段 model_type/version/domain 在场（AC3）、
      域 manifest.json 在场且 profile 已登记、模型类型已知、文件名与注册表该模型
      yamlFile 一致（票 10 AC4：GLS 文件名错挂/model_type 写错；真源=model-registry.json
-     yamlFile，即"一模型一 YAML、固定文件名"约定的闸上强化）、schema 两份机读表互相一致；
+     yamlFile，即"一模型一 YAML、固定文件名"约定的闸上强化）、schema 两份机读表互相一致、
+     逐元素结构性必填字段在场（票 13 required-field：身份/类型判别/检查锚点/载荷容器四类，
+     口径与逐模型推导表见 lessons/13；空壳文件——不含任何本模型元素——同报 required-field）；
   L2 引用与依赖——ref 指向的 ID 全仓有定义（AC4 悬空引用）、ref 目标模型不越
      类型层依赖白名单（AC5，真源 ontology/schema/model-deps.json + model-registry.json）；
      一致性对（票 11，digest §16.4 本仓可行子集）：
@@ -18,10 +23,12 @@ tickets/11-一致性对核验.md AC 表 + ontology/schema/schema.md §14）。
      涉事元素存在性仍由 dangling-ref 承载（ref 扫描面=refKeys ∪ *Ref/Refs ∪ edges），
      本组只补"语义闭合向"，违规 kind 一律 consistency- 前缀（schema.md §14）。
   L4 profile 合规与兼容——profile 未启用的模型文件不得出现（AC6；票 10 GLS-AC2 同款）、
-     换义锁定字段（model-registry.json lockedFields）不得复用（AC7 字段换义式变更）。
+     profile 启用的模型缺文件且 manifest omittedModels 无带理由豁免条目必须红
+     （票 13 AC6 反向 missing-model-file）、换义锁定字段（lockedFields）不得复用
+     （AC7 字段换义式变更）。
 
-模型类型/文件名/前缀/依赖判定全部走两份机读表（model-registry.json + model-deps.json），
-本脚本不硬编码任何模型清单——新增模型=机读表加条目。
+模型类型/文件名/前缀/依赖/必填判定全部走两份机读表（model-registry.json +
+model-deps.json），本脚本不硬编码任何模型清单——新增模型=机读表加条目。
 
 只读不写 YAML；失败输出含文件+行级定位（行号取自 YAML node start_mark）；
 --json 供 CI 消费。依赖：Python3 stdlib + PyYAML（safe 装载，PRD 技术栈唯一第三方）。
@@ -287,8 +294,35 @@ def run(target: Path) -> dict:
                    if profile and profile in m.get("profiles", [])}
         files = model_files(domain)
         n_files += len(files)
+
+        # AC6 反向（票 13）：manifest omittedModels 显式豁免清单——profile 启用的
+        # 模型无文件时，必须有带理由的豁免条目，否则 L4 missing-model-file 红。
+        # 豁免条目 = {model: 注册表模型键, reason: 非空字符串}；reason 缺失/空串
+        # 视为无效豁免（=无豁免），引用未注册模型单独 L1 红。
+        omitted: dict[str, str] = {}
+        for entry in manifest.get("omittedModels") or []:
+            if not isinstance(entry, dict) or "model" not in entry:
+                add("L1", "bad-omitted-model", str(domain / "manifest.json"), 0,
+                    f"omittedModels 条目必须是含 model/reason 的对象: {entry!r}")
+                continue
+            om = entry.get("model")
+            if om not in models:
+                add("L1", "unknown-omitted-model", str(domain / "manifest.json"),
+                    0, f"omittedModels 引用未注册模型「{om}」（注册表: {sorted(models)}）")
+                continue
+            reason = entry.get("reason")
+            if not isinstance(reason, str) or not reason.strip():
+                continue  # 无理由 = 无效豁免，缺文件时照报 missing-model-file
+            omitted[om] = reason.strip()
+        # 在场判定按注册文件名（稳健于内容解析失败：文件建了=在场，schema 错误
+        # 是 L1 的管辖面，不在此重复追责）
+        file_names = {p.name for p in files}
+        present_models = {key for key, m in models.items()
+                          if m.get("yamlFile") in file_names}
+
         domain_summaries.append({"domain": dname, "profile": profile,
-                                 "files": len(files), "enabled": sorted(enabled)})
+                                 "files": len(files), "enabled": sorted(enabled),
+                                 "omittedModels": sorted(omitted)})
 
         for path in files:
             rel = str(path)
@@ -314,11 +348,37 @@ def run(target: Path) -> dict:
             if mkey is None:
                 continue
             yaml_file = models[mkey].get("yamlFile")
-            if yaml_file and path.name != yaml_file:  # 票 10 AC4：文件名与 model_type 错挂
+            name_mismatch = bool(yaml_file) and path.name != yaml_file
+            if name_mismatch:  # 票 10 AC4：文件名与 model_type 错挂
                 add("L1", "filename-mismatch", rel, data.line,
                     f"文件名「{path.name}」与 model_type「{mtype}」的注册文件名"
                     f"「{yaml_file}」不符（一模型一 YAML、固定文件名，"
                     f"真源 model-registry.json yamlFile）")
+
+            # 元素级结构性必填闸（票 13，真源=model-registry.json
+            # requiredElementFields）。文件名错挂时内容与模型的锚已断，闸让位给
+            # filename-mismatch，不叠加空壳红因（负变体红因纯净，lessons/13）。
+            req_map = models[mkey].get("requiredElementFields") or {}
+            if req_map and not name_mismatch:
+                elements = collect_elements(data, mkey, prefix2model, ref_keys)
+                if not elements:
+                    add("L1", "required-field", rel, data.line,
+                        f"模型 {mkey} 文件不含任何本模型元素（空壳文件：主集合为空"
+                        f"或缺失）——结构性必填闸（票 13），真源 model-registry.json "
+                        f"{mkey}.requiredElementFields")
+                for eid, mapping in elements:
+                    for prefix, fields in req_map.items():
+                        if not eid.startswith(prefix):
+                            continue
+                        for fieldname in fields:
+                            if fieldname not in mapping:
+                                add("L1", "required-field", rel,
+                                    key_line(mapping, fieldname),
+                                    f"元素 {eid} 缺必填字段「{fieldname}」"
+                                    f"（结构性必填：身份/类型判别/检查锚点/载荷容器，"
+                                    f"缺失会使一致性对与引用扫描静默跳过；真源 "
+                                    f"model-registry.json {mkey}.requiredElementFields）")
+
             if mkey not in enabled:  # AC6
                 add("L4", "profile-disabled", rel, data.line,
                     f"profile「{profile}」未启用模型 {mkey}，但出现其文件"
@@ -350,6 +410,18 @@ def run(target: Path) -> dict:
             for ref_id, loc in collect_definitions(
                     data, ref_keys, prefix2model).items():
                 definitions.setdefault(ref_id, (rel, loc))
+
+        # AC6 反向（票 13）：profile 启用的模型缺文件且无带理由豁免 = L4 红。
+        # profile 未知时 enabled 为空、不触发（unknown-profile 已单独红）。
+        if profile is not None:
+            for mkey in sorted(enabled):
+                if mkey in present_models or mkey in omitted:
+                    continue
+                add("L4", "missing-model-file", str(domain / "manifest.json"), 0,
+                    f"profile「{profile}」启用模型 {mkey}，但域内无 "
+                    f"{models[mkey].get('yamlFile')} 文件且 omittedModels 无带理由"
+                    f"豁免条目（AC6 反向，票 13；确属有意裁剪须在 manifest 登记 "
+                    f"omittedModels: [{{\"model\": \"{mkey}\", \"reason\": \"…\"}}]）")
 
     # 悬空引用统一判定（定义收集完后）
     for domain in domains:

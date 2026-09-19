@@ -1,0 +1,9 @@
+{
+  "domain": "req-ac5",
+  "label": "AC6 反向负变体 REQ-AC5（票 13）：v9-full 域缺 MU 文件且 manifest 无豁免条目 → L4 missing-model-file 红（即票 09 渤海 MU 缺文件当时靠人工裁决兜底的缺口）",
+  "profile": "v9-full",
+  "schemaVersion": "1.2.0",
+  "omittedModels": [
+    { "model": "GLS", "reason": "REQ-AC5 负变体极简域：GLS 先行豁免以隔离红因，仅 MU 缺文件无豁免入镜，票 13。" }
+  ]
+}

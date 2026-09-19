@@ -1,0 +1,10 @@
+{
+  "domain": "req-ac6",
+  "label": "AC6 反向正例 REQ-AC6（票 13）：同 REQ-AC5 但 MU 在 omittedModels 带理由豁免（即 bohai 真域同款形态）→ 全过",
+  "profile": "v9-full",
+  "schemaVersion": "1.2.0",
+  "omittedModels": [
+    { "model": "GLS", "reason": "REQ-AC6 正例极简域：GLS 非本变体断言对象，票 13。" },
+    { "model": "MU", "reason": "R5 全文无界面/屏幕/菜单素材证据，MU 有意裁剪不建文件（裁决记录 docs/walkthrough/step2-mr-adjudication.md 同款理由），票 13。" }
+  ]
+}

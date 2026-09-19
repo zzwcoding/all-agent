@@ -1,0 +1,30 @@
+model_type: RULE
+version: "1.0.0"
+domain: req-ac6
+rules:
+  - id: RULE-BOHAI-001
+    name: 日产量不得为负
+    ruleType: VALIDATION
+    description: 录入产量时校验产液量非负
+    inputParams:
+      - name: outputVolume
+        type: Decimal
+        sourceField: dailyProduction.outputVolume
+        required: true
+    outputType: Boolean
+    expression: outputVolume >= 0
+    reusedBy:
+      - BH-BOHAI-RecordDailyOutput
+  - id: RULE-BOHAI-002
+    name: 产量待联动判定
+    ruleType: VALIDATION
+    description: 判断本次录入是否满足联动刷新井状态的条件（规则只判断不改状态）
+    inputParams:
+      - name: outputVolume
+        type: Decimal
+        sourceField: dailyProduction.outputVolume
+        required: true
+    outputType: Boolean
+    expression: outputVolume > 0
+    reusedBy:
+      - BH-BOHAI-RecordDailyOutput
