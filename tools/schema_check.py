@@ -17,7 +17,7 @@ description/notes 不扫=文档自由）。
      口径与逐模型推导表见 lessons/13；空壳文件——不含任何本模型元素——同报 required-field）；
   L2 引用与依赖——ref 指向的 ID 全仓有定义（AC4 悬空引用）、ref 目标模型不越
      类型层依赖白名单（AC5，真源 ontology/schema/model-deps.json + model-registry.json）；
-     一致性对（票 11，digest §16.4 本仓可行子集）：
+     一致性对（票 11，digest §12.2 本仓可行子集）：
        consistency-redirection    M7.behaviorRef 未指向 behaviorType=QUERY 的 M2 行为
        consistency-not-one-to-one 同一 M2 查询行为被两个 M7 对象绑定（严格一对一）
        consistency-permission     M2.requiredPermissions 指到的 PERM.targetRef 未回指该行为
@@ -550,7 +550,7 @@ def run(target: Path) -> dict:
                                 f"悬空引用: ref 字段「{key}」指向的 {ref} "
                                 f"在本体仓内无 ID 定义")
 
-    # ---------- 一致性对核验（票 11；digest §16.4 本仓可行子集，schema.md §14） ----------
+    # ---------- 一致性对核验（票 11；digest §12.2 本仓可行子集，schema.md §14） ----------
     # 元素收集：锚定各模型的结构性承载字段（behaviorType/targetRef/behaviorRef/
     # activities），模型定位走注册表 modelType（脚本不硬编码模型键名）。涉事 ID 的
     # 存在性由上方 dangling-ref 承载，此处只判语义闭合向。
@@ -647,7 +647,7 @@ def run(target: Path) -> dict:
                         f"（依据 M2.requiredPermissions ↔ M5.targetRef，schema.md §14）")
 
     # P3 M6 活动 roleRef ∈ 流程 roleRefs（活动级角色必须是流程角色集的子集，
-    # digest §16.4 P3 / v9 §6.5；ROLE 本身的存在性由 dangling-ref 承载）
+    # digest §12.2 P3 / v9 §6.5；ROLE 本身的存在性由 dangling-ref 承载）
     if m6_key:
         for flow_id, flow, rel_c in flows:
             role_refs = {r for r in iter_ref_strings(flow.get("roleRefs") or [])

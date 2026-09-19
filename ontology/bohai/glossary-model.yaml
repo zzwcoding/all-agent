@@ -15,7 +15,7 @@ terms:
     status: 禁用（替代：产量完成率）
     owner: 开发室
     source: R5·设定书 §6
-    notes: 对账落点 step5-fidelity §三（RULE-BOHAI-009 描述注记承载）；禁用词的强制拦截面（校验侧禁用）未建。
+    notes: 对账落点 step5-fidelity §三（RULE-BOHAI-009 描述注记承载）；禁用词的强制拦截面（校验侧禁用）已建：schema_check banned-term 闸（票 16，commit bad916c）。
   - id: GLS-BOHAI-002
     term: 剔检产量
     aliases: [净产量]

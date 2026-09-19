@@ -1,0 +1,22 @@
+# 守卫例集回归清单（票 20）：regex.txt 为唯一正则真源；行格式 = match|nomatch<TAB>相对 root 路径。
+# good/ 干净文本必须不命中（nomatch）；bad/ 被禁话术必须命中（match）；
+# 真答案 ac8/ac7 以 nomatch 纳管（../ 出 root 引用）——守卫持续压真答案。
+nomatch	good/disposal-statement.md
+nomatch	good/question-form.md
+nomatch	good/negation-forms.md
+nomatch	good/can-serve-as-negative.md
+nomatch	good/do-not-use-forms.md
+nomatch	good/carry-over-negative.md
+nomatch	good/term-as-entry.md
+match	bad/still-valid-caliber.md
+match	bad/caliber-still-valid.md
+match	bad/caliber-yet-valid.md
+match	bad/can-serve-as-caliber.md
+match	bad/treat-as-caliber.md
+match	bad/passive-endorse.md
+match	bad/still-usable.md
+match	bad/continue-carry-over.md
+match	bad/still-usable-declarative.md
+match	bad/use-directly.md
+nomatch	../expected-answers/ac8-banned-term-disposal.md
+nomatch	../expected-answers/ac7-term-caliber.md
