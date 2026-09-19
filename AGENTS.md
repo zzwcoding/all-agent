@@ -22,12 +22,13 @@
 |---|---|
 | `docs/prd.md` | PRD（状态驱动：粗稿→逼问中→已定稿） |
 | `docs/design-sdd-flow2.md` | sdd-flow2 设计案（两条验收主线） |
+| `docs/`（子目录） | reviews/（外部审查）/ walkthrough/（端到端走查）/ proposals/（提案池 PROP）/ impact/（影响分析）/ adr/（决策记录） |
 | `references/` | 调研落盘：omf-spec-digest（OMF 规范精读）/ existing-research-inventory（既有调研盘点）/ tech-selection（选型） |
 | `diagrams/` | 三张图：all-agent（大总架构）/ skill-structure（skill 组织）/ sdd-flow2（建造流内部） |
 | `specs/` `tickets/` `policies/` | 骨架已立，随阶段推进填充 |
-| `ontology/` | 本体仓：schema/（七模型 schema+模型注册表+依赖白名单，票 03）；首个业务域=渤海油田产量域（bohai/manifest.json 已声明 profile，模型 YAML 票 05 起） |
-| `tools/` | 已落：schema_check（语义 CI L1–L4）+ 三闸（skill_deps/fixture_run/archive_check）+ ci.sh；graph_index 票 04 |
-| `fixtures/` | 出厂集：schema_check/（AC1–7 最小域+非法变体）；其余随票补 |
+| `ontology/` | 本体仓：schema/（八模型 schema+模型注册表+依赖白名单，票 03 立七模型、票 10 增 GLS）；首个业务域渤海域已进仓（bohai/：6 模型+glossary+manifest，语义闸全绿） |
+| `tools/` | schema_check（L1/L2/L4+必填/一致性对/禁用词）+ graph_index + install_skills（+hooks/ pre-commit 安装位闸）+ proposal_check + check_citations + guard_corpus_check + 三闸（skill_deps/fixture_run/archive_check）+ ci.sh |
+| `fixtures/` | 出厂集七套全建 7/7：schema_check / graph_index / onto-modeler / db-reverse / semantic-service（含 guard-corpus 守卫例集）/ impact-analyzer / proposal-pool |
 | `lessons/` | 施工日志：每票一篇（03 起） |
 
 ## 流水线续跑协议（一期票 04–09 已收官；二期票同协议）

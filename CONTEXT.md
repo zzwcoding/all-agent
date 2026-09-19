@@ -15,9 +15,11 @@
 - **语义 CI（semantic CI）**：五级检查——L1 语法合法 / L2 引用与本体一致 / L3 指标·SQL·安全 / L4 权限·兼容 / L5 行为与检索回归（Golden Question + 出厂集）。
 - **出厂集（factory corpus）**：每个生成器/适配器的固定输入→确定性断言集，平台改版的回归闸（双门槛：全过 + 负样本不误报）。
 - **信号路由表（signal routing）**：元循环的核心纪律——业务错→本体 MR；工程错→sdd-flow 票；元模型错→框架版本演进（CHANGELOG+版本号+迁移票伴随实现票）。
+- **正本/安装位**：skill 的双位置——正本 `skills/<名>/`（仓内，受边界闸+归档闸治理）、安装位 `~/.agents/skills/<名>/`（Kimi Code 路由用）；`install_skills sync/--check` 维护两处一致，pre-commit 钩子（core.hooksPath 启用）拦提交时漂移。
 
 ## 三循环
 
 - **业务语义循环**：本体 → Agent 消费 → 三源信号（监督/自检/交互）→ 提案池 → MR（自动化止于提案）。
+- **提案池/提案（PROP）**：三源信号归一成的标准化提案文件（`docs/proposals/PROP-<域>-NNN.md`），状态机 draft/open/accepted/rejected；自动化止于提案（`proposal_check` 做确定性冲突预检），进仓 MR 由人完成。
 - **建造循环**：sdd-flow 四拍（讨论→约定→开发→检查）。
 - **元循环**：跨层探针度量 → 信号路由 → 分道修复 → 定期体检；治理对象 = 平台自身与元模型。

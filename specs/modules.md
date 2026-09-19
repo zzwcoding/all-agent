@@ -3,6 +3,7 @@
 > 卡是唯一真源，格式真源见 sdd-flow2 `references/skill-module-format.md`。
 > 划分依据：PRD F1–F14 聚类（docs/prd.md）；分层纪律见 docs/design-sdd-flow2.md §1。
 > 一期范围（PRD 决策 3）：onto-modeler / db-reverse / impact-analyzer / semantic-service + L3 两脚本；其余二期（骨架卡先立）。
+> （2026-09-19：+proposal-pool 转正（票 18）；skill 双位置与安装位机制（票 05/12/15））
 > 卡名纪律：卡名 = skill 目录名（边界闸按名精确匹配，（一期）/（二期）标注不入名字槽）；skill 正本落仓内 skills/<名>/，安装位 ~/.agents/skills/<名>/（双位置同内容，票 05 起）。
 
 ## skill: onto-modeler
