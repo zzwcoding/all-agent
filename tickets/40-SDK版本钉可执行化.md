@@ -1,6 +1,6 @@
 # 票 40：MCP SDK 版本钉可执行化
 
-Status: todo
+Status: done
 Belongs to: docs/第三期B线拆票方案.md 批次一；docs/二期收官报告.md §6 #4
 Touches: tools/requirements-mcp.txt、tools/semantic_mcp_server.py、tools/test_semantic_mcp_server.py、references/repo-layout.json、docs/mcp-server.md、lessons/40
 
@@ -18,10 +18,10 @@ Touches: tools/requirements-mcp.txt、tools/semantic_mcp_server.py、tools/test_
 
 ## 验收（注源）
 
-- [ ] AC1 钉版文件在场、布局登记、归档闸绿（源：本票 AC 表）
-- [ ] AC2 版本检出四路径单测（一致/不一致/--strict/钉版缺失）（源：本票 AC 表）
-- [ ] AC3 docs/mcp-server.md 指向钉版文件为准（源：本票 AC 表）
-- [ ] AC4 `bash tools/ci.sh` 四闸绿（源：CI）
+- [x] AC1 钉版文件在场、布局登记、归档闸绿（源：本票 AC 表）
+- [x] AC2 版本检出四路径单测（一致/不一致/--strict/钉版缺失）（源：本票 AC 表）
+- [x] AC3 docs/mcp-server.md 指向钉版文件为准（源：本票 AC 表）
+- [x] AC4 `bash tools/ci.sh` 四闸绿（源：CI）
 
 ## 交接包（L2 自主档）
 

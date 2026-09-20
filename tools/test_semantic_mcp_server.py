@@ -9,7 +9,10 @@
   3. 回答骨架组装（纯函数）——answered/refused 两态文本必含 ID token 与
      「本回答引用的元素 ID」清单（票 24 AC3 grep 的载体）；
   4. 子进程链路（真域集成）——core/graph_index 包装的真实回答文本；
-  5. 协议面——skipUnless(_HAS_MCP) 占位骨架（票 24 venv 实弹）。
+  5. 协议面——skipUnless(_HAS_MCP) 占位骨架（票 24 venv 实弹）；
+  6. 启动版本检出（票 40）——check_version 四路径注入式（一致静默/不一致
+     警告/--strict 退出/钉版缺失降级），tempfile 注入钉版 + monkeypatch
+     已装版本，不装 mcp 不碰真 venv。
 
 红相记录（TDD）：本文件先行落盘，semantic_mcp_server 未实现时收集即红。
 """
@@ -21,6 +24,7 @@ import tempfile
 import unittest
 from contextlib import redirect_stderr
 from pathlib import Path
+from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
@@ -195,6 +199,111 @@ class GraphSkeletonTest(unittest.TestCase):
             {"found": False, "query": "AGG-X-999", "error": "未找到: AGG-X-999"})
         self.assertIn("未找到", text)
         self.assertIn("AGG-X-999", text)
+
+
+class VersionCheckTest(unittest.TestCase):
+    """启动版本检出（票 40 AC2）：四路径注入式，不装 mcp 不碰真 venv。
+
+    检出是提示性非硬闸：默认警告继续；--strict 仅对「版本不符」升级为退 2，
+    钉版文件缺失/不可读/无钉版行一律降级警告继续（检出不崩）。
+    """
+
+    PIN_CONTENT = "# MCP 发布侧依赖钉版（票 40）\nmcp==2.2.0\n"
+
+    def _pin(self, td, content=PIN_CONTENT):
+        pin = Path(td) / "requirements-mcp.txt"
+        pin.write_text(content, encoding="utf-8")
+        return pin
+
+    # ---- 路径一：一致 → 静默 ----
+
+    def test_path1_consistent_returns_none(self):
+        with tempfile.TemporaryDirectory() as td:
+            self.assertIsNone(sms.check_version("2.2.0", self._pin(td)))
+
+    def test_path1_ignores_comments_and_blank_lines(self):
+        content = ("# 注释行\n\n"
+                   "  # 行内注释形态 mcp==9.9.9 不算\n"
+                   "mcp==2.2.0  # 行尾注释\n")
+        with tempfile.TemporaryDirectory() as td:
+            self.assertIsNone(sms.check_version("2.2.0", self._pin(td, content)))
+
+    # ---- 路径二：不一致 → 警告（默认继续） ----
+
+    def test_path2_mismatch_warns_with_both_versions(self):
+        with tempfile.TemporaryDirectory() as td:
+            warning = sms.check_version("9.9.9", self._pin(td))
+        self.assertIsNotNone(warning)
+        self.assertIn("9.9.9", warning)
+        self.assertIn("2.2.0", warning)
+        self.assertIn("≠", warning)
+        self.assertIn("docs/mcp-server.md", warning)
+
+    def test_path2_mismatch_is_strict_worthy_not_degrade(self):
+        with tempfile.TemporaryDirectory() as td:
+            _warning, mismatch = sms._version_verdict("9.9.9", self._pin(td))
+        self.assertTrue(mismatch)  # --strict 只升级这一类，不升级降级类
+
+    def test_path2_installed_unknown_counts_as_mismatch(self):
+        # installed=None（PackageNotFoundError 视角）也是不符，不是静默
+        with tempfile.TemporaryDirectory() as td:
+            warning = sms.check_version(None, self._pin(td))
+        self.assertIsNotNone(warning)
+        self.assertIn("未检出", warning)
+        self.assertIn("≠", warning)
+
+    # ---- 路径三：--strict + 不符 → main 退出 2 ----
+
+    def test_path3_strict_mismatch_exit_2(self):
+        err = io.StringIO()
+        saved = sms._HAS_MCP
+        try:
+            sms._HAS_MCP = True  # 强制过引导闸：本路径只验版本检出，不依赖 SDK
+            with mock.patch.object(sms, "_installed_mcp_version",
+                                   return_value="9.9.9"), \
+                    redirect_stderr(err):
+                rc = sms.main(["--strict", "ontology/bohai"])
+        finally:
+            sms._HAS_MCP = saved
+        self.assertEqual(rc, 2)
+        self.assertIn("≠", err.getvalue())
+        self.assertIn("docs/mcp-server.md", err.getvalue())
+
+    def test_path3_degrade_never_exits_even_strict(self):
+        # 降级类（钉版缺失）不属「不符」：--strict 也只警告继续（mismatch=False）
+        with tempfile.TemporaryDirectory() as td:
+            _warning, mismatch = sms._version_verdict(
+                "2.2.0", Path(td) / "no-such-requirements.txt")
+        self.assertFalse(mismatch)
+
+    # ---- 路径四：钉版缺失/不可读/无钉版行 → 降级警告，不崩 ----
+
+    def test_path4_missing_pin_file_degrades(self):
+        warning = sms.check_version(
+            "2.2.0", Path(tempfile.gettempdir()) / "no-such-pin-票40.txt")
+        self.assertIsNotNone(warning)
+        self.assertIn("降级", warning)
+        self.assertIn("跳过版本核对", warning)
+
+    def test_path4_unreadable_pin_degrades(self):
+        # 目录路径 → IsADirectoryError（OSError 族）→ 同走降级，不裸崩
+        with tempfile.TemporaryDirectory() as td:
+            warning = sms.check_version("2.2.0", Path(td))
+        self.assertIsNotNone(warning)
+        self.assertIn("降级", warning)
+
+    def test_path4_pin_without_pin_line_degrades(self):
+        with tempfile.TemporaryDirectory() as td:
+            warning = sms.check_version(
+                "2.2.0", self._pin(td, "# 只有注释\npyyaml==6.0.3\n"))
+        self.assertIsNotNone(warning)
+        self.assertIn("降级", warning)
+
+    # ---- 仓内钉版文件自身契约（AC1 单测面；归档闸绿归 CI 闸 4） ----
+
+    def test_repo_pin_file_pins_2_2_0(self):
+        self.assertTrue(sms.PIN_FILE.is_file(), f"钉版文件不在场: {sms.PIN_FILE}")
+        self.assertEqual(sms._read_pin(sms.PIN_FILE), "2.2.0")
 
 
 @unittest.skipUnless(BOHAI.is_dir(), "真域缺失（跳过集成链路）")

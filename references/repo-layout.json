@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "description": "机读布局表（唯一真源）。目录 → 用途 → 允许的文件模式 → 产生者。人类可读说明见 references/repo-layout.md（本文是机器消费真源，两文件以本文为准）。消费方：tools/archive_check.py（归档闸）。本表从 sdd-flow2 票 01 版实例化：profile=governed-project，按本仓实际补 RESOURCES.md 根条目；票 23 增 exports/（MCP 发布物派生物，禁手改）；票 28 增 docs/meta/（元循环体检留痕）——布局条目按顶层目录匹配，故以 docs 条目内 meta/*.md、meta/*.json 模式登记（子目录独立条目是死配置），派生物可由 tools/meta_probe.py 重生成；票 30 增 docs 条目内 requirements/*.md（需求细稿，requirement-explorer 实际运行落位，实跑归档闸驱动）；票 31 增 docs 条目内 code-reverse/*.md（调用链素材，code-reverse 实际运行落位，实跑归档闸驱动，同票 30 手法）；票 32 增 docs 条目内 doc-extractor/*.md（文档萃取证据索引，doc-extractor 实际运行落位，实跑归档闸驱动，同票 30/31 手法）；票 35 增 exports 条目内 devkit/*.md、devkit/*.json（应用生成器开发包入库副本，实跑归档闸驱动，同票 23 手法）；票 36 增 exports 条目内 skillpkg/*.md、skillpkg/*.json（Skill 发布器可对话技能包入库副本，实跑归档闸驱动，同票 23/35 手法）。",
+  "description": "机读布局表（唯一真源）。目录 → 用途 → 允许的文件模式 → 产生者。人类可读说明见 references/repo-layout.md（本文是机器消费真源，两文件以本文为准）。消费方：tools/archive_check.py（归档闸）。本表从 sdd-flow2 票 01 版实例化：profile=governed-project，按本仓实际补 RESOURCES.md 根条目；票 23 增 exports/（MCP 发布物派生物，禁手改）；票 28 增 docs/meta/（元循环体检留痕）——布局条目按顶层目录匹配，故以 docs 条目内 meta/*.md、meta/*.json 模式登记（子目录独立条目是死配置），派生物可由 tools/meta_probe.py 重生成；票 30 增 docs 条目内 requirements/*.md（需求细稿，requirement-explorer 实际运行落位，实跑归档闸驱动）；票 31 增 docs 条目内 code-reverse/*.md（调用链素材，code-reverse 实际运行落位，实跑归档闸驱动，同票 30 手法）；票 32 增 docs 条目内 doc-extractor/*.md（文档萃取证据索引，doc-extractor 实际运行落位，实跑归档闸驱动，同票 30/31 手法）；票 35 增 exports 条目内 devkit/*.md、devkit/*.json（应用生成器开发包入库副本，实跑归档闸驱动，同票 23 手法）；票 36 增 exports 条目内 skillpkg/*.md、skillpkg/*.json（Skill 发布器可对话技能包入库副本，实跑归档闸驱动，同票 23/35 手法）；票 40 增 tools 条目内 requirements*.txt（MCP 发布侧依赖钉版文件，实跑归档闸驱动，同票 30 手法）。",
   "patternConventions": {
     "patterns": "相对于该目录的 fnmatch glob；* 可跨路径分隔符。文件须匹配至少一条 pattern。",
     "nameRegex": "可选。对文件basename（或目录相对路径）施加的正则，命名纪律（如票号前缀）落在这里。",
@@ -38,9 +38,9 @@
         },
         {
           "path": "tools",
-          "purpose": "确定性脚本（语义闸、三闸、出厂集 runner）及 unittest 单测 + 脚本自维护机读表（install-registry.json，票 15）+ git 钩子（hooks/pre-commit）",
-          "patterns": ["*.py", "*.sh", "*.json", "hooks/*"],
-          "producer": "各票实现拍（脚本走 TDD）"
+          "purpose": "确定性脚本（语义闸、三闸、出厂集 runner）及 unittest 单测 + 脚本自维护机读表（install-registry.json，票 15）+ git 钩子（hooks/pre-commit）+ MCP 发布侧依赖钉版文件（requirements-mcp.txt，票 40）",
+          "patterns": ["*.py", "*.sh", "*.json", "hooks/*", "requirements*.txt"],
+          "producer": "各票实现拍（脚本走 TDD）/ 票 40（MCP SDK 钉版）"
         },
         {
           "path": "fixtures",

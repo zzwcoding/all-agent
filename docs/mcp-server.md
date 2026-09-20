@@ -7,9 +7,9 @@
 ## 前提
 
 - **Python 3.10+**（官方 mcp SDK 要求；票 24 实测 Python 3.11）。
-- **安装 mcp SDK（仅发布侧）**：`pip install "mcp==2.2.0"`。版本钉：票 24 实测组合为 **mcp 2.2.0 + Python 3.11**，升级 SDK 版本须重跑票 24 smoke（`tools/mcp_smoke_client.py`）复验行为一致。本体仓的构建/CI 链路**不安装也不依赖它**——未装 SDK 时起服会打印安装指引并以退出码 2 结束（四闸照常全绿，这是票 23 的 CI 免疫红线）。
+- **安装 mcp SDK（仅发布侧，钉版安装）**：`pip install -r tools/requirements-mcp.txt`。版本钉**以 tools/requirements-mcp.txt 为准**（当前 `mcp==2.2.0`；票 24 实测组合为 mcp 2.2.0 + Python 3.11）。启动时 server 自动检出：比对已装版本（`importlib.metadata`）与钉版——一致静默；不一致/钉版文件缺失打 stderr 警告继续启动，`--strict` 可改为不符即退（退出码 2，票 40）。升级纪律：改钉版文件版本号 → 重跑票 24 smoke client（`.venv-mcp/bin/python tools/mcp_smoke_client.py --full`，9/9）→ 同步更新钉版文件与本文（升级不重跑 smoke = 违纪）。本体仓的构建/CI 链路**不安装也不依赖它**——未装 SDK 时起服会打印安装指引并以退出码 2 结束（四闸照常全绿，这是票 23 的 CI 免疫红线）。
 - **PyYAML（server 子进程链需要，勿漏装）**：server 经子进程调 core/graph_index，二者解析本体 YAML 要用 PyYAML——**它不在 mcp SDK 的依赖树里**（票 26 实测 mcp 2.2.0 的 Requires 无 pyyaml），隔离环境须显式安装 `pip install pyyaml`（票 24 的 .venv-mcp 实测装有 PyYAML 6.0.3）。
-- **建议 venv 隔离**：`python3 -m venv .venv-mcp && .venv-mcp/bin/pip install "mcp==2.2.0" pyyaml`，之后一律用 `.venv-mcp/bin/python` 起 server（票 24 实弹方案，用户已批）。
+- **建议 venv 隔离**：`python3 -m venv .venv-mcp && .venv-mcp/bin/pip install -r tools/requirements-mcp.txt pyyaml`，之后一律用 `.venv-mcp/bin/python` 起 server（票 24 实弹方案，用户已批）。
 
 ## 运行
 
@@ -19,6 +19,7 @@ python3 tools/semantic_mcp_server.py ontology/bohai
 ```
 
 - 目标本体目录**显式传**（本体仓根或单域目录；不设默认——发布面不猜）。
+- 版本检出（票 40）：起服自动比对已装 mcp 与 `tools/requirements-mcp.txt` 钉版——一致静默；不一致 stderr 警告继续（`已装 mcp X ≠ 钉版 2.2.0——核对 docs/mcp-server.md`）；钉版文件缺失/不可读降级警告不崩；`--strict` 时「不符」即退出 2（降级类仍只警告——检出是提示性非硬闸）。
 - stdio 说明：server 经标准输入/输出与 MCP 客户端对话（JSON-RPC），适合本地子进程形态；配置到 Agent 平台时把上面的命令填为启动命令即可。
 - HTTP 形态（R3·tech-selection §3）：只改末行——`mcp.run()` 换成 `mcp.run(transport="http", port=8000, path="/mcp")`（v2 起 transport 参数在 `run()` 上）。HTTP 档需自行考虑鉴权与部署面。
 - 再生发布物（本体演进后必须做，防陈旧）：

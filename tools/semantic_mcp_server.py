@@ -27,15 +27,25 @@ API 面选型（记 lessons/23）：官方 SDK v2 `from mcp.server import MCPSer
 import 同源复用，防两处漂移）→ 生成 manifest → 起服装载入库 manifest 并与
 模板逐项核对（防陈旧哨兵）；装载失败/漂移时回退模板常量并 stderr 报注。
 
-CLI: python3 tools/semantic_mcp_server.py <ontology目录>
+CLI: python3 tools/semantic_mcp_server.py <ontology目录> [--strict]
   显式传本体目录（本体仓根或单域；不设默认——发布面不猜）。
+  --strict：启动版本检出不符（已装 mcp ≠ tools/requirements-mcp.txt 钉版）
+  即退出 2；缺省只 stderr 警告继续（提示性检出非硬闸，票 40）。
 
 依赖：stdlib + PyYAML（既有工具侧）；mcp 仅本文件发布侧 import。
-退出码：0 正常退出；2 无 mcp SDK（安装指引见 stderr）。
+退出码：0 正常退出；2 无 mcp SDK（安装指引见 stderr）或 --strict 版本检出不符。
+
+版本钉可执行化（票 40）：mcp==2.2.0 的唯一真源是 tools/requirements-mcp.txt
+（升级须重跑票 24 smoke client，纪律见该文件注释与 docs/mcp-server.md）。
+本文件在其上只做提示性检出：import mcp 成功后比对已装版本与钉版，一致静默、
+不一致/钉版缺失 stderr 警告——默认警告继续，--strict 时不符即退。检出逻辑
+抽成模块级纯函数 check_version（CLI 薄调用），无 SDK 环境也可全路径单测。
 """
 
 import argparse
+import importlib.metadata
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -45,6 +55,7 @@ TOOLS_DIR = Path(__file__).resolve().parent
 CORE_CLI = TOOLS_DIR / "semantic_service_core.py"
 GRAPH_INDEX = TOOLS_DIR / "graph_index.py"
 MANIFEST_PATH = REPO_ROOT / "exports" / "mcp" / "capability-manifest.json"
+PIN_FILE = TOOLS_DIR / "requirements-mcp.txt"
 
 SUBPROCESS_TIMEOUT = 120
 CITATION_HEADER = "本回答引用的元素 ID"
@@ -72,7 +83,68 @@ INSTALL_HINT = (
     "  本服务器是发布侧组件：本体仓构建/CI 链路不安装 mcp（PRD「仅发布侧安装」）。\n"
     "  安装：pip install mcp（要求 Python 3.10+；建议 venv：\n"
     "    python3 -m venv .venv-mcp && .venv-mcp/bin/pip install mcp ）。\n"
+    "  钉版安装（票 40）：python3 -m venv .venv-mcp && "
+    ".venv-mcp/bin/pip install -r tools/requirements-mcp.txt。\n"
     "  详见 docs/mcp-server.md 与 references/tech-selection.md §3。")
+
+
+# ---------- 版本检出（票 40：提示性非硬闸；纯函数可独立单测） ----------
+
+_PIN_LINE = re.compile(r"^mcp==(\S+)$")
+
+
+def _installed_mcp_version() -> str | None:
+    """已装 mcp 版本（importlib.metadata 视角）；未装返回 None。"""
+    try:
+        return importlib.metadata.version("mcp")
+    except importlib.metadata.PackageNotFoundError:
+        return None
+
+
+def _version_verdict(installed: str | None,
+                     pin_path: Path) -> tuple[str | None, bool]:
+    """（警告, 是否版本不符）。一致 → (None, False)；钉版缺失 → (降级警告, False)。"""
+    pinned = _read_pin(pin_path)
+    if pinned is None:
+        return (f"mcp 版本检出降级：钉版文件缺失/不可读/无 mcp== 行"
+                f"（{pin_path}）——跳过版本核对继续启动"
+                f"（钉版以 tools/requirements-mcp.txt 为准，见 docs/mcp-server.md）。",
+                False)
+    if installed == pinned:
+        return (None, False)
+    shown = installed if installed is not None else "未检出（mcp 未安装？）"
+    return (f"mcp 版本检出：已装 mcp {shown} ≠ 钉版 {pinned}"
+            f"——核对 docs/mcp-server.md；继续启动（--strict 可改为强退）。",
+            True)
+
+
+def _read_pin(pin_path: Path) -> str | None:
+    """读钉版文件的 mcp==X 行；缺失/不可读/无钉版行 → None（降级，不崩）。"""
+    try:
+        text = pin_path.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError):
+        return None
+    for line in text.splitlines():
+        line = line.split("#", 1)[0].strip()
+        if not line:
+            continue
+        m = _PIN_LINE.match(line)
+        if m:
+            return m.group(1)
+    return None
+
+
+def check_version(installed: str | None,
+                  pin_path: Path = PIN_FILE) -> str | None:
+    """版本检出纯函数（票 40）：返回警告文本，一致返回 None。
+
+    - installed 与钉版一致 → None（静默）；
+    - 不一致 → 不一致警告（--strict 时调用方据此强退）；
+    - 钉版文件缺失/不可读/无 mcp== 行 → 降级警告（提示性检出非硬闸，不崩不挡）。
+    CLI 侧薄调用（main → _version_verdict 取 mismatch 标志）；独立成纯函数
+    是为了无 mcp SDK 环境也能注入式测全四路径（单测不装真包）。
+    """
+    return _version_verdict(installed, pin_path)[0]
 
 
 class ManifestError(ValueError):
@@ -286,7 +358,16 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser(
         description="语义服务 MCP stdio 服务器（票 23；四工具，判定核心=票 22/04）")
     ap.add_argument("ontology", help="本体目录（本体仓根或单域；显式传，不设默认）")
+    ap.add_argument("--strict", action="store_true",
+                    help="版本检出不符即退出 2（缺省仅 stderr 警告继续；票 40）")
     args = ap.parse_args(argv)
+
+    # 启动版本检出（票 40）：先于 build_server——strict 不符即退，不起服
+    warning, mismatch = _version_verdict(_installed_mcp_version(), PIN_FILE)
+    if warning:
+        print(warning, file=sys.stderr)
+        if args.strict and mismatch:
+            return 2
 
     mcp = build_server(args.ontology)
     print(f"{SERVER_NAME} MCP 服务器就绪：ontology={args.ontology} "

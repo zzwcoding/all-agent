@@ -1,0 +1,3 @@
+# MCP 发布侧依赖钉版（票 40）。安装：python3 -m venv .venv-mcp && .venv-mcp/bin/pip install -r tools/requirements-mcp.txt
+# 升级纪律：改版本号 → 重跑票 24 smoke client（.venv-mcp/bin/python tools/mcp_smoke_client.py --full 9/9）→ 更新本文件与 docs/mcp-server.md
+mcp==2.2.0
