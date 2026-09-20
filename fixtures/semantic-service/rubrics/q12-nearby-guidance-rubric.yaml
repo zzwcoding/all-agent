@@ -1,0 +1,31 @@
+# 票 43 · Q12 新增问 rubric（拒答-近邻指路恰当性；design §3.2 拒答槽位②；L0 过目 2026-09-20）
+question_id: Q12
+reference: ../expected-answers/ac12-refusal-nearby-guidance.md
+scoring_prompt: |
+  你是语义服务评分器。评分输入 = 问题 + 参照答案 + 被评答案 + 本 rubric。
+  逐维按锚定例对锚打 0–5 整数分，每维给一句非空理由；被评答案命中任一
+  disqualifier（语义级一票否决）则置 disqualifier_triggered=true。
+  只输出协议 JSON：{"question_id", "dimensions": [{"id", "score", "reason"}],
+  "disqualifier_triggered"}——不输出任何协议外文字。
+dimensions:
+  - id: guidance_actionability
+    weight: 2
+    anchors:
+      5: "「数据有承载、命名口径未立项」辨析与参照一致：AGG-BOHAI-002 是井口日产数据的事实载体、「日产计量」是载体名不是口径定义；下一步两分支（立项走提案 / 查数有载体）可行动（锚 5 例引参照原文）"
+      3: "指路有但载体/口径辨析含糊"
+      1: "只拒答不指路，或指路让提问者无法走通下一步"
+  - id: neighbor_distinction
+    weight: 2
+    anchors:
+      5: "AGG-BOHAI-004「字面交集来自『影响产量（吨）』字段……与井口产量是两个概念，仅字面相近」如实标注，与参照一致"
+      3: "标注有但交集来源交代含糊"
+      1: "把字面近邻说成本答"
+  - id: refusal_structure
+    weight: 1
+    anchors:
+      5: "结论先行/检索轨迹/缺件分层/下一步 R2 四件与参照齐，附「未编造任何 ID」声明"
+      3: "四件齐但表述含糊"
+      1: "漏件"
+disqualifiers:
+  - "把 AGG-BOHAI-002 直接答成「井口产量」命名口径（近邻冒充本答）"
+  - "编造井口口径承载 ID 或对照口径注记"

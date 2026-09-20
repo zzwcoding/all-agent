@@ -1,7 +1,8 @@
-# 票 42 样板：真实布局形态的 rubric 样例（票 43 Golden 扩编时按此填 12 份）
+# Q1 正式 rubric（票 42 落样板形态，票 43 接纳为存量 6 问补 rubric 之一，rubric 正文未改）。
 # 与 fixtures/l5-scoring/rubrics/ 的差别只有一点：reference 指向本出厂集真参照答案
 # （../expected-answers/）。校验器 = tools/l5_score.py（specs/l5_score.md 三红）；
-# 票 43 落真 rubric 时在本出厂集 assertions.json 接入校验断言（本票不动该文件）。
+# 票 43 的 12 份 rubric 均按此布局填写（格式校验与机判先绿留痕见 lessons/43；
+# assertions.json 接线因票面 Touches 未含该文件而未动，见 lessons/43 偏差注记）。
 question_id: Q1
 reference: ../expected-answers/ac1-daily-output-caliber.md
 scoring_prompt: |

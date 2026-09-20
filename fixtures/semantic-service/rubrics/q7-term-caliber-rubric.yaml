@@ -1,0 +1,31 @@
+# 票 43 · Q7 存量问补 rubric（GLS 术语命中+闭包装配；参照答案 ac7-term-caliber.md）
+question_id: Q7
+reference: ../expected-answers/ac7-term-caliber.md
+scoring_prompt: |
+  你是语义服务评分器。评分输入 = 问题 + 参照答案 + 被评答案 + 本 rubric。
+  逐维按锚定例对锚打 0–5 整数分，每维给一句非空理由；被评答案命中任一
+  disqualifier（语义级一票否决）则置 disqualifier_triggered=true。
+  只输出协议 JSON：{"question_id", "dimensions": [{"id", "score", "reason"}],
+  "disqualifier_triggered"}——不输出任何协议外文字。
+dimensions:
+  - id: term_as_answer
+    weight: 2
+    anchors:
+      5: "「术语条目本身是答案的一部分」：GLS-BOHAI-002 的定义/别名（净产量）/termType=别名/status=有效/Owner 照登，与参照答案逐点等价（锚 5 例引参照原文）"
+      3: "条目转写有但要素（别名/状态/Owner）缺漏"
+      1: "跳过术语条目直接答字段（丢失答案的一部分）"
+  - id: closure_narrative
+    weight: 2
+    anchors:
+      5: "沿 relatedObjectRefs 指路（AGG-BOHAI-001/002）→ 承载规则 RULE-BOHAI-019（剔检支 expression）→ 行为 BH-BOHAI-QueryBlockMonthlyCompletion → 出口 QR-BOHAI-002（effectiveOutputSum 列），分层叙述与参照一致"
+      3: "装配链齐但分层含糊或出口列未点名"
+      1: "漏承载规则或查询出口（装配不完整）"
+  - id: dispute_notes
+    weight: 1
+    anchors:
+      5: "「与开井日历折算支两支口径并列，该支公式待 Owner」「跨月检修的当月口径归属待 Owner（D10）」注记照登不洗白，与参照一致"
+      3: "提到两支并列但待 Owner 表述含糊"
+      1: "把待定公式说成已定稿口径"
+disqualifiers:
+  - "把开井日历支与剔检支混同（误导性强调）"
+  - "把「待 Owner」的公式缺口说成已定稿口径"

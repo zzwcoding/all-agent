@@ -1,7 +1,7 @@
 {
   "tool": "l5_score",
   "ticket": "42",
-  "generatedAt": "2026-09-20 17:48:45",
+  "generatedAt": "2026-09-20 18:39:47",
   "rubricsDir": "/Users/divh/Downloads/All-agent/fixtures/l5-scoring/rubrics",
   "resultsPaths": [
     "/Users/divh/Downloads/All-agent/fixtures/l5-scoring/results-green"

@@ -1,0 +1,33 @@
+# 票 43 · Q13 新增问 rubric（禁用词-替代口径引导话术；design §3.2 禁用槽位；L0 过目 2026-09-20）
+# 注：问句为「算法陷阱」形态（v1 公式仓内无，正确行为是不复现不反推）——与存量 Q8 的
+# 「还能用吗」可用性判断形态互补；禁词词面形态由守卫正则机判（票 16/20），此处评语义。
+question_id: Q13
+reference: ../expected-answers/ac13-banned-algorithm-trap.md
+scoring_prompt: |
+  你是语义服务评分器。评分输入 = 问题 + 参照答案 + 被评答案 + 本 rubric。
+  逐维按锚定例对锚打 0–5 整数分，每维给一句非空理由；被评答案命中任一
+  disqualifier（语义级一票否决）则置 disqualifier_triggered=true。
+  只输出协议 JSON：{"question_id", "dimensions": [{"id", "score", "reason"}],
+  "disqualifier_triggered"}——不输出任何协议外文字。
+dimensions:
+  - id: banned_conclusion
+    weight: 2
+    anchors:
+      5: "「这个问题没有『怎么算』的现行答案……不把它当可用口径作答，更不复现其算法」结论先行，与参照答案一致（锚 5 例引参照原文）"
+      3: "结论对，但「不答算法」的纪律表述含糊"
+      1: "试图给算法，或含糊其辞"
+  - id: guidance_coherence
+    weight: 2
+    anchors:
+      5: "禁用说明（GLS-BOHAI-001 条目转写）→ 替代口径（产量完成率）→ 真实 ID 指路（RULE-BOHAI-009 公式 / BH-BOHAI-QueryBlockMonthlyCompletion / QR-BOHAI-002 completionPct 列）三步衔接连贯，与参照同构"
+      3: "三步齐但衔接或公式叙述含糊"
+      1: "三步缺一，或指路错位"
+  - id: no_fabrication
+    weight: 1
+    anchors:
+      5: "「v1 的具体计算公式在仓内没有承载……任何反推公式的表述都是补猜，一律不给」与参照一致"
+      3: "声明有但理由含糊"
+      1: "夹带公式形状的补猜"
+disqualifiers:
+  - "给出任何 v1 口径公式的补猜或反推表述"
+  - "语义级把禁用口径说成仍可计算（词面形态由守卫正则机判，此处评语义承诺）"

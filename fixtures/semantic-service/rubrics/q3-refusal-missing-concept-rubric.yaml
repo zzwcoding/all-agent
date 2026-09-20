@@ -1,0 +1,31 @@
+# 票 43 · Q3 存量问补 rubric（拒答-缺件分层；参照答案 ac3-refusal-missing-concept.md）
+question_id: Q3
+reference: ../expected-answers/ac3-refusal-missing-concept.md
+scoring_prompt: |
+  你是语义服务评分器。评分输入 = 问题 + 参照答案 + 被评答案 + 本 rubric。
+  逐维按锚定例对锚打 0–5 整数分，每维给一句非空理由；被评答案命中任一
+  disqualifier（语义级一票否决）则置 disqualifier_triggered=true。
+  只输出协议 JSON：{"question_id", "dimensions": [{"id", "score", "reason"}],
+  "disqualifier_triggered"}——不输出任何协议外文字。
+dimensions:
+  - id: refusal_structure
+    weight: 2
+    anchors:
+      5: "「拒答：仓内没有……」结论先行 + 检索轨迹交代穷尽未命中不猜 + 缺什么分层 + 提案流程下一步，R2 四件与参照答案逐件对应（锚 5 例引参照原文）"
+      3: "四件齐但检索轨迹或下一步表述含糊"
+      1: "给了无锚定的泛泛作答，或漏缺件说明"
+  - id: layer_accuracy
+    weight: 2
+    anchors:
+      5: "查询/对象/行为三层逐层核对且只声明真缺的层；近邻出口（QR-BOHAI-001）与明细载体（AGG-BOHAI-002）均标「近邻指路，非所问」，与参照一致"
+      3: "分层有但把近邻层说成部分承载等含糊表述"
+      1: "分层错位，或把近邻说成本答"
+  - id: zero_fabrication
+    weight: 1
+    anchors:
+      5: "全文 ID 仅白名单近邻（QR-BOHAI-001/AGG-BOHAI-002），「未编造任何 ID」声明与参照一致"
+      3: "ID 集合对但未编造声明缺位"
+      1: "叙述中出现白名单外的 ID"
+disqualifiers:
+  - "编造白名单之外的元素 ID 或「按命名规律推想」的 ID"
+  - "暗示仓内已有月度汇总口径（把近邻答成本答）"

@@ -1,0 +1,31 @@
+# 参照答案 Q10（票 43）· 产量完成率的口径是什么？
+
+- Golden Question: 「产量完成率的口径是什么？」
+- 走到的瀑布级: 二级 ID/名称解析（RULE-BOHAI-009 全等主命中 + 3 个非全等候选）→ 三级闭包装配（装配链分层叙述，非 ID 堆砌）
+- 证据域: 解析自 bohai 真域（ontology/bohai——照票 17 先例，问答本体不扩文件）
+- 断言面: 主命中/近邻分清 + 口径链分层可消费 + 争议注记照登；引用清单齐
+
+## 答案（示范格式）
+
+**产量完成率**——名称解析全等命中口径真源 `RULE-BOHAI-009`（产量完成率，CALCULATION），装配链分层如下：
+
+- **公式与粒度**：actualOilSum / planOutputSum × 100，即 Σ实际产油 / Σ计划配产 × 100%；粒度=月/区块（R5·§3 指标 1 ★，Owner 开发室）。
+- **分子/分母承载**（规则 inputParams sourceField）：分子=实际产油合计（dailyProduction.oilOutput，区块月合计），分母=计划配产合计（dailyProduction.planOutput，区块月合计）。
+- **执行行为**：`BH-BOHAI-QueryBlockMonthlyCompletion`（查询区块月度产量完成率）appliedRules 引用本规则；其前置条件「统计月已封账」的封账规则本体**未建、待 Owner**（注记照登，缺口另见提案流程）。
+- **查询出口**：`QR-BOHAI-002`（区块月度产量完成率统计）结果列 completionPct（产量完成率（%））。
+
+**同出口并列列，非本答（单列防混淆）**：`QR-BOHAI-002` 同页还有 effectiveOutputSum（有效产量·剔检，吨）列，口径真源是 `RULE-BOHAI-019`（有效产量·剔检口径）——它与完成率并列展示、互不替代，**不是**产量完成率口径的一部分。
+
+**限定变体命中，非本答（t4 头部共缀）**：名称解析另命中 `FLOW-BOHAI-001`（产量下滑归因，R5·§7 剧本 1；其步骤 1 拉取的正是本完成率）——它是消费本口径的流程，不是口径本身。
+
+**争议注记照登**：分母 planOutput 存在配产双值行（D4，待 Owner）；本规则描述另带禁用旧称注记（旧称 2024 年废弃，替代即本指标）。
+
+**一句话口径**：产量完成率 = 区块月 Σ实际产油 / Σ计划配产 × 100（真源 `RULE-BOHAI-009`，出口 `QR-BOHAI-002` 的 completionPct 列），月/区块粒度；封账前置在仓内暂无规则判据。
+
+## 本回答引用的元素 ID
+
+- RULE-BOHAI-009（产量完成率——全等主命中，口径真源）
+- BH-BOHAI-QueryBlockMonthlyCompletion（查询区块月度产量完成率——执行行为，appliedRules 引用真源）
+- QR-BOHAI-002（区块月度产量完成率统计——查询出口，completionPct 列）
+- RULE-BOHAI-019（有效产量·剔检口径——同出口并列列的真源，非本答，单列防混淆）
+- FLOW-BOHAI-001（产量下滑归因——t4 限定变体命中，口径消费流程，非本答）

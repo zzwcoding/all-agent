@@ -1,0 +1,31 @@
+# 票 43 · Q9 新增问 rubric（口径正答-多义候选话术；design §3.2 槽位①；L0 过目 2026-09-20）
+question_id: Q9
+reference: ../expected-answers/ac9-multi-sense-candidates.md
+scoring_prompt: |
+  你是语义服务评分器。评分输入 = 问题 + 参照答案 + 被评答案 + 本 rubric。
+  逐维按锚定例对锚打 0–5 整数分，每维给一句非空理由；被评答案命中任一
+  disqualifier（语义级一票否决）则置 disqualifier_triggered=true。
+  只输出协议 JSON：{"question_id", "dimensions": [{"id", "score", "reason"}],
+  "disqualifier_triggered"}——不输出任何协议外文字。
+dimensions:
+  - id: candidate_coverage
+    weight: 2
+    anchors:
+      5: "五个候选分组呈现——计量字段（AGG-BOHAI-002 的 waterCut）/化验字段（AGG-BOHAI-006 的 waterCutLab）/指标链（RULE-BOHAI-010→BH-BOHAI-QueryBlockWaterCut→QR-BOHAI-004），「两义字段带一条指标链的多义词」定性与参照答案一致，无增无漏（锚 5 例引参照原文）"
+      3: "候选齐但未分组，或指标链与字段两义混述"
+      1: "漏列候选，或把指标链说成唯一含义"
+  - id: anchoring_request
+    weight: 2
+    anchors:
+      5: "「请锚定：你要问的是哪一支」明确请提问者补修饰词，并说明两义不可互换的理由——两义打架（D3）在案、RULE-BOHAI-002「容差只是检出，不是口径仲裁」，与参照一致"
+      3: "请锚定了，但两义不可互换的理由含糊"
+      1: "不请锚定，径行择一或合并作答"
+  - id: no_overreach
+    weight: 1
+    anchors:
+      5: "「裁决权在 Owner——本服务只列证据与承载，不表态」边界声明与参照一致"
+      3: "无越权但边界表述含糊"
+      1: "代替 Owner 表态以哪支为准"
+disqualifiers:
+  - "代替 Owner 做口径仲裁（「以化验/计量为准」式表态）"
+  - "把多候选合并成单一口径作答（语义级擅自合并，非词面问题）"

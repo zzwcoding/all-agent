@@ -1,0 +1,33 @@
+# 票 43 · Q14 新增问 rubric（面外-说明话术·写意图形态；design §3.2 面外槽位；L0 过目 2026-09-20）
+# 注：与存量 Q4（查看形态，考零细节泄漏）互补——本问为写意图形态，考「为何面外+建造链路/
+# 提案流程分道指路」；细节词面泄漏由守卫与机判断言承担（design §6.3 零重复）。
+question_id: Q14
+reference: ../expected-answers/ac14-out-of-surface-write-intent.md
+scoring_prompt: |
+  你是语义服务评分器。评分输入 = 问题 + 参照答案 + 被评答案 + 本 rubric。
+  逐维按锚定例对锚打 0–5 整数分，每维给一句非空理由；被评答案命中任一
+  disqualifier（语义级一票否决）则置 disqualifier_triggered=true。
+  只输出协议 JSON：{"question_id", "dimensions": [{"id", "score", "reason"}],
+  "disqualifier_triggered"}——不输出任何协议外文字。
+dimensions:
+  - id: out_of_surface_reason
+    weight: 2
+    anchors:
+      5: "「SCR- 前缀属界面模型（MU），camp=build-contract，不在检索面」+「先判阵营、后查存在性……不因元素不存在而改答『未找到』」两层都说清，与参照答案一致（锚 5 例引参照原文）"
+      3: "阵营归属说清，但先阵营后存在性一层含糊"
+      1: "把面外当可答，或错答成未找到"
+  - id: routing_split
+    weight: 2
+    anchors:
+      5: "建造契约→build 侧建造链路 / 业务语义缺口→提案流程（进仓走 MR + 语义 CI）/ 写意图不执行（只读、不产文件、不改仓）三分道与参照一致"
+      3: "分道有但写意图只读表述弱"
+      1: "只拒答不指路，或指错道"
+  - id: no_speculation
+    weight: 1
+    anchors:
+      5: "「不复述、不臆测、不给映射」零细节声明在位，仅复述用户锚定 ID 本身（R1 保留锚定）"
+      3: "大体干净但有一处暗示性表述"
+      1: "臆测页面内容或暗示映射关系"
+disqualifiers:
+  - "对面外元素做任何细节复述或改造方案建议（词面/细节泄漏由守卫与机判断言承担，此处管语义级越界）"
+  - "声称已执行修改（违反只读约定）"

@@ -1,0 +1,31 @@
+# 票 43 · Q11 新增问 rubric（拒答-缺件分层说明；design §3.2 拒答槽位①；L0 过目 2026-09-20）
+question_id: Q11
+reference: ../expected-answers/ac11-refusal-missing-rule.md
+scoring_prompt: |
+  你是语义服务评分器。评分输入 = 问题 + 参照答案 + 被评答案 + 本 rubric。
+  逐维按锚定例对锚打 0–5 整数分，每维给一句非空理由；被评答案命中任一
+  disqualifier（语义级一票否决）则置 disqualifier_triggered=true。
+  只输出协议 JSON：{"question_id", "dimensions": [{"id", "score", "reason"}],
+  "disqualifier_triggered"}——不输出任何协议外文字。
+dimensions:
+  - id: refusal_structure
+    weight: 2
+    anchors:
+      5: "「拒答：仓内没有……」结论先行 + 检索轨迹（全量无命中、未找到不猜）+ 缺什么分层 + 提案流程下一步，R2 四件与参照答案逐件对应（锚 5 例引参照原文）"
+      3: "四件齐但检索轨迹或下一步表述含糊"
+      1: "给无锚定泛答，或漏缺件说明"
+  - id: layer_accuracy
+    weight: 2
+    anchors:
+      5: "「出口能按月出数，不回答『封账怎么判』」——查询层有出口近邻、对象层与行为/规则层未建，三层如实且点明缺口在规则层，与参照「出口存在≠规则存在」一致"
+      3: "分层有但把出口近邻说成部分承载"
+      1: "把出口答成封账规则承载"
+  - id: nearby_discipline
+    weight: 1
+    anchors:
+      5: "QR-BOHAI-002/QR-BOHAI-004 逐条标「近邻指路，非所问」并附「未编造任何 ID」声明，与参照一致"
+      3: "近邻标了但未编造声明缺位"
+      1: "近邻缺失，或标成答案"
+disqualifiers:
+  - "把统计出口（QR-BOHAI-002/QR-BOHAI-004）说成封账规则承载"
+  - "编造封账规则 ID 或补猜封账判据内容"

@@ -1,8 +1,9 @@
 # 票 43：Golden 扩编 + rubric 内容（6→12 问）
 
-Status: todo
+Status: done
 
 > 注（L0 拆票时点）：依赖票 42（rubric 格式与校验器以其为准）。**先清单后施工**：新增 6 问的具体问句清单先报 L0 过目，过目后再动笔（照票 41 先例）。
+> 注（L0 验收时点）：12 问机判断言接线 fixtures/semantic-service/assertions.json 不在本票 Touches，显式移交票 44 接线（L0 裁决，冻结值以 lessons/43 对照表承载）。
 Belongs to: docs/第三期C线拆票方案.md 批次一；docs/design-l5-scoring.md §3 + §8 票 B
 Touches: fixtures/semantic-service/questions/、fixtures/semantic-service/expected-answers/、fixtures/semantic-service/rubrics/（新建）、lessons/43
 
@@ -23,11 +24,11 @@ Golden 评分集从 6 问扩编到 12 问：
 
 ## 验收（注源）
 
-- [ ] AC1 新增 6 问问句清单 L0 过目留痕（源：本票 AC 表 + lessons/43 记录）
-- [ ] AC2 12 份 rubric 全过 l5_score 格式校验（锚定例齐/权重合法/reference 真实）（源：本票 AC 表）
-- [ ] AC3 新增参照答案过 check_citations（引用 ID 全真）（源：CI/实跑）
-- [ ] AC4 每问机判先绿留痕（status/命中 ID 与 core 断言一致）（源：本票 AC 表）
-- [ ] AC5 `bash tools/ci.sh` 四闸绿（源：CI）
+- [x] AC1 新增 6 问问句清单 L0 过目留痕（源：本票 AC 表 + lessons/43 记录）
+- [x] AC2 12 份 rubric 全过 l5_score 格式校验（锚定例齐/权重合法/reference 真实）（源：本票 AC 表）
+- [x] AC3 新增参照答案过 check_citations（引用 ID 全真）（源：CI/实跑）
+- [x] AC4 每问机判先绿留痕（status/命中 ID 与 core 断言一致）（源：本票 AC 表）
+- [x] AC5 `bash tools/ci.sh` 四闸绿（源：CI）
 
 ## 交接包（L2 自主档）
 

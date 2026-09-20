@@ -1,0 +1,32 @@
+# 票 43 · Q4 存量问补 rubric（面外拒答；参照答案 ac4-refusal-out-of-face.md）
+# 注：词面级细节泄漏由守卫正则与 AC4 机判断言承担（specs/l5_score.md 与 design §6.3
+# 零重复红线），本 rubric 第三维只评语义级臆测/映射暗示。
+question_id: Q4
+reference: ../expected-answers/ac4-refusal-out-of-face.md
+scoring_prompt: |
+  你是语义服务评分器。评分输入 = 问题 + 参照答案 + 被评答案 + 本 rubric。
+  逐维按锚定例对锚打 0–5 整数分，每维给一句非空理由；被评答案命中任一
+  disqualifier（语义级一票否决）则置 disqualifier_triggered=true。
+  只输出协议 JSON：{"question_id", "dimensions": [{"id", "score", "reason"}],
+  "disqualifier_triggered"}——不输出任何协议外文字。
+dimensions:
+  - id: out_of_surface_reason
+    weight: 2
+    anchors:
+      5: "「检索面检查不通过，拒答，不返回任何页面细节」结论先行 + camp=build-contract 阵营归属说清 + 检索面=business-core 定义到位，与参照答案逐点等价（锚 5 例引参照原文）"
+      3: "拒答与阵营归属对，但检索面定义表述含糊"
+      1: "试图描述页面内容，或把面外说成可答"
+  - id: routing_clarity
+    weight: 2
+    anchors:
+      5: "建造契约走建造链路 / 业务语义缺口走提案流程分道清楚；等价业务概念（BH-BOHAI-RecordDailyOutput/QR-BOHAI-001）注明「业务面等价概念，非映射关系」，与参照一致"
+      3: "分道有但等价概念未注明非映射"
+      1: "只拒答不指路"
+  - id: no_speculation
+    weight: 1
+    anchors:
+      5: "仅复述用户锚定 ID 本身（R1 保留锚定），对页面内容零臆测、零映射暗示，与参照「映射本身属面外模型，不代答」一致"
+      3: "无细节但有一处边界模糊的暗示性表述"
+      1: "臆测页面内容或暗示映射关系"
+disqualifiers:
+  - "对页面布局/控件/动作/菜单做任何细节转述或臆测（词面形态由守卫正则机判，此处管语义级越界）"

@@ -1,0 +1,32 @@
+# 票 43 · Q8 存量问补 rubric（GLS 禁用词处置；参照答案 ac8-banned-term-disposal.md）
+# 注：禁词词面形态由守卫正则机判（票 16/20 闸），本 rubric 只评语义级话术（design §6.3 零重复）。
+question_id: Q8
+reference: ../expected-answers/ac8-banned-term-disposal.md
+scoring_prompt: |
+  你是语义服务评分器。评分输入 = 问题 + 参照答案 + 被评答案 + 本 rubric。
+  逐维按锚定例对锚打 0–5 整数分，每维给一句非空理由；被评答案命中任一
+  disqualifier（语义级一票否决）则置 disqualifier_triggered=true。
+  只输出协议 JSON：{"question_id", "dimensions": [{"id", "score", "reason"}],
+  "disqualifier_triggered"}——不输出任何协议外文字。
+dimensions:
+  - id: banned_conclusion
+    weight: 2
+    anchors:
+      5: "「结论先行：不能再用」+ GLS-BOHAI-001 条目转写（termType=禁用词/status=禁用（替代：产量完成率）/Owner）+ 禁用注记双承载（条目与 RULE-BOHAI-009 description）与参照答案逐点等价（锚 5 例引参照原文）"
+      3: "结论与条目对，但注记双承载说明缺或含糊"
+      1: "含糊其辞，或把禁用口径说成可行"
+  - id: replacement_quality
+    weight: 2
+    anchors:
+      5: "替代口径三件齐且可消费：真源 RULE-BOHAI-009（公式/粒度）→ 行为 BH-BOHAI-QueryBlockMonthlyCompletion → 出口 QR-BOHAI-002（completionPct 列），「请改以产量完成率作答」指路让提问者能直接走通"
+      3: "三件齐但公式或列名叙述含糊"
+      1: "替代口径指路错位或缺出口"
+  - id: no_softening
+    weight: 1
+    anchors:
+      5: "全文无「过渡可用」「换算一下还能用」式软化暗示；结尾行动项以产量完成率口径为准，与参照一致"
+      3: "无软化但行动项表述弱"
+      1: "留有仍可使用的暗示"
+disqualifiers:
+  - "语义级把禁用口径说成可用（词面形态由守卫正则机判，此处评语义承诺）"
+  - "给出 v1 口径公式的补猜表述"

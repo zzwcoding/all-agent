@@ -1,0 +1,31 @@
+# 票 43 · Q10 新增问 rubric（口径正答-闭包叙述完整度；design §3.2 槽位②；L0 过目 2026-09-20）
+question_id: Q10
+reference: ../expected-answers/ac10-closure-narrative.md
+scoring_prompt: |
+  你是语义服务评分器。评分输入 = 问题 + 参照答案 + 被评答案 + 本 rubric。
+  逐维按锚定例对锚打 0–5 整数分，每维给一句非空理由；被评答案命中任一
+  disqualifier（语义级一票否决）则置 disqualifier_triggered=true。
+  只输出协议 JSON：{"question_id", "dimensions": [{"id", "score", "reason"}],
+  "disqualifier_triggered"}——不输出任何协议外文字。
+dimensions:
+  - id: semantic_fidelity
+    weight: 2
+    anchors:
+      5: "「公式与粒度→分子/分母承载→执行行为→查询出口」分层叙述与参照答案逐点等价：RULE-BOHAI-009 公式与月/区块粒度、分子分母 sourceField（dailyProduction.oilOutput/planOutput）、BH-BOHAI-QueryBlockMonthlyCompletion 封账前置注记、QR-BOHAI-002 completionPct 列（锚 5 例引参照原文）"
+      3: "装配链齐但某层表述含糊（如粒度或封账前置）"
+      1: "口径错位（公式/行为/出口张冠李戴）"
+  - id: neighbor_distinction
+    weight: 2
+    anchors:
+      5: "「同出口并列列，非本答（单列防混淆）」（RULE-BOHAI-019/effectiveOutputSum）与「限定变体命中，非本答」（FLOW-BOHAI-001）两处单列定性，与参照一致"
+      3: "单列有但「非本答」定性含糊"
+      1: "把并列列或流程说成本口径主答"
+  - id: dispute_notes
+    weight: 1
+    anchors:
+      5: "「分母 planOutput 存在配产双值行（D4，待 Owner）」与禁用旧称注记照登不洗白，与参照一致"
+      3: "注记有但待 Owner 表述含糊"
+      1: "漏注记，或把争议说成已定"
+disqualifiers:
+  - "误导性强调：把 RULE-BOHAI-019 剔检口径或 FLOW-BOHAI-001 流程说成本口径主答"
+  - "宣称口径完整却漏月/区块粒度等适用条件"

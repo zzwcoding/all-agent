@@ -1,0 +1,31 @@
+# 票 43 · Q2 存量问补 rubric（显式锚定问；参照答案 ac2-explicit-anchor.md，只补 rubric 不换问题）
+question_id: Q2
+reference: ../expected-answers/ac2-explicit-anchor.md
+scoring_prompt: |
+  你是语义服务评分器。评分输入 = 问题 + 参照答案 + 被评答案 + 本 rubric。
+  逐维按锚定例对锚打 0–5 整数分，每维给一句非空理由；被评答案命中任一
+  disqualifier（语义级一票否决）则置 disqualifier_triggered=true。
+  只输出协议 JSON：{"question_id", "dimensions": [{"id", "score", "reason"}],
+  "disqualifier_triggered"}——不输出任何协议外文字。
+dimensions:
+  - id: anchor_discipline
+    weight: 2
+    anchors:
+      5: "「显式锚定直接命中，未走名称模糊检索」照参照答案点明；名下行为逐条带类型/触发/权限叙述，行为集合与参照一致无增无漏（锚 5 例引参照原文）"
+      3: "锚定与行为集合对，但行为的类型/触发/权限叙述含糊或有小漏"
+      1: "实走模糊检索仍称锚定直达，或行为集合与参照错位（漏报/张冠李戴）"
+  - id: boundary_distinction
+    weight: 2
+    anchors:
+      5: "关联行为（BH-BOHAI-RecordDailyOutput）照参照答案单列「非本对象名下，单列防误答」，并交代间接触达路径（ASSOC-BOHAI-001/FLOW-BOHAI-001），与参照逐点等价"
+      3: "有关联说明但间接触达路径交代含糊"
+      1: "把关联行为混入名下行为集（反向收集边界错）"
+  - id: organization
+    weight: 1
+    anchors:
+      5: "结论先行 + 逐行为条目 + 「本回答引用的元素 ID」清单收尾，与参照同构"
+      3: "有结构但层级混乱"
+      1: "无组织，一锅粥"
+disqualifiers:
+  - "编造名下不存在的行为、权限或出口（机判管正文与清单一致，此处管 ID 真实性的语义承诺）"
+  - "把关联行为答成名下行为（误导性强调）"
