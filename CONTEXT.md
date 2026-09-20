@@ -12,7 +12,7 @@
 
 - **前端（frontend/适配器）**：把输入（需求/数据库/源代码/文档）转成本体 YAML 草案的部件；只产草案，进仓必过 MR + 语义 CI。
 - **后端（backend/生成器）**：把本体 YAML 变成输出（应用包/Skill/MCP/报告）的部件；只读仓，禁直连前端。
-- **语义 CI（semantic CI）**：五级检查——L1 语法合法 / L2 引用与本体一致 / L3 指标·SQL·安全 / L4 权限·兼容 / L5 行为与检索回归（Golden Question + 出厂集）。
+- **语义 CI（semantic CI）**：五级检查——L1 语法合法 / L2 引用与本体一致 / L3 指标·SQL·安全 / L4 权限·兼容 / L5 行为与检索回归（Golden Question + 出厂集）。L5 现状（票 44）：结构断言级已建（core 机判十二问 + 出厂集断言）；LLM 评分级=离线批评分器（12 问评分集 + rubric 锚定例 + l5_score.py 三采样中位聚合），按 design-l5-scoring 节奏触发——批收官软闸 / 发布前硬闸，不进每提交 CI，红灯走信号路由三分道。
 - **出厂集（factory corpus）**：每个生成器/适配器的固定输入→确定性断言集，平台改版的回归闸（双门槛：全过 + 负样本不误报）。
 - **信号路由表（signal routing）**：元循环的核心纪律——业务错→本体 MR；工程错→sdd-flow 票；元模型错→框架版本演进（CHANGELOG+版本号+迁移票伴随实现票）。
 - **正本/安装位**：skill 的双位置——正本 `skills/<名>/`（仓内，受边界闸+归档闸治理）、安装位 `~/.agents/skills/<名>/`（Kimi Code 路由用）；`install_skills sync/--check` 维护两处一致，pre-commit 钩子（core.hooksPath 启用）拦提交时漂移。

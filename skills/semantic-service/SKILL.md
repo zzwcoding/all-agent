@@ -45,6 +45,7 @@ description: 运行时语义服务——查口径/问业务对象/解析指标�
 - references/retrieval-waterfall.md——检索瀑布判定细则（四级判定与边界、闭包深度策略、检索面划界操作法）
 - references/refusal-guide.md——拒答话术与缺件说明规范（R1 面外 / R2 仓内没有 / R3 解析失败 / R4 写意图）
 - references/id-citation-format.md——ID 引用格式（行内引用、闭包轨迹记法、引用清单规则）
+- references/l5-dispatch.md——L5 评分子 agent 派发契约（离线评分面，票 44：批收官软闸/发布前硬闸触发时逐问派 3 个全新子 agent、请求/结果 JSON 照 specs/l5_score.md 协议、评分无效重派与仲裁升级；运行时问答不触发）
 
 ## 出厂集（Seam）
 

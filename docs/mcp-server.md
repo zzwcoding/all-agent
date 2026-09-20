@@ -43,6 +43,10 @@ python3 tools/mcp_manifest_gen.py ontology --check exports/mcp/capability-manife
 
 只读边界：四工具不写仓；改口径/补概念等写意图一律回「走提案流程」（进仓走 MR + 语义 CI）。
 
+## 发布检查位（L5 评分硬闸，票 44）
+
+**语义服务对外发布或新域接入验收前，L5 全量跑，红则不发**（设计案 docs/design-l5-scoring.md §5.2：发布前为硬闸）：12 问评分集逐问机判先绿后，每问派发 3 个全新子 agent 评分（派发契约见 skills/semantic-service/references/l5-dispatch.md，评者≠答者），tools/l5_score.py 聚合判定，留痕落 docs/meta/l5-评分-<日期>.md/.json 随交付物引用。复评仍红走仲裁升级——换更强模型重派该问（design §2 C 子集形态）。与批收官软闸的分工：批收官只留痕开单不阻塞（AGENTS.md 续跑协议第 9 条第 ⑤ 件），本检查位是发布语义的硬闸；L5 红不覆盖机判四闸结论（design §6：冲突信机判，人裁 L5）。
+
 ## 与 semantic-service skill 的关系
 
 **同一个判定核心，两种成稿形态**。`skills/semantic-service/` 是 LLM 工序：按检索瀑布操作 `tools/graph_index.py` 人工（对话内）取证，把票 22 core 的确定性裁决**成稿为自然语言回答**（多候选消歧、缺件归因、话术组织都是它的事）。本 MCP 服务器是纯机器发布面：同一 core 经子进程包装直接给出骨架回答，不经 LLM 成稿——回答是裁决结构的文本化装配，确定性可回归。两者共用 `tools/semantic_service_core.py` 与 `tools/graph_index.py`，行为基准同源（`fixtures/semantic-service/` CORE 八问 = `fixtures/mcp-publisher/cases/` 对照单）；票 24 smoke client 按该对照单逐条核对 MCP 实调与出厂集行为一致。

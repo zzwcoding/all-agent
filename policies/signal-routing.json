@@ -1,11 +1,16 @@
 {
   "version": 1,
-  "description": "信号路由表（票 29，PRD F14，CONTEXT.md「信号路由表」词条的机读真源）：三类信号各走各的修复道，本表是唯一机读登记处；人读说明见 policies/README.md。维护纪律：改路由 = 改本 JSON + 每条实例指针先核实（commit 在 git log、PROP 文件在 docs/proposals/）再写入 + 跑 python3 tools/meta_probe.py ontology/bohai（第 10 项硬闸自检，红即回改）。实例指针字段：desc=一句话；ticket=票号；commit=短哈希（probe 逐个 git log 核实）；props=涉及的提案 ID（probe 逐个查 docs/proposals/ 文件在池）。每类路由 instances 至少 2 条真实指针。",
+  "description": "信号路由表（票 29，PRD F14，CONTEXT.md「信号路由表」词条的机读真源）：三类信号各走各的修复道，本表是唯一机读登记处；人读说明见 policies/README.md。维护纪律：改路由 = 改本 JSON + 每条实例指针先核实（commit 在 git log、PROP 文件在 docs/proposals/）再写入 + 跑 python3 tools/meta_probe.py ontology/bohai（第 10 项硬闸自检，红即回改）。实例指针字段：desc=一句话；ticket=票号；commit=短哈希（probe 逐个 git log 核实）；props=涉及的提案 ID（probe 逐个查 docs/proposals/ 文件在池）。每类路由 instances 至少 2 条真实指针。 L5 红三分道（票 44 接线，design-l5-scoring §4.4）：L5 评分红灯只报告不修复、只路由不自动改——语义内容错→业务错道 / 话术工序错→工程错道 / rubric 错→元模型错道，分道登记在各路由的 l5RedDispatch 字段（探针不核该字段）；其实例指针在 L5 首跑（批收官软闸/发布前硬闸）后回填真实 commit/props，占位期如实标注、不虚构指针（虚构即第 10 项硬闸红）。",
   "routes": [
     {
       "kind": "业务错",
       "destination": "本体 MR（人审）",
       "mechanism": "docs/proposals/PROP-*.md → 人 merge（proposal-pool 起草，Owner 裁决 open→accepted/rejected，实现走本体 MR 过语义 CI）",
+      "l5RedDispatch": {
+        "signal": "L5 红·语义内容错（语义保真度/口径解释类维度红：要点漏述、误导性强调、答非所问——本体语义有缺有错）",
+        "source": "docs/design-l5-scoring.md §4.4（票 44 接线）",
+        "instancePlaceholder": "占位——L5 首跑（批收官软闸/发布前硬闸）后回填真实实例指针（留痕 docs/meta/l5-评分-<日期>.json 的路由去向）；首跑前不虚构 commit/props"
+      },
       "instances": [
         {
           "desc": "裁决队列实弹落池（票 19；31 提案=5 闭环回填+26 开放待 Owner 裁决）",
@@ -25,6 +30,11 @@
       "kind": "工程错",
       "destination": "tickets/ 票",
       "mechanism": "tickets/NN-*.md 一票一提交（续跑协议串行派发，四闸绿收官）",
+      "l5RedDispatch": {
+        "signal": "L5 红·话术工序错（拒答话术/组织类维度红：本体没错，skill 工序话术或参照答案要修）",
+        "source": "docs/design-l5-scoring.md §4.4（票 44 接线）",
+        "instancePlaceholder": "占位——L5 首跑（批收官软闸/发布前硬闸）后回填真实实例指针（留痕 docs/meta/l5-评分-<日期>.json 的路由去向）；首跑前不虚构 commit/props"
+      },
       "instances": [
         {
           "desc": "图索引构建器（纯内存图+闭包/影响链 CLI）",
@@ -42,6 +52,11 @@
       "kind": "元模型错",
       "destination": "schema 演进票",
       "mechanism": "CHANGELOG+版本号+迁移注记（模型注册表/依赖白名单同步，schema 演进票伴随实现票）",
+      "l5RedDispatch": {
+        "signal": "L5 红·rubric 错（锚定例与工序矛盾/评分提示词偏差/权重集失衡：改 rubric 走评分框架演进票，锚例修订=改出厂集）",
+        "source": "docs/design-l5-scoring.md §4.4 + §4.5（票 44 接线）",
+        "instancePlaceholder": "占位——L5 首跑（批收官软闸/发布前硬闸）后回填真实实例指针（留痕 docs/meta/l5-评分-<日期>.json 的路由去向）；首跑前不虚构 commit/props"
+      },
       "instances": [
         {
           "desc": "术语模型 GLS 进 schema（版本 1.1.0+CHANGELOG+filename-mismatch 闸）",
