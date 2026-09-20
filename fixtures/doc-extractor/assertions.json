@@ -1,59 +1,152 @@
 {
   "skill": "doc-extractor（文档萃取器，票 32）",
-  "description": "出厂集：合成制度文档两份（input/terms.md 术语定义段 + input/rules.md 规则条款段，中性域「数据管理制度」，零现实业务域专名）→ 断言萃取工序产物的确定性结果（AC 真源=tickets/32-文档萃取器.md AC 表）。输入侧三类素材齐：明确定义术语 6 条（T1–T6，其中 T5 明示废弃、T6 明示仅限安全审计语境——status 如实标注不洗白的考题）、可条件化规则条款 5 条（R1–R5，IF/超限/必填形态）、纯叙述性条款 2 条（R6–R7，应加强/应推进——照票面裁决进疑点清单不硬转规则）；每条定义/条款为带编号列表项（【Tn】/【Rn】），锚点可指认（文件#条目号）。markers.txt=萃取覆盖不变量的输入侧（13 条标记逐行：编号+类型+锚点）；expected-output/ 是按 SKILL.md 工序对同一输入手工产出的参照产物：草案域目录 datagov/（manifest + M3/GLS 两件——文档的本体形态就是术语与规则，M1/M2/M5/M7 零结构证据挂 omittedModels 带理由豁免，schema 经 expected-output/schema 符号链接取自仓内 ontology/schema 单一真源，同 fixtures/db-reverse 手法）+ datagov-证据索引.md（每条候选→文档 file#锚点 逐条证据 + 疑点清单 + 状态标注留痕，实际运行落位 docs/doc-extractor/<域>-证据索引.md，出厂集按镜像路径存放）。AC1=草案过语义闸+覆盖探针正例 exit 0（markers ⊆ 证据索引末节覆盖对照表）；AC2=草案与证据索引头部固定声明「证据非权威，待 Owner 确认」+草案注源计数+证据索引候选/疑点条目 ≥7 且每条含 file#锚点；AC3=负变体 negative-variants/datagov-证据索引.md 删对照表 R6 一行（注入说明在头部——探针只扫对照表节）→探针 exit 1 报缺编号。",
+  "description": "出厂集：合成制度文档两份（input/terms.md 术语定义段 + input/rules.md 规则条款段，中性域「数据管理制度」，零现实业务域专名）→ 断言萃取工序产物的确定性结果（AC 真源=tickets/32-文档萃取器.md AC 表）。输入侧三类素材齐：明确定义术语 6 条（T1–T6，其中 T5 明示废弃、T6 明示仅限安全审计语境——status 如实标注不洗白的考题）、可条件化规则条款 5 条（R1–R5，IF/超限/必填形态）、纯叙述性条款 2 条（R6–R7，应加强/应推进——照票面裁决进疑点清单不硬转规则）；每条定义/条款为带编号列表项（【Tn】/【Rn】），锚点可指认（文件#条目号）。markers.txt=萃取覆盖不变量的输入侧（13 条标记逐行：编号+类型+锚点）；expected-output/ 是按 SKILL.md 工序对同一输入手工产出的参照产物：草案域目录 datagov/（manifest + M3/GLS 两件——文档的本体形态就是术语与规则，M1/M2/M5/M7 零结构证据挂 omittedModels 带理由豁免，schema 经 expected-output/schema 符号链接取自仓内 ontology/schema 单一真源，同 fixtures/db-reverse 手法）+ datagov-证据索引.md（每条候选→文档 file#锚点 逐条证据 + 疑点清单 + 状态标注留痕，实际运行落位 docs/doc-extractor/<域>-证据索引.md，出厂集按镜像路径存放）。AC1=草案过语义闸+覆盖探针正例 exit 0（markers ⊆ 证据索引末节覆盖对照表）；AC2=草案与证据索引头部固定声明「证据非权威，待 Owner 确认」+草案注源计数+证据索引候选/疑点条目 ≥7 且每条含 file#锚点；AC3=负变体 negative-variants/datagov-证据索引.md 删对照表 R6 一行（注入说明在头部——探针只扫对照表节）→探针 exit 1 报缺编号。 票 34 增（P2-B 尾款）：①status 字段级断言两条 file-contains——GLS 文件含「status: 废弃（替代：数据 Owner）」（T5）与「status: 有效（限安全审计语境）」（T6），字段级钉死不洗白；②废弃-判定探针（判据读 input/terms.md 明示废弃/停用条目与 GLS source 锚点对照，status 不含废弃/禁用即洗白）：正例 cmd-succeeds（对照数 1、洗白 []）+ 洗白负变体 negative-variants/t5-whitewashed/（变体域，唯一差异=T5 status 改「有效」，manifest 与 M3 逐字复制、schema 符号链接同手法）cmd-fails（洗白 [['GLS-DATAGOV-005', '有效']]，exit 1）。",
   "assertions": [
-    { "ac": "输入（两文档在位）", "type": "file-exists", "path": "input/terms.md" },
-    { "ac": "输入（两文档在位）", "type": "file-exists", "path": "input/rules.md" },
+    {
+      "ac": "输入（两文档在位）",
+      "type": "file-exists",
+      "path": "input/terms.md"
+    },
+    {
+      "ac": "输入（两文档在位）",
+      "type": "file-exists",
+      "path": "input/rules.md"
+    },
     {
       "ac": "输入（覆盖清单逐条在文档锚点位可指认：条目号命中 文件 该行文本——覆盖不变量输入侧机判，清单与文档对不上后面全白做）",
       "type": "cmd-succeeds",
       "cmd": "python3 -c \"import pathlib,sys; fx=pathlib.Path('{fixture_dir}'); docs={p.name:p.read_text(encoding='utf-8') for p in (fx/'input').glob('*.md')}; rows=[l.split() for l in (fx/'markers.txt').read_text(encoding='utf-8').splitlines() if l.strip() and not l.startswith('#')]; bad=[r[0] for r in rows if len(r)!=3 or r[2].split('#')[0] not in docs or r[2].split('#')[-1] not in docs[r[2].split('#')[0]]]; print('标记数',len(rows),'缺位',bad); sys.exit(1 if bad or len(rows)<7 or len(set(r[0] for r in rows))!=len(rows) else 0)\"",
-      "outputContains": ["标记数 13", "缺位 []"]
+      "outputContains": [
+        "标记数 13",
+        "缺位 []"
+      ]
     },
     {
       "ac": "AC1（草案域过语义闸）",
       "type": "cmd-succeeds",
       "cmd": "python3 tools/schema_check.py {fixture_dir}/expected-output/datagov",
-      "outputContains": ["语义闸: 全过"]
+      "outputContains": [
+        "语义闸: 全过"
+      ]
     },
-    { "ac": "AC1（草案 profile=headless（GLS 在组合内，票 10 裁决），M1/M2/M5/M7 缺证据挂 omittedModels）", "type": "file-contains", "path": "expected-output/datagov/manifest.json", "contains": ["headless", "omittedModels"] },
+    {
+      "ac": "AC1（草案 profile=headless（GLS 在组合内，票 10 裁决），M1/M2/M5/M7 缺证据挂 omittedModels）",
+      "type": "file-contains",
+      "path": "expected-output/datagov/manifest.json",
+      "contains": [
+        "headless",
+        "omittedModels"
+      ]
+    },
     {
       "ac": "AC2（草案头部固定声明「证据非权威，待 Owner 确认」·M3/GLS 两件逐一）",
       "type": "file-contains",
       "path": "expected-output/datagov/m3-rule-model.yaml",
-      "contains": ["证据非权威，待 Owner 确认"]
+      "contains": [
+        "证据非权威，待 Owner 确认"
+      ]
     },
-    { "ac": "AC2（草案头部固定声明·GLS）", "type": "file-contains", "path": "expected-output/datagov/glossary-model.yaml", "contains": ["证据非权威，待 Owner 确认"] },
+    {
+      "ac": "AC2（草案头部固定声明·GLS）",
+      "type": "file-contains",
+      "path": "expected-output/datagov/glossary-model.yaml",
+      "contains": [
+        "证据非权威，待 Owner 确认"
+      ]
+    },
     {
       "ac": "AC2（草案 file#锚点 注源计数：M3+GLS 全文 terms.md#/rules.md# 计数 ≥7）",
       "type": "cmd-succeeds",
       "cmd": "python3 -c \"import pathlib,sys; d=pathlib.Path('{fixture_dir}/expected-output/datagov'); t=''.join(p.read_text(encoding='utf-8') for p in sorted(d.glob('*.yaml'))); n=t.count('terms.md#')+t.count('rules.md#'); print('草案注源数',n); sys.exit(0 if n>=7 else 1)\"",
-      "outputContains": ["草案注源数"]
+      "outputContains": [
+        "草案注源数"
+      ]
     },
     {
       "ac": "AC2（证据索引头部声明+覆盖载体四节齐：术语候选/规则候选/疑点清单/覆盖对照表）",
       "type": "file-contains",
       "path": "expected-output/datagov-证据索引.md",
-      "contains": ["证据非权威，待 Owner 确认", "## 术语候选", "## 规则候选", "## 疑点清单", "## 覆盖对照表"]
+      "contains": [
+        "证据非权威，待 Owner 确认",
+        "## 术语候选",
+        "## 规则候选",
+        "## 疑点清单",
+        "## 覆盖对照表"
+      ]
     },
     {
       "ac": "AC2（证据索引候选/疑点条目 ≥7 条且逐条含 file#锚点：候选+疑点三节锚点计数）",
       "type": "cmd-succeeds",
       "cmd": "python3 -c \"import pathlib,sys; t=pathlib.Path('{fixture_dir}/expected-output/datagov-证据索引.md').read_text(encoding='utf-8'); i=t.find('## 术语候选'); k=t.find('## 覆盖对照表'); span=t[i:k] if 0<=i<k else ''; n=span.count('terms.md#')+span.count('rules.md#'); print('证据索引锚点数',n); sys.exit(1 if n<7 or i<0 or k<0 else 0)\"",
-      "outputContains": ["证据索引锚点数 13"]
+      "outputContains": [
+        "证据索引锚点数 13"
+      ]
     },
     {
       "ac": "AC1（萃取覆盖探针·正例：13 条标记全落对照表，exit 0）",
       "type": "cmd-succeeds",
       "cmd": "python3 -c \"import pathlib,sys; fx=pathlib.Path('{fixture_dir}'); rows=[l.split() for l in (fx/'markers.txt').read_text(encoding='utf-8').splitlines() if l.strip() and not l.startswith('#')]; t=(fx/'expected-output'/'datagov-证据索引.md').read_text(encoding='utf-8'); i=t.find('## 覆盖对照表'); sect=t[i:] if i>=0 else ''; miss=[r[0] for r in rows if ('`'+r[0]+'`') not in sect]; print('覆盖探针: 标记数',len(rows),'未覆盖',miss); sys.exit(1 if miss or i<0 else 0)\"",
-      "outputContains": ["未覆盖 []"]
+      "outputContains": [
+        "未覆盖 []"
+      ]
     },
     {
       "ac": "AC3（萃取覆盖探针·负变体：对照表缺 R6 一行=红 exit 1）",
       "type": "cmd-fails",
       "cmd": "python3 -c \"import pathlib,sys; fx=pathlib.Path('{fixture_dir}'); rows=[l.split() for l in (fx/'markers.txt').read_text(encoding='utf-8').splitlines() if l.strip() and not l.startswith('#')]; t=(fx/'negative-variants'/'datagov-证据索引.md').read_text(encoding='utf-8'); i=t.find('## 覆盖对照表'); sect=t[i:] if i>=0 else ''; miss=[r[0] for r in rows if ('`'+r[0]+'`') not in sect]; print('覆盖探针: 标记数',len(rows),'未覆盖',miss); sys.exit(1 if miss or i<0 else 0)\"",
-      "outputContains": ["未覆盖 ['R6']"]
+      "outputContains": [
+        "未覆盖 ['R6']"
+      ]
     },
-    { "ac": "AC3（负变体可追溯：注入说明在头部——探针只扫对照表节，不扫头部）", "type": "file-contains", "path": "negative-variants/datagov-证据索引.md", "contains": ["缺覆盖注入"] }
+    {
+      "ac": "AC3（负变体可追溯：注入说明在头部——探针只扫对照表节，不扫头部）",
+      "type": "file-contains",
+      "path": "negative-variants/datagov-证据索引.md",
+      "contains": [
+        "缺覆盖注入"
+      ]
+    },
+    {
+      "ac": "票34 AC3（status 字段级断言·T5：GLS 文件含「status: 废弃（替代：数据 Owner）」——文档明示废弃如实落 status 字段不洗白）",
+      "type": "file-contains",
+      "path": "expected-output/datagov/glossary-model.yaml",
+      "contains": [
+        "status: 废弃（替代：数据 Owner）"
+      ]
+    },
+    {
+      "ac": "票34 AC3（status 字段级断言·T6：GLS 文件含「status: 有效（限安全审计语境）」——限语境如实标注）",
+      "type": "file-contains",
+      "path": "expected-output/datagov/glossary-model.yaml",
+      "contains": [
+        "status: 有效（限安全审计语境）"
+      ]
+    },
+    {
+      "ac": "票34 AC3（废弃-判定探针·正例：terms.md 明示废弃条目（T5）对 GLS source 锚点对照，status 含废弃 → exit 0）",
+      "type": "cmd-succeeds",
+      "cmd": "python3 -c \"import pathlib,sys,re,yaml\nfx=pathlib.Path('{fixture_dir}')\ndoc=(fx/'input'/'terms.md').read_text(encoding='utf-8')\ndep=sorted({m.group(1) for m in re.finditer(r'^\\s*-\\s*【(T\\d+)】([^【]*)$', doc, re.M) if ('废弃' in m.group(2) or '停用' in m.group(2))})\ngls=yaml.safe_load((fx/'expected-output/datagov/glossary-model.yaml').read_text(encoding='utf-8'))\nbad=[]\nn=0\nfor t in gls.get('terms') or []:\n    m=re.search(r'terms\\.md#(T\\d+)', str(t.get('source') or ''))\n    if not m or m.group(1) not in dep: continue\n    n+=1\n    st=str(t.get('status') or '')\n    if '废弃' not in st and '禁用' not in st: bad.append([str(t.get('id')), st])\nprint('文档明示废弃条目', dep, '对照数', n, '洗白', bad)\nsys.exit(1 if bad or n==0 else 0)\"",
+      "outputContains": [
+        "文档明示废弃条目 ['T5']",
+        "对照数 1",
+        "洗白 []"
+      ]
+    },
+    {
+      "ac": "票34 AC3（废弃-判定探针·洗白负变体 t5-whitewashed：T5 status 改「有效」→ 同一判据判红 exit 1）",
+      "type": "cmd-fails",
+      "cmd": "python3 -c \"import pathlib,sys,re,yaml\nfx=pathlib.Path('{fixture_dir}')\ndoc=(fx/'input'/'terms.md').read_text(encoding='utf-8')\ndep=sorted({m.group(1) for m in re.finditer(r'^\\s*-\\s*【(T\\d+)】([^【]*)$', doc, re.M) if ('废弃' in m.group(2) or '停用' in m.group(2))})\ngls=yaml.safe_load((fx/'negative-variants/t5-whitewashed/glossary-model.yaml').read_text(encoding='utf-8'))\nbad=[]\nn=0\nfor t in gls.get('terms') or []:\n    m=re.search(r'terms\\.md#(T\\d+)', str(t.get('source') or ''))\n    if not m or m.group(1) not in dep: continue\n    n+=1\n    st=str(t.get('status') or '')\n    if '废弃' not in st and '禁用' not in st: bad.append([str(t.get('id')), st])\nprint('文档明示废弃条目', dep, '对照数', n, '洗白', bad)\nsys.exit(1 if bad or n==0 else 0)\"",
+      "outputContains": [
+        "洗白 [['GLS-DATAGOV-005', '有效']]"
+      ]
+    },
+    {
+      "ac": "票34 AC3（负变体可追溯：洗白注入说明在变体域文件头——唯一差异=T5 status 改「有效」，manifest/M3 逐字复制）",
+      "type": "file-contains",
+      "path": "negative-variants/t5-whitewashed/glossary-model.yaml",
+      "contains": [
+        "洗白注入（票 34 负变体 t5-whitewashed）"
+      ]
+    }
   ]
 }

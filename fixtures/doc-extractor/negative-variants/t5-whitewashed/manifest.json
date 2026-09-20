@@ -1,0 +1,25 @@
+{
+  "domain": "datagov",
+  "label": "数据管理制度域（doc-extractor 文档萃取草案）",
+  "profile": "headless",
+  "schemaVersion": "1.0.0",
+  "description": "【洗白负变体（票 34，t5-whitewashed）】唯一差异 = T5 status 由「废弃（替代：数据 Owner）」改「有效」——文档明示废弃的术语被洗白成有效；判据探针（assertions.json cmd-fails）读 input/terms.md 明示废弃条目与本 glossary source 锚点对照，必须判红。其余与 expected-output/datagov 参照产物一致（manifest/M3 逐字复制）。",
+  "omittedModels": [
+    {
+      "model": "M1",
+      "reason": "文档只有术语定义段与规则条款段，零对象/属性/字段证据——「有术语」不等于「有对象」，术语入 GLS 后其结构承载（哪个聚合根哪个字段）文档未给，relatedObjectRefs 全空不硬挂；对象建模待 Owner 补证据（票 32 参照产物）。"
+    },
+    {
+      "model": "M2",
+      "reason": "文档条款均为判定/叙述形态，无触发主体/前置/状态变更的完整行为语义（「执行备份」「完成整改」仅短语级提及）——不发明行为证据（票 32 参照产物）。"
+    },
+    {
+      "model": "M5",
+      "reason": "「数据 Owner」是职责称谓且已入 GLS（GLS-DATAGOV-001），无组织粒度/从属/权限边界证据；「各部门」为含糊归属——主体建模待 Owner 收敛（票 32 参照产物）。"
+    },
+    {
+      "model": "M7",
+      "reason": "文档未提及任何查询/报表/界面——零证据不建文件（票 32 参照产物）。"
+    }
+  ]
+}

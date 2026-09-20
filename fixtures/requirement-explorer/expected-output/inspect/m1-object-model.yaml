@@ -20,7 +20,7 @@ aggregates:
     description: "粗 PRD 业务对象第 1 条直译。原文言明「设备台账已有（在既有系统里），本次只做巡检这一条线」——本域设备与既有台账的关系（引用/同步/只读镜像）粗 PRD 未给，待 Owner 确认。巡检周期口径见 GLS-INSPECT-001。"
     aggregateType: AGGREGATE_ROOT
     attributes:
-      - { name: equipmentId, label: 设备编号, type: String, required: true, unique: true }
+      - { name: equipmentId, label: 设备编号, type: String, required: true, unique: true }   # unique：粗 PRD 明示「设备编号（唯一）」直译（票 34 注记）
       - { name: equipmentName, label: 设备名称, type: String, required: true }
       - { name: equipmentType, label: 设备类型, type: Enum, enumValues: [泵, 风机, 电机] }
       - { name: status, label: 设备状态, type: Enum, enumValues: [在用, 停用, 报废] }
@@ -32,7 +32,7 @@ aggregates:
     description: "粗 PRD 业务对象第 2 条直译：「一张工单挂一台设备」→ equipment 引用属性（方向/基数按原文单句直译，仍待 Owner 确认）。超期单判定判据见 RULE-INSPECT-001、术语见 GLS-INSPECT-002；「处理完把工单关闭」的闭环流转是开放问题 Q3——待 Owner 确认。"
     aggregateType: AGGREGATE_ROOT
     attributes:
-      - { name: workOrderId, label: 工单编号, type: String, required: true, unique: true }
+      - { name: workOrderId, label: 工单编号, type: String, required: true, unique: true }   # unique：工程外推（粗 PRD 未明示唯一），待 Owner 确认（票 34 注记，审查 P3）
       - { name: equipment, label: 巡检设备, type: AggregateRootRef, required: true, targetAggregate: AGG-INSPECT-001 }
       - { name: planDate, label: 计划巡检日期, type: Date, required: true }
       - { name: inspectDate, label: 实际巡检日期, type: Date }
@@ -46,7 +46,7 @@ aggregates:
     description: "粗 PRD 业务对象第 3 条直译。处理时限（handleDeadline）只落属性占位，取值口径是开放问题 Q2（原文含糊，不硬化成规则）；处理人/关闭人属性是否立，待开放问题 Q3 收敛——均待 Owner 确认。"
     aggregateType: AGGREGATE_ROOT
     attributes:
-      - { name: defectId, label: 缺陷编号, type: String, required: true, unique: true }
+      - { name: defectId, label: 缺陷编号, type: String, required: true, unique: true }   # unique：工程外推（粗 PRD 未明示唯一），待 Owner 确认（票 34 注记，审查 P3）
       - { name: workOrder, label: 发现工单, type: AggregateRootRef, required: true, targetAggregate: AGG-INSPECT-002 }
       - { name: description, label: 缺陷描述, type: String, required: true }
       - { name: level, label: 缺陷等级, type: Enum, enumValues: [一般, 严重, 紧急] }

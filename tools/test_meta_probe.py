@@ -310,6 +310,122 @@ class MetaProbeHardRedPaths(unittest.TestCase):
         self.assertEqual(items[1]["status"], "skipped")
 
 
+# ---------- 票 34 P2-A 扩根：第 2 项「目标域 + 溯源仓根」两跑，任一红即红 ----------
+
+XP_REGISTRY = {"version": 1, "models": {
+    "M1": {"name": "对象模型", "yamlFile": "m1-object-model.yaml",
+           "modelType": "OBJECT", "camp": "business-core",
+           "consumers": ["runtime"], "profiles": ["full"],
+           "dependsOn": [], "lockedFields": {}}}}
+XP_DEPS = {"version": 1, "idPrefixes": {"AGG-": "M1"},
+           "refKeys": ["ownerEntity"], "edges": []}
+XP_M1 = """model_type: OBJECT
+version: "1.0.0"
+domain: bohai
+aggregates:
+  - id: AGG-XP-001
+    name: 扩根单测对象
+    aggregateType: AGGREGATE_ROOT
+    attributes: []
+"""
+
+
+class MetaProbeSchemaRootExpansion(unittest.TestCase):
+    """票 34 扩根（AC2）：probe 第 2 项对「目标域 + 溯源 ontology 根」各跑一次
+    schema_check（目标即根时去重），任一红即红——裸仓根绿挂硬闸。溯源规则：
+    从目标目录起向上找含 schema/ 子目录的祖先（最多 3 级）。注入场景照主窗口
+    防踩坑 #2 修正：patterns 素材目录排除后其坏 YAML 不再红，「根下真域坏 YAML」
+    才是仓根闸要抓的（patterns 复现场景的修前红已由 L0/施工窗实跑留痕）。"""
+
+    def _fake_repo(self, *, patterns_bad_yaml=False, root_bad_domain=False):
+        """tempfile 假仓：ontology/schema + ontology/bohai（合法域）。"""
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        root = Path(tmp.name)
+        onto = root / "ontology"
+        (onto / "schema").mkdir(parents=True)
+        (onto / "schema" / "model-registry.json").write_text(
+            json.dumps(XP_REGISTRY), encoding="utf-8")
+        (onto / "schema" / "model-deps.json").write_text(
+            json.dumps(XP_DEPS), encoding="utf-8")
+        bohai = onto / "bohai"
+        bohai.mkdir()
+        (bohai / "manifest.json").write_text(json.dumps(
+            {"domain": "bohai", "profile": "full", "schemaVersion": "1.0.0"}),
+            encoding="utf-8")
+        (bohai / "m1-object-model.yaml").write_text(XP_M1, encoding="utf-8")
+        if patterns_bad_yaml:
+            (onto / "patterns").mkdir()
+            (onto / "patterns" / "broken-pattern.yaml").write_text(
+                "model_type: [破括号\n", encoding="utf-8")
+        if root_bad_domain:
+            bad = onto / "wildjunk"
+            bad.mkdir()
+            (bad / "m1-object-model.yaml").write_text(XP_M1, encoding="utf-8")
+        return root, bohai, onto
+
+    def _probe_real(self, target):
+        """真 subprocess runner（cwd=真仓跑真 schema_check）打 tempfile 假仓。"""
+        return mp.probe_schema(REAL_ROOT, target, mp.subprocess_runner(REAL_ROOT))
+
+    def test_target_and_root_both_run_green_with_patterns_bad_yaml(self):
+        # 修后绿态：patterns/ 坏 YAML 被素材排除——目标域与仓根两跑全过
+        _root, bohai, onto = self._fake_repo(patterns_bad_yaml=True)
+        item = self._probe_real(bohai)
+        self.assertEqual(item["status"], "green")
+        self.assertTrue(item["data"]["rootChecked"])
+        self.assertEqual(item["data"]["ontologyRoot"], str(onto))
+        self.assertEqual([r["role"] for r in item["data"]["runs"]],
+                         ["目标域", "仓根"])
+        self.assertTrue(all(r["status"] == "pass"
+                            for r in item["data"]["runs"]))
+        self.assertEqual(mp.evaluate([item]), ("PASS", 0))
+
+    def test_target_is_root_dedup_single_run(self):
+        # 目标即根（溯源返回自身）→ 去重只跑一次，不再注记 rootChecked
+        _root, _bohai, onto = self._fake_repo()
+        item = self._probe_real(onto)
+        self.assertEqual(item["status"], "green")
+        self.assertFalse(item["data"]["rootChecked"])
+        self.assertEqual([r["role"] for r in item["data"]["runs"]], ["目标域"])
+
+    def test_bad_real_domain_at_root_is_red_even_when_target_green(self):
+        # 注入红态（仓根闸的本职）：目标域 bohai 合法，根下 wildjunk 真域坏
+        # （有模型 YAML 无 manifest）——修前 probe 只跑目标域会放行，扩根后红
+        _root, bohai, _onto = self._fake_repo(root_bad_domain=True)
+        item = self._probe_real(bohai)
+        self.assertEqual(item["status"], "red")
+        self.assertEqual(mp.evaluate([item]), ("FAIL", 1))
+        self.assertIn("仓根", item["summary"])
+        roles = {r["role"]: r["status"] for r in item["data"]["runs"]}
+        self.assertEqual(roles, {"目标域": "pass", "仓根": "fail"})
+
+    def test_injected_runner_two_calls_root_red_decides(self):
+        # 注入式假 runner：按目标路径分流——目标域绿、仓根红 → 项红且取红方计数
+        _root, bohai, onto = self._fake_repo()
+        green = json.dumps({"status": "pass",
+                            "levels": {"L1": 0, "L2": 0, "L4": 0},
+                            "violations": [], "files": 1})
+        red = json.dumps({"status": "fail",
+                          "levels": {"L1": 2, "L2": 0, "L4": 0},
+                          "violations": [{"level": "L1", "kind": "x",
+                                          "file": "f", "line": 1,
+                                          "message": "m"}], "files": 3})
+        calls: list[list[str]] = []
+
+        def split_runner(cmd):
+            calls.append(cmd)
+            return (0, green, "") if cmd[2] == str(bohai) else (1, red, "")
+
+        item = mp.probe_schema(Path("/any"), bohai, split_runner)
+        self.assertEqual(len(calls), 2)  # 目标域 + 仓根各一次
+        self.assertEqual(item["status"], "red")
+        self.assertEqual(item["data"]["levels"], {"L1": 2, "L2": 0, "L4": 0})
+        self.assertEqual(item["data"]["fileCount"], 3)  # 取决定方（红）的快照
+        self.assertEqual([r["role"] for r in item["data"]["runs"]],
+                         ["目标域", "仓根"])
+
+
 class MetaProbeSignalRoutingRed(unittest.TestCase):
     """票 29 AC2：路由表自检（第 10 项）红灯可注入——坏表各形态 → 红 + exit 1。"""
 

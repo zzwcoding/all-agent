@@ -31,6 +31,10 @@ CLI 契约（票 22 L0）:
   票 25 起 R1 裁剪收敛到 Surface.in_surface 单一判定，并覆盖**名称解析候选
   产生处**：面外节点不进候选集，故不进 hits/citations/装配指令；命中集全为
   面外时按既有「未找到」（R2）语义如实拒答。
+  票 34 收敛票 25 审查指出的两处 latent 出口（R1 补齐到剩余装配面）：
+  ①GLS 命中的闭包目标先过 in_surface 再挂 --closure 装配指令（闭包全面外
+  =不产指令）；②@锚定 --impact 行的 BEHAVIOR 类型过滤叠加 in_surface camp
+  裁剪——类型过滤不豁免检索面判定。
   之后：禁用词扫问面 → 一级锚定（--impact 反向收行为）→ 二级名称解析
   （候选词对 name/alias/属性标签/GLS term+alias 的确定性分层匹配，不猜不模糊）
   → 三级闭包装配 → 四级可拒答（R2 缺件分层 + 近邻指路）。
@@ -420,8 +424,14 @@ def assemble(target: Path, surface: Surface, hit_ids: list[str],
     for hit_id in hit_ids:
         if surface.type_of(hit_id) == "GLOSSARY":
             closure = graph_query(target, hit_id, ("--closure", "1"))
-            scaffold.append(_scaffold(target_display, hit_id, "--closure 1"))
             related = [row["id"] for row in (closure or {}).get("closure", [])]
+            # R1 裁剪在装配指令产生处（票 34 收敛票 25 latent 出口①）：闭包目标
+            # 先过 Surface.in_surface——面外目标不进 citations、不产 --impact
+            # 指路；闭包全为面外时连 --closure 装配指令也不挂（不产指向面外的
+            # 装配指令）。
+            related = [rel for rel in related if surface.in_surface(rel)]
+            if related:
+                scaffold.append(_scaffold(target_display, hit_id, "--closure 1"))
             for rel in related:
                 add(rel)
             for rel in related:  # 指路实体的承载规则（瀑布 §2 术语装配）
@@ -551,7 +561,11 @@ def answer(target: Path, question: str, surface: Surface,
         hits = [{"id": anchor, "model": surface.model_of(anchor),
                  "name": surface.name_of(anchor), "via": "显式锚定直达"}]
         for row in report.get("impact", []):
-            if surface.type_of(row["id"]) == "BEHAVIOR":
+            # BEHAVIOR 过滤收敛到 Surface 判定链（票 34 收敛票 25 latent 出口②）：
+            # modelType=BEHAVIOR 但 camp≠business-core 的面外行同样不进 hits——
+            # 类型过滤不豁免 camp 裁剪，同一 in_surface 判定链说了算。
+            if surface.type_of(row["id"]) == "BEHAVIOR" \
+                    and surface.in_surface(row["id"]):
                 hits.append({"id": row["id"],
                              "model": surface.model_of(row["id"]),
                              "name": surface.name_of(row["id"]),

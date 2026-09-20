@@ -33,6 +33,8 @@
 
 `profile` 引用 model-registry.json 的 profile 组合名；未启用的模型文件出现 = L4 违规（AC6）。反向同理（票 13）：**profile 启用的模型缺文件且 manifest 无豁免 = L4 `missing-model-file` 违规**。豁免走 manifest 可选清单 `omittedModels: [{"model": "MU", "reason": "…"}]`——条目必须带非空 reason（无理由 = 无效豁免照红），引用未注册模型 = L1 红。适用场景：素材证据不支撑某模型、经裁决有意不建（如 bohai 的 MU，理由引裁决记录）。
 
+**素材目录约定（票 34，2026-09-20）**：`patterns/` = 建模素材区，不作为域扫描——schema_check 域发现对名为 `patterns` 的子目录整体排除（排除只按目录名，不按内容：其下将来出现含 manifest 的真域结构也不作为域扫）；模式件是素材不是域，**不补 manifest**（manifest=域声明，素材目录补=撒谎）。patterns/ 下模式件的结构纪律由出厂集 `fixtures/pattern-library/` 与归档闸 ontology-pattern 类（specs/archive-registry.json）承载，不经语义闸域扫描。
+
 **元素级运行期预留字段（全模型可选，一期只定义不消费，PRD F1「运行期四外衣」）**：
 - 元素级 `version`（String）：元素独立版本，供运行期消费方做兼容判断。
 - 元素级 `validFrom`（ISO 日期）：有效期起点，供运行期判断"当前可消费版本"。

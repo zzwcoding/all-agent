@@ -9,6 +9,9 @@ L4 AC6 反向闸 missing-model-file（profile 启用却缺文件，经 manifest 
 description/notes 不扫=文档自由）；票 27 元素枚举去 id 锚定——主集合每个字典即元素
 （无 id 也枚举，报缺必填身份字段，修"混入合法元素即静默逃逸"盲区），空壳守卫收窄为
 「主集合键缺失或集合为空」。
+票 34 增 P2-A 素材目录排除：域发现对名为 `patterns` 的子目录整体排除（素材目录
+不是域，不补 manifest；约定成文 schema.md §1），修"票 33 模式件进 ontology/patterns/
+后裸仓根 ontology/ 语义闸红灯"的 P2-A 缺口——裸仓根全量绿灯红线恢复。
 
 对给定 ontology 目录做确定性校验：
   L1 schema 合法——YAML 可解析（AC2）、公共字段 model_type/version/domain 在场（AC3）、
@@ -136,13 +139,25 @@ def load_json(path: Path) -> dict:
         raise ValueError(f"{path} 不是合法 JSON: {exc}") from exc
 
 
+# 素材目录（票 34 P2-A）：名为 patterns 的子目录是建模素材区不是域——不作为域
+# 扫描（含 manifest 的真域形态也不扫，排除只按目录名不按内容）；其结构纪律由
+# fixtures/pattern-library/ 出厂集与归档闸 ontology-pattern 类承载，约定见
+# schema.md §1「素材目录约定」。
+PATTERN_DIRS = ("patterns",)
+
+
 def discover_domains(target: Path) -> tuple[list[Path], list[Path]]:
-    """返回 (域目录列表, 有模型文件但缺 manifest 的目录列表)。"""
+    """返回 (域目录列表, 有模型文件但缺 manifest 的目录列表)。
+
+    票 34 P2-A：名为 patterns 的子目录整体排除（素材目录补 manifest=撒谎，
+    设计裁决不补 manifest 而是排除）；其余含模型 YAML 但缺 manifest 的目录
+    照报 missing-manifest（真域扫描一个不少）。
+    """
     if (target / "manifest.json").is_file():
         return [target], []
     domains, missing = [], []
     for sub in sorted(target.iterdir()):
-        if not sub.is_dir() or sub.name == "schema":
+        if not sub.is_dir() or sub.name == "schema" or sub.name in PATTERN_DIRS:
             continue
         if (sub / "manifest.json").is_file():
             domains.append(sub)

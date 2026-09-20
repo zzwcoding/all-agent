@@ -2,7 +2,7 @@
 
 触及: skill `semantic-service`
 
-> 断言真源（2026-09-19 起）：tickets/07、17、22 票面 AC 表 + fixtures/semantic-service/assertions.json；本表为一期原始基线。
+> 断言真源（2026-09-19 起）：tickets/07、17、22、25 票面 AC 表 + fixtures/semantic-service/assertions.json；本表为一期原始基线。
 
 ## 出厂集断言表
 

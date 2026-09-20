@@ -291,6 +291,69 @@ class DemoDomainCase(unittest.TestCase):
         self.assertEqual("answered", v["status"])
         self.assertIn("显式锚定", v["waterfall_level"])
 
+    # -- 票 34：两处 latent 出口收敛（R1 补齐到剩余装配面，最小域构造） --
+
+    def test_gls_closure_all_out_of_surface_no_scaffold(self):
+        """latent 出口①（票 25→34）：GLS 命中的闭包目标全为面外（SCR-）时，
+        --closure 装配指令不挂、面外 ID 不进 citations/scaffold_commands；
+        术语本命中照常 answered（R1 只裁装配面，不改裁决）。"""
+        gls = GLS.replace("relatedObjectRefs: [AGG-DEMO-002]",
+                          "relatedObjectRefs: [SCR-DEMO-01]")
+        (self.demo / "glossary-model.yaml").write_text(gls, encoding="utf-8")
+        rc, v = self.verdict("术语丙是什么口径")
+        self.assertEqual(0, rc)
+        self.assertEqual("answered", v["status"])
+        self.assertIn("GLS-DEMO-002", v["citations"])   # 命中本体照常入引用
+        self.assertNotIn("SCR-DEMO-01", v["citations"])
+        blob = " ".join(v["scaffold_commands"])
+        self.assertNotIn("SCR-DEMO-01", blob)           # 不产指向面外的指令
+        self.assertFalse(any("--closure" in c for c in v["scaffold_commands"]),
+                         v["scaffold_commands"])         # 闭包全面外=不挂指令
+
+    def test_gls_closure_mixed_targets_keep_in_surface_only(self):
+        """latent 出口①对照（混合闭包）：面内目标照常指路+挂 --closure 指令，
+        面外目标不出现——裁剪只出面外，不误伤面内装配。"""
+        gls = GLS.replace("relatedObjectRefs: [AGG-DEMO-002]",
+                          "relatedObjectRefs: [AGG-DEMO-002, SCR-DEMO-01]")
+        (self.demo / "glossary-model.yaml").write_text(gls, encoding="utf-8")
+        rc, v = self.verdict("术语丙是什么口径")
+        self.assertEqual(0, rc)
+        self.assertEqual("answered", v["status"])
+        self.assertIn("AGG-DEMO-002", v["citations"])   # 面内指路保留
+        self.assertTrue(any("--closure" in c for c in v["scaffold_commands"]))
+        blob = json.dumps(v, ensure_ascii=False)
+        self.assertNotIn("SCR-DEMO-01", blob)           # 面外零出现
+
+    def test_anchor_impact_rows_filtered_through_camp(self):
+        """latent 出口②（票 25→34）：@锚定 --impact 行的 BEHAVIOR 过滤收敛到
+        Surface 判定链——modelType=BEHAVIOR 但 camp=build-contract 的面外行为
+        不进 hits（类型过滤不豁免 camp 裁剪）。"""
+        deps = json.loads(json.dumps(DEPS))
+        deps["idPrefixes"]["BOP-"] = "MB"
+        (self.root / "schema" / "model-deps.json").write_text(
+            json.dumps(deps, ensure_ascii=False), encoding="utf-8")
+        registry = json.loads(json.dumps(REGISTRY))
+        registry["models"]["MB"] = {"name": "建造侧行为模型",
+                                    "modelType": "BEHAVIOR",
+                                    "camp": "build-contract"}
+        (self.root / "schema" / "model-registry.json").write_text(
+            json.dumps(registry, ensure_ascii=False), encoding="utf-8")
+        (self.demo / "mb-behavior-model.yaml").write_text(
+            "model_type: BEHAVIOR\nversion: \"1.0.0\"\ndomain: demo\n"
+            "behaviors:\n"
+            "  - id: BOP-DEMO-Build\n"
+            "    name: 建造侧处理对象甲\n"
+            "    ownerEntity: AGG-DEMO-001\n"
+            "    behaviorType: COMMAND\n", encoding="utf-8")
+        rc, v = self.verdict("@AGG-DEMO-001 有哪些行为")
+        self.assertEqual(0, rc)
+        self.assertEqual("answered", v["status"])
+        hit_ids = [h["id"] for h in v["hits"]]
+        self.assertIn("BH-DEMO-Do", hit_ids)      # 面内行为照常反向收集
+        self.assertNotIn("BOP-DEMO-Build", hit_ids)
+        # 面外 BEHAVIOR 行全账零出现（hits/citations/装配指令皆无）
+        self.assertNotIn("BOP-DEMO-Build", json.dumps(v, ensure_ascii=False))
+
     # -- CLI/配置 --
 
     def test_config_error_without_schema(self):

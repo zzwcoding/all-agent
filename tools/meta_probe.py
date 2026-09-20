@@ -6,7 +6,8 @@
 
 十项（〔硬闸〕红 → 退出码 1；（信息）红只注记不判死）：
   1.〔硬闸〕出厂集：fixture_run --require-fixtures --json，逐套 PASS/PENDING/FAIL
-  2.〔硬闸〕语义闸：schema_check <target> --json，L1/L2/L4 计数
+  2.〔硬闸〕语义闸：schema_check 对「目标域 + 溯源 ontology 根」各跑一次（票 34
+     扩根，目标即根时去重；任一红即红），L1/L2/L4 计数
   3.（信息）CORE 分布：八问逐条 semantic_service_core --json，status 分布+期望对照。
      八问常量表与 fixtures/semantic-service/assertions.json CORE-01–08 同步维护
      （断言 fixture 是真源，此处是探针内置副本）——改问/改期望两处一起改。
@@ -276,29 +277,71 @@ def probe_fixtures(root: Path, runner: Runner) -> dict:
                        "runnerExitCode": rc, "reportStatus": data.get("status")})
 
 
+def find_ontology_root(target: Path) -> Path | None:
+    """溯源 ontology 根（票 34 P2-A 扩根）：从目标目录起向上找含 `schema/`
+    子目录的祖先（含目标自身，最多向上 3 级）。目标本身即根时返回自身
+    （probe 侧去重只跑一次）；3 级内找不到返回 None（仅跑目标域）。"""
+    cur = target
+    for depth in range(4):  # 自身 + 向上 3 级
+        if (cur / "schema").is_dir():
+            return cur
+        if depth == 3 or cur.parent == cur:
+            break
+        cur = cur.parent
+    return None
+
+
 def probe_schema(root: Path, target: Path, runner: Runner) -> dict:
-    """2. 语义闸：schema_check <target>，L1/L2/L4 计数。"""
-    rc, out, err = runner([sys.executable, "tools/schema_check.py",
-                           str(target), "--json"])
-    data, skip = _load_tool_json(rc, out, err)
-    if data is None:
-        return _hard_item("2", "skipped", f"语义闸不可用，降级 SKIPPED：{skip}",
-                          error=err.strip() or skip)
-    levels = data.get("levels", {})
-    n_viol = len(data.get("violations", []))
-    files = data.get("files")
-    n_files = files if isinstance(files, int) else None
-    ok = rc == 0 and data.get("status") == "pass"
+    """2. 语义闸：schema_check 对「目标域 + 溯源 ontology 根」各跑一次（票 34
+    扩根——根是任一域的超集，裸仓根绿挂硬闸：patterns 排除后域内绿不等于仓根
+    绿，根下任一真域坏 YAML 根必红），L1/L2/L4 计数；目标即根时去重只跑一次。
+    硬闸语义：任一红即红。"""
+    checks = [target]
+    ont_root = find_ontology_root(target)
+    if ont_root is not None and ont_root != target:
+        checks.append(ont_root)
+    runs: list[dict] = []
+    for tgt in checks:
+        rc, out, err = runner([sys.executable, "tools/schema_check.py",
+                               str(tgt), "--json"])
+        data, skip = _load_tool_json(rc, out, err)
+        if data is None:
+            return _hard_item("2", "skipped", f"语义闸不可用，降级 SKIPPED：{skip}",
+                              error=err.strip() or skip)
+        levels = data.get("levels", {})
+        files = data.get("files")
+        runs.append({
+            "target": str(tgt),
+            "role": "目标域" if tgt == target else "仓根",
+            "status": data.get("status"),
+            "levels": {"L1": levels.get("L1", 0), "L2": levels.get("L2", 0),
+                       "L4": levels.get("L4", 0)},
+            "violationCount": len(data.get("violations", [])),
+            "fileCount": files if isinstance(files, int) else None,
+            "runnerExitCode": rc,
+        })
+    reds = [r for r in runs if r["status"] != "pass" or r["runnerExitCode"] != 0]
+    deciding = reds[0] if reds else runs[0]
+    ok = not reds
+    levels = deciding["levels"]
+    n_files = deciding["fileCount"]
+    n_viol = sum(r["violationCount"] for r in runs)
     if ok:
-        summary = (f"L1/L2/L4 全 0（pass）"
+        scope = "目标域" + ("+仓根" if len(runs) > 1 else "")
+        summary = (f"L1/L2/L4 全 0（pass，{scope}）"
                    + (f"，检查文件 {n_files}" if n_files is not None else ""))
     else:
-        summary = (f"语义闸有红：L1 {levels.get('L1', 0)} / L2 {levels.get('L2', 0)}"
-                   f" / L4 {levels.get('L4', 0)}（violation {n_viol} 条，rc={rc}）")
+        summary = (f"语义闸有红（{'、'.join(r['role'] for r in reds)}）："
+                   f"L1 {levels.get('L1', 0)} / L2 {levels.get('L2', 0)}"
+                   f" / L4 {levels.get('L4', 0)}（violation {n_viol} 条，"
+                   f"rc={deciding['runnerExitCode']}）")
     return _hard_item("2", "green" if ok else "red", summary,
-                      {"status": data.get("status"), "levels": levels,
+                      {"status": deciding["status"], "levels": levels,
                        "violationCount": n_viol, "fileCount": n_files,
-                       "runnerExitCode": rc})
+                       "runnerExitCode": deciding["runnerExitCode"],
+                       "ontologyRoot": str(ont_root) if ont_root else None,
+                       "rootChecked": len(runs) > 1,
+                       "runs": runs})
 
 
 def probe_core(root: Path, target: Path, runner: Runner) -> dict:
@@ -664,8 +707,16 @@ def render_md(items: list[dict], conclusion: str, target: Path, root: Path,
                 lines.append(f"| {s['name']} | {mark} |")
         elif i["id"] == "2" and d.get("levels") is not None:
             lv = d["levels"]
-            lines += [f"- L1: {lv.get('L1', 0)}　L2: {lv.get('L2', 0)}　"
+            scope = ("目标域 + 仓根（" + d["ontologyRoot"] + "）"
+                     if d.get("rootChecked") else "仅目标域")
+            lines += [f"- 检查范围: {scope}",
+                      f"- L1: {lv.get('L1', 0)}　L2: {lv.get('L2', 0)}　"
                       f"L4: {lv.get('L4', 0)}　violation: {d.get('violationCount', 0)}"]
+            for r in d.get("runs", []):
+                mark = "pass" if r["status"] == "pass" else f"红（{r['status']}）"
+                lines.append(f"  - {r['role']} `{r['target']}`: {mark}"
+                             f"（L1 {r['levels']['L1']} / L2 {r['levels']['L2']}"
+                             f" / L4 {r['levels']['L4']}）")
         elif i["id"] == "3" and d.get("questions"):
             dist = d["dist"]
             lines.append("status 分布: " + "，".join(

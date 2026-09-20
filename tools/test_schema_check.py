@@ -257,6 +257,64 @@ class Misc(Base):
         self.assertEqual(v["line"], 7)
 
 
+# ---------- 票 34 P2-A：patterns/ 素材目录排除（裸仓根绿灯红线恢复）----------
+
+class PatternDirExclusion(Base):
+    """票 34 P2-A 单测面：patterns/ 是建模素材区不是域——域发现整体排除，
+    素材目录不补 manifest（manifest=域声明，素材目录补=撒谎，设计裁决）。
+    两场景钉死（排除只按目录名 patterns，不按内容）+ 真域零扰动红线；
+    约定成文 ontology/schema/schema.md §1「素材目录约定」。
+    """
+
+    PATTERN_YAML = """model_type: OBJECT
+version: "1.0.0"
+domain: patterns
+aggregates:
+  - id: AGG-PATTERN-001
+    name: 状态机聚合模式件
+    aggregateType: AGGREGATE_ROOT
+    attributes: []
+"""
+
+    def test_patterns_yaml_without_manifest_not_reported(self):
+        # 甲（票 33 复现场景）：patterns/ 放模式件 YAML、无 manifest——
+        # 修前裸仓根报 L1 missing-manifest 1 处（P2-A 实锤），修后整体排除
+        write(self.root / "patterns" / "state-machine-lifecycle.yaml",
+              self.PATTERN_YAML)
+        report = self.run_check()
+        self.assertEqual(report["status"], "pass", report["violations"])
+        self.assertNotIn("missing-manifest", self.kinds(report))
+        self.assertNotIn("patterns", [d["domain"] for d in report["domains"]])
+        # 红线：真域扫描一个不少——同仓根 demo 域照常在列
+        self.assertIn("demo", [d["domain"] for d in report["domains"]])
+
+    def test_patterns_with_manifest_still_not_scanned_as_domain(self):
+        # 乙（防内容漂移）：patterns/ 下将来出现真域结构（含 manifest）仍不作为
+        # 域扫描——排除只按目录名；其结构纪律归 fixtures/pattern-library/ 出厂集
+        # 与归档闸 ontology-pattern 类，不归语义闸域扫描
+        write(self.root / "patterns" / "manifest.json", json.dumps(
+            {"domain": "patterns", "profile": "full", "schemaVersion": "1.0.0"}))
+        write(self.root / "patterns" / "m1-object-model.yaml", self.PATTERN_YAML)
+        report = self.run_check()
+        self.assertNotIn("patterns", [d["domain"] for d in report["domains"]])
+        # 若被当域扫：profile=full 启用 M2/GLS 缺文件必红 missing-model-file——
+        # 零违规即证明确实没扫
+        self.assertEqual(report["violations"], [])
+
+    def test_non_pattern_dir_with_yaml_still_missing_manifest(self):
+        # 对照（排除不外溢）：其余名字的目录含模型 YAML 缺 manifest 照报——
+        # 排除只对 patterns 目录生效，真域缺失 manifest 一个不少
+        write(self.root / "wild" / "m1-object-model.yaml", M1)
+        write(self.root / "patterns" / "state-machine-lifecycle.yaml",
+              self.PATTERN_YAML)
+        kinds = self.kinds()
+        self.assertIn("missing-manifest", kinds)
+        v = next(v for v in self.run_check()["violations"]
+                 if v["kind"] == "missing-manifest")
+        self.assertIn("wild", v["file"])
+        self.assertNotIn("patterns", v["file"])
+
+
 GLOSSARY = """model_type: GLOSSARY
 version: "1.0.0"
 domain: demo
