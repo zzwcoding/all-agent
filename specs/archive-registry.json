@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "description": "归档登记表（项目内产物归档唯一真源，设计案「两条验收主线」主线 2）。每类产物 → 路径模式（落在 repo-layout.json 登记的目录内）+ 必备字段 + 状态字段与合法值 + 翻转人。消费方：tools/archive_check.py。本表从 sdd-flow2 票 01 版实例化到本仓：ticket 状态值 todo/doing/done；票面 NN-*.md；新增 ontology 产物类（schema 文档/注册表/域 manifest/模型 YAML，票 03）；票 23 增 MCP capability manifest 产物类（exports/mcp/，派生物禁手改）；票 26 增 proposal/walkthrough/review 三类（第四轮审查账目清偿，必备字段以实跑驱动收敛）。",
+  "description": "归档登记表（项目内产物归档唯一真源，设计案「两条验收主线」主线 2）。每类产物 → 路径模式（落在 repo-layout.json 登记的目录内）+ 必备字段 + 状态字段与合法值 + 翻转人。消费方：tools/archive_check.py。本表从 sdd-flow2 票 01 版实例化到本仓：ticket 状态值 todo/doing/done；票面 NN-*.md；新增 ontology 产物类（schema 文档/注册表/域 manifest/模型 YAML，票 03）；票 23 增 MCP capability manifest 产物类（exports/mcp/，派生物禁手改）；票 26 增 proposal/walkthrough/review 三类（第四轮审查账目清偿，必备字段以实跑驱动收敛）；票 37 增 devkit/skillpack 两类（exports 生成物人审头入归档闸机判面，第六轮审查账目清偿）。",
   "fieldConventions": {
     "pathPatterns": "仓根相对的 fnmatch glob；命中的文件接受该类产物的必备字段/状态检查。",
     "requiredFields": "必备字段。md 类为必现的行前缀或关键节名；json 类为顶层键；yaml 类为必现文本。",
@@ -170,6 +170,36 @@
       },
       "statusNote": "派生物禁手改：本体演进后必须再生，新鲜度由 --check 再制一致断言承载（fixtures/mcp-publisher AC2）；归档闸对 json 类只查必备顶层键（check_json_artifact 不查状态值），状态契约按生成器模板前置登记（生成器固定写「已生成」），闸后续增强时零返工。",
       "producer": "票 23 起 tools/mcp_manifest_gen.py（零时间戳确定性派生物，同本体仓任意机器重生成字节一致）"
+    },
+    {
+      "type": "devkit",
+      "label": "应用开发包（发布物派生物，exports/devkit/<域>/，票 35 起；票 37 登记产物类）",
+      "layoutDir": "exports",
+      "pathPatterns": ["exports/devkit/**/*.md", "exports/devkit/**/*.json"],
+      "template": "tools/app_pack_gen.py（确定性装配：YAML 机读 + 提案 frontmatter 扫描，零 LLM 零时间戳）",
+      "requiredFields": ["status"],
+      "status": {
+        "field": "status",
+        "values": ["待Owner人审（生成物禁手改，可再生）"],
+        "flippedBy": "不适用（派生物由 tools/app_pack_gen.py 再生产出，不人工改写；人审结论经提案/票据落定后随再生更新）"
+      },
+      "statusNote": "人审头的归档闸侧保护（票 37，第六轮审查账目）：生成物头部 `status: 待Owner人审…` 是 PRD 决策 2 的人审锚，登记后归档闸机判该行/键在场与合法值——md 类按行前缀正则取首个非空 token（全角括号内无空格，整串命中），json 类只查顶层键在场（check_json_artifact 不查状态值，与 mcp-manifest 同款前置登记）。内容裁决归 Owner；派生物禁手改，新鲜度由 --check 再制一致断言承载（fixtures/app-pack-gen AC2）。",
+      "producer": "票 35 起 tools/app_pack_gen.py（零时间戳确定性派生物，同本体仓任意机器重生成字节一致）"
+    },
+    {
+      "type": "skillpack",
+      "label": "可对话技能包（发布物派生物，exports/skillpkg/<域>/，票 36 起；票 37 登记产物类）",
+      "layoutDir": "exports",
+      "pathPatterns": ["exports/skillpkg/**"],
+      "template": "tools/skill_pack_gen.py（camp 切片确定性装配：SKILL.md frontmatter+正文双 status 行 + skillpack.json 机读镜像，零 LLM 零时间戳）",
+      "requiredFields": ["status"],
+      "status": {
+        "field": "status",
+        "values": ["待Owner人审（生成物禁手改，可再生）"],
+        "flippedBy": "不适用（派生物由 tools/skill_pack_gen.py 再生产出，不人工改写；人审结论经提案/票据落定后随再生更新）"
+      },
+      "statusNote": "人审头的归档闸侧保护（票 37，第六轮审查账目），同 devkit 类：SKILL.md `status: 待Owner人审…` 机判在场与合法值（frontmatter 与正文各一行，正则取首个命中，两行同值），skillpack.json 顶层 status 键在场即可。内容裁决归 Owner；派生物禁手改，新鲜度由 --check 再制一致断言承载（fixtures/skill-pack-gen AC2）。",
+      "producer": "票 36 起 tools/skill_pack_gen.py（零时间戳确定性派生物，同本体仓任意机器重生成字节一致）"
     },
     {
       "type": "ontology-schema-doc",
