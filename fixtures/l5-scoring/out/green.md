@@ -1,6 +1,6 @@
 # L5 评分报告（l5_score · 票 42）
 
-- 生成时间: 2026-09-20 21:10:13
+- 生成时间: 2026-09-20 21:10:55
 - rubrics 目录: /Users/divh/Downloads/All-agent/fixtures/l5-scoring/rubrics
 - 评分结果来源: /Users/divh/Downloads/All-agent/fixtures/l5-scoring/results-green
 - 形态: 确定性骨架（零模型调用）——LLM 评分由运行时子 agent 产出评分结果 JSON（协议: specs/l5_score.md），本脚本只校验、聚合、判定、留痕
