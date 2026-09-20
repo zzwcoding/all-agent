@@ -4,3 +4,6 @@ __pycache__/
 *.pyc
 # 票 24：MCP 实弹 venv（执行面，不入库）
 .venv*/
+# 票 52：ddd-modeler 工序中间件工作区（逐轮 YAML，工作件不入库——归档闸 design-card 类
+# 要求 status、五查闸只认四类设计件，中间件混入任一面都是红，实跑确认记 lessons/53）
+tmp/

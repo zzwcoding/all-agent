@@ -1,6 +1,6 @@
 {
-  "skill": "ddd-modeler（DDD 战术设计，票 50 开卡；本套=tools/ddd_check.py 五查闸出厂集，票 51 建）",
-  "description": "第八套出厂集（fixtures 7→8 套，真源=tickets/51-ddd_check闸与第八套出厂集.md 票面 AC 表，DDD- 前缀标签防撞沿 CONS-/REQ- 先例）：最小订单域（中性：订单 AGG-ORDER-001/订单项 AGG-ORDER-002/支付 AGG-ORDER-003，词条 GLS-ORDER-001..007）。目录形态：inputs/ontology/order=自造本体词条输入（不借真域 bohai——避免与真域词条耦合，取舍见 lessons/52；schema 机读表经 ../schema 符号链接取自仓内 ontology/schema，单一真源沿 schema_check 套先例）；expected/=绿灯样本（四类设计件全齐，形照 design/ddd/README.md §1–§4 最小合法样例，即 ddd-modeler 工序的期望产物形态——ddd_check 是闸不是生成器，设计件本身就是产物，故 expected/ 即正例对象、不另设生成物）；negative-variants/ 七目录=五查负变体各一（每目录 README.md 注明变体缺陷与期望码；由绿灯副本精确单点变异生成，保证红因唯一）+ ac3a-multi-error（三类错误一次收齐，failFast=false）+ ac3b-granularity（支付聚合零事件→人审清单软节在场、exit 仍 0）。判定细则：D1 点号路径左段解析到另一聚合卡聚合主词条即内嵌红（本聚合自身结构引用合法；左段解析不到归 D2 红因不混）；D2 词条集合=collect_definitions 同族口径（id/*Id 定义键非 ref 键带 model-deps.json idPrefixes 注册前缀，独立实现对齐、单测 ResolutionFamilyAlignment 钉死）；D3 清单空与三元组缺项同码（AC1c 两形态各一实例）；D4 缺表名/列名/term 与映射聚合不在设计件集合；D5 四命名空间（聚合/实体/事件/仓储）重名报双位置+ID-role 注册前缀+事件名大写下划线；kind 不可判读文件报 ddd-file-kind（票 51 五查之外的结构兜底，防坏文件静默逃逸，lessons/52 记边界）。退出码 0/1/2 契约：本套 cmd-succeeds/cmd-fails 断言钉 0 与非零路径，2 路径以「配置错误」报文钉（该报文仅在退出码 2 分支输出），精确退出码整数由 tools/test_ddd_check.py ExitCodes 类断言（AC4 双层实证）。",
+  "skill": "ddd-modeler（DDD 战术设计，票 50 开卡；本套=tools/ddd_check.py 五查闸出厂集（票 51 建）+ skill 轨工序出厂集（票 52 扩充））",
+  "description": "第八套出厂集（fixtures 7→8 套，真源=tickets/51-ddd_check闸与第八套出厂集.md 票面 AC 表，DDD- 前缀标签防撞沿 CONS-/REQ- 先例）：最小订单域（中性：订单 AGG-ORDER-001/订单项 AGG-ORDER-002/支付 AGG-ORDER-003，词条 GLS-ORDER-001..007）。目录形态：inputs/ontology/order=自造本体词条输入（不借真域 bohai——避免与真域词条耦合，取舍见 lessons/52；schema 机读表经 ../schema 符号链接取自仓内 ontology/schema，单一真源沿 schema_check 套先例）；expected/=绿灯样本（四类设计件全齐，形照 design/ddd/README.md §1–§4 最小合法样例，即 ddd-modeler 工序的期望产物形态——ddd_check 是闸不是生成器，设计件本身就是产物，故 expected/ 即正例对象、不另设生成物）；negative-variants/ 七目录=五查负变体各一（每目录 README.md 注明变体缺陷与期望码；由绿灯副本精确单点变异生成，保证红因唯一）+ ac3a-multi-error（三类错误一次收齐，failFast=false）+ ac3b-granularity（支付聚合零事件→人审清单软节在场、exit 仍 0）。判定细则：D1 点号路径左段解析到另一聚合卡聚合主词条即内嵌红（本聚合自身结构引用合法；左段解析不到归 D2 红因不混）；D2 词条集合=collect_definitions 同族口径（id/*Id 定义键非 ref 键带 model-deps.json idPrefixes 注册前缀，独立实现对齐、单测 ResolutionFamilyAlignment 钉死）；D3 清单空与三元组缺项同码（AC1c 两形态各一实例）；D4 缺表名/列名/term 与映射聚合不在设计件集合；D5 四命名空间（聚合/实体/事件/仓储）重名报双位置+ID-role 注册前缀+事件名大写下划线；kind 不可判读文件报 ddd-file-kind（票 51 五查之外的结构兜底，防坏文件静默逃逸，lessons/52 记边界）。退出码 0/1/2 契约：本套 cmd-succeeds/cmd-fails 断言钉 0 与非零路径，2 路径以「配置错误」报文钉（该报文仅在退出码 2 分支输出），精确退出码整数由 tools/test_ddd_check.py ExitCodes 类断言（AC4 双层实证）。票 52 扩充（skill 轨，S 前缀标签）：skill-corpus/=固定本体输入上 ddd-modeler 五步工序的逐轮中间件样例（轮 1 时间轴/轮 2 命令/轮 3 聚合候选/轮 4 合并追问，格式真源=skills/ddd-modeler/references/slicing-playbook.md §4）+ human-review.md（待人审清单随行件样例），成稿终态即 expected/（单一真源不复制，anti-drift 沿 lessons/52 取舍）；断言钉三件事——中间件逐轮在场（file-exists 逐轮）、聚合卡结构（expected/aggregate-order.yaml 的 aggregate_root 与不变量三元组在场）、新鲜上下文链条（input_of_round 逐轮衔接，cmd 断言）与中间件非设计件（无 status 面）。发现机制注记：fixture_run 按 fixtures/ 直接子目录发现套件、每套读根 assertions.json（不递归）——skill 轨与闸轨同居本套 assertions.json，suite 数不变（17），嵌套 assertions.json 不会被独立发现（票 52 实跑确认，lessons/53 记）。",
   "assertions": [
     {
       "ac": "AC1a",
@@ -67,6 +67,80 @@
       "type": "cmd-fails",
       "cmd": "python3 tools/ddd_check.py {fixture_dir}/negative-variants/nonexistent-dir",
       "outputContains": ["配置错误", "目标目录不存在"]
+    },
+    {
+      "ac": "S1 中间件清单·轮 1 事件时间轴在场（逐轮 file-exists，票 52 AC3）",
+      "type": "file-exists",
+      "path": "skill-corpus/round-1-event-timeline.yaml"
+    },
+    {
+      "ac": "S2 中间件清单·轮 2 命令清单在场",
+      "type": "file-exists",
+      "path": "skill-corpus/round-2-commands.yaml"
+    },
+    {
+      "ac": "S3 中间件清单·轮 3 聚合候选在场",
+      "type": "file-exists",
+      "path": "skill-corpus/round-3-aggregate-candidates.yaml"
+    },
+    {
+      "ac": "S4 中间件清单·轮 4 合并追问记录在场（必走步的产物面）",
+      "type": "file-exists",
+      "path": "skill-corpus/round-4-merge-review.yaml"
+    },
+    {
+      "ac": "S5 轮 1 结构：round/artifact 头+事件词条锚+来源线索+开放问题位（术语锚定证据随中间件走）",
+      "type": "file-contains",
+      "path": "skill-corpus/round-1-event-timeline.yaml",
+      "contains": ["round: 1", "artifact: event-timeline", "ORDER_SUBMITTED", "- GLS-ORDER-001", "origin:", "open_questions:"]
+    },
+    {
+      "ac": "S6 轮 2 结构：只喂上轮定稿（input_of_round 留痕）+命令挂触发事件",
+      "type": "file-contains",
+      "path": "skill-corpus/round-2-commands.yaml",
+      "contains": ["round: 2", "input_of_round: tmp/ddd/order/round-1-event-timeline.yaml", "triggers_event: ORDER_SUBMITTED", "triggers_event: PAYMENT_SUCCEEDED"]
+    },
+    {
+      "ac": "S7 轮 3 结构：候选=词条根+一致性锚（切碎不收口，合并留轮 4）",
+      "type": "file-contains",
+      "path": "skill-corpus/round-3-aggregate-candidates.yaml",
+      "contains": ["round: 3", "artifact: aggregate-candidates", "candidate: AGG-ORDER-001", "candidate: AGG-ORDER-002", "candidate: AGG-ORDER-003", "consistency_anchor:"]
+    },
+    {
+      "ac": "S8 轮 4 结构：合并追问话术（同时成立/同时改）+裁决 verdict+并入去向",
+      "type": "file-contains",
+      "path": "skill-corpus/round-4-merge-review.yaml",
+      "contains": ["round: 4", "artifact: merge-review", "同时成立/同时改", "verdict: merge", "merged_into: AGG-ORDER-001", "verdict: keep-apart", "resolved_candidates:"]
+    },
+    {
+      "ac": "S9 轮 4 新鲜上下文链条头（input_of_round 指向轮 3 定稿，格式锚 regex）",
+      "type": "file-matches-regex",
+      "path": "skill-corpus/round-4-merge-review.yaml",
+      "pattern": "^input_of_round: tmp/ddd/order/round-3-aggregate-candidates\\.yaml$"
+    },
+    {
+      "ac": "S10 新鲜上下文链条完整性：轮 2→1、轮 3→2、轮 4→3 逐轮衔接（纪律变机判断言）",
+      "type": "cmd-succeeds",
+      "cmd": "python3 -c \"import pathlib,sys; fx=pathlib.Path('{fixture_dir}/skill-corpus'); r={n:(fx/f).read_text(encoding='utf-8') for n,f in [(1,'round-1-event-timeline.yaml'),(2,'round-2-commands.yaml'),(3,'round-3-aggregate-candidates.yaml'),(4,'round-4-merge-review.yaml')]}; chain=[r[2].find('round-1-event-timeline.yaml')>=0, r[3].find('round-2-commands.yaml')>=0, r[4].find('round-3-aggregate-candidates.yaml')>=0]; print('新鲜上下文链条:', '完整' if all(chain) else '断裂'); sys.exit(0 if all(chain) else 1)\"",
+      "outputContains": ["新鲜上下文链条: 完整"]
+    },
+    {
+      "ac": "S11 聚合卡结构断言：aggregateRoot 标记+不变量三元组（trigger/expect_fail/method）在场（票 52 AC3，成稿终态=expected/ 单一真源）",
+      "type": "file-contains",
+      "path": "expected/aggregate-order.yaml",
+      "contains": ["aggregate_root: true", "invariants:", "trigger:", "expect_fail:", "method:"]
+    },
+    {
+      "ac": "S12 待人审清单随行件样例在场：机判绿≠人审完，粒度/完备性问题逐条交 Owner",
+      "type": "file-contains",
+      "path": "skill-corpus/human-review.md",
+      "contains": ["待人审清单", "聚合粒度", "Owner", "草案"]
+    },
+    {
+      "ac": "S13 中间件非设计件：逐轮无 status 面（不入 design-card 机判面，tmp 不入仓约定的机判镜像）",
+      "type": "cmd-succeeds",
+      "cmd": "python3 -c \"import pathlib,sys; fx=pathlib.Path('{fixture_dir}/skill-corpus'); bad=[p.name for p in sorted(fx.glob('round-*.yaml')) if any(l.startswith('status:') for l in p.read_text(encoding='utf-8').splitlines())]; print('中间件无status面:', '过' if not bad else bad); sys.exit(0 if not bad else 1)\"",
+      "outputContains": ["中间件无status面: 过"]
     }
   ]
 }

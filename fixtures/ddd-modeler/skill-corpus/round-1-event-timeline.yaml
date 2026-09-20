@@ -1,0 +1,21 @@
+# 工序中间件样例（票 52 skill 轨出厂集）·轮 1/4：事件时间轴
+# 中间件是工作件不是设计件：无 status、不写 design/ddd/、不进 MR（运行时落 tmp/ddd/<域>/，tmp/ 不入仓）。
+# 本样例与 skills/ddd-modeler/references/slicing-playbook.md §4 格式互为镜像；成稿终态见 ../expected/。
+round: 1
+artifact: event-timeline
+domain: order
+input_of_round: inputs/ontology/order（本体模型产物：模型文件+glossary，语义闸绿）
+events:
+  - event: ORDER_SUBMITTED
+    position: 下单成功后
+    terms:
+      - GLS-ORDER-001
+      - GLS-ORDER-002
+    origin: 行为清单「提交订单」
+  - event: PAYMENT_SUCCEEDED
+    position: 支付成功后
+    terms:
+      - GLS-ORDER-006
+      - GLS-ORDER-007
+    origin: 行为清单「支付扣款成功」
+open_questions: []

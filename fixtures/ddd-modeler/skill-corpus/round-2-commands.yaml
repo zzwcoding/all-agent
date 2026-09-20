@@ -1,0 +1,20 @@
+# 工序中间件样例（票 52 skill 轨出厂集）·轮 2/4：命令清单
+# 新鲜上下文纪律：本轮新开上下文，只喂轮 1 定稿（input_of_round 留痕），不带轮 1 的对话与草稿。
+round: 2
+artifact: commands
+domain: order
+input_of_round: tmp/ddd/order/round-1-event-timeline.yaml
+commands:
+  - command: 提交订单
+    actor: 下单用户
+    triggers_event: ORDER_SUBMITTED
+    terms:
+      - GLS-ORDER-001
+      - GLS-ORDER-002
+  - command: 支付扣款
+    actor: 支付方
+    triggers_event: PAYMENT_SUCCEEDED
+    terms:
+      - GLS-ORDER-006
+      - GLS-ORDER-007
+open_questions: []

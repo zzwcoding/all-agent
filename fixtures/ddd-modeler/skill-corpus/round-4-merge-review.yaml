@@ -1,0 +1,30 @@
+# 工序中间件样例（票 52 skill 轨出厂集）·轮 4/4：合并追问记录（必走步）
+# 新鲜上下文纪律：本轮新开上下文，只喂轮 3 定稿。
+# 合并候选显式追问："这几个候选是否必须同时成立/同时改？"——判据满足才并，有疑义 pending 不擅断。
+round: 4
+artifact: merge-review
+domain: order
+input_of_round: tmp/ddd/order/round-3-aggregate-candidates.yaml
+merge_questions:
+  - question: 候选 AGG-ORDER-001 与 AGG-ORDER-002 是否必须同时成立/同时改？
+    candidates:
+      - AGG-ORDER-001
+      - AGG-ORDER-002
+    answer: 是——订单项不能脱离订单存在，无订单中间态，必须同聚合一个事务整体保存
+    verdict: merge
+    merged_into: AGG-ORDER-001
+    decided_by: Owner
+  - question: 候选 AGG-ORDER-001 与 AGG-ORDER-003 是否必须同时成立/同时改？
+    candidates:
+      - AGG-ORDER-001
+      - AGG-ORDER-003
+    answer: 否——订单提交与支付成功可分别成立，跨聚合拆事务+领域事件串联
+    verdict: keep-apart
+    decided_by: Owner
+resolved_candidates:
+  - aggregate: AGG-ORDER-001
+    absorbed:
+      - AGG-ORDER-002
+  - aggregate: AGG-ORDER-003
+    absorbed: []
+pending_questions: []

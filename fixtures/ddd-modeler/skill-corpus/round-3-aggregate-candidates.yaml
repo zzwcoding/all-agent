@@ -1,0 +1,25 @@
+# 工序中间件样例（票 52 skill 轨出厂集）·轮 3/4：聚合候选
+# 新鲜上下文纪律：本轮新开上下文，只喂轮 2 定稿。本步只列候选不合并——
+# 切碎没关系，轮 4 合并追问收口（对冲 LLM 切片偏碎偏差：先允许碎，再按判据并）。
+round: 3
+artifact: aggregate-candidates
+domain: order
+input_of_round: tmp/ddd/order/round-2-commands.yaml
+candidates:
+  - candidate: AGG-ORDER-001
+    member_terms:
+      - GLS-ORDER-001
+      - GLS-ORDER-002
+    consistency_anchor: 订单编号与下单时间随订单同生同改
+  - candidate: AGG-ORDER-002
+    member_terms:
+      - GLS-ORDER-003
+      - GLS-ORDER-004
+      - GLS-ORDER-005
+    consistency_anchor: 行数量/行单价/收货地址随订单项同生同改
+  - candidate: AGG-ORDER-003
+    member_terms:
+      - GLS-ORDER-006
+      - GLS-ORDER-007
+    consistency_anchor: 支付金额与支付状态同时成立
+open_questions: []

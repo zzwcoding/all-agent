@@ -1,6 +1,6 @@
 # 票 52：ddd-modeler skill 正文（skill 轨出厂集先行）
 
-Status: todo
+Status: done
 
 > 注（L0 拆票时点）：依赖票 50（卡与格式真源）、票 51（ddd_check——skill 的自检工具）。本票写 skill 正文，出厂集先行红→绿。
 Belongs to: docs/第四期DDD线拆票方案.md 批次二；docs/ddd-modeler-建造交接包.md §3.1；references/ddd-as-code-digest.md §2/§5
@@ -28,11 +28,11 @@ Touches: skills/ddd-modeler/（正本）、~/.agents/skills/ddd-modeler/（安�
 
 ## 验收（注源）
 
-- [ ] AC1 出厂集先行红→绿留痕（lessons/52 记录）（源：本票 AC 表）
-- [ ] AC2 五步工序正文在场，含"合并追问"显式步骤与"新鲜上下文只喂定稿"纪律（源：实读）
-- [ ] AC3 出厂集断言：固定输入 → 聚合卡结构断言 + 中间件清单断言全过（源：CI）
-- [ ] AC4 触发面选配路由明文 + 安装位双落零漂移（pre-commit install_skills --check 绿）（源：CI）
-- [ ] AC5 `bash tools/ci.sh` 四闸绿（源：CI）
+- [x] AC1 出厂集先行红→绿留痕（lessons/52 记录）（源：本票 AC 表）
+- [x] AC2 五步工序正文在场，含"合并追问"显式步骤与"新鲜上下文只喂定稿"纪律（源：实读）
+- [x] AC3 出厂集断言：固定输入 → 聚合卡结构断言 + 中间件清单断言全过（源：CI）
+- [x] AC4 触发面选配路由明文 + 安装位双落零漂移（pre-commit install_skills --check 绿）（源：CI）
+- [x] AC5 `bash tools/ci.sh` 四闸绿（源：CI）
 
 ## 交接包（L2 自主档）
 

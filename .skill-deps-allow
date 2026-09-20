@@ -8,3 +8,4 @@ fixtures/requirement-explorer/**  # requirement-explorer 的出厂集 Seam：已
 fixtures/code-reverse/**  # code-reverse 的出厂集 Seam：已在卡「Seam 与出厂集」字段声明，闸只解析 reads/writes/data 行，故在此显式豁免（票 31，同票 05/06/07/08/18/30 手法）
 fixtures/doc-extractor/**  # doc-extractor 的出厂集 Seam：已在卡「Seam 与出厂集」字段声明，闸只解析 reads/writes/data 行，故在此显式豁免（票 32，同票 05/06/07/08/18/30/31 手法）
 fixtures/pattern-library/**  # onto-modeler 模式件库出厂集 Seam：已在卡「Seam 与出厂集」字段声明，闸只解析 reads/writes/data 行，故在此显式豁免（票 33，同票 05–32 手法）
+fixtures/ddd-modeler/**  # ddd-modeler 的出厂集 Seam：已在卡「Seam 与出厂集」字段声明，闸只解析 reads/writes/data 行，故在此显式豁免（票 52，同票 05–33 手法）
