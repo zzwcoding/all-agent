@@ -1,0 +1,20 @@
+# AC1a 负变体：organization 维整缺 anchors（锚定例必填，红）
+question_id: Q1
+reference: ../../expected/q1-reference.md
+dimensions:
+  - id: semantic_fidelity
+    weight: 2
+    anchors:
+      5: "口径四件套全部忠实参照答案"
+      3: "要点齐但表述含糊"
+      1: "语义偏离参照"
+  - id: caliber_quality
+    weight: 2
+    anchors:
+      5: "口径表述与参照答案逐句等价"
+      3: "口径正确但夹杂未定义口语词"
+      1: "口径说错"
+  - id: organization
+    weight: 1
+disqualifiers:
+  - "编造装配集之外的承诺性表述"

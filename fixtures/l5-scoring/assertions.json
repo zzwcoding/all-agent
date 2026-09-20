@@ -1,0 +1,178 @@
+{
+  "skill": "l5-scoring（L5 评分器确定性骨架，票 42）",
+  "description": "出厂集：rubric 样例 3 份（rubrics/，合法：每维 5/3/1 三档锚定例+正整数权重+可达 reference+scoring_prompt 提示词载体字段）+ 参照答案占位 3 份（expected/，rubric reference 的相对解析目标，真参照答案归票 43）+ 合法 mock 评分 JSON 四态（results-green 全绿 exit 0 / results-unstable 分差≥2 标不稳定不判死 exit 0 / results-disq 一票否决 exit 1 / results-lowtotal 单问总分 1<3 exit 1 / results-lowmedian 全集中位 3<4.0 exit 1，后两者各只踩一条通过线条件以证三条件逐一可红可绿）+ 负变体（negative-rubrics/ 三红×各一：整缺 anchors/weight=0/reference 指向 ghost-answer.md；results-dirty-* 三形态：漏维/score=6 越界/混入非 JSON 文本）。l5_score.py 零模型调用——mock 注入=预置评分结果 JSON 文件（裁决①）。AC 真源=tickets/42-L5评分器骨架.md AC 表；聚合口径：逐问恰 3 采样逐维取中位、总分=各维 score×weight 加权和（不常态化，L0 定稿）、问总分集取中位对照 4.0、disqualifier 触发问按 0 分计且一票否决。AC3a/AC4c 用 python -c 探针（票 23/25 手法先例）跑 --json 机读面断言中位数与双落盘；探针先清 out/ 保证幂等不触后缀改道。",
+  "assertions": [
+    {
+      "ac": "输入（rubric 样例三份在档）",
+      "type": "file-exists",
+      "path": "rubrics/q1-rubric.yaml"
+    },
+    {
+      "ac": "输入（rubric 样例三份在档）",
+      "type": "file-exists",
+      "path": "rubrics/q2-rubric.yaml"
+    },
+    {
+      "ac": "输入（rubric 样例三份在档）",
+      "type": "file-exists",
+      "path": "rubrics/q3-rubric.yaml"
+    },
+    {
+      "ac": "输入（mock 四态结果目录在档，各含 9 份采样）",
+      "type": "file-exists",
+      "path": "results-green/q1-s1.json"
+    },
+    {
+      "ac": "输入（mock 四态结果目录在档，各含 9 份采样）",
+      "type": "file-exists",
+      "path": "results-unstable/q1-s2.json"
+    },
+    {
+      "ac": "输入（mock 四态结果目录在档，各含 9 份采样）",
+      "type": "file-exists",
+      "path": "results-disq/q1-s2.json"
+    },
+    {
+      "ac": "输入（mock 四态结果目录在档，各含 9 份采样）",
+      "type": "file-exists",
+      "path": "results-lowtotal/q3-s3.json"
+    },
+    {
+      "ac": "输入（mock 四态结果目录在档，各含 9 份采样）",
+      "type": "file-exists",
+      "path": "results-lowmedian/q1-s3.json"
+    },
+    {
+      "ac": "AC1a（rubric 整缺某维 anchors → 红 rubric 非法）",
+      "type": "cmd-fails",
+      "cmd": "python3 tools/l5_score.py --rubrics {fixture_dir}/negative-rubrics/missing-anchors --results {fixture_dir}/results-green",
+      "outputContains": [
+        "rubric 非法",
+        "missing-anchors",
+        "organization",
+        "锚定例"
+      ]
+    },
+    {
+      "ac": "AC1b（rubric 权重为 0 → 红 rubric 非法）",
+      "type": "cmd-fails",
+      "cmd": "python3 tools/l5_score.py --rubrics {fixture_dir}/negative-rubrics/bad-weight --results {fixture_dir}/results-green",
+      "outputContains": [
+        "rubric 非法",
+        "bad-weight",
+        "coverage",
+        "weight"
+      ]
+    },
+    {
+      "ac": "AC1c（rubric reference 指向不存在文件 → 红 rubric 非法）",
+      "type": "cmd-fails",
+      "cmd": "python3 tools/l5_score.py --rubrics {fixture_dir}/negative-rubrics/ghost-reference --results {fixture_dir}/results-green",
+      "outputContains": [
+        "rubric 非法",
+        "ghost-answer.md",
+        "reference 不存在"
+      ]
+    },
+    {
+      "ac": "AC2 形态一（评分 JSON 漏维 organization → exit 2 评分无效，不进聚合）",
+      "type": "cmd-fails",
+      "cmd": "python3 tools/l5_score.py --rubrics {fixture_dir}/rubrics --results {fixture_dir}/results-dirty-missing-dim",
+      "outputContains": [
+        "评分无效",
+        "q1-missing-org.json",
+        "organization"
+      ]
+    },
+    {
+      "ac": "AC2 形态二（score=6 越界 → exit 2 评分无效）",
+      "type": "cmd-fails",
+      "cmd": "python3 tools/l5_score.py --rubrics {fixture_dir}/rubrics --results {fixture_dir}/results-dirty-score-range",
+      "outputContains": [
+        "评分无效",
+        "q1-score6.json",
+        "越界",
+        "6"
+      ]
+    },
+    {
+      "ac": "AC2 形态三（.json 文件混入非 JSON 文本 → exit 2 评分无效）",
+      "type": "cmd-fails",
+      "cmd": "python3 tools/l5_score.py --rubrics {fixture_dir}/rubrics --results {fixture_dir}/results-dirty-not-json",
+      "outputContains": [
+        "评分无效",
+        "q1-prose.json",
+        "不是合法 JSON"
+      ]
+    },
+    {
+      "ac": "AC3a（mock 三采样 [5,3,4] → 中位 4；探针跑 --json 断言逐维中位数，票 23/25 手法先例）",
+      "type": "cmd-succeeds",
+      "cmd": "python3 -c \"import json,subprocess,sys\nfx=sys.argv[1]\np=subprocess.run([sys.executable,'tools/l5_score.py','--rubrics',fx+'/rubrics','--results',fx+'/results-unstable','--json'],capture_output=True,text=True)\nassert p.returncode==0, 'exit=%d %s%s'%(p.returncode,p.stdout,p.stderr)\nr=json.loads(p.stdout)\nq1=[x for x in r['questions'] if x['question_id']=='Q1'][0]\nsf=[d for d in q1['dimensions'] if d['id']=='semantic_fidelity'][0]\nassert sf['samples']==[5,3,4], sf\nassert sf['median']==4, sf\nassert q1['stable'] is False, q1\nassert r['verdict']=='PASS', r['verdict']\nprint('L5-AC3a OK：Q1 semantic_fidelity 采样 [5, 3, 4] 中位 4')\" {fixture_dir}",
+      "outputContains": [
+        "L5-AC3a OK",
+        "中位 4"
+      ]
+    },
+    {
+      "ac": "AC3b（三采样分差 ≥2 → 报告标不稳定，且不稳定单独不判死——同轮结论 PASS exit 0）",
+      "type": "cmd-succeeds",
+      "cmd": "python3 tools/l5_score.py --rubrics {fixture_dir}/rubrics --results {fixture_dir}/results-unstable --out {fixture_dir}/out/unstable.md",
+      "outputContains": [
+        "不稳定",
+        "semantic_fidelity",
+        "结论: PASS"
+      ]
+    },
+    {
+      "ac": "AC3b 复核（不稳定标记进机读伴生 JSON：Q1 stable=false）",
+      "type": "cmd-succeeds",
+      "cmd": "python3 -c \"import json,sys\nfx=sys.argv[1]\nr=json.loads(open(fx+'/out/unstable.json',encoding='utf-8').read())\nq1=[x for x in r['questions'] if x['question_id']=='Q1'][0]\nassert q1['stable'] is False, q1\nprint('L5-AC3b OK：unstable.json Q1 stable=false')\" {fixture_dir}",
+      "outputContains": [
+        "L5-AC3b OK"
+      ]
+    },
+    {
+      "ac": "AC3c（mock 含 disqualifier_triggered=true → 该问按 0 分计、一票否决、整体红 exit 1）",
+      "type": "cmd-fails",
+      "cmd": "python3 tools/l5_score.py --rubrics {fixture_dir}/rubrics --results {fixture_dir}/results-disq",
+      "outputContains": [
+        "结论: FAIL",
+        "一票否决",
+        "disqualifier_triggered",
+        "Q1",
+        "总分: 0"
+      ]
+    },
+    {
+      "ac": "AC4a（单问总分 <3 → exit 1；本变体只踩条件①：全集中位 12≥4.0、无 disqualifier）",
+      "type": "cmd-fails",
+      "cmd": "python3 tools/l5_score.py --rubrics {fixture_dir}/rubrics --results {fixture_dir}/results-lowtotal",
+      "outputContains": [
+        "结论: FAIL",
+        "条件①",
+        "Q3 总分 1"
+      ]
+    },
+    {
+      "ac": "AC4b（全集中位 <4.0 → exit 1；本变体只踩条件②：单问总分 [3,3,13] 均≥3、无 disqualifier）",
+      "type": "cmd-fails",
+      "cmd": "python3 tools/l5_score.py --rubrics {fixture_dir}/rubrics --results {fixture_dir}/results-lowmedian",
+      "outputContains": [
+        "结论: FAIL",
+        "条件②",
+        "全集中位 3",
+        "4.0"
+      ]
+    },
+    {
+      "ac": "AC4c（全绿样本 → exit 0 + md/json 报告双落盘 + 机读 verdict=PASS；探针先清 out/ 保证幂等，同名加 -2 序号不覆盖由单测钉死）",
+      "type": "cmd-succeeds",
+      "cmd": "python3 -c \"import json,shutil,subprocess,sys\nfrom pathlib import Path\nfx=Path(sys.argv[1]); out=fx/'out'\nshutil.rmtree(out,ignore_errors=True)\np=subprocess.run([sys.executable,'tools/l5_score.py','--rubrics',str(fx/'rubrics'),'--results',str(fx/'results-green'),'--out',str(out/'green.md')],capture_output=True,text=True,cwd=str(fx.parents[1]))\nassert p.returncode==0, 'exit=%d %s%s'%(p.returncode,p.stdout,p.stderr)\nassert (out/'green.md').is_file(), 'md 未落盘'\nassert (out/'green.json').is_file(), 'json 未落盘'\nr=json.loads((out/'green.json').read_text(encoding='utf-8'))\nassert r['verdict']=='PASS', r['verdict']\nassert r['exitCode']==0, r['exitCode']\nassert len(r['questions'])==3, r['questions']\nprint('L5-AC4c OK：exit 0 + md/json 报告双落盘 + verdict=PASS（3 问）')\" {fixture_dir}",
+      "outputContains": [
+        "L5-AC4c OK",
+        "双落盘"
+      ]
+    }
+  ]
+}

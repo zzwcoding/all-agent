@@ -1,0 +1,17 @@
+# AC1b 负变体：coverage 维 weight=0（权重须正整数，红）
+question_id: Q2
+reference: ../../expected/q2-reference.md
+dimensions:
+  - id: coverage
+    weight: 0
+    anchors:
+      5: "全部要点覆盖"
+      3: "漏一个次要要点"
+      1: "漏主要要点"
+  - id: citation_fit
+    weight: 1
+    anchors:
+      5: "引用必要性与参照一致"
+      3: "引用多挂一处无关 ID"
+      1: "关键引用缺失"
+disqualifiers: []

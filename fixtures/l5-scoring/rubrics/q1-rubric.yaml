@@ -1,0 +1,32 @@
+# 票 42 出厂集样例 rubric（合法）：Q1 口径问答
+# 格式协议真源 = specs/l5_score.md；校验器 = tools/l5_score.py（三红：缺锚定例/权重非法/reference 不存在）。
+# scoring_prompt 字段 = 评分提示词载体随 rubric 进 fixtures（design-l5-scoring.md 开放问题④随票 42 定），
+# 本脚本校验时忽略该字段（提示词改 = 改出厂集 = 走票）。
+question_id: Q1
+reference: ../expected/q1-reference.md
+scoring_prompt: |
+  你是语义服务评分器。拿到问题、参照答案、被评答案与本 rubric，
+  逐维按锚定例对锚打分（0–5 整数）并给一句理由；语义级一票否决项命中
+  则 disqualifier_triggered=true。只输出协议 JSON，不输出任何其他文字。
+dimensions:
+  - id: semantic_fidelity
+    weight: 2
+    anchors:
+      5: "口径四件套（字段/聚合对象/规则/查询出口）全部忠实参照答案 q1-reference.md，无增无漏"
+      3: "要点齐但表述含糊或冗余，引用装配链有一处表述失准"
+      1: "语义偏离参照（答非所问/要点错位）"
+  - id: caliber_quality
+    weight: 2
+    anchors:
+      5: "口径表述与参照答案逐句等价，可直接作范例"
+      3: "口径正确但夹杂未定义口语词"
+      1: "口径说错（把禁用口径说成可用/张冠李戴）"
+  - id: organization
+    weight: 1
+    anchors:
+      5: "分层组织与参照答案同构：结论先行、引用清单收尾"
+      3: "有结构但层级混乱"
+      1: "无组织，一锅粥"
+disqualifiers:
+  - "编造装配集之外的承诺性表述"
+  - "把禁用口径说成可用"

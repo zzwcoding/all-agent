@@ -1,0 +1,20 @@
+# 票 42 出厂集样例 rubric（合法）：Q2 两维（覆盖 + 引用贴合，权重 2/1）
+question_id: Q2
+reference: ../expected/q2-reference.md
+scoring_prompt: |
+  同 q1-rubric 的评分提示词（样例各带一份，内容一致；提示词版本演进走票）。
+dimensions:
+  - id: coverage
+    weight: 2
+    anchors:
+      5: "参照答案全部要点覆盖且顺序一致"
+      3: "漏一个次要要点"
+      1: "漏主要要点或答非所问"
+  - id: citation_fit
+    weight: 1
+    anchors:
+      5: "引用必要性与参照答案一致，无凑数引用"
+      3: "引用多挂一处无关 ID"
+      1: "关键引用缺失或全是凑数"
+disqualifiers:
+  - "编造装配集之外的承诺性表述"

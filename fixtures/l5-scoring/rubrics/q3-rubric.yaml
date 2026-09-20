@@ -1,0 +1,20 @@
+# 票 42 出厂集样例 rubric（合法）：Q3 两维（覆盖 + 准确，权重 1/2）
+question_id: Q3
+reference: ../expected/q3-reference.md
+scoring_prompt: |
+  同 q1-rubric 的评分提示词（样例各带一份，内容一致；提示词版本演进走票）。
+dimensions:
+  - id: coverage
+    weight: 1
+    anchors:
+      5: "全部要点覆盖"
+      3: "要点齐但含糊"
+      1: "漏主要要点"
+  - id: accuracy
+    weight: 2
+    anchors:
+      5: "与参照答案逐句等价，无一处失准"
+      3: "一处表述失准不影响消费"
+      1: "两处以上失准或关键处失准"
+disqualifiers:
+  - "把禁用口径说成可用"

@@ -1,0 +1,34 @@
+# 票 42 样板：真实布局形态的 rubric 样例（票 43 Golden 扩编时按此填 12 份）
+# 与 fixtures/l5-scoring/rubrics/ 的差别只有一点：reference 指向本出厂集真参照答案
+# （../expected-answers/）。校验器 = tools/l5_score.py（specs/l5_score.md 三红）；
+# 票 43 落真 rubric 时在本出厂集 assertions.json 接入校验断言（本票不动该文件）。
+question_id: Q1
+reference: ../expected-answers/ac1-daily-output-caliber.md
+scoring_prompt: |
+  你是语义服务评分器。评分输入 = 问题 + 参照答案 + 被评答案 + 本 rubric。
+  逐维按锚定例对锚打 0–5 整数分，每维给一句非空理由；被评答案命中任一
+  disqualifier（语义级一票否决）则置 disqualifier_triggered=true。
+  只输出协议 JSON：{"question_id", "dimensions": [{"id", "score", "reason"}],
+  "disqualifier_triggered"}——不输出任何协议外文字。
+dimensions:
+  - id: semantic_fidelity
+    weight: 2
+    anchors:
+      5: "口径四件套（字段 dailyOutput / 载体 AGG-BOHAI-002 / 规则 RULE-BOHAI-001 / 查询出口 QR-BOHAI-001）与参照答案逐句等价，闭包装配链无增无漏（锚 5 例引参照原文）"
+      3: "要点齐但表述含糊或冗余，装配链有一处表述失准"
+      1: "语义偏离参照（答非所问 / 要点错位 / 口径张冠李戴）"
+  - id: caliber_quality
+    weight: 2
+    anchors:
+      5: "口径表述可直接作范例，字典下钻链（dictionaryRef → DICT-BOHAI-01）交代与参照一致"
+      3: "口径正确但夹杂未定义口语词"
+      1: "把禁用口径说成可用等口径级错误"
+  - id: organization
+    weight: 1
+    anchors:
+      5: "结论先行 + 闭包装配展开 + 「本回答引用的元素 ID」清单收尾，与参照同构"
+      3: "有结构但层级混乱"
+      1: "无组织，一锅粥"
+disqualifiers:
+  - "编造装配集之外的承诺性表述"
+  - "把禁用口径说成可用"

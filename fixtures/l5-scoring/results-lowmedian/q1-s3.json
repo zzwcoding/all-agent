@@ -1,0 +1,21 @@
+{
+  "question_id": "Q1",
+  "dimensions": [
+    {
+      "id": "semantic_fidelity",
+      "score": 0,
+      "reason": "按锚定例对锚打分（票 42 mock 注入，零模型调用）。"
+    },
+    {
+      "id": "caliber_quality",
+      "score": 5,
+      "reason": "按锚定例对锚打分（票 42 mock 注入，零模型调用）。"
+    },
+    {
+      "id": "organization",
+      "score": 1,
+      "reason": "按锚定例对锚打分（票 42 mock 注入，零模型调用）。"
+    }
+  ],
+  "disqualifier_triggered": false
+}

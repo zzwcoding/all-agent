@@ -1,0 +1,18 @@
+# AC1c 负变体：reference 指向不存在文件（红）
+question_id: Q3
+reference: ../../expected/ghost-answer.md
+dimensions:
+  - id: coverage
+    weight: 1
+    anchors:
+      5: "全部要点覆盖"
+      3: "要点齐但含糊"
+      1: "漏主要要点"
+  - id: accuracy
+    weight: 2
+    anchors:
+      5: "与参照逐句等价"
+      3: "一处表述失准不影响消费"
+      1: "两处以上失准"
+disqualifiers:
+  - "把禁用口径说成可用"
