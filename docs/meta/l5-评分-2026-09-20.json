@@ -1,0 +1,557 @@
+{
+  "tool": "l5_score",
+  "ticket": "42",
+  "generatedAt": "2026-09-20 20:39:27",
+  "rubricsDir": "fixtures/semantic-service/rubrics",
+  "resultsPaths": [
+    "/tmp/l5run"
+  ],
+  "verdict": "PASS",
+  "exitCode": 0,
+  "conditions": {
+    "perQuestionTotal": {
+      "pass": true,
+      "below": [],
+      "threshold": 3
+    },
+    "setMedian": {
+      "pass": true,
+      "value": 25.0,
+      "threshold": 4.0
+    },
+    "noDisqualifier": {
+      "pass": true,
+      "triggered": []
+    }
+  },
+  "questions": [
+    {
+      "question_id": "Q1",
+      "rubric_file": "fixtures/semantic-service/rubrics/q1-sample-rubric.yaml",
+      "total": 25,
+      "stable": true,
+      "disqualified": false,
+      "disq_votes": 0,
+      "unstable_dims": [],
+      "dimensions": [
+        {
+          "id": "semantic_fidelity",
+          "weight": 2,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        },
+        {
+          "id": "caliber_quality",
+          "weight": 2,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        },
+        {
+          "id": "organization",
+          "weight": 1,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        }
+      ]
+    },
+    {
+      "question_id": "Q10",
+      "rubric_file": "fixtures/semantic-service/rubrics/q10-closure-narrative-rubric.yaml",
+      "total": 25,
+      "stable": true,
+      "disqualified": false,
+      "disq_votes": 0,
+      "unstable_dims": [],
+      "dimensions": [
+        {
+          "id": "semantic_fidelity",
+          "weight": 2,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        },
+        {
+          "id": "neighbor_distinction",
+          "weight": 2,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        },
+        {
+          "id": "dispute_notes",
+          "weight": 1,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        }
+      ]
+    },
+    {
+      "question_id": "Q11",
+      "rubric_file": "fixtures/semantic-service/rubrics/q11-missing-rule-rubric.yaml",
+      "total": 25,
+      "stable": true,
+      "disqualified": false,
+      "disq_votes": 0,
+      "unstable_dims": [],
+      "dimensions": [
+        {
+          "id": "refusal_structure",
+          "weight": 2,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        },
+        {
+          "id": "layer_accuracy",
+          "weight": 2,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        },
+        {
+          "id": "nearby_discipline",
+          "weight": 1,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        }
+      ]
+    },
+    {
+      "question_id": "Q12",
+      "rubric_file": "fixtures/semantic-service/rubrics/q12-nearby-guidance-rubric.yaml",
+      "total": 25,
+      "stable": true,
+      "disqualified": false,
+      "disq_votes": 0,
+      "unstable_dims": [],
+      "dimensions": [
+        {
+          "id": "guidance_actionability",
+          "weight": 2,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        },
+        {
+          "id": "neighbor_distinction",
+          "weight": 2,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        },
+        {
+          "id": "refusal_structure",
+          "weight": 1,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        }
+      ]
+    },
+    {
+      "question_id": "Q13",
+      "rubric_file": "fixtures/semantic-service/rubrics/q13-banned-algorithm-rubric.yaml",
+      "total": 25,
+      "stable": true,
+      "disqualified": false,
+      "disq_votes": 0,
+      "unstable_dims": [],
+      "dimensions": [
+        {
+          "id": "banned_conclusion",
+          "weight": 2,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        },
+        {
+          "id": "guidance_coherence",
+          "weight": 2,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        },
+        {
+          "id": "no_fabrication",
+          "weight": 1,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        }
+      ]
+    },
+    {
+      "question_id": "Q14",
+      "rubric_file": "fixtures/semantic-service/rubrics/q14-write-intent-rubric.yaml",
+      "total": 25,
+      "stable": true,
+      "disqualified": false,
+      "disq_votes": 0,
+      "unstable_dims": [],
+      "dimensions": [
+        {
+          "id": "out_of_surface_reason",
+          "weight": 2,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        },
+        {
+          "id": "routing_split",
+          "weight": 2,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        },
+        {
+          "id": "no_speculation",
+          "weight": 1,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        }
+      ]
+    },
+    {
+      "question_id": "Q2",
+      "rubric_file": "fixtures/semantic-service/rubrics/q2-explicit-anchor-rubric.yaml",
+      "total": 25,
+      "stable": true,
+      "disqualified": false,
+      "disq_votes": 0,
+      "unstable_dims": [],
+      "dimensions": [
+        {
+          "id": "anchor_discipline",
+          "weight": 2,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        },
+        {
+          "id": "boundary_distinction",
+          "weight": 2,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        },
+        {
+          "id": "organization",
+          "weight": 1,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        }
+      ]
+    },
+    {
+      "question_id": "Q3",
+      "rubric_file": "fixtures/semantic-service/rubrics/q3-refusal-missing-concept-rubric.yaml",
+      "total": 25,
+      "stable": true,
+      "disqualified": false,
+      "disq_votes": 0,
+      "unstable_dims": [],
+      "dimensions": [
+        {
+          "id": "refusal_structure",
+          "weight": 2,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        },
+        {
+          "id": "layer_accuracy",
+          "weight": 2,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        },
+        {
+          "id": "zero_fabrication",
+          "weight": 1,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        }
+      ]
+    },
+    {
+      "question_id": "Q4",
+      "rubric_file": "fixtures/semantic-service/rubrics/q4-out-of-surface-rubric.yaml",
+      "total": 25,
+      "stable": true,
+      "disqualified": false,
+      "disq_votes": 0,
+      "unstable_dims": [],
+      "dimensions": [
+        {
+          "id": "out_of_surface_reason",
+          "weight": 2,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        },
+        {
+          "id": "routing_clarity",
+          "weight": 2,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        },
+        {
+          "id": "no_speculation",
+          "weight": 1,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        }
+      ]
+    },
+    {
+      "question_id": "Q7",
+      "rubric_file": "fixtures/semantic-service/rubrics/q7-term-caliber-rubric.yaml",
+      "total": 25,
+      "stable": true,
+      "disqualified": false,
+      "disq_votes": 0,
+      "unstable_dims": [],
+      "dimensions": [
+        {
+          "id": "term_as_answer",
+          "weight": 2,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        },
+        {
+          "id": "closure_narrative",
+          "weight": 2,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        },
+        {
+          "id": "dispute_notes",
+          "weight": 1,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        }
+      ]
+    },
+    {
+      "question_id": "Q8",
+      "rubric_file": "fixtures/semantic-service/rubrics/q8-banned-disposal-rubric.yaml",
+      "total": 25,
+      "stable": true,
+      "disqualified": false,
+      "disq_votes": 0,
+      "unstable_dims": [],
+      "dimensions": [
+        {
+          "id": "banned_conclusion",
+          "weight": 2,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        },
+        {
+          "id": "replacement_quality",
+          "weight": 2,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        },
+        {
+          "id": "no_softening",
+          "weight": 1,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        }
+      ]
+    },
+    {
+      "question_id": "Q9",
+      "rubric_file": "fixtures/semantic-service/rubrics/q9-multi-sense-rubric.yaml",
+      "total": 25,
+      "stable": true,
+      "disqualified": false,
+      "disq_votes": 0,
+      "unstable_dims": [],
+      "dimensions": [
+        {
+          "id": "candidate_coverage",
+          "weight": 2,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        },
+        {
+          "id": "anchoring_request",
+          "weight": 2,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        },
+        {
+          "id": "no_overreach",
+          "weight": 1,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        }
+      ]
+    }
+  ]
+}
