@@ -1,0 +1,10 @@
+model_type: BEHAVIOR
+version: "1.0.0"
+domain: dup-ac1
+behaviors:
+  - id: BH-DUP-001
+    name: 录入
+    ownerEntity: AGG-DUP-001
+    behaviorType: COMMAND
+    appliedRules: []
+    requiredPermissions: []

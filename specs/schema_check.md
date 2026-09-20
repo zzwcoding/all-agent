@@ -63,12 +63,20 @@ GLS 套件（票 10，真源 = tickets/10-术语模型GLS.md AC 表）：
 | MID-AC3 | bohai / valid-domain / 全部出厂集域副本（attributes 等嵌套字典无 id 是合法形态） | 全绿零扰动（由既有 AC1/GLS-AC1/REQ-AC4/BAN-AC3/AC4 等绿断言承载） |
 | MID-AC4 | `terms: []` 纯空集合（=REQ-AC3b） | 仍报空壳红——空壳语义不回退（断言 REQ-AC3b 承载，零改动） |
 
+重复 id 套件（票 38，真源 = tickets/38-重复id检测.md AC 表；同域元素 id 唯一，违规码 `duplicate-id`，L1 身份族）：
+
+| 断言 | 给定 | 期望 |
+|---|---|---|
+| DUP-AC1 | 同域两元素同 id（dup-ac1-same-domain-duplicate-id：AGG-DUP-001 在同一主集合出现两次，两元素必填字段齐全、ownerEntity 引用照常解析） | 报 L1 duplicate-id 红，报文含双位置（先出现 m1-object-model.yaml:5 + 后出现 m1-object-model.yaml:10）与双元素名（井甲/井乙）；重复≠悬空，无杂音红因 |
+| DUP-AC2 | bohai / valid-domain / 全部出厂集域副本（各域合法复用同形 ID——唯一性判定键 = manifest 域值，跨域不判） | 全绿零误报（由既有绿断言 + 全量回归承载）；跨键同值（M5 actorId/roleId 式）/跨文件同域两形态由单测面（DuplicateId 类）钉死 |
+
 ## 违规码总表
 
 | 级别 | kind | 判定真源 |
 |---|---|---|
 | L1 | yaml-syntax / missing-common-field / unknown-model-type / filename-mismatch / missing-manifest / missing-manifest-field / unknown-profile / deps-registry-conflict | schema.md §1 + model-registry.json |
 | L1 | required-field（票 13：缺结构性必填字段；票 27：主集合逐字典枚举——无 id 元素报缺必填身份字段，空壳判定收窄为「主集合键缺失或集合为空」；文件名错挂的文件跳过本闸） | model-registry.json 各模型 requiredElementFields |
+| L1 | duplicate-id（票 38：同一 manifest 域值之下元素 id（id/*Id 定义键，非 ref 键、带注册前缀）不得重复——挂票 27 元素枚举建域值→id 索引，报文含双位置与元素名；M5 actorId/roleId/permissionId 跨键同值同判；跨域不判；文件名错挂的文件跳过本闸） | manifest.json domain + model-deps.json idPrefixes |
 | L1 | unknown-omitted-model / bad-omitted-model（票 13：omittedModels 引用未注册模型/条目缺 model） | model-registry.json models |
 | L2 | dangling-ref / dep-whitelist | model-deps.json（refKeys ∪ *Ref/Refs ∪ edges） |
 | L2 | consistency-redirection / consistency-not-one-to-one / consistency-permission / consistency-flow-role | schema.md §14（票 11） |

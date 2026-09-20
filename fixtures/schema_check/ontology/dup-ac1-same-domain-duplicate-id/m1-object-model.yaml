@@ -1,0 +1,14 @@
+model_type: OBJECT
+version: "1.0.0"
+domain: dup-ac1
+aggregates:
+  - id: AGG-DUP-001
+    name: 井甲
+    alias: WellDupA
+    aggregateType: AGGREGATE_ROOT
+    attributes: []
+  - id: AGG-DUP-001
+    name: 井乙
+    alias: WellDupB
+    aggregateType: AGGREGATE_ROOT
+    attributes: []

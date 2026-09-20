@@ -2,7 +2,7 @@
 
 > 本文是本体 YAML 的 schema 文档（人读）；机读消费方两份：
 > `model-registry.json`（模型注册表：camp/consumers/profiles/dependsOn）、`model-deps.json`（类型层依赖白名单 + ID 前缀表）。
-> 执行闸：`tools/schema_check.py`（语义 CI L1–L4，断言表 `specs/schema_check.md` AC1–7 + 票 10 GLS-AC1–4 + 票 11 一致性对 §14 + 票 13 必填闸 REQ-AC1–6 + 票 16 禁用词拦截面 BAN-AC1–4）。
+> 执行闸：`tools/schema_check.py`（语义 CI L1–L4，断言表 `specs/schema_check.md` AC1–7 + 票 10 GLS-AC1–4 + 票 11 一致性对 §14 + 票 13 必填闸 REQ-AC1–6 + 票 16 禁用词拦截面 BAN-AC1–4 + 票 38 重复 id DUP-AC1–2）。
 > 蓝本：OMF v9 七模型（references/omf-spec-digest.md §0/§16，下注 `v9 §x`）；裁剪决定均注明出处。
 > GLS 术语模型为本仓自定义扩展（OMF v6/v9 均无，票 10 走"元模型错→框架版本演进"路由进 schema，演进账见 CHANGELOG.md）。
 
@@ -43,6 +43,8 @@
 **元素级结构性必填（票 13，机读真源 = model-registry.json 各模型 `requiredElementFields`）**：口径 = 身份（id/name，含各模型具名 ID 键）+ 类型判别（behaviorType 等）+ 检查锚点（一致性对/引用扫描依赖、缺失即静默跳过的字段）+ 载荷容器（attributes/activities 等空壳即红的容器）；闸 = schema_check L1 `required-field`（含空壳文件判定）。schema.md 全字段集（preconditions 等）**不在**必填闸（缺口清单留后续演进票）；逐模型推导表与证据见 `lessons/13-机读必填字段闸.md`。
 
 **违规语义注记（票 27，2026-09-19）：元素枚举去 id 锚定**——`required-field` 闸对模型文件主集合（aggregates/behaviors/rules/actors/roles/permissions/flows/query_reports/screens/terms 等顶层 list-of-dicts 集合键）内的**每个字典**按元素枚举，不再以「有 id 键」为枚举前提：无 id 元素报缺必填身份字段（id 已在各模型必填集首位；M5=actorId/roleId/permissionId、MU=screenId 同判），修掉「无 id 元素混入合法元素即静默逃逸」盲区。**空壳判定随之收窄**为「主集合键缺失或集合为空」——集合里有字典就逐元素报缺 id，空壳不再兜底；纯空集合（`terms: []`）语义不变仍报空壳。嵌套子结构（attributes[]/refRules[]/activities[] 等）不是元素、不进枚举（由 ref 扫描与字段检查覆盖，其字典无 id 合法）。负变体出厂集：`mid-ac1-mixed-missing-id`（混入形态）/ `mid-ac2-pure-missing-id`（纯无 id 域），断言 MID-AC1/2。
+
+**同域元素 id 唯一（票 38，2026-09-20）：`duplicate-id`，L1 身份族**——**唯一性判定键 = manifest 域值**：同一 domain 值之下，元素 id（`id`/`*Id` 定义键——非 ref 键、值带注册前缀，口径同悬空引用的定义收集；M5 的 actorId/roleId/permissionId 跨键同值同判）不得重复；**跨域不判**（fixture 各域合法复用同形 ID 是合法现状，两目录同域值 = 同一命名空间照判）。实现挂在票 27 元素枚举产物上：建 域值→id→(file,line,键,名) 索引，撞即报且报文含**双位置**（先出现+后出现 file:line 与元素名）——票 27 前重复 id 曾静默（枚举以 id 为锚，后者被先出现者吞）、票 27 后双双枚举但无重复判定，本票补齐；重复≠悬空（ref 指向重复 id 照常解析，dangling-ref 不重复追责）。文件名错挂的文件跳过本闸（红因纯净，沿票 13/16 先例）。负变体出厂集：`dup-ac1-same-domain-duplicate-id`，断言 DUP-AC1/2。
 
 ## 2. ID 前缀与 ref 命名约定
 

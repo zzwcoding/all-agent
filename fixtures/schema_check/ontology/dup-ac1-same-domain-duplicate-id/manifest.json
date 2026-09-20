@@ -1,0 +1,10 @@
+{
+  "domain": "dup-ac1",
+  "label": "重复id负变体 DUP-AC1（票 38）：同域两元素同 id（AGG-DUP-001 在同一主集合出现两次，两元素必填字段齐全）→ L1 duplicate-id 红，报文含双位置（先出现 m1-object-model.yaml:5 井甲 + 后出现 m1-object-model.yaml:10 井乙）与元素名；ownerEntity 引用照常解析（重复≠悬空，红因唯一）",
+  "profile": "v9-core",
+  "schemaVersion": "1.2.0",
+  "omittedModels": [
+    { "model": "M3", "reason": "DUP-AC1 负变体极简域：仅 M1/M2 入镜验同集合重复形态，票 38。" },
+    { "model": "M5", "reason": "DUP-AC1 负变体极简域：仅 M1/M2 入镜验同集合重复形态，票 38。" }
+  ]
+}

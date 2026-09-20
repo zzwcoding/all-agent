@@ -12,6 +12,12 @@ description/notes 不扫=文档自由）；票 27 元素枚举去 id 锚定—�
 票 34 增 P2-A 素材目录排除：域发现对名为 `patterns` 的子目录整体排除（素材目录
 不是域，不补 manifest；约定成文 schema.md §1），修"票 33 模式件进 ontology/patterns/
 后裸仓根 ontology/ 语义闸红灯"的 P2-A 缺口——裸仓根全量绿灯红线恢复。
+票 38 增 L1 同域元素 id 唯一性闸 duplicate-id（身份族，与 required-field 同级）：
+唯一性判定键 = manifest 域值——同一 domain 值之下元素 id（id/*Id 定义键，口径同
+collect_definitions：非 ref 键、带注册前缀）不得重复，撞即报且报文含双位置（先出现
++后出现 file:line 与元素名）；跨域不判（fixture 各域合法复用同形 ID）。实现挂在
+票 27 元素枚举（iter_collection_items）产物上：域值→id→(file,line,键,名) 索引；
+M5 的 actorId/roleId/permissionId 跨键同值同判；文件名错挂的文件跳过（红因纯净）。
 
 对给定 ontology 目录做确定性校验：
   L1 schema 合法——YAML 可解析（AC2）、公共字段 model_type/version/domain 在场（AC3）、
@@ -390,6 +396,11 @@ def run(target: Path) -> dict:
             f"目录「{sub.name}」含模型 YAML 但缺 manifest.json（域声明必配）")
 
     definitions: dict[str, tuple[str, int]] = {}
+    # 重复 id 索引（票 38）：manifest 域值 → id → (file, line, 键, 元素名)。
+    # 唯一性判定键 = manifest 域值（同一 domain 值之下 id 不得重复，跨域不判——
+    # fixture 各域合法复用同形 ID、真仓单域无跨域场景）；两目录同域值 = 同一
+    # 命名空间（索引按域值共享）。
+    id_index: dict[str, dict[str, tuple[str, int, str, str]]] = {}
     domain_summaries = []
     n_files = 0
 
@@ -516,6 +527,41 @@ def run(target: Path) -> dict:
                         f"主集合元素{hint}缺必填字段「{'/'.join(id_fields)}」"
                         f"{stray_note}（元素枚举不再以有 id 为前提——票 27 修缺 id "
                         f"盲区；真源 model-registry.json {mkey}.requiredElementFields）")
+
+            # 同域元素 id 唯一性（票 38，L1 duplicate-id 身份族）：挂点=票 27 元素
+            # 枚举（iter_collection_items 主集合逐字典）。id 索引收 id/*Id 全部
+            # 定义键（非 ref 键、值带注册前缀——与 collect_definitions 同口径，
+            # M5 的 actorId/roleId/permissionId 跨键同值同判）；撞即报，报文含
+            # 双位置（先出现+后出现 file:line 与元素名）。独立于必填闸（不依赖
+            # req_map 在场）；文件名错挂的文件跳过——内容与模型锚已断，让位
+            # filename-mismatch，不叠杂音红因（沿票 13/16 红因纯净先例）。
+            if not name_mismatch:
+                ids_of_domain = id_index.setdefault(dname, {})
+                for item in iter_collection_items(data):
+                    for key, value in item.items():
+                        if not (isinstance(key, str)
+                                and (key == "id" or key.endswith("Id"))):
+                            continue
+                        if is_ref_key(key, ref_keys) or not isinstance(value, str):
+                            continue
+                        if id_model_of(value, prefix2model) is None:
+                            continue
+                        elem_name = next(
+                            (item.get(k) for k in ("name", "term")
+                             if isinstance(item.get(k), str) and item[k]), "?")
+                        loc = (rel, key_line(item, key), str(key), elem_name)
+                        first = ids_of_domain.get(value)
+                        if first is None:
+                            ids_of_domain[value] = loc
+                        else:
+                            add("L1", "duplicate-id", rel, loc[1],
+                                f"重复 id「{value}」: 先出现 {first[0]}:{first[1]}"
+                                f"（元素「{first[3]}」，键 {first[2]}），后出现 "
+                                f"{rel}:{loc[1]}（元素「{elem_name}」，键 {key}）"
+                                f"——同一 manifest 域「{dname}」之下元素 id 不得"
+                                f"重复（票 38 duplicate-id，L1 身份族；id/*Id "
+                                f"定义键全收，M5 actorId/roleId/permissionId "
+                                f"同判；跨域不判）")
 
             if mkey not in enabled:  # AC6
                 add("L4", "profile-disabled", rel, data.line,

@@ -1160,5 +1160,107 @@ behaviors:
         self.assertIn("required-field", kinds)
 
 
+# ---------- 票 38：同域元素 id 唯一（duplicate-id，L1 身份族；出厂断言 DUP-AC1）----------
+
+class DuplicateId(Base):
+    """票 38 单测面：同一 manifest 域值之下，元素 id（id/*Id 定义键）不得重复。
+
+    唯一性判定键 = manifest 域值（同一 domain 值之下建 id→位置索引，撞即红）；
+    跨域不判（fixture 各域合法复用同形 ID）；id 索引收 id/*Id 全部定义键
+    （M5 式 actorId/roleId/permissionId 跨键同值同判）；文件名错挂的文件跳过
+    （红因纯净，沿票 13/16 先例）。真源 = tickets/38 AC 表（DUP-AC1）。
+    本类用 Base 迷你表（无 requiredElementFields）：顺带证明 duplicate-id 闸
+    独立于必填闸，不依赖 req_map 在场。
+    """
+
+    def test_duplicate_id_in_same_collection_is_l1(self):
+        # DUP-AC1：同一主集合两元素同 id → duplicate-id（L1）红，
+        # 报文含双位置（先出现 file:line + 后出现 file:line）与双元素名
+        self.add("m1-object-model.yaml", M1 + """  - id: AGG-DEMO-001
+    name: 井乙
+    alias: WellB
+    aggregateType: AGGREGATE_ROOT
+    attributes: []
+""")
+        report = self.run_check()
+        self.assertIn("duplicate-id", self.kinds(report))
+        v = next(v for v in report["violations"] if v["kind"] == "duplicate-id")
+        self.assertEqual(v["level"], "L1")
+        for needle in ("AGG-DEMO-001", "井", "井乙",
+                       "m1-object-model.yaml:5", "m1-object-model.yaml:10"):
+            self.assertIn(needle, v["message"])
+        self.assertEqual(v["line"], 10)  # 挂后出现者
+        self.assertEqual(quiet_main([str(self.root)]), 1)
+
+    def test_duplicate_id_across_files_same_domain(self):
+        # 跨文件同域（跨模型同值形态）：m2 集合挂 AGG- id 与 m1 的定义撞 → 红
+        self.add("m1-object-model.yaml", M1)
+        self.add("m2-behavior-model.yaml",
+                 M2.replace("id: BH-DEMO-Record", "id: AGG-DEMO-001"))
+        v = next(v for v in self.run_check()["violations"]
+                 if v["kind"] == "duplicate-id")
+        self.assertIn("m1-object-model.yaml", v["message"])
+        self.assertIn("m2-behavior-model.yaml", v["message"])
+
+    def test_duplicate_id_across_definition_keys(self):
+        # id/*Id 全部定义键入索引：id 与 *Id（roleId 式）键同值同判——
+        # 防踩坑：M5 actorId/roleId/permissionId 任一撞另一元素 id 都算重复
+        self.add("m1-object-model.yaml", M1)
+        self.add("m2-behavior-model.yaml", M2 + """  - roleId: BH-DEMO-Record
+    name: 跨键同值元素
+    ownerEntity: AGG-DEMO-001
+    behaviorType: COMMAND
+""")
+        v = next(v for v in self.run_check()["violations"]
+                 if v["kind"] == "duplicate-id")
+        self.assertIn("roleId", v["message"])
+
+    def test_unique_ids_still_pass(self):
+        # 正例红线：同域全异 id 零扰动（valid-domain/bohai 形态）
+        self.add("m1-object-model.yaml", M1)
+        self.add("m2-behavior-model.yaml", M2)
+        report = self.run_check()
+        self.assertEqual(report["status"], "pass", report["violations"])
+        self.assertNotIn("duplicate-id", self.kinds(report))
+
+    def test_same_id_in_other_domain_not_reported(self):
+        # 跨域不判：另一域（manifest 域值不同）合法复用同形 ID → 无 duplicate-id
+        self.add("m1-object-model.yaml", M1)
+        write(self.root / "other" / "manifest.json", json.dumps(
+            {"domain": "other", "profile": "full", "schemaVersion": "1.0.0",
+             "omittedModels": [
+                 {"model": k, "reason": "单测：另一域按需加装"}
+                 for k in ("M1", "M2", "GLS")]}))
+        write(self.root / "other" / "m1-object-model.yaml", M1)
+        kinds = self.kinds()
+        self.assertNotIn("duplicate-id", kinds)
+        self.assertEqual(kinds, [])
+
+    def test_same_domain_value_across_dirs_shares_namespace(self):
+        # 唯一性判定键=manifest 域值：两目录域值相同 → 同一命名空间，撞 id 照红
+        #（报文双位置各指一个目录下的文件）
+        self.add("m1-object-model.yaml", M1)
+        write(self.root / "twin" / "manifest.json", json.dumps(
+            {"domain": "demo", "profile": "full", "schemaVersion": "1.0.0",
+             "omittedModels": [
+                 {"model": k, "reason": "单测：孪生域按需加装"}
+                 for k in ("M1", "M2", "GLS")]}))
+        write(self.root / "twin" / "m1-object-model.yaml", M1)
+        v = next(v for v in self.run_check()["violations"]
+                 if v["kind"] == "duplicate-id")
+        self.assertIn("twin", v["message"])
+        self.assertIn("demo", v["message"])
+
+    def test_filename_mismatch_file_skips_duplicate_gate(self):
+        # 红因纯净：文件名与 model_type 错挂的文件跳过 id 索引
+        #（OBJECT 内容错挂 m2 文件名，其 AGG- id 不与 m1 撞报 duplicate-id，
+        # 让位 filename-mismatch，沿票 13/16 先例）
+        self.add("m1-object-model.yaml", M1)
+        self.add("m2-behavior-model.yaml", M1)
+        report = self.run_check()
+        self.assertIn("filename-mismatch", self.kinds(report))
+        self.assertNotIn("duplicate-id", self.kinds(report))
+
+
 if __name__ == "__main__":
     unittest.main()
