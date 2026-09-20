@@ -1,0 +1,1 @@
+{"question_id": "Q10", "dimensions": [{"id": "semantic_fidelity", "score": 5, "reason": "公式、粒度（月/区块）、分子分母 sourceField、执行行为、出口列五点全中，无口径错位。"}, {"id": "neighbor_distinction", "score": 5, "reason": "「同出口并列列」与「t4 头部共缀限定变体」两处均单列并定性非本答，与参照一致。"}, {"id": "dispute_notes", "score": 5, "reason": "两处注记（D4 待 Owner、禁用旧称）照登，缺口表述不洗白。"}], "disqualifier_triggered": false}

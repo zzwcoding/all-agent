@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "description": "信号路由表（票 29，PRD F14，CONTEXT.md「信号路由表」词条的机读真源）：三类信号各走各的修复道，本表是唯一机读登记处；人读说明见 policies/README.md。维护纪律：改路由 = 改本 JSON + 每条实例指针先核实（commit 在 git log、PROP 文件在 docs/proposals/）再写入 + 跑 python3 tools/meta_probe.py ontology/bohai（第 10 项硬闸自检，红即回改）。实例指针字段：desc=一句话；ticket=票号；commit=短哈希（probe 逐个 git log 核实）；props=涉及的提案 ID（probe 逐个查 docs/proposals/ 文件在池）。每类路由 instances 至少 2 条真实指针。 L5 红三分道（票 44 接线，design-l5-scoring §4.4）：L5 评分红灯只报告不修复、只路由不自动改——语义内容错→业务错道 / 话术工序错→工程错道 / rubric 错→元模型错道，分道登记在各路由的 l5RedDispatch 字段（探针不核该字段）；其实例指针在 L5 首跑（批收官软闸/发布前硬闸）后回填真实 commit/props，占位期如实标注、不虚构指针（虚构即第 10 项硬闸红）。 人审打回分道（票 47 接线，design-human-review-gate §4 #3 + §8 裁决点 6，ADR 0003）：人审闸审记 verdict=打回 强制当场开单、不留审记意见悬着——本体内容错→业务错道（提案池）/ 装配·生成器错→工程错道（票），分道登记在业务错/工程错路由的 reviewRejectDispatch 字段（探针不核该字段）；人审闸信号源实例=票 46 首审审记（exports/reviews/devkit-review.json，commit 6f85807），首个真实打回落地后按维护纪律回填实例。",
+  "description": "信号路由表（票 29，PRD F14，CONTEXT.md「信号路由表」词条的机读真源）：三类信号各走各的修复道，本表是唯一机读登记处；人读说明见 policies/README.md。维护纪律：改路由 = 改本 JSON + 每条实例指针先核实（commit 在 git log、PROP 文件在 docs/proposals/）再写入 + 跑 python3 tools/meta_probe.py ontology/bohai（第 10 项硬闸自检，红即回改）。实例指针字段：desc=一句话；ticket=票号；commit=短哈希（probe 逐个 git log 核实）；props=涉及的提案 ID（probe 逐个查 docs/proposals/ 文件在池）。每类路由 instances 至少 2 条真实指针。 L5 红三分道（票 44 接线，design-l5-scoring §4.4）：L5 评分红灯只报告不修复、只路由不自动改——语义内容错→业务错道 / 话术工序错→工程错道 / rubric 错→元模型错道，分道登记在各路由的 l5RedDispatch 字段（探针不核该字段）；L5 首跑（8a4a632，12问×3 PASS 全绿 0 红灯）已回填信号源基线与首跑实弹发现两实例（Q8 参照答案矛盾→工程错道票 48 修 ac8；Q8 rubric 一致性覆盖缝隙→元模型错道随票 49 裁决），后续真实红灯按留痕 docs/meta/l5-评分-<日期>.json 路由去向续回填。 人审打回分道（票 47 接线，design-human-review-gate §4 #3 + §8 裁决点 6，ADR 0003）：人审闸审记 verdict=打回 强制当场开单、不留审记意见悬着——本体内容错→业务错道（提案池）/ 装配·生成器错→工程错道（票），分道登记在业务错/工程错路由的 reviewRejectDispatch 字段（探针不核该字段）；人审闸信号源实例=票 46 首审审记（exports/reviews/devkit-review.json，commit 6f85807），首个真实打回落地后按维护纪律回填实例。",
   "routes": [
     {
       "kind": "业务错",
@@ -9,7 +9,13 @@
       "l5RedDispatch": {
         "signal": "L5 红·语义内容错（语义保真度/口径解释类维度红：要点漏述、误导性强调、答非所问——本体语义有缺有错）",
         "source": "docs/design-l5-scoring.md §4.4（票 44 接线）",
-        "instancePlaceholder": "占位——L5 首跑（批收官软闸/发布前硬闸）后回填真实实例指针（留痕 docs/meta/l5-评分-<日期>.json 的路由去向）；首跑前不虚构 commit/props"
+        "instances": [
+          {
+            "desc": "L5 首跑信号源基线（票 43 rubric 集 0cb5efc；首跑留痕 commit 8a4a632：12问×3 PASS 全绿 0 红灯，本道暂无真实红灯实例——首个真实红灯按留痕 docs/meta/l5-评分-<日期>.json 路由去向当场起草提案）",
+            "ticket": "44",
+            "commit": "8a4a632"
+          }
+        ]
       },
       "reviewRejectDispatch": {
         "signal": "人审打回·本体内容错（审记 verdict=打回 且打回因=本体内容错：人审闸审出派生物转译保真度问题根因在本体语义有缺有错）",
@@ -43,7 +49,13 @@
       "l5RedDispatch": {
         "signal": "L5 红·话术工序错（拒答话术/组织类维度红：本体没错，skill 工序话术或参照答案要修）",
         "source": "docs/design-l5-scoring.md §4.4（票 44 接线）",
-        "instancePlaceholder": "占位——L5 首跑（批收官软闸/发布前硬闸）后回填真实实例指针（留痕 docs/meta/l5-评分-<日期>.json 的路由去向）；首跑前不虚构 commit/props"
+        "instances": [
+          {
+            "desc": "L5 首跑实弹发现 Q8 参照答案内部矛盾（「校验侧禁用闸」同文既已建又待补建）→ 工程错道开票修 ac8——票 48 第七轮整改执行修复+施工元数据清理；发现留痕 commit 8a4a632（lessons/48 实弹发现节）",
+            "ticket": "48",
+            "commit": "8a4a632"
+          }
+        ]
       },
       "reviewRejectDispatch": {
         "signal": "人审打回·装配/生成器错（审记 verdict=打回 且打回因=装配或生成器缺陷：本体没错，生成器装配错位/漏装）",
@@ -75,9 +87,20 @@
       "l5RedDispatch": {
         "signal": "L5 红·rubric 错（锚定例与工序矛盾/评分提示词偏差/权重集失衡：改 rubric 走评分框架演进票，锚例修订=改出厂集）",
         "source": "docs/design-l5-scoring.md §4.4 + §4.5（票 44 接线）",
-        "instancePlaceholder": "占位——L5 首跑（批收官软闸/发布前硬闸）后回填真实实例指针（留痕 docs/meta/l5-评分-<日期>.json 的路由去向）；首跑前不虚构 commit/props"
+        "instances": [
+          {
+            "desc": "L5 首跑实弹发现 Q8 rubric 一致性覆盖缝隙（三维 banned_conclusion/replacement_quality/no_softening 均不覆盖「答案内部一致性」）→ 元模型错道演进随票 49 rubric 演进一并裁决（票 49 已拆票，拆票 commit 5357d1a 在案）；发现留痕 commit 8a4a632",
+            "ticket": "49",
+            "commit": "5357d1a"
+          }
+        ]
       },
       "instances": [
+        {
+          "desc": "L3 首跑真缺陷裁决修域 RULE-BOHAI-003（票 41 L3 确定性闸存量首跑，修域不改闸、原值留档）",
+          "ticket": "41",
+          "commit": "0104735"
+        },
         {
           "desc": "术语模型 GLS 进 schema（版本 1.1.0+CHANGELOG+filename-mismatch 闸）",
           "ticket": "10",

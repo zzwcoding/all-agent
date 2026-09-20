@@ -1,0 +1,1 @@
+{"question_id": "Q7", "dimensions": [{"id": "term_as_answer", "score": 5, "reason": "GLS-BOHAI-002 条目转写逐点等价，未跳过术语条目直接答字段。"}, {"id": "closure_narrative", "score": 5, "reason": "装配链四层（实体指路→承载规则→执行行为→查询出口）与锚 5 例逐点对应，承载规则与出口列均点名，「一句话口径」收束。"}, {"id": "dispute_notes", "score": 5, "reason": "两支口径并列、该支公式待 Owner 补全的缺口如实保留，无洗白表述。"}], "disqualifier_triggered": false}

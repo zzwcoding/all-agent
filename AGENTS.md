@@ -45,6 +45,7 @@
 7. 审查报告必落盘 `docs/reviews/`，不以对话转述存活；整改票引用审查结论须引落盘路径。
 8. 验收扫描面必须对得上 AC 声明面：AC 说"全仓"就查全仓含 `.py`；票面引用"本票 AC 表"必须真实存在（票 14/票 20 两次教训）。断言真源：出厂断言以票面 AC 表为正，specs/*.md 仅为一期基线+汇总指针。
 9. 批收官清单（票 29 起）：① `python3 tools/meta_probe.py ontology/bohai --out docs/meta/体检-<日期>.md` 留痕（硬闸必须全绿，路由表自检在内；同名已存在则加序号后缀追加，不覆盖旧留痕）；② 锚点推进入账（带断言验证）；③ 本批审查报告落盘 docs/reviews/（如有审查）；④ 豁免复核结论更新 docs/meta/exemption-reviews.json；⑤ L5 全量跑（12 问 × 3 子 agent 派发）留痕落 docs/meta/l5-评分-<日期>.md/.json——软闸：红灯开单走信号路由分道，不阻塞收官留痕与锚点推进（派发契约见 semantic-service skill references/l5-dispatch.md，票 44）。Owner 抽检校准（随票 44 定）：L5 绿的批次 Owner 按比例抽检评分结论，抽检被人工复核证伪即推翻该问结论、按元模型错道开票修 rubric/评分提示词（ADR 0002「复核证伪则推翻」同款句式）；⑥ 审记 verify（devkit/skillpkg，票 46 起）：`python3 tools/review_gate.py verify exports/devkit/bohai/devkit.md`、`python3 tools/review_gate.py verify exports/skillpkg/bohai/SKILL.md`——审记缺失或失效=收官挂账项，不阻塞四闸（manifest 免审级不要求审记）。探针硬闸红灯=下批首票。
+10. 翻 done 与批收官提交前，必须对「将提交的最终树」复跑 `bash tools/ci.sh`——CI 结论只对跑它那一刻的树负责（8a4a632 带红入仓事故：验收时点绿 ≠ 最终树绿，第七轮 P1）。
 
 ## 使用方式（建成后）
 

@@ -1,0 +1,1 @@
+{"question_id": "Q14", "dimensions": [{"id": "out_of_surface_reason", "score": 5, "reason": "「为什么（阵营归属说明）」段两层理由齐备，与锚 5 例逐点对应，未把面外当可答或错答未找到。"}, {"id": "routing_split", "score": 5, "reason": "三条分道（建造链路/提案流程/写意图不执行）与锚 5 例逐点对应，无指错道。"}, {"id": "no_speculation", "score": 5, "reason": "仅复述 SCR-BOHAI-01 锚定 ID 并说明阵营归属与拒答理由，零细节零映射暗示。"}], "disqualifier_triggered": false}

@@ -1,3 +1,6 @@
 # MCP 发布侧依赖钉版（票 40）。安装：python3 -m venv .venv-mcp && .venv-mcp/bin/pip install -r tools/requirements-mcp.txt
+# 注意：PyYAML 不在本文件也不在 mcp SDK 依赖树（票 26 实测 mcp 2.2.0 的 Requires 无 pyyaml）——
+# server 子进程链（core/graph_index 解析本体 YAML）需要它，隔离环境须显式补装：
+#   .venv-mcp/bin/pip install pyyaml（票 24 venv 实测 PyYAML 6.0.3；照 docs/mcp-server.md 前提节，票 48 注释补记）
 # 升级纪律：改版本号 → 重跑票 24 smoke client（.venv-mcp/bin/python tools/mcp_smoke_client.py --full 9/9）→ 更新本文件与 docs/mcp-server.md
 mcp==2.2.0

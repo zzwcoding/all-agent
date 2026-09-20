@@ -1,0 +1,1 @@
+{"question_id": "Q11", "dimensions": [{"id": "refusal_structure", "score": 5, "reason": "结论先行+检索轨迹+缺件分层+提案流程四件俱全，未给无锚定泛答。"}, {"id": "layer_accuracy", "score": 5, "reason": "三层核对如实：查询层不缺出口（近邻在册）、对象/字段层与行为/规则层未建，缺口定位准确。"}, {"id": "nearby_discipline", "score": 5, "reason": "近邻逐条标非所问 + 「本回答不含任何 ID」的零编造声明，与参照一致。"}], "disqualifier_triggered": false}

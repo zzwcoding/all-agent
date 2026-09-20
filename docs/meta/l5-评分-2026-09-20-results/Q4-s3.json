@@ -1,0 +1,1 @@
+{"question_id": "Q4", "dimensions": [{"id": "out_of_surface_reason", "score": 5, "reason": "锚定可解析但检索面检查不通过的拒答结论先行，阵营归属与检索面定义（检索面=camp=business-core）逐点对应锚 5 例。"}, {"id": "routing_clarity", "score": 5, "reason": "页面契约走建造链路、缺业务概念走提案流程的分道在「下一步」段清楚交代，等价概念未混同为映射。"}, {"id": "no_speculation", "score": 5, "reason": "仅保留锚定 ID 复述，零臆测零映射暗示，与参照一致。"}], "disqualifier_triggered": false}

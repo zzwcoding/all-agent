@@ -30,7 +30,11 @@ rubric（YAML）三红（机判，AC1）：某维缺 anchors 或 anchors 缺 5/3
   不覆盖旧留痕（照 meta_probe 体检留痕惯例，AGENTS.md 续跑协议第 9 条同款）。
   内容 = 每问逐维分数 + 采样分布 + 结论 + 不稳定升级提示 + 红灯路由去向
   （红灯只报告不修复，分道人工裁决，路由表 policies/signal-routing.json）。
-  留痕带生成时间戳（留痕不是 golden）。
+  报告确定性（票 48 P2-B）：零时间戳、零机器路径——同输入两次生成字节一致，
+  留痕的时间性由 --out 同名序号后缀承载（-2/-3…），输入身份由「输入指纹」承载
+  （rubric+评分结果文件名与内容 sha256 前 16 位，报告内可追溯非 golden）。
+  --keep-results <目录>：评分结果 JSON 原样拷入指定目录（采样 reason 留仓用，
+  票 48 P3；缺省不落——结果只进聚合不落盘副本）。
 
 退出码：0 通过线全绿；1 红（低于通过线或触发 disqualifier）；2 配置错
   （rubric 非法 / 评分文件无效 / 用法错误）。错误走 stderr，报告走 stdout
@@ -38,10 +42,11 @@ rubric（YAML）三红（机判，AC1）：某维缺 anchors 或 anchors 缺 5/3
 """
 
 import argparse
+import hashlib
 import json
+import shutil
 import statistics
 import sys
-from datetime import datetime
 from pathlib import Path
 
 import yaml
@@ -308,7 +313,8 @@ def aggregate_question(rubric: dict, qid: str, samples: list) -> dict:
     disqualified = disq_votes > 0
     unstable_dims = [d for d in dims if d["spread"] >= UNSTABLE_SPREAD]
     total = 0 if disqualified else sum(d["median"] * d["weight"] for d in dims)
-    return {"question_id": qid, "rubric_file": str(rubric.get("path", "")),
+    rubric_path = rubric.get("path")
+    return {"question_id": qid, "rubric_file": rubric_path.name if rubric_path else "",
             "total": total, "stable": not unstable_dims,
             "disqualified": disqualified, "disq_votes": disq_votes,
             "unstable_dims": unstable_dims, "dimensions": dims}
@@ -337,17 +343,55 @@ def evaluate(questions: list) -> "tuple[str, dict]":
     return verdict, conditions
 
 
+# ---------- 输入指纹与采样留仓（票 48） ----------
+
+def input_fingerprint(rubrics: dict, files: list) -> str:
+    """报告输入指纹（票 48 P2-B）：rubric+评分结果逐文件取「文件名\\t内容 sha256」
+    排序后喂入总 sha256，取前 16 位——替代时间戳/机器路径成为报告的输入身份，
+    同输入两次生成字节一致；内容变则指纹变，报告可追溯而不含机器路径。
+    """
+    entries = [r["path"] for r in rubrics.values() if r.get("path") is not None]
+    entries.extend(files)
+    pairs = sorted((p.name, hashlib.sha256(p.read_bytes()).hexdigest())
+                   for p in entries)
+    h = hashlib.sha256()
+    for name, digest in pairs:
+        h.update(f"{name}\t{digest}\n".encode("utf-8"))
+    return h.hexdigest()[:16]
+
+
+def keep_results_copy(files: list, dest: Path) -> int:
+    """评分结果 JSON 原样拷入 dest（--keep-results，票 48 P3 采样 reason 留仓用）。
+
+    逐份按原文件名落盘：同名同字节 = 幂等跳过；同名不同字节 = 配置错不覆盖
+    （与 --out 序号不覆盖同款纪律）。返回本次新拷贝份数。仅在评分校验通过后
+    调用（配置错路径不产副本，脏文件不外流）。
+    """
+    dest.mkdir(parents=True, exist_ok=True)
+    copied = 0
+    for f in files:
+        target = dest / f.name
+        if target.exists():
+            if target.read_bytes() == f.read_bytes():
+                continue
+            raise ConfigError(f"配置错误: --keep-results 名称冲突且内容不同，"
+                              f"不覆盖: {target}（与 {f}）")
+        shutil.copyfile(f, target)
+        copied += 1
+    return copied
+
+
 # ---------- 报告渲染 ----------
 
 def render_md(questions: list, verdict: str, conditions: dict, exit_code: int,
-              rubrics_dir: Path, results_paths: list, generated_at: str) -> str:
+              fingerprint: str, rubric_count: int, result_count: int) -> str:
     lines: list[str] = []
     lines += [
         "# L5 评分报告（l5_score · 票 42）",
         "",
-        f"- 生成时间: {generated_at}",
-        f"- rubrics 目录: {rubrics_dir}",
-        "- 评分结果来源: " + "、".join(str(p) for p in results_paths),
+        f"- 输入指纹: {fingerprint}（rubric×{rubric_count} 文件 + 评分结果"
+        f"×{result_count} 文件内容 sha256 前 16 位；零时间戳零机器路径，"
+        "同输入两次生成字节一致——留痕时间性由 --out 序号后缀承载，票 48）",
         "- 形态: 确定性骨架（零模型调用）——LLM 评分由运行时子 agent 产出评分结果"
         " JSON（协议: specs/l5_score.md），本脚本只校验、聚合、判定、留痕",
         "",
@@ -425,13 +469,11 @@ def render_md(questions: list, verdict: str, conditions: dict, exit_code: int,
 
 
 def render_json(questions: list, verdict: str, conditions: dict, exit_code: int,
-                rubrics_dir: Path, results_paths: list, generated_at: str) -> str:
+                fingerprint: str) -> str:
     return json.dumps({
         "tool": "l5_score",
         "ticket": TICKET,
-        "generatedAt": generated_at,
-        "rubricsDir": str(rubrics_dir),
-        "resultsPaths": [str(p) for p in results_paths],
+        "inputFingerprint": fingerprint,
         "verdict": verdict,
         "exitCode": exit_code,
         "conditions": conditions,
@@ -466,6 +508,11 @@ def main(argv=None) -> int:
     ap.add_argument("--out", default=None,
                     help="报告落盘路径（.md；同时落同名 .json；同名已存在加 "
                          "-2/-3 序号不覆盖；缺省只打 stdout）")
+    ap.add_argument("--keep-results", dest="keep_results", default=None,
+                    metavar="目录",
+                    help="评分结果 JSON 原样拷入指定目录（校验通过后落盘，采样 "
+                         "reason 留仓用，票 48；缺省不落；同名不同内容=配置错"
+                         "不覆盖）")
     ap.add_argument("--json", action="store_true",
                     help="机读 JSON 输出（stdout 只含 JSON，供探针消费）")
     args = ap.parse_args(argv)
@@ -491,6 +538,10 @@ def main(argv=None) -> int:
                                         [s["data"] for s in grouped[qid]])
                      for qid in sorted(grouped)]
         verdict, conditions = evaluate(questions)
+        if args.keep_results:
+            kept = keep_results_copy(files, Path(args.keep_results))
+            print(f"--keep-results: 已拷贝 {kept}/{len(files)} 份评分结果 JSON "
+                  f"→ {args.keep_results}", file=sys.stderr)
     except ConfigError as exc:
         print(str(exc), file=sys.stderr)
         print("配置校验失败（退出码 2）：评分面未运行，脏点不进聚合",
@@ -498,11 +549,12 @@ def main(argv=None) -> int:
         return EXIT_CONFIG
 
     exit_code = EXIT_OK if verdict == "PASS" else EXIT_RED
-    generated_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    rubric_count = len({r["path"] for r in rubrics.values()
+                        if r.get("path") is not None})
+    fingerprint = input_fingerprint(rubrics, files)
     md = render_md(questions, verdict, conditions, exit_code,
-                   rubrics_dir, results_paths, generated_at)
-    js = render_json(questions, verdict, conditions, exit_code,
-                     rubrics_dir, results_paths, generated_at)
+                   fingerprint, rubric_count, len(files))
+    js = render_json(questions, verdict, conditions, exit_code, fingerprint)
     if args.json:
         sys.stdout.write(js + "\n")  # 机读契约：stdout 只含 JSON
     elif args.out:

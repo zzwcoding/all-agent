@@ -11,7 +11,10 @@
   聚合与判定：中位算术（[5,3,4]→4）/ 分差 ≥2 标不稳定 / disqualifier 一票否决
     按 0 分计 / 总分=score×weight 加权和 / 问总分集中位 / 通过线三条件逐条单点红；
   报告与 CLI：MD/JSON 渲染稳定标记 / --out 双落盘 / 同名 -2/-3 序号不覆盖 /
-    退出码 0/1/2 契约 / 错误走 stderr。
+    退出码 0/1/2 契约 / 错误走 stderr；
+  报告确定性与采样留仓（票 48）：同输入两次生成字节一致（零时间戳零机器路径，
+    无 generatedAt）/ --keep-results 有=采样 JSON 原样拷入、无=不落目录 /
+    同名不同内容冲突=exit 2 不覆盖。
 """
 
 import io
@@ -475,6 +478,117 @@ class ReportAndCli(L5Base):
                                  "--results", str(self.root / "results")])
         self.assertEqual(rc, 2)
         self.assertIn("配置错误", err)
+
+
+class DeterminismAndKeepResults(L5Base):
+    """票 48：报告确定性（P2-B）与 --keep-results 采样留仓（P3）。"""
+
+    def build_env(self):
+        """两问 rubric + 全绿采样（复用 ReportAndCli 同款构造）。"""
+        (self.rubrics / "q2.yaml").write_text(
+            LEGAL_RUBRIC.replace("Q1", "Q2").replace("semantic_fidelity", "coverage")
+            .replace("caliber_quality", "citation_fit"), encoding="utf-8")
+        scores = {"Q1": {"semantic_fidelity": 5, "caliber_quality": 4},
+                  "Q2": {"coverage": 4, "citation_fit": 4}}
+        for q, sc in scores.items():
+            for n in ("s1", "s2", "s3"):
+                self.write_result(f"{q.lower()}-{n}.json", legal_result(q, sc))
+
+    def test_report_bytes_identical_across_runs(self):
+        # AC2 同款判定动作的单测层：同输入两次生成（不同 --out 路径）字节一致
+        self.build_env()
+        for tag in ("r1", "r2"):
+            rc, _, _ = run_main(["--rubrics", str(self.rubrics),
+                                 "--results", str(self.root / "results"),
+                                 "--out", str(self.root / f"{tag}.md")])
+            self.assertEqual(rc, 0)
+        self.assertEqual((self.root / "r1.md").read_bytes(),
+                         (self.root / "r2.md").read_bytes())
+        self.assertEqual((self.root / "r1.json").read_bytes(),
+                         (self.root / "r2.json").read_bytes())
+
+    def test_report_no_timestamp_no_machine_path(self):
+        # 确定性化契约：无 generatedAt 字段、报告不含临时目录机器路径
+        self.build_env()
+        rc, out, _ = run_main(["--rubrics", str(self.rubrics),
+                               "--results", str(self.root / "results"),
+                               "--out", str(self.root / "r.md")])
+        self.assertEqual(rc, 0)
+        j = json.loads((self.root / "r.json").read_text(encoding="utf-8"))
+        self.assertNotIn("generatedAt", j)
+        self.assertNotIn("rubricsDir", j)
+        self.assertNotIn("resultsPaths", j)
+        self.assertIn("inputFingerprint", j)
+        for text in (out, (self.root / "r.md").read_text(encoding="utf-8"),
+                     (self.root / "r.json").read_text(encoding="utf-8")):
+            self.assertNotIn(str(self.root), text)  # 机器路径零泄漏
+            self.assertNotIn("生成时间", text)
+        # 输入指纹随内容变：改一份评分内容 → 指纹变
+        fp1 = j["inputFingerprint"]
+        self.write_result("q1-s1.json", legal_result(
+            "Q1", {"semantic_fidelity": 5, "caliber_quality": 5}))
+        rc, _, _ = run_main(["--rubrics", str(self.rubrics),
+                             "--results", str(self.root / "results"),
+                             "--out", str(self.root / "r2.md")])
+        self.assertEqual(rc, 0)
+        fp2 = json.loads((self.root / "r2.json").read_text(
+            encoding="utf-8"))["inputFingerprint"]
+        self.assertNotEqual(fp1, fp2)
+
+    def test_rubric_file_in_report_is_basename(self):
+        self.build_env()
+        rc, out, _ = run_main(["--rubrics", str(self.rubrics),
+                               "--results", str(self.root / "results")])
+        self.assertEqual(rc, 0)
+        self.assertIn("- rubric: q1.yaml", out)
+        self.assertNotIn(str(self.rubrics), out)
+
+    def test_keep_results_copies_samples(self):
+        self.build_env()
+        kept = self.root / "kept"
+        rc, _, err = run_main(["--rubrics", str(self.rubrics),
+                               "--results", str(self.root / "results"),
+                               "--keep-results", str(kept)])
+        self.assertEqual(rc, 0)
+        self.assertIn("--keep-results", err)
+        srcs = sorted((self.root / "results").glob("*.json"))
+        dsts = sorted(kept.glob("*.json"))
+        self.assertEqual([p.name for p in dsts], [p.name for p in srcs])
+        for s, d in zip(srcs, dsts):
+            self.assertEqual(s.read_bytes(), d.read_bytes())
+
+    def test_keep_results_absent_by_default(self):
+        self.build_env()
+        kept = self.root / "kept"
+        rc, _, _ = run_main(["--rubrics", str(self.rubrics),
+                             "--results", str(self.root / "results")])
+        self.assertEqual(rc, 0)
+        self.assertFalse(kept.exists())
+
+    def test_keep_results_conflict_red_no_overwrite(self):
+        self.build_env()
+        kept = self.root / "kept"
+        kept.mkdir()
+        (kept / "q1-s1.json").write_text('{"不同": "内容"}', encoding="utf-8")
+        rc, _, err = run_main(["--rubrics", str(self.rubrics),
+                               "--results", str(self.root / "results"),
+                               "--keep-results", str(kept)])
+        self.assertEqual(rc, 2)
+        self.assertIn("名称冲突", err)
+        self.assertEqual((kept / "q1-s1.json").read_text(encoding="utf-8"),
+                         '{"不同": "内容"}')  # 不覆盖
+
+    def test_keep_results_dirty_run_copies_nothing(self):
+        # 配置错路径不产副本：脏采样不外流
+        self.build_env()
+        self.write_result("q1-s1.json", legal_result(
+            scores={"semantic_fidelity": 6, "caliber_quality": 4}))
+        kept = self.root / "kept"
+        rc, _, _ = run_main(["--rubrics", str(self.rubrics),
+                             "--results", str(self.root / "results"),
+                             "--keep-results", str(kept)])
+        self.assertEqual(rc, 2)
+        self.assertFalse(kept.exists())
 
 
 if __name__ == "__main__":

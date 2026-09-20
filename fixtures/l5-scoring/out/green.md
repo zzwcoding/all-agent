@@ -1,8 +1,6 @@
 # L5 评分报告（l5_score · 票 42）
 
-- 生成时间: 2026-09-20 21:10:55
-- rubrics 目录: /Users/divh/Downloads/All-agent/fixtures/l5-scoring/rubrics
-- 评分结果来源: /Users/divh/Downloads/All-agent/fixtures/l5-scoring/results-green
+- 输入指纹: fde8ef84f05d1991（rubric×3 文件 + 评分结果×9 文件内容 sha256 前 16 位；零时间戳零机器路径，同输入两次生成字节一致——留痕时间性由 --out 序号后缀承载，票 48）
 - 形态: 确定性骨架（零模型调用）——LLM 评分由运行时子 agent 产出评分结果 JSON（协议: specs/l5_score.md），本脚本只校验、聚合、判定、留痕
 
 **结论: PASS**（退出码 0）
@@ -13,7 +11,7 @@
 ## 逐问明细
 
 ### Q1
-- rubric: /Users/divh/Downloads/All-agent/fixtures/l5-scoring/rubrics/q1-rubric.yaml
+- rubric: q1-rubric.yaml
 - 判定: PASS ｜ 总分: 22 ｜ 稳定
 
 | 维度 | 权重 | 三采样 | 中位 | 分差 |
@@ -23,7 +21,7 @@
 | organization | 1 | [4, 4, 5] | 4 | 1 |
 
 ### Q2
-- rubric: /Users/divh/Downloads/All-agent/fixtures/l5-scoring/rubrics/q2-rubric.yaml
+- rubric: q2-rubric.yaml
 - 判定: PASS ｜ 总分: 12 ｜ 稳定
 
 | 维度 | 权重 | 三采样 | 中位 | 分差 |
@@ -32,7 +30,7 @@
 | citation_fit | 1 | [4, 4, 4] | 4 | 0 |
 
 ### Q3
-- rubric: /Users/divh/Downloads/All-agent/fixtures/l5-scoring/rubrics/q3-rubric.yaml
+- rubric: q3-rubric.yaml
 - 判定: PASS ｜ 总分: 13 ｜ 稳定
 
 | 维度 | 权重 | 三采样 | 中位 | 分差 |

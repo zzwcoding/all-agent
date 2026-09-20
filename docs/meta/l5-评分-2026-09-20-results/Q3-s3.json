@@ -1,0 +1,1 @@
+{"question_id": "Q3", "dimensions": [{"id": "refusal_structure", "score": 5, "reason": "结论先行+检索轨迹（按命名规律推想的 ID 经图索引复核明确报未找到）+缺件分层+提案流程下一步，四件与参照逐件对应。"}, {"id": "layer_accuracy", "score": 5, "reason": "三层核对如实：现有明细查询/明细载体均如实交代能力边界（按井号查单日、无月累计），缺件定位准确且近邻均标非所问。"}, {"id": "zero_fabrication", "score": 5, "reason": "白名单外零 ID，零编造声明与参照一致。"}], "disqualifier_triggered": false}
