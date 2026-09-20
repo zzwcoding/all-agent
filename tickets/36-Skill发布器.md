@@ -1,6 +1,6 @@
 # 票 36：F10 Skill 发布器（skill_pack_gen）
 
-Status: todo
+Status: done
 Belongs to: 第六批拆票方案（2026-09-20 用户批准）；PRD F10；specs/modules.md 边界规则 5
 Touches: tools/skill_pack_gen.py、tools/test_skill_pack_gen.py、exports/skillpkg/、fixtures/skill-pack-gen/、references/repo-layout.json、specs/modules.md、lessons/36
 
@@ -18,10 +18,10 @@ Touches: tools/skill_pack_gen.py、tools/test_skill_pack_gen.py、exports/skillp
 
 ## 验收（注源）
 
-- [ ] AC1 正例：bohai 切片 exit 0，三件套齐，问答卡与 CORE 行为同源（源：本票 AC 表）
-- [ ] AC2 幂等+防陈旧+篡改探针（源：本票 AC 表）
-- [ ] AC3 负变体×2：缺声明模型报错；声明含 build-contract 模型报错（源：边界规则 5+检索面纪律）
-- [ ] AC4 人审头部+登记+四闸（源：PRD 决策 2 与 CI）
+- [x] AC1 正例：bohai 切片 exit 0，三件套齐，问答卡与 CORE 行为同源（源：本票 AC 表）
+- [x] AC2 幂等+防陈旧+篡改探针（源：本票 AC 表）
+- [x] AC3 负变体×2：缺声明模型报错；声明含 build-contract 模型报错（源：边界规则 5+检索面纪律）
+- [x] AC4 人审头部+登记+四闸（源：PRD 决策 2 与 CI）
 
 ## 交接包（L2 自主档）
 

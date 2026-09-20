@@ -1,0 +1,683 @@
+{
+  "status": "待Owner人审（生成物禁手改，可再生）",
+  "domain": {
+    "name": "bohai",
+    "label": "渤海油田产量域",
+    "profile": "v9-full",
+    "sourcePath": "ontology/bohai"
+  },
+  "slice": {
+    "declared": [
+      "M1",
+      "M2",
+      "M3",
+      "M7",
+      "GLS"
+    ],
+    "models": [
+      {
+        "model": "M1",
+        "name": "对象模型",
+        "camp": "business-core",
+        "modelType": "OBJECT",
+        "yamlFile": "m1-object-model.yaml",
+        "version": "1.0.0"
+      },
+      {
+        "model": "M2",
+        "name": "行为模型",
+        "camp": "business-core",
+        "modelType": "BEHAVIOR",
+        "yamlFile": "m2-behavior-model.yaml",
+        "version": "1.0.0"
+      },
+      {
+        "model": "M3",
+        "name": "规则模型",
+        "camp": "business-core",
+        "modelType": "RULE",
+        "yamlFile": "m3-rule-model.yaml",
+        "version": "1.0.0"
+      },
+      {
+        "model": "M7",
+        "name": "查询统计与报表模型",
+        "camp": "business-core",
+        "modelType": "REPORT",
+        "yamlFile": "m7-report-model.yaml",
+        "version": "1.0.0"
+      },
+      {
+        "model": "GLS",
+        "name": "术语模型",
+        "camp": "business-core",
+        "modelType": "GLOSSARY",
+        "yamlFile": "glossary-model.yaml",
+        "version": "1.0.0"
+      }
+    ],
+    "citationPrefixes": [
+      "AGG-",
+      "ASSOC-",
+      "DICT-",
+      "BH-",
+      "RULE-",
+      "QR-",
+      "RPT-",
+      "GLS-"
+    ]
+  },
+  "routing": {
+    "note": "问答纪律的静态化表述：检索瀑布运行时真源见语义服务（skills/semantic-service）；成稿润色归人审后的使用方，本包只供确定性骨架。",
+    "steps": [
+      {
+        "step": "①",
+        "name": "显式锚定",
+        "discipline": "问句带 @ID 时按前缀定模型定阵营（先阵营后存在性）：business-core 面内 → 存在性确认并 --impact 反向收名下行为（ownerEntity 直挂与经子对象挂靠两类）；camp≠business-core → 面外拒答，不返回该元素任何细节。"
+      },
+      {
+        "step": "②",
+        "name": "名称解析",
+        "discipline": "无锚定/锚定失败降级：候选词对 name/alias/属性标签/术语 term+alias 确定性分层匹配（全等→字段⊆候选词→候选词⊆字段→头部同前缀），不猜不模糊；多义列候选请锚定修饰词，不擅自合并。"
+      },
+      {
+        "step": "③",
+        "name": "闭包装配",
+        "discipline": "命中元素沿 relatedObjectRefs/impact 反向装配证据集（承载/行为/规则/查询出口/术语），装配指令可复现；术语命中沿关联对象再收承载规则。"
+      },
+      {
+        "step": "④",
+        "name": "可拒答",
+        "discipline": "面外/仓内没有/禁用词三分支：缺件分层说明（查询层/对象字段层/行为规则层）+近邻指路；禁用词给替代口径真实 ID；业务口径缺口走提案流程（进仓走 MR + 语义 CI），本技能只读，不代填口径。"
+      }
+    ]
+  },
+  "calibers": [
+    {
+      "id": "QR-BOHAI-001",
+      "name": "单井日产量明细查询",
+      "alias": "wellDailyOutputQuery",
+      "objectType": "DETAIL_QUERY",
+      "questionSample": "单井日产量明细查询",
+      "description": "按井号查单井日产计量明细（R5·A.2 全字段出口）；D2 班次重复行注记：明细行含 reportShift，去重口径待 Owner。",
+      "behavior": {
+        "id": "BH-BOHAI-QueryWellDailyOutput",
+        "name": "查询单井日产量",
+        "type": "QUERY",
+        "ownerEntity": "AGG-BOHAI-001"
+      },
+      "sourceObjects": [
+        {
+          "objectRef": "AGG-BOHAI-002",
+          "alias": "d",
+          "primary": true,
+          "name": "日产计量"
+        },
+        {
+          "objectRef": "AGG-BOHAI-001",
+          "alias": "w",
+          "primary": false,
+          "name": "井"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "wellId",
+          "label": "井号",
+          "dataType": "String",
+          "required": true
+        }
+      ],
+      "rules": [
+        {
+          "id": "RULE-BOHAI-005",
+          "name": "井号归一化",
+          "type": "TRANSFORMATION",
+          "point": {
+            "expression": "normalizeWellId(rawWellId)"
+          },
+          "via": "ownerObjectBehaviors(AGG-BOHAI-002)"
+        },
+        {
+          "id": "RULE-BOHAI-002",
+          "name": "计量化验含水偏差校验",
+          "type": "VALIDATION",
+          "point": {
+            "expression": "abs(waterCut - waterCutLab) <= 5"
+          },
+          "via": "ownerObjectBehaviors(AGG-BOHAI-002)"
+        },
+        {
+          "id": "RULE-BOHAI-003",
+          "name": "日产油非空率校验",
+          "type": "VALIDATION",
+          "point": {
+            "expression": "(totalCount - nullCount) / totalCount >= 0.995"
+          },
+          "via": "ownerObjectBehaviors(AGG-BOHAI-002)"
+        },
+        {
+          "id": "RULE-BOHAI-004",
+          "name": "日产恒值检测",
+          "type": "VALIDATION",
+          "point": {
+            "narrative": "同井生产日期连续 30 日内 oilOutput 全部相同时判为恒值异常，返回 false（告警）"
+          },
+          "via": "ownerObjectBehaviors(AGG-BOHAI-002)"
+        },
+        {
+          "id": "RULE-BOHAI-008",
+          "name": "区块物质平衡校验",
+          "type": "VALIDATION",
+          "point": {
+            "expression": "abs(blockInjVolume - blockLiquidVolume - retentionDelta) / blockLiquidVolume <= 0.03"
+          },
+          "via": "ownerObjectBehaviors(AGG-BOHAI-002)"
+        },
+        {
+          "id": "RULE-BOHAI-009",
+          "name": "产量完成率",
+          "type": "CALCULATION",
+          "point": {
+            "expression": "actualOilSum / planOutputSum * 100"
+          },
+          "via": "ownerObjectBehaviors(AGG-BOHAI-002)"
+        },
+        {
+          "id": "RULE-BOHAI-019",
+          "name": "有效产量（剔检口径）",
+          "type": "CALCULATION",
+          "point": {
+            "expression": "SUM(dailyProduction.oilOutput WHERE well.currentStatus <> '检修')"
+          },
+          "via": "ownerObjectBehaviors(AGG-BOHAI-002)"
+        },
+        {
+          "id": "RULE-BOHAI-010",
+          "name": "综合含水率",
+          "type": "CALCULATION",
+          "point": {
+            "expression": "(liquidSum - oilSum) / liquidSum * 100"
+          },
+          "via": "ownerObjectBehaviors(AGG-BOHAI-002)"
+        }
+      ],
+      "hitIds": [
+        "QR-BOHAI-001",
+        "BH-BOHAI-QueryWellDailyOutput",
+        "AGG-BOHAI-002",
+        "AGG-BOHAI-001",
+        "RULE-BOHAI-005",
+        "RULE-BOHAI-002",
+        "RULE-BOHAI-003",
+        "RULE-BOHAI-004",
+        "RULE-BOHAI-008",
+        "RULE-BOHAI-009",
+        "RULE-BOHAI-019",
+        "RULE-BOHAI-010"
+      ]
+    },
+    {
+      "id": "QR-BOHAI-002",
+      "name": "区块月度产量完成率统计",
+      "alias": "blockMonthlyCompletionStat",
+      "objectType": "STATISTICAL_QUERY",
+      "questionSample": "区块月度产量完成率统计",
+      "description": "口径真源 RULE-BOHAI-009（完成率）与 RULE-BOHAI-019（有效产量·剔检口径）；D4 配产双值行影响分母注记。剔检列依赖井状态（w.currentStatus）；statMonth 由 prodDate 按月归组（月粒度函数语法随实现层）。",
+      "behavior": {
+        "id": "BH-BOHAI-QueryBlockMonthlyCompletion",
+        "name": "查询区块月度产量完成率",
+        "type": "QUERY",
+        "ownerEntity": "AGG-BOHAI-002"
+      },
+      "sourceObjects": [
+        {
+          "objectRef": "AGG-BOHAI-002",
+          "alias": "d",
+          "primary": true,
+          "name": "日产计量"
+        },
+        {
+          "objectRef": "AGG-BOHAI-001",
+          "alias": "w",
+          "primary": false,
+          "name": "井"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "blockName",
+          "label": "区块",
+          "dataType": "String",
+          "required": false
+        },
+        {
+          "name": "statMonth",
+          "label": "统计月",
+          "dataType": "String",
+          "required": true
+        }
+      ],
+      "rules": [
+        {
+          "id": "RULE-BOHAI-009",
+          "name": "产量完成率",
+          "type": "CALCULATION",
+          "point": {
+            "expression": "actualOilSum / planOutputSum * 100"
+          },
+          "via": "behavior.appliedRules(BH-BOHAI-QueryBlockMonthlyCompletion)"
+        },
+        {
+          "id": "RULE-BOHAI-019",
+          "name": "有效产量（剔检口径）",
+          "type": "CALCULATION",
+          "point": {
+            "expression": "SUM(dailyProduction.oilOutput WHERE well.currentStatus <> '检修')"
+          },
+          "via": "behavior.appliedRules(BH-BOHAI-QueryBlockMonthlyCompletion)"
+        },
+        {
+          "id": "RULE-BOHAI-005",
+          "name": "井号归一化",
+          "type": "TRANSFORMATION",
+          "point": {
+            "expression": "normalizeWellId(rawWellId)"
+          },
+          "via": "ownerObjectBehaviors(AGG-BOHAI-002)"
+        },
+        {
+          "id": "RULE-BOHAI-002",
+          "name": "计量化验含水偏差校验",
+          "type": "VALIDATION",
+          "point": {
+            "expression": "abs(waterCut - waterCutLab) <= 5"
+          },
+          "via": "ownerObjectBehaviors(AGG-BOHAI-002)"
+        },
+        {
+          "id": "RULE-BOHAI-003",
+          "name": "日产油非空率校验",
+          "type": "VALIDATION",
+          "point": {
+            "expression": "(totalCount - nullCount) / totalCount >= 0.995"
+          },
+          "via": "ownerObjectBehaviors(AGG-BOHAI-002)"
+        },
+        {
+          "id": "RULE-BOHAI-004",
+          "name": "日产恒值检测",
+          "type": "VALIDATION",
+          "point": {
+            "narrative": "同井生产日期连续 30 日内 oilOutput 全部相同时判为恒值异常，返回 false（告警）"
+          },
+          "via": "ownerObjectBehaviors(AGG-BOHAI-002)"
+        },
+        {
+          "id": "RULE-BOHAI-008",
+          "name": "区块物质平衡校验",
+          "type": "VALIDATION",
+          "point": {
+            "expression": "abs(blockInjVolume - blockLiquidVolume - retentionDelta) / blockLiquidVolume <= 0.03"
+          },
+          "via": "ownerObjectBehaviors(AGG-BOHAI-002)"
+        },
+        {
+          "id": "RULE-BOHAI-010",
+          "name": "综合含水率",
+          "type": "CALCULATION",
+          "point": {
+            "expression": "(liquidSum - oilSum) / liquidSum * 100"
+          },
+          "via": "ownerObjectBehaviors(AGG-BOHAI-002)"
+        }
+      ],
+      "hitIds": [
+        "QR-BOHAI-002",
+        "BH-BOHAI-QueryBlockMonthlyCompletion",
+        "AGG-BOHAI-002",
+        "AGG-BOHAI-001",
+        "RULE-BOHAI-009",
+        "RULE-BOHAI-019",
+        "RULE-BOHAI-005",
+        "RULE-BOHAI-002",
+        "RULE-BOHAI-003",
+        "RULE-BOHAI-004",
+        "RULE-BOHAI-008",
+        "RULE-BOHAI-010"
+      ]
+    },
+    {
+      "id": "QR-BOHAI-003",
+      "name": "区块月度商品量结算查询",
+      "alias": "monthlySettlementQuery",
+      "objectType": "DETAIL_QUERY",
+      "questionSample": "区块月度商品量结算查询",
+      "description": "商品量=净重（扣自用油与输差，R5·A.8/§3 指标 11）；与井口口径天然不等=事故 7 另一面（D15），两口径并列展示不互替。",
+      "behavior": {
+        "id": "BH-BOHAI-QueryMonthlySettlement",
+        "name": "查询区块月度商品量结算",
+        "type": "QUERY",
+        "ownerEntity": "AGG-BOHAI-008"
+      },
+      "sourceObjects": [
+        {
+          "objectRef": "AGG-BOHAI-008",
+          "alias": "m",
+          "primary": true,
+          "name": "区块月度结算"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "blockName",
+          "label": "区块",
+          "dataType": "String",
+          "required": false
+        }
+      ],
+      "rules": [],
+      "hitIds": [
+        "QR-BOHAI-003",
+        "BH-BOHAI-QueryMonthlySettlement",
+        "AGG-BOHAI-008"
+      ]
+    },
+    {
+      "id": "QR-BOHAI-004",
+      "name": "区块综合含水率统计",
+      "alias": "blockWaterCutStat",
+      "objectType": "STATISTICAL_QUERY",
+      "questionSample": "区块综合含水率统计",
+      "description": "口径真源 RULE-BOHAI-010（f_w=Q_w/(Q_o+Q_w)，Q_w=Q_液−Q_油 换算待 Owner）；化验 vs 计量打架由 RULE-BOHAI-002 容差承载；与注采比同受物质平衡约束（§3 注记）。",
+      "behavior": {
+        "id": "BH-BOHAI-QueryBlockWaterCut",
+        "name": "查询区块综合含水率",
+        "type": "QUERY",
+        "ownerEntity": "AGG-BOHAI-002"
+      },
+      "sourceObjects": [
+        {
+          "objectRef": "AGG-BOHAI-002",
+          "alias": "d",
+          "primary": true,
+          "name": "日产计量"
+        },
+        {
+          "objectRef": "AGG-BOHAI-001",
+          "alias": "w",
+          "primary": false,
+          "name": "井"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "blockName",
+          "label": "区块",
+          "dataType": "String",
+          "required": false
+        },
+        {
+          "name": "statMonth",
+          "label": "统计月",
+          "dataType": "String",
+          "required": true
+        }
+      ],
+      "rules": [
+        {
+          "id": "RULE-BOHAI-010",
+          "name": "综合含水率",
+          "type": "CALCULATION",
+          "point": {
+            "expression": "(liquidSum - oilSum) / liquidSum * 100"
+          },
+          "via": "behavior.appliedRules(BH-BOHAI-QueryBlockWaterCut)"
+        },
+        {
+          "id": "RULE-BOHAI-005",
+          "name": "井号归一化",
+          "type": "TRANSFORMATION",
+          "point": {
+            "expression": "normalizeWellId(rawWellId)"
+          },
+          "via": "ownerObjectBehaviors(AGG-BOHAI-002)"
+        },
+        {
+          "id": "RULE-BOHAI-002",
+          "name": "计量化验含水偏差校验",
+          "type": "VALIDATION",
+          "point": {
+            "expression": "abs(waterCut - waterCutLab) <= 5"
+          },
+          "via": "ownerObjectBehaviors(AGG-BOHAI-002)"
+        },
+        {
+          "id": "RULE-BOHAI-003",
+          "name": "日产油非空率校验",
+          "type": "VALIDATION",
+          "point": {
+            "expression": "(totalCount - nullCount) / totalCount >= 0.995"
+          },
+          "via": "ownerObjectBehaviors(AGG-BOHAI-002)"
+        },
+        {
+          "id": "RULE-BOHAI-004",
+          "name": "日产恒值检测",
+          "type": "VALIDATION",
+          "point": {
+            "narrative": "同井生产日期连续 30 日内 oilOutput 全部相同时判为恒值异常，返回 false（告警）"
+          },
+          "via": "ownerObjectBehaviors(AGG-BOHAI-002)"
+        },
+        {
+          "id": "RULE-BOHAI-008",
+          "name": "区块物质平衡校验",
+          "type": "VALIDATION",
+          "point": {
+            "expression": "abs(blockInjVolume - blockLiquidVolume - retentionDelta) / blockLiquidVolume <= 0.03"
+          },
+          "via": "ownerObjectBehaviors(AGG-BOHAI-002)"
+        },
+        {
+          "id": "RULE-BOHAI-009",
+          "name": "产量完成率",
+          "type": "CALCULATION",
+          "point": {
+            "expression": "actualOilSum / planOutputSum * 100"
+          },
+          "via": "ownerObjectBehaviors(AGG-BOHAI-002)"
+        },
+        {
+          "id": "RULE-BOHAI-019",
+          "name": "有效产量（剔检口径）",
+          "type": "CALCULATION",
+          "point": {
+            "expression": "SUM(dailyProduction.oilOutput WHERE well.currentStatus <> '检修')"
+          },
+          "via": "ownerObjectBehaviors(AGG-BOHAI-002)"
+        }
+      ],
+      "hitIds": [
+        "QR-BOHAI-004",
+        "BH-BOHAI-QueryBlockWaterCut",
+        "AGG-BOHAI-002",
+        "AGG-BOHAI-001",
+        "RULE-BOHAI-010",
+        "RULE-BOHAI-005",
+        "RULE-BOHAI-002",
+        "RULE-BOHAI-003",
+        "RULE-BOHAI-004",
+        "RULE-BOHAI-008",
+        "RULE-BOHAI-009",
+        "RULE-BOHAI-019"
+      ]
+    }
+  ],
+  "caliberNote": "",
+  "glossary": {
+    "declared": true,
+    "terms": [
+      {
+        "id": "GLS-BOHAI-001",
+        "term": "老完成率",
+        "aliases": [],
+        "status": "禁用（替代：产量完成率）",
+        "termType": "禁用词",
+        "definition": "v1 口径（不含自用油折算），2024 年废弃；禁用旧称，替代口径=产量完成率。",
+        "relatedObjectRefs": [
+          "AGG-BOHAI-002"
+        ]
+      },
+      {
+        "id": "GLS-BOHAI-002",
+        "term": "剔检产量",
+        "aliases": [
+          "净产量"
+        ],
+        "status": "有效",
+        "termType": "别名",
+        "definition": "剔除检修井口径的产量（即净产量）。",
+        "relatedObjectRefs": [
+          "AGG-BOHAI-001",
+          "AGG-BOHAI-002"
+        ]
+      },
+      {
+        "id": "GLS-BOHAI-003",
+        "term": "有效产量",
+        "aliases": [],
+        "status": "有效",
+        "termType": "一词两译",
+        "definition": "需修饰词消歧的产量词：开井日历支 / 剔检支，两支口径并列，单说「有效产量」必须追问修饰词。",
+        "relatedObjectRefs": [
+          "AGG-BOHAI-002"
+        ]
+      },
+      {
+        "id": "GLS-BOHAI-004",
+        "term": "躺井",
+        "aliases": [
+          "停产待检泵"
+        ],
+        "status": "有效（限作业区语境）",
+        "termType": "黑话",
+        "definition": "作业区口语，指停产待检泵的井（及该检修事件）。",
+        "relatedObjectRefs": [
+          "AGG-BOHAI-004"
+        ]
+      },
+      {
+        "id": "GLS-BOHAI-005",
+        "term": "时率",
+        "aliases": [
+          "抽油机时率"
+        ],
+        "status": "有效",
+        "termType": "缩写",
+        "definition": "「抽油机时率」的缩写；= Σ开井时长/Σ日历时长×100（见指标 14）。",
+        "relatedObjectRefs": [
+          "AGG-BOHAI-002"
+        ]
+      },
+      {
+        "id": "GLS-BOHAI-006",
+        "term": "水淹层",
+        "aliases": [],
+        "status": "有效",
+        "termType": "术语",
+        "definition": "驱替前沿到达的高含水层段。",
+        "relatedObjectRefs": []
+      },
+      {
+        "id": "GLS-BOHAI-007",
+        "term": "递减增油",
+        "aliases": [],
+        "status": "有效（待联席裁决）",
+        "termType": "术语",
+        "definition": "措施后增产油量=（实际产量−递减基线产量）×劈分系数；基线 q₀(1−dₐ)^t 拟合参数设定书未给。含口径争议注记：事故 7「一数多源」争议、待联席裁决。",
+        "relatedObjectRefs": [
+          "AGG-BOHAI-009"
+        ]
+      },
+      {
+        "id": "GLS-BOHAI-008",
+        "term": "存水率",
+        "aliases": [],
+        "status": "有效",
+        "termType": "术语",
+        "definition": "注入水留存地层比例（物质平衡用）。",
+        "relatedObjectRefs": [
+          "AGG-BOHAI-003"
+        ]
+      },
+      {
+        "id": "GLS-BOHAI-009",
+        "term": "配注合格率",
+        "aliases": [],
+        "status": "有效",
+        "termType": "术语",
+        "definition": "分层实注/配注 达标井次占比。",
+        "relatedObjectRefs": [
+          "AGG-BOHAI-003"
+        ]
+      },
+      {
+        "id": "GLS-BOHAI-010",
+        "term": "三多四难",
+        "aliases": [],
+        "status": "有效（引用马涛）",
+        "termType": "治理热词",
+        "definition": "数据库多、平台多、孤立应用多；共享难、复用难、开发难、协同难（引马涛）。",
+        "relatedObjectRefs": []
+      }
+    ],
+    "bannedTerms": [
+      {
+        "id": "GLS-BOHAI-001",
+        "term": "老完成率",
+        "aliases": [],
+        "status": "禁用（替代：产量完成率）"
+      }
+    ]
+  },
+  "citationDiscipline": {
+    "idCitationFormat": "回答必带元素 ID 引用（前缀形态真实 ID，如 AGG-BOHAI-002），逐条可经 `python3 tools/graph_index.py <域> --query <ID> --json` 复核；成稿须含「本回答引用的元素 ID」清单节，与正文 ID token 双向一致（tools/check_citations.py 检具）。",
+    "outOfSurface": [
+      {
+        "prefixes": [
+          "SCR-"
+        ],
+        "model": "MU",
+        "name": "UI 模型",
+        "camp": "build-contract"
+      }
+    ],
+    "outsideSlice": [
+      {
+        "prefixes": [
+          "ACTOR-",
+          "ROLE-",
+          "PERM-"
+        ],
+        "model": "M5",
+        "name": "主体模型",
+        "camp": "business-core"
+      },
+      {
+        "prefixes": [
+          "FLOW-"
+        ],
+        "model": "M6",
+        "name": "流程模型",
+        "camp": "business-core"
+      }
+    ],
+    "refusal": "可拒答声明：仓内没有就说明缺什么，绝不编造；写意图一律回「走提案流程」（进仓走 MR + 语义 CI）；本包只读——运行面语义消费，不做本体写入。"
+  },
+  "generatedFrom": {
+    "generator": "tools/skill_pack_gen.py",
+    "source": "ontology/bohai",
+    "note": "确定性派生物：本体切片装配零 LLM 零时间戳，同域同声明重生成字节一致；生成物禁手改，防陈旧断言=--check 再制一致（票 36）"
+  }
+}
