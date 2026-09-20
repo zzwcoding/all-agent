@@ -41,9 +41,11 @@ import=WATERFALL_STEPS 常量（票 39 件二：工序路由四步单一真源�
     同拒。校验面=口径卡装配链与术语关联，不及其余（对比 app_pack_gen 全域
     校验：本生成器只消费装配链触到的引用）。
 
-头部人审状态纪律（同票 35，PRD 决策 2 生成物侧落位）：
-status: 待Owner人审（生成物禁手改，可再生）。入库副本 exports/skillpkg/bohai/
-是派生物禁手改，防陈旧断言=--check 模式（现场重生成与入库逐字节比对）。
+头部人审状态纪律（同票 35，PRD 决策 2 生成物侧落位；票 46 增审记指针）：
+status: 待Owner人审（生成物禁手改，可再生；审记旁档 exports/reviews/，
+review_gate.py verify 判失效）——人审结论落审记旁档（design-human-review-gate
+§8 裁决点 4），生成物本体字面不改。入库副本 exports/skillpkg/bohai/ 是派生物
+禁手改，防陈旧断言=--check 模式（现场重生成与入库逐字节比对）。
 
 CLI: python3 tools/skill_pack_gen.py <域目录> --models M1,M2,M3,M7,GLS
      [--out <目录>] [--check <入库SKILL.md>] [--schema-dir <目录>]
@@ -71,7 +73,9 @@ from semantic_service_core import WATERFALL_STEPS
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
-STATUS_REVIEW = "待Owner人审（生成物禁手改，可再生）"
+# 票 46：原字面保留为前缀，只追加审记指针（审记旁档 exports/reviews/，哈希锚定
+# 判失效）；字面内禁 ASCII 空格——归档闸 md 状态行取首个非空 token 整串命中。
+STATUS_REVIEW = "待Owner人审（生成物禁手改，可再生；审记旁档exports/reviews/，review_gate.py-verify判失效）"
 GENERATOR = "tools/skill_pack_gen.py"
 
 MD_NAME = "SKILL.md"

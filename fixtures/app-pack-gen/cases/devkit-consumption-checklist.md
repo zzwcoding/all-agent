@@ -7,7 +7,7 @@
 
 给定 devkit.md（人读面）与 devkit.json（机读面）：
 
-- 头部 `status: 待Owner人审（生成物禁手改，可再生）` 在场——生成物禁手改，缺件回生成器再生；
+- 头部 `status: 待Owner人审（生成物禁手改，可再生；审记旁档exports/reviews/，review_gate.py-verify判失效）` 在场——生成物禁手改，缺件回生成器再生；人审结论在审记旁档 exports/reviews/（票 46），本件被审过与否由 `python3 tools/review_gate.py verify <devkit.md>` 机判；
 - 四节齐：一、数据字典（M1）；二、口径四件套（M7×M2×M3×M1）；三、行为与规则清单（M2/M3 全量）；四、开放疑点（docs/proposals 扫描）；
 - 头部约束节=技术架构约束/开发指导书（出厂集固定输入（合成）），按原样装配。
 

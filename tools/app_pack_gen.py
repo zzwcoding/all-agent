@@ -30,8 +30,10 @@ model_type 不符 / 引用失效（behaviorRef/objectRef/appliedRules/reusedBy/
 targetAggregate 指空）/ 口径装配必备键缺失（QR 缺 behaviorRef 键，票 39 件一：
 结构化报错定位元素，不 KeyError 裸崩）同样拒绝——不硬编不产残包。
 
-头部人审状态纪律（PRD 决策 2 生成物侧落位）：status: 待Owner人审（生成物禁手
-改，可再生）。入库副本 exports/devkit/bohai/ 是派生物禁手改，防陈旧断言 =
+头部人审状态纪律（PRD 决策 2 生成物侧落位；票 46 增审记指针）：status: 待Owner
+人审（生成物禁手改，可再生；审记旁档 exports/reviews/，review_gate.py verify
+判失效）——人审结论落审记旁档（design-human-review-gate §8 裁决点 4），生成物
+本体字面不改。入库副本 exports/devkit/bohai/ 是派生物禁手改，防陈旧断言 =
 --check 模式（现场重生成与入库逐字节比对，照 mcp_manifest_gen 手法）。
 
 CLI: python3 tools/app_pack_gen.py <域目录> [--out <目录>] [--check <路径>]
@@ -57,7 +59,9 @@ import yaml
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
-STATUS_REVIEW = "待Owner人审（生成物禁手改，可再生）"
+# 票 46：原字面保留为前缀，只追加审记指针（审记旁档 exports/reviews/，哈希锚定
+# 判失效）；字面内禁 ASCII 空格——归档闸 md 状态行取首个非空 token 整串命中。
+STATUS_REVIEW = "待Owner人审（生成物禁手改，可再生；审记旁档exports/reviews/，review_gate.py-verify判失效）"
 GENERATOR = "tools/app_pack_gen.py"
 
 # 声明模型集（票 35 设计裁决：缺了报错不硬编——边界规则 5 生成器侧首证）

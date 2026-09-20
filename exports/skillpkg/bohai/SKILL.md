@@ -4,12 +4,12 @@ description: "渤海油田产量域（bohai）可对话技能包骨架——口�
 domain: bohai
 slice-models: ["M1", "M2", "M3", "M7", "GLS"]
 citation-prefixes: ["AGG-", "ASSOC-", "DICT-", "BH-", "RULE-", "QR-", "RPT-", "GLS-"]
-status: 待Owner人审（生成物禁手改，可再生）
+status: 待Owner人审（生成物禁手改，可再生；审记旁档exports/reviews/，review_gate.py-verify判失效）
 ---
 
 # 渤海油田产量域 可对话技能包（skillpkg · bohai）
 
-status: 待Owner人审（生成物禁手改，可再生）
+status: 待Owner人审（生成物禁手改，可再生；审记旁档exports/reviews/，review_gate.py-verify判失效）
 
 - 生成器: tools/skill_pack_gen.py（确定性装配：本体切片 + schema 注册表 camp 面，零 LLM 零时间戳）
 - 本体来源: ontology/bohai（profile=v9-full）

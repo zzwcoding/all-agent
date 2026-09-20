@@ -289,8 +289,8 @@ class ContentContractTest(unittest.TestCase):
 
     def test_review_status_header(self):
         self.assertEqual(self.pkg["status"],
-                         "待Owner人审（生成物禁手改，可再生）")
-        self.assertIn("status: 待Owner人审（生成物禁手改，可再生）", self.md)
+                         "待Owner人审（生成物禁手改，可再生；审记旁档exports/reviews/，review_gate.py-verify判失效）")
+        self.assertIn("status: 待Owner人审（生成物禁手改，可再生；审记旁档exports/reviews/，review_gate.py-verify判失效）", self.md)
 
     def test_md_four_sections(self):
         for head in ("## 一、数据字典", "## 二、口径四件套", "## 三、行为与规则清单",
@@ -508,7 +508,7 @@ class BohaiRealDomainTest(unittest.TestCase):
     def test_four_sections_and_status_header(self):
         rc, md, _ = run_main(["ontology/bohai"])
         self.assertEqual(rc, 0)
-        self.assertIn("status: 待Owner人审（生成物禁手改，可再生）", md)
+        self.assertIn("status: 待Owner人审（生成物禁手改，可再生；审记旁档exports/reviews/，review_gate.py-verify判失效）", md)
         for head in ("## 一、数据字典", "## 二、口径四件套", "## 三、行为与规则清单",
                      "## 四、开放疑点"):
             self.assertIn(head, md)

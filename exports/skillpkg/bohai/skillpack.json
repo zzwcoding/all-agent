@@ -1,5 +1,5 @@
 {
-  "status": "待Owner人审（生成物禁手改，可再生）",
+  "status": "待Owner人审（生成物禁手改，可再生；审记旁档exports/reviews/，review_gate.py-verify判失效）",
   "domain": {
     "name": "bohai",
     "label": "渤海油田产量域",

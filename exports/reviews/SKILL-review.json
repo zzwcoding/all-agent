@@ -1,0 +1,20 @@
+{
+  "target": "exports/skillpkg/bohai/SKILL.md",
+  "created": "2026-09-20",
+  "records": [
+    {
+      "target": "exports/skillpkg/bohai/SKILL.md",
+      "reviewedCommit": "2c7e5658f751a1ef12cbf7f06a04c08e70768cba",
+      "reviewedSha256": "c23df9d1dfebc36b4ef89421f59820d0d6c87028974c8d99612c9bc83d7159cd",
+      "verdict": "已审",
+      "checkpoints": [
+        "切片完整",
+        "口径卡同源",
+        "引用纪律"
+      ],
+      "notes": "首审基线（票 46）：--check 再制一致绿；三件套+frontmatter 齐；口径卡与 CORE 同源（出厂集 AC1 探针机核）；引用纪律与拒答边界节在场；档位=首审+变更审（SKILL.md 变更=审全文，skillpack.json 变更=审口径卡节）",
+      "reviewedBy": "divh",
+      "date": "2026-09-20"
+    }
+  ]
+}

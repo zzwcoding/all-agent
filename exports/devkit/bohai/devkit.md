@@ -1,6 +1,6 @@
 # 渤海油田产量域 开发包（devkit · bohai）
 
-status: 待Owner人审（生成物禁手改，可再生）
+status: 待Owner人审（生成物禁手改，可再生；审记旁档exports/reviews/，review_gate.py-verify判失效）
 
 - 生成器: tools/app_pack_gen.py（确定性装配：YAML 机读 + 提案 frontmatter 扫描，零 LLM 零时间戳）
 - 本体来源: ontology/bohai（profile=v9-full）
