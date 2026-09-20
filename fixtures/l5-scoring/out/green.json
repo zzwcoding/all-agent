@@ -1,33 +1,36 @@
 {
   "tool": "l5_score",
   "ticket": "42",
-  "inputFingerprint": "fde8ef84f05d1991",
+  "inputFingerprint": "c33cbf4e872d06a2",
   "verdict": "PASS",
   "exitCode": 0,
   "conditions": {
-    "perQuestionTotal": {
+    "perQuestionNormalized": {
       "pass": true,
       "below": [],
       "threshold": 3
     },
     "setMedian": {
       "pass": true,
-      "value": 13,
+      "value": 4.333333333333333,
       "threshold": 4.0
     },
-    "noDisqualifier": {
+    "noZeroScore": {
       "pass": true,
-      "triggered": []
+      "zeroed": []
     }
   },
   "questions": [
     {
       "question_id": "Q1",
       "rubric_file": "q1-rubric.yaml",
-      "total": 22,
+      "normalized": 4.4,
+      "rawTotal": 22,
       "stable": true,
       "disqualified": false,
       "disq_votes": 0,
+      "zeroed": false,
+      "zero_reasons": [],
       "unstable_dims": [],
       "dimensions": [
         {
@@ -68,10 +71,13 @@
     {
       "question_id": "Q2",
       "rubric_file": "q2-rubric.yaml",
-      "total": 12,
+      "normalized": 4.0,
+      "rawTotal": 12,
       "stable": true,
       "disqualified": false,
       "disq_votes": 0,
+      "zeroed": false,
+      "zero_reasons": [],
       "unstable_dims": [],
       "dimensions": [
         {
@@ -101,10 +107,13 @@
     {
       "question_id": "Q3",
       "rubric_file": "q3-rubric.yaml",
-      "total": 13,
+      "normalized": 4.333333333333333,
+      "rawTotal": 13,
       "stable": true,
       "disqualified": false,
       "disq_votes": 0,
+      "zeroed": false,
+      "zero_reasons": [],
       "unstable_dims": [],
       "dimensions": [
         {
