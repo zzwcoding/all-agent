@@ -1,0 +1,257 @@
+# =====================================================================
+# 渤海域 · M1 对象模型（票 09 工序②进仓版；模拟 MR 过闸后落仓）
+# ────────────────────────────────────────────────────────────────
+# 素材边界：全部元素注源 R5（teach-petro-agent 设定书 v3）。M1 八聚合根
+#   源自工序① db-reverse 草案（docs/walkthrough/step1-db-reverse-draft/，
+#   证据非权威）+ 工序② Owner 裁决（docs/walkthrough/step2-mr-adjudication.md，
+#   裁决依据 = R5·§5 关系草案与 §4 规则下沉）。DDL 无外键，引用结构
+#   （wellRef/ASSOC/AGG-BOHAI-009）全部来自 R5·§5 业务草案并逐处注源；
+#   设定书没有的一律未建（区块/油田/平台未提升对象；MU 无素材不建文件）。
+# 脏特征疑点 D1–D15 全集见 docs/walkthrough/step1-db-reverse-draft/dirty-signs.md，
+#   各聚合根描述保留疑点点名（不静默吞）。
+# 表示法注记：子表同时保留 wellId（DDL 键列，复合主键成分）与 wellRef（§5 语义
+#   引用）——双表示是「键结构保真」与「引用显式」的叠加，属转写残留，是否以
+#   wellRef 吸收 wellId 待 Owner 确认（清理属 ID/键变更，须过影响分析）。
+# =====================================================================
+model_type: OBJECT
+version: "1.0.0"
+domain: bohai
+aggregates:
+  # [R5·A.1 井档案 + §5 实体「井」] Owner 裁决：对象名从 §5 实体草案取短名「井」
+  - id: AGG-BOHAI-001
+    name: 井
+    alias: Well
+    description: "源表 well_info（R5·设定书附录 A.1，字典标题「井档案」；§5 实体草案名「井」），一井一行。§1 组织规模：3 作业区 120 口在产井（采油 86/注水 34）、5 平台。疑点残留：井号旧写法 N2/N-2 并存（D6，归一化落 RULE-BOHAI-005）；currentStatus 状态滞后（D7）；fieldName 行内冗余（D8）——均待 Owner 确认。"
+    aggregateType: AGGREGATE_ROOT
+    lifecycle: [生产中, 停产, 检修, 待弃置]   # [R5·A.1 current_status 值集 + §5 井「状态机」] 迁移合法性校验 RULE-BOHAI-007
+    attributes:
+      - { name: wellId, label: 井号, type: String, unique: true }   # [R5·A.1 PK well_id] D6：旧写法 N2/N-2 并存，归一化 RULE-BOHAI-005
+      - { name: wellName, label: 井名, type: String }               # [R5·A.1] 样本 渤中28-1-N2
+      - { name: wellType, label: 井别, type: Enum, enumValues: [EW, IW] }   # [R5·A.1] EW 采油·IW 注水；个别改型未留版本待 Owner
+      - { name: firstProdDate, label: 首次投产日期, type: Date }    # [R5·A.1] 自然递减率「扣新井」判据用（§3 指标 3）
+      - { name: platform, label: 平台, type: String }               # [R5·A.1] 样本 CEP-A/B；§5「平台—承载→井」未建对象（无源表，待 Owner）
+      - { name: blockName, label: 区块, type: String }              # [R5·A.1] 渤南/渤中/渤西；§5「井—隶属→区块」未建对象（无源表，待 Owner）
+      - { name: fieldName, label: 油田, type: String }              # [R5·A.1] 行内冗余=反规范化样例（D8 待 Owner）
+      - { name: currentStatus, label: 当前状态, type: Enum, enumValues: [生产中, 停产, 检修, 待弃置] }   # [R5·A.1] 状态滞后 D7；「检修」值是 RULE-BOHAI-019 剔检口径的判定字段
+      - { name: remarks, label: 备注, type: String }                # [R5·A.1] 供应商导入曾塞入注入指令
+  # [R5·A.2 日产计量（★核心事实源）+ §5 Join 白名单 oil ⋈ well ✓]
+  - id: AGG-BOHAI-002
+    name: 日产计量
+    alias: OilProductionDaily
+    description: "源表 oil_production_daily（R5·设定书附录 A.2，字典标注核心事实源），一井一日，复合主键（wellId, prodDate）。§3 指标 1/3/4/5/7/10/14 的承载事实源。疑点残留：吨方混写（D1，校验 RULE-BOHAI-001）；A/B 班重复行与主键声明冲突（D2）；化验/折算打架（D3，RULE-BOHAI-002）；配产双值行（D4）；openDays 停井日>0（D5，值域已下沉 refRules）——均待 Owner 确认。"
+    aggregateType: AGGREGATE_ROOT
+    attributes:
+      - name: wellRef            # [R5·§5「oil_production_daily ⋈ well_info（井号）✓」+ A.2 键列] 引用 vs 依赖待 Owner
+        label: 所属井
+        type: AggregateRootRef
+        targetAggregate: AGG-BOHAI-001
+      - { name: wellId, label: 井号, type: String }                  # [R5·A.2 复合主键成分] D6 归一化 RULE-BOHAI-005
+      - { name: prodDate, label: 生产日期, type: Date }              # [R5·A.2 复合主键成分]
+      - { name: oilOutput, label: 日产油量（吨）, type: Decimal }    # [R5·A.2] D1 吨方混写；§3 指标 1/2/3/4/10/14 的分子/基线承载
+      - { name: liquidOutput, label: 日产液量（方）, type: Decimal } # [R5·A.2] §3 指标 5/6/7/12 承载
+      - name: waterCut          # [R5·A.2 化验折算] D3 与 fluid_test 打架；§4 规则 5 值域下沉
+        label: 含水率（%）
+        type: Decimal
+        refRules:
+          - name: 含水率值域
+            expression: value >= 0 and value <= 100
+            violationMessage: 含水率须在 [0,100]（R5·§4 规则 5）
+            enforcedAt: ALWAYS
+      - { name: planOutput, label: 配产量（吨）, type: Decimal }     # [R5·A.2] D4 双值行待 Owner；§3 指标 1 分母承载
+      - name: openDays          # [R5·A.2] D5 矛盾行；§4 规则 5 值域下沉；§3 指标 14 时率承载
+        label: 开井时长（天）
+        type: Decimal
+        refRules:
+          - name: 开井时长值域
+            expression: value >= 0 and value <= 24
+            violationMessage: 开井时长须在 [0,24]（R5·§4 规则 5）
+            enforcedAt: ALWAYS
+      - { name: oilPressure, label: 油压（MPa）, type: Decimal }     # [R5·A.2]
+      - { name: reportShift, label: 报表班次, type: Enum, enumValues: [A, B, C] }   # [R5·A.2] D2 班次手抄汇总；§2.1 手工录入环节是脏数据主要来源
+  # [R5·A.3 + §5] 注水侧事实源；§3 指标 6/7/12 承载
+  - id: AGG-BOHAI-003
+    name: 注水日计量
+    alias: WaterInjectionDaily
+    description: "源表 water_injection_daily（R5·设定书附录 A.3），键=井号+日期，复合主键（wellId, injDate）；injDate 为列名转写补记。疑点残留：layerSplit 两层/三层口径不一、偶为累计值（D9，保持 String 待 Owner）。§5：oil_production_daily ⋈ 本对象直连禁止（须经 AGG-BOHAI-009 受效关系）。"
+    aggregateType: AGGREGATE_ROOT
+    attributes:
+      - name: wellRef            # [R5·§5 注水井实体 + A.3 键列]
+        label: 所属井
+        type: AggregateRootRef
+        targetAggregate: AGG-BOHAI-001
+      - { name: wellId, label: 井号, type: String }                  # [R5·A.3 复合主键成分]
+      - { name: injDate, label: 注水日期, type: Date }               # [R5·A.3 列名补记]
+      - { name: injVolume, label: 注水量（方）, type: Decimal }      # [R5·A.3] §3 指标 6/7/12 承载
+      - { name: pumpPressure, label: 泵压（MPa）, type: Decimal }    # [R5·A.3]
+      - { name: layerSplit, label: 分层配注, type: String }          # [R5·A.3] D9 不结构化；§6「配注合格率」缺配注目标承载字段
+  # [R5·A.4] 检修台账；§3 指标 2（剔检）/13 承载；票 09 影响分析变更的台账面
+  - id: AGG-BOHAI-004
+    name: 井检修记录
+    alias: WellOverhaul
+    description: "源表 well_overhaul（R5·设定书附录 A.4），键=井号+起止，复合主键（wellId, overhaulStart, overhaulEnd）。疑点残留：跨月作业口径切割（D10，波及 RULE-BOHAI-016/019）；affectedOutput 估算口径不一；batchId 补录（D11，BH-BOHAI-RecordOverhaul 前置条件承载）。术语注记（R5·§6）：作业区口语「躺井」指停产待检泵——限作业区语境（Owner=采油工艺所）。"
+    aggregateType: AGGREGATE_ROOT
+    attributes:
+      - name: wellRef            # [R5·§5 + A.4 键列]
+        label: 所属井
+        type: AggregateRootRef
+        targetAggregate: AGG-BOHAI-001
+      - { name: wellId, label: 井号, type: String }                  # [R5·A.4 复合主键成分]
+      - { name: overhaulStart, label: 检修开始日期, type: Date }     # [R5·A.4 复合主键成分；样本 2026-08-28]
+      - { name: overhaulEnd, label: 检修结束日期, type: Date }       # [R5·A.4 样本 2026-09-06；D10 跨月]
+      - { name: overhaulType, label: 检修类型, type: String }        # [R5·A.4] 样本仅「检泵」值集不全不建枚举；§3 指标 13 判据用
+      - { name: affectedOutput, label: 影响产量（吨）, type: Decimal }   # [R5·A.4] 各作业区估算口径不一待 Owner
+      - { name: batchId, label: 批次号, type: String }               # [R5·A.4] D11 补录标记（样本 20260911-T3）
+  # [R5·A.5] 措施台账；§3 指标 8/9/10/15 承载
+  - id: AGG-BOHAI-005
+    name: 井措施记录
+    alias: WellMeasures
+    description: "源表 well_measures（R5·设定书附录 A.5），键=井号+措施次，复合主键（wellId, measureSeq）；measureSeq 为列名转写补记。疑点残留：有效期 30% 缺失（D12）；incrOilAnnual 两作业区算法不一致=事故 7（D13）。§7 剧本 2《注水井措施评估》的台账面。"
+    aggregateType: AGGREGATE_ROOT
+    attributes:
+      - name: wellRef            # [R5·§5「措施—作用于→井」+ A.5 键列]
+        label: 所属井
+        type: AggregateRootRef
+        targetAggregate: AGG-BOHAI-001
+      - { name: wellId, label: 井号, type: String }                  # [R5·A.5 复合主键成分]
+      - { name: measureSeq, label: 措施次序, type: Integer }         # [R5·A.5 复合主键成分；列名补记]
+      - { name: measureType, label: 措施类型, type: Enum, enumValues: [压裂, 酸化, 补孔, 调剖] }   # [R5·A.5 字典值集]
+      - { name: jobDate, label: 施工日期, type: Date }               # [R5·A.5]
+      - { name: effectiveFrom, label: 有效期起, type: Date }         # [R5·A.5] D12 约 30% 缺失，不设 required
+      - { name: effectiveTo, label: 有效期止, type: Date }           # [R5·A.5] D12
+      - { name: incrOilAnnual, label: 年增油量（吨）, type: Decimal }   # [R5·A.5] D13 事故 7
+  # [R5·A.6] 化验台账；§3 指标 5 数据源 2.6；§4 规则 3/4 承载
+  - id: AGG-BOHAI-006
+    name: 流体化验记录
+    alias: FluidTest
+    description: "源表 fluid_test（R5·设定书附录 A.6），键=井号+取样日期，复合主键（wellId, sampleDate）；sampleDate 为列名转写补记。疑点残留：取样频次不齐（高产周报/低产半月报）、插补规则争议；waterCutLab 与 AGG-BOHAI-002.waterCut 打架（D3，RULE-BOHAI-002 容差 ≤5pp）。§5 Join 白名单：oil_production_daily ⋈ 本对象直连禁止（须井号+取样日期双键+时间容差经中间视图）。"
+    aggregateType: AGGREGATE_ROOT
+    attributes:
+      - name: wellRef            # [R5·§5「化验样—取样自→井」+ A.6 键列]
+        label: 所属井
+        type: AggregateRootRef
+        targetAggregate: AGG-BOHAI-001
+      - { name: wellId, label: 井号, type: String }                  # [R5·A.6 复合主键成分]
+      - { name: sampleDate, label: 取样日期, type: Date }            # [R5·A.6 列名补记]
+      - { name: waterCutLab, label: 化验含水率（%）, type: Decimal } # [R5·A.6] D3
+      - { name: density, label: 密度（t/m³）, type: Decimal }        # [R5·A.6] §4 规则 3 折算密度域 [0.82,0.98]
+      - { name: apiGravity, label: API 度, type: Decimal }           # [R5·A.6]
+  # [R5·A.7] 设备台账；§4 规则 8/11 关联面
+  - id: AGG-BOHAI-007
+    name: 设备状态记录
+    alias: EquipStatus
+    description: "源表 equip_status（R5·设定书附录 A.7），键=设备号+时间戳，复合主键（equipId, statusTime）；equipId/statusTime 为列名转写补记。疑点残留：stopReasonCode 新旧编码并存（D14，RULE-BOHAI-006 映射）；load/current 单位字典未声明。§5 未声明设备—井关系，故不建 wellRef（零证据零引用，待 Owner）。"
+    aggregateType: AGGREGATE_ROOT
+    attributes:
+      - { name: equipId, label: 设备号, type: String }               # [R5·A.7 复合主键成分；列名补记]
+      - { name: statusTime, label: 状态时间戳, type: DateTime }      # [R5·A.7 复合主键成分；列名补记]
+      - { name: equipType, label: 设备类型, type: Enum, enumValues: [电泵, 螺杆泵, 加热炉] }   # [R5·A.7 字典值集]
+      - { name: load, label: 负载, type: Decimal }                   # [R5·A.7] 单位待 Owner
+      - { name: current, label: 电流, type: Decimal }                # [R5·A.7] 单位待 Owner；§4 规则 11 零值告警属实时域未建
+      - { name: stopReasonCode, label: 停机原因码, type: String }    # [R5·A.7] D14 新旧编码并存，不建枚举
+  # [R5·A.8] 经营侧事实源；§3 指标 11 商品量承载
+  - id: AGG-BOHAI-008
+    name: 区块月度结算
+    alias: MonthlySettlement
+    description: "源表 monthly_settlement（R5·设定书附录 A.8），键=区块+结算月，复合主键（blockName, settleDate），settleDate 粒度为月（v2 兼容声明：规范名）。疑点残留：netWeight 扣自用油与输差、与井口口径天然不等=事故 7 另一面（D15）；§8 事故 13（A11 实时加和 vs E7 统计上报差 3.2%）同源——口径仲裁待 Owner。"
+    aggregateType: AGGREGATE_ROOT
+    attributes:
+      - { name: blockName, label: 区块, type: String }               # [R5·A.8 复合主键成分；渤南/渤中/渤西]
+      - { name: settleDate, label: 结算月, type: Date }              # [R5·A.8 复合主键成分；粒度=月]
+      - { name: netWeight, label: 商品量净重（吨）, type: Decimal }  # [R5·A.8] §3 指标 11「商品量」承载（扣自用油与输差）
+  # [R5·§5 业务实体，无源表] 注水井→受效油井 多对多关系实体；物理落表待 Owner 确认
+  - id: AGG-BOHAI-009
+    name: 受效关系
+    alias: EffectuationRelation
+    description: "R5·§5 Ontology 域草案实体：「受效关系（注水井→受效油井，多对多，属性=劈分系数 Σ=1、响应起始日——由王飞系数劈分强制要求，业务规则驱动建模的实证）」。8 表无源表，物理落表待 Owner 确认；不建它则 §5 Join 白名单「oil_production_daily ⋈ water_injection_daily 直连 ✗（须经受效关系实体）」无承载。§3 指标 10 递减增油的劈分承载。"
+    aggregateType: AGGREGATE_ROOT
+    attributes:
+      - name: injectorWellRef    # [R5·§5「注水井→受效油井」注水方]
+        label: 注水井
+        type: AggregateRootRef
+        targetAggregate: AGG-BOHAI-001
+      - name: producerWellRef    # [R5·§5「注水井→受效油井」受效方]
+        label: 受效油井
+        type: AggregateRootRef
+        targetAggregate: AGG-BOHAI-001
+      - name: splitCoefficient   # [R5·§5「劈分系数 Σ=1」；§3 指标 10「多井受效按劈分系数（Σ=1）分摊」]
+        label: 劈分系数
+        type: Decimal
+        refRules:
+          - name: 劈分系数值域
+            expression: value > 0 and value <= 1
+            violationMessage: 劈分系数须在 (0,1]（R5·§5）
+            enforcedAt: ALWAYS
+      - { name: responseStartDate, label: 响应起始日, type: Date }   # [R5·§5]
+    invariants:
+      - name: 同一注水井劈分系数合计为 1
+        expression: 对同一 injectorWellRef 的全部受效关系，splitCoefficient 之和 = 1
+        violationMessage: 劈分系数合计须为 1（R5·§5「Σ=1」）
+        enforcedAt: ALWAYS
+# 无 data_dictionaries：字典无字典表声明（注释值集≠字典表，reverse-guide §6），
+#   完整值集以 enumValues 承载（current_status / well_type / measure_type /
+#   report_shift / equip_type）；stop_reason_code / overhaul_type 值集不全保持 String。
+aggregate_associations:
+  # [R5·§5 关系草案 + A.2 Join 白名单 ✓] 井 1..* 日产计量
+  - id: ASSOC-BOHAI-001
+    sourceAggregate: AGG-BOHAI-001
+    targetAggregate: AGG-BOHAI-002
+    associationType: REFERENCE
+    sourceRole: 井
+    targetRole: 日产计量
+    cardinality: ONE_TO_MANY
+    referenceField: wellRef
+  # [R5·§5 + A.3] 井 1..* 注水日计量
+  - id: ASSOC-BOHAI-002
+    sourceAggregate: AGG-BOHAI-001
+    targetAggregate: AGG-BOHAI-003
+    associationType: REFERENCE
+    sourceRole: 井
+    targetRole: 注水日计量
+    cardinality: ONE_TO_MANY
+    referenceField: wellRef
+  # [R5·§5 + A.4] 井 1..* 井检修记录
+  - id: ASSOC-BOHAI-003
+    sourceAggregate: AGG-BOHAI-001
+    targetAggregate: AGG-BOHAI-004
+    associationType: REFERENCE
+    sourceRole: 井
+    targetRole: 井检修记录
+    cardinality: ONE_TO_MANY
+    referenceField: wellRef
+  # [R5·§5「措施—作用于→井」+ A.5] 井 1..* 井措施记录
+  - id: ASSOC-BOHAI-004
+    sourceAggregate: AGG-BOHAI-001
+    targetAggregate: AGG-BOHAI-005
+    associationType: REFERENCE
+    sourceRole: 井
+    targetRole: 井措施记录
+    cardinality: ONE_TO_MANY
+    referenceField: wellRef
+  # [R5·§5「化验样—取样自→井」+ A.6] 井 1..* 流体化验记录
+  - id: ASSOC-BOHAI-005
+    sourceAggregate: AGG-BOHAI-001
+    targetAggregate: AGG-BOHAI-006
+    associationType: REFERENCE
+    sourceRole: 井
+    targetRole: 流体化验记录
+    cardinality: ONE_TO_MANY
+    referenceField: wellRef
+  # [R5·§5「注水井—受效→油井」注水方] 井（注水方）1..* 受效关系
+  - id: ASSOC-BOHAI-006
+    sourceAggregate: AGG-BOHAI-001
+    targetAggregate: AGG-BOHAI-009
+    associationType: DEPENDENCY
+    sourceRole: 注水井
+    targetRole: 受效关系（注水方）
+    cardinality: ONE_TO_MANY
+    referenceField: injectorWellRef
+  # [R5·§5「注水井—受效→油井」受效方] 井（受效油井）1..* 受效关系
+  #   （多对多经关系实体展开为两条一对多；§5 原文「多对多」）
+  - id: ASSOC-BOHAI-007
+    sourceAggregate: AGG-BOHAI-001
+    targetAggregate: AGG-BOHAI-009
+    associationType: DEPENDENCY
+    sourceRole: 受效油井
+    targetRole: 受效关系（受效方）
+    cardinality: ONE_TO_MANY
+    referenceField: producerWellRef
