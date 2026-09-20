@@ -76,6 +76,28 @@ STATUS_OUT_OF_SURFACE = "refused_out_of_surface"
 STATUS_MISSING = "refused_missing"
 STATUS_BANNED = "refused_banned"
 
+# 瀑布真源常量（票 39 件二，二期收官报告 §6.5 观察项 #1 清偿）：四步检索瀑布的
+# (编号, 名称, 一句话)——与本模块 answer() 的瀑布实现工序一一对应
+# （①↔一级·显式锚定、②↔二级·ID/名称解析、③↔三级·闭包装配、④↔四级·可拒答）。
+# 真源地位：瀑布演进改这里，消费面同步重 gen——工序（skill_pack_gen 工序路由节
+# import 本常量渲染）/发布物（exports/skillpkg SKILL.md+skillpack.json，--check
+# 抓陈旧）/文档（skill references 细则的速查面）三处消费；运行时判定细则仍以
+# skills/semantic-service/references/retrieval-waterfall.md 为准。
+WATERFALL_STEPS = (
+    ("①", "显式锚定",
+     "问句带 @ID 时按前缀定模型定阵营（先阵营后存在性）：面内确认存在并反向收"
+     "名下行为；面外拒答，不返回该元素任何细节。"),
+    ("②", "名称解析",
+     "无锚定/锚定失败降级：候选词对 name/alias/属性标签/术语确定性分层匹配，"
+     "不猜不模糊；多义列候选请锚定修饰词，不擅自合并。"),
+    ("③", "闭包装配",
+     "命中元素沿引用/影响两向装配证据集（承载/行为/规则/查询出口/术语），只引"
+     "用装配集内 ID，装配指令可复现。"),
+    ("④", "可拒答",
+     "面外/仓内没有/禁用词三分支如实拒答：缺件分层说明+近邻指路；禁用词给替代"
+     "口径真实 ID；写意图走提案流程。"),
+)
+
 
 class ConfigError(ValueError):
     """目标域/schema 配置不可用（退出码 2）。"""

@@ -1,6 +1,6 @@
 {
   "skill": "app-pack-gen（F9 应用生成器出厂集，票 35）",
-  "description": "出厂集：本体域 → 开发包生成器（tools/app_pack_gen.py）的免疫面断言（AC 真源=tickets/35-应用生成器.md AC 表）。开发包=确定性装配非创作：MD+JSON 双载体落 exports/devkit/<域>/，头部人审状态纪律（status: 待Owner人审（生成物禁手改，可再生），PRD 决策 2 生成物侧落位）；入库副本 exports/devkit/bohai/ 禁手改。AC1（正例+口径同源机核）=两条 cmd-succeeds 探针：①四节齐+人审头部+固定输入约束节在场（读 exports/devkit/bohai/devkit.md，仓级文件用 python -c 承载沿 fixtures/mcp-publisher 手法）；②跑 semantic_service_core 子进程对 bohai 问「日产量口径是什么？」，断言其命中 ID 逐个 ∈ 开发包 JSON 口径节对应卡片（QR-BOHAI-001）的 hitIds——口径四件套与 CORE 八问同源的机核面（CORE-01 冻结期望=AGG-BOHAI-002/BH-BOHAI-QueryWellDailyOutput/QR-BOHAI-001/RULE-BOHAI-003/RULE-BOHAI-004；装配面=behaviorRef+sourceObjects.objectRef+关联 M3 规则，生成器本体零子进程耦合，同源对账归出厂集）。AC2（幂等+防陈旧）=①--check 模式对入库副本逐字节比对（照 fixtures/mcp-publisher AC2 手法，规避 cmd 断言无 shell 算子的约束）②双跑字节一致探针（tempfile 内连跑两次比对 md+json bytes）；连跑幂等与篡改探针红另有生成器单测 tools/test_app_pack_gen.py 双承载。AC3（缺声明模型负变体）=cmd-fails 对 negative-variants/bohai-no-m3（bohai 副本剃掉 m3，fixtures 自管副本，范围=生成器声明面消费文件 manifest+M1/M2/M7）断言 exit 2+「缺声明模型」+M3 指认，不产残包（specs/modules.md 边界规则 5 生成器侧首证；负变体缺件/引用失效还有单测面 4 例）。AC4（人审状态头部+布局登记+归档闸绿）=人审头部由 AC1 探针①承载；布局登记=references/repo-layout.json exports 条目 devkit/*.md、devkit/*.json（实跑归档闸驱动，照票 23 手法）；归档闸绿=CI 闸 4（bash tools/ci.sh）承载，不可写成单条断言。cases/devkit-consumption-checklist.md=编码 agent 消费用例单（四节齐读/口径同源/防陈旧/缺件拒收四场景，与断言一一对应）。固定输入 inputs/tech-constraints.md、inputs/dev-guide.md=技术架构约束/开发指导书（合成中性文本，文件头自带「出厂集固定输入（合成）」声明），生成器原样装配进开发包头部约束节——它是输入不是生成器产物。",
+  "description": "出厂集：本体域 → 开发包生成器（tools/app_pack_gen.py）的免疫面断言（AC 真源=tickets/35-应用生成器.md AC 表）。开发包=确定性装配非创作：MD+JSON 双载体落 exports/devkit/<域>/，头部人审状态纪律（status: 待Owner人审（生成物禁手改，可再生），PRD 决策 2 生成物侧落位）；入库副本 exports/devkit/bohai/ 禁手改。AC1（正例+口径同源机核）=两条 cmd-succeeds 探针：①四节齐+人审头部+固定输入约束节在场（读 exports/devkit/bohai/devkit.md，仓级文件用 python -c 承载沿 fixtures/mcp-publisher 手法）；②跑 semantic_service_core 子进程对 bohai 问「日产量口径是什么？」，断言其命中 ID 逐个 ∈ 开发包 JSON 口径节对应卡片（QR-BOHAI-001）的 hitIds——口径四件套与 CORE 八问同源的机核面（CORE-01 冻结期望=AGG-BOHAI-002/BH-BOHAI-QueryWellDailyOutput/QR-BOHAI-001/RULE-BOHAI-003/RULE-BOHAI-004；装配面=behaviorRef+sourceObjects.objectRef+关联 M3 规则，生成器本体零子进程耦合，同源对账归出厂集）。AC2（幂等+防陈旧）=①--check 模式对入库副本逐字节比对（照 fixtures/mcp-publisher AC2 手法，规避 cmd 断言无 shell 算子的约束）②双跑字节一致探针（tempfile 内连跑两次比对 md+json bytes）；连跑幂等与篡改探针红另有生成器单测 tools/test_app_pack_gen.py 双承载。AC3（缺声明模型负变体）=cmd-fails 对 negative-variants/bohai-no-m3（bohai 副本剃掉 m3，fixtures 自管副本，范围=生成器声明面消费文件 manifest+M1/M2/M7）断言 exit 2+「缺声明模型」+M3 指认，不产残包（specs/modules.md 边界规则 5 生成器侧首证；负变体缺件/引用失效还有单测面 4 例）。AC4（人审状态头部+布局登记+归档闸绿）=人审头部由 AC1 探针①承载；布局登记=references/repo-layout.json exports 条目 devkit/*.md、devkit/*.json（实跑归档闸驱动，照票 23 手法）；归档闸绿=CI 闸 4（bash tools/ci.sh）承载，不可写成单条断言。cases/devkit-consumption-checklist.md=编码 agent 消费用例单（四节齐读/口径同源/防陈旧/缺件拒收四场景，与断言一一对应）。固定输入 inputs/tech-constraints.md、inputs/dev-guide.md=技术架构约束/开发指导书（合成中性文本，文件头自带「出厂集固定输入（合成）」声明），生成器原样装配进开发包头部约束节——它是输入不是生成器产物。 票 39 增 behaviorRef 缺失负变体 bohai-no-behaviorref（manifest+M1/M2/M3/M7 全量在场，仅 m7 的 QR-BOHAI-001 剃 behaviorRef 行；fixtures 自管副本，复制时点与真域逐字节一致，见 negative-variants/README.md 第二节）=cmd-succeeds 探针（子进程 --out 进 tempfile：钉 exit 2+stderr 定位元素 QR-BOHAI-001+behaviorRef 字样+schema_check 指路+无 Traceback+零残包文件——schema_check required-field 是字段完备第一道闸，但生成器遇残缺输入须自己干净拒绝不裸崩，票 39 件一设计裁决 L0）。票 39 AC 真源=tickets/39-工具卫生两件.md AC 表。",
   "assertions": [
     {
       "ac": "AC1（MD 四节齐+人审状态头部+固定输入约束节在场）",
@@ -42,6 +42,14 @@
       "outputContains": [
         "缺声明模型",
         "M3"
+      ]
+    },
+    {
+      "ac": "票39 AC1（behaviorRef 缺失负变体：exit 2 干净报错定位元素+无 traceback+无残包；探针本体 cmd-succeeds，钉退出码 2——沿票 25 CORE 探针手法）",
+      "type": "cmd-succeeds",
+      "cmd": "python3 -c \"import subprocess,sys,tempfile\nfrom pathlib import Path\nwith tempfile.TemporaryDirectory() as td:\n    out=Path(td)/'pkg'\n    r=subprocess.run(['python3','tools/app_pack_gen.py','{fixture_dir}/negative-variants/bohai-no-behaviorref','--out',str(out)],capture_output=True,text=True)\n    files=sorted(p.name for p in out.iterdir()) if out.is_dir() else []\n    ok=(r.returncode==2 and 'QR-BOHAI-001' in r.stderr and 'behaviorRef' in r.stderr and 'schema_check' in r.stderr and 'Traceback' not in r.stderr and not files)\n    print('rc',r.returncode,'定位元素','QR-BOHAI-001' in r.stderr,'behaviorRef字样','behaviorRef' in r.stderr,'无Traceback','Traceback' not in r.stderr,'无残包',not files)\n    sys.exit(0 if ok else 1)\"",
+      "outputContains": [
+        "rc 2 定位元素 True behaviorRef字样 True 无Traceback True 无残包 True"
       ]
     }
   ]

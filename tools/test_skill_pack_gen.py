@@ -8,9 +8,11 @@
   2. 口径卡装配纪律——M7 在切片而 M1/M2/M3 缺伴 → exit 2（口径卡命中集须与
      CORE 同源，不产残卡）；M7 未声明 → 如实注记无口径卡（L0 示例切片可出包）；
   3. 三件套内容契约——frontmatter（name/slice-models/citation-prefixes/人审状态）、
-     工序路由四步静态化、口径问答卡 hitIds 装配（behaviorRef+objectRef+
-     appliedRules+承载对象关联规则，同票 35 口径节装配来源）、引用纪律
-     （camp 面外/切片外/禁用词/可拒答声明）、GLS 术语面；
+     工序路由四步静态化（票 39 件二起自 core WATERFALL_STEPS 真源常量渲染：
+     import 同一性+渲染含常量全部步骤名+常量自身契约四步钉死）、口径问答卡
+     hitIds 装配（behaviorRef+objectRef+appliedRules+承载对象关联规则，同票 35
+     口径节装配来源）、引用纪律（camp 面外/切片外/禁用词/可拒答声明）、GLS 术语面；
+     口径装配必备键缺失（QR 缺 behaviorRef 键）→ exit 2 不裸崩（票 39 件一同款）；
   4. 确定性核心——零时间戳、两次生成字节一致（AC2 的单测面）；
   5. CLI 三模式——stdout 缺省 / --out 双文件 / --check 逐字节比对（AC2 载体）；
   6. 渤海真域回归——三件套齐 + 口径卡与 CORE-01 冻结命中集同源（AC1 单测面）
@@ -325,6 +327,19 @@ class CaliberQuartetTest(unittest.TestCase):
         self.assertIn("未声明 M7", out)
         self.assertNotIn("### 口径", out)
 
+    def test_missing_behavior_ref_key_exit_2(self):
+        """票 39 件一（同款装配链）：M7 口径缺 behaviorRef 键 → 结构化 exit 2
+        （不 KeyError 裸崩），stderr 定位元素 id + behaviorRef 字样。"""
+        dom = make_domain(self.tmp / "c2")
+        (dom / "m7-report-model.yaml").write_text(
+            M7.replace("    behaviorRef: BH-DEMO-Query\n", ""), encoding="utf-8")
+        rc, _out, err = run_main(self._argv(dom, ",".join(GOLDEN_MODELS)))
+        self.assertEqual(rc, 2)
+        self.assertIn("QR-DEMO-001", err)
+        self.assertIn("behaviorRef", err)
+        self.assertIn("schema_check", err)
+        self.assertNotIn("Traceback", err)
+
 
 class DeterminismTest(unittest.TestCase):
     """确定性核心：幂等 + 零时间戳（AC2 单测面）。"""
@@ -407,6 +422,32 @@ class ContentContractTest(unittest.TestCase):
                          ["显式锚定", "名称解析", "闭包装配", "可拒答"])
         self.assertIn("① 显式锚定", self.md)
         self.assertIn("④ 可拒答", self.md)
+
+    def test_routing_steps_single_source_with_core_constant(self):
+        """票 39 件二：工序路由四步 = core WATERFALL_STEPS 单一真源——
+        渲染输出包含常量全部步骤名与纪律句；改常量→本测试与黄金包 --check
+        抓工序/发布物同步。"""
+        import semantic_service_core as ssc
+        self.assertIs(spg.WATERFALL_STEPS, ssc.WATERFALL_STEPS,
+                      "skill_pack_gen 须 import core WATERFALL_STEPS 消费，"
+                      "不得自有静态副本")
+        self.assertFalse(hasattr(spg, "ROUTING_STEPS"),
+                         "自有静态四步文本须删除（票 39 件二）")
+        # 常量自身契约：四步 (编号,名称,一句话)，与 core answer() 工序一一对应
+        steps_const = ssc.WATERFALL_STEPS
+        self.assertEqual(len(steps_const), 4, "四步瀑布：常量须恰四步")
+        self.assertEqual([num for num, _n, _t in steps_const],
+                         ["①", "②", "③", "④"])
+        self.assertTrue(all(text.strip() for _num, _n, text in steps_const),
+                        "每步须带一句话纪律")
+        steps = self.pkg["routing"]["steps"]
+        self.assertEqual([(s["step"], s["name"], s["discipline"])
+                          for s in steps],
+                         [(num, name, text) for num, name, text
+                          in steps_const])
+        for num, name, text in steps_const:
+            self.assertIn(f"{num} {name}:", self.md)
+            self.assertIn(text, spg.render_json(self.pkg))
 
     def test_caliber_card_hit_ids_assembly(self):
         """口径卡同票 35 装配来源：hitIds=QR+behaviorRef+objectRefs+关联规则。"""

@@ -5,14 +5,17 @@
 双载体（MD+JSON 双出口，同票 35 手法）。生成=确定性装配非创作：输入=域目录 +
 --models 切片声明（显式子集，如 --models M1,M2,M3,M7,GLS）+ ontology/schema
 注册表（camp/模型面真源——读 model-registry.json 的 camp 字段与 model-deps.json
-的 idPrefixes 前缀表，不 import core）；装配逻辑零 LLM（YAML/JSON 机读），
-零时间戳——输出不含任何日期/时间形态 token，同域同声明任意机器重生成字节一致。
+的 idPrefixes 前缀表）；装配逻辑零 LLM（YAML/JSON 机读），零时间戳——输出不含
+任何日期/时间形态 token，同域同声明任意机器重生成字节一致。对 core 的唯一
+import=WATERFALL_STEPS 常量（票 39 件二：工序路由四步单一真源，仅常量无逻辑
+耦合；此前零 import core，观察项 #1 的既定清偿方向）。
 
 技能包三件套（票 36 设计裁决，SKILL.md 单文件三节 + JSON 机读镜像）：
   ①frontmatter+工序路由——frontmatter：name/domain/slice-models/
     citation-prefixes（ID 前缀回答面=model-deps.json idPrefixes 反查声明模型）+
     人审状态；工序路由=问答四步的静态化表述（显式锚定→名称解析→闭包装配→
-    可拒答），运行时真源=语义服务检索瀑布，发布物内只是静态化纪律卡；
+    可拒答），自 core WATERFALL_STEPS 真源常量渲染（票 39 件二，瀑布演进改
+    常量→发布物 --check 抓同步），发布物内只是静态化纪律卡；
   ②口径问答卡——M7 query_reports 逐口径一卡（问题样例/命中 ID 集/口径要点），
     装配来源同票 35 口径节（QR+behaviorRef+objectRefs+关联 M3 规则：
     behavior.appliedRules ∪ reusedBy ∪ 承载对象关联规则=ownerEntity 落在承载
@@ -64,6 +67,8 @@ from pathlib import Path
 
 import yaml
 
+from semantic_service_core import WATERFALL_STEPS
+
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
 STATUS_REVIEW = "待Owner人审（生成物禁手改，可再生）"
@@ -80,27 +85,12 @@ SECTION_HEADS = ("## 一、工序路由（问答四步·静态化）",
 CALIBER_QUARTET = ("M1", "M2", "M3", "M7")
 GLOSSARY_MODEL = "GLS"
 
-# 工序路由四步（静态化表述常量；运行时真源=语义服务检索瀑布）
+# 工序路由静态化注记（票 36）。四步文本已常数化（票 39 件二，观察项 #1 清偿）：
+# 渲染消费 core 的 WATERFALL_STEPS 真源常量（上方 import，仅常量无逻辑耦合），
+# 本模块不再自有静态四步文本——瀑布演进改 core 常量，此处与发布物随之同步。
 ROUTING_NOTE = ("问答纪律的静态化表述：检索瀑布运行时真源见语义服务"
                 "（skills/semantic-service）；成稿润色归人审后的使用方，"
                 "本包只供确定性骨架。")
-ROUTING_STEPS = (
-    ("①", "显式锚定",
-     "问句带 @ID 时按前缀定模型定阵营（先阵营后存在性）：business-core 面内 →"
-     " 存在性确认并 --impact 反向收名下行为（ownerEntity 直挂与经子对象挂靠两类）；"
-     "camp≠business-core → 面外拒答，不返回该元素任何细节。"),
-    ("②", "名称解析",
-     "无锚定/锚定失败降级：候选词对 name/alias/属性标签/术语 term+alias 确定性"
-     "分层匹配（全等→字段⊆候选词→候选词⊆字段→头部同前缀），不猜不模糊；"
-     "多义列候选请锚定修饰词，不擅自合并。"),
-    ("③", "闭包装配",
-     "命中元素沿 relatedObjectRefs/impact 反向装配证据集（承载/行为/规则/查询"
-     "出口/术语），装配指令可复现；术语命中沿关联对象再收承载规则。"),
-    ("④", "可拒答",
-     "面外/仓内没有/禁用词三分支：缺件分层说明（查询层/对象字段层/行为规则层）"
-     "+近邻指路；禁用词给替代口径真实 ID；业务口径缺口走提案流程（进仓走 MR +"
-     " 语义 CI），本技能只读，不代填口径。"),
-)
 
 ID_CITATION_FORMAT = (
     "回答必带元素 ID 引用（前缀形态真实 ID，如 AGG-BOHAI-002），逐条可经"
@@ -318,7 +308,14 @@ def _validate_references(dd: dict, loaded: set) -> None:
             for bid in r.get("reusedBy") or []:
                 check(bid, beh_set, r.get("id", "?"), "reusedBy")
     for qr in dd["queryReports"]:
-        if qr.get("behaviorRef") and has_m2:
+        # 装配口径卡的必备键（票 39 件一，同 app_pack_gen）：缺失/为空 →
+        # 结构化配置错误不裸崩——schema_check 是字段完备的第一道闸
+        # （required-field），生成器遇残缺输入自己干净拒绝，不产残卡。
+        if not qr.get("behaviorRef"):
+            raise ConfigError(
+                f"域内 M7 元素 {qr.get('id', '?')} 缺 behaviorRef 键"
+                f"（装配口径卡需要）——先过 schema_check（required-field）")
+        if has_m2:
             check(qr["behaviorRef"], beh_set, qr.get("id", "?"),
                   "behaviorRef")
         if has_m1:
@@ -498,7 +495,7 @@ def build_package(domain_dir: Path, models: list[str],
         "slice": build_slice(declared, metas, prefix2model),
         "routing": {"note": ROUTING_NOTE,
                     "steps": [{"step": step, "name": name, "discipline": text}
-                              for step, name, text in ROUTING_STEPS]},
+                              for step, name, text in WATERFALL_STEPS]},
         "calibers": build_calibers(dd) if has_m7 else [],
         "caliberNote": "" if has_m7 else CALIBER_NOTE_EMPTY,
         "glossary": build_glossary(dd),

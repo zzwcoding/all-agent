@@ -9,9 +9,12 @@
      开放提案过滤（status=open 且 target.element 含本域前缀）；
   3. 声明模型集——缺 M1/M2/M3/M7 任一 → exit 2 不产残包（AC3 的单测面，
      modules.md 边界规则 5 生成器侧）；引用失效（behaviorRef 指空）→ exit 2；
+     口径装配必备键缺失（QR 缺 behaviorRef 键）→ exit 2 干净报错不裸崩不产残包
+     （票 39 件一）；
   4. CLI 三模式——stdout 缺省 / --out 双文件 / --check 逐字节比对（AC2 载体）；
   5. 渤海真域回归——四节齐 + 口径节与 CORE-01 冻结命中集同源（AC1 单测面）
-     + 入库副本 --check 一致 + fixtures 负变体（剃 m3）exit 2。
+     + 入库副本 --check 一致 + fixtures 负变体（剃 m3）exit 2
+     + fixtures 负变体（剃 behaviorRef）exit 2 干净报错（票 39 件一 AC1）。
 
 红相记录（TDD）：本文件先行落盘，app_pack_gen 未实现时收集即红。
 """
@@ -33,6 +36,8 @@ REPO = Path(__file__).resolve().parent.parent
 BOHAI = REPO / "ontology" / "bohai"
 EXPORTS_DEVKIT = REPO / "exports" / "devkit" / "bohai"
 NEGATIVE_VARIANT = REPO / "fixtures" / "app-pack-gen" / "negative-variants" / "bohai-no-m3"
+NEGATIVE_NO_BEHAVIORREF = (REPO / "fixtures" / "app-pack-gen"
+                           / "negative-variants" / "bohai-no-behaviorref")
 
 # CORE-01 冻结期望集（fixtures/semantic-service 票 25 探针同源）：
 # core 对 bohai「日产量口径是什么？」的命中 ID。
@@ -409,6 +414,24 @@ class DeclaredModelsTest(unittest.TestCase):
         self.assertEqual(rc, 2)
         self.assertIn("BH-DEMO-Ghost", err)
 
+    def test_missing_behavior_ref_key_exit_2_no_partial_output(self):
+        """票 39 件一：M7 口径缺 behaviorRef 键 → 结构化 exit 2（不 KeyError 裸崩），
+        stderr 定位元素 id + behaviorRef 字样 + schema_check 指路，--out 不产残包。"""
+        dom = make_domain(self.tmp / "d2")
+        m7 = dom / "m7-report-model.yaml"
+        m7.write_text(M7.replace("    behaviorRef: BH-DEMO-Query\n", ""),
+                      encoding="utf-8")
+        outdir = self.tmp / "pkg-no-bref"
+        rc, _out, err = run_main([str(dom), "--inputs-dir", str(self.inputs),
+                                  "--out", str(outdir)])
+        self.assertEqual(rc, 2)
+        self.assertIn("QR-DEMO-001", err)
+        self.assertIn("behaviorRef", err)
+        self.assertIn("schema_check", err)
+        self.assertNotIn("Traceback", err)
+        self.assertFalse(outdir.exists() and any(outdir.iterdir()),
+                         "配置错误不得产出残包文件")
+
     def test_missing_fixed_inputs_exit_2(self):
         dom = make_domain(self.tmp / "e")
         rc, _out, err = run_main(
@@ -513,6 +536,22 @@ class BohaiRealDomainTest(unittest.TestCase):
         self.assertEqual(rc, 2)
         self.assertIn("缺声明模型", err)
         self.assertIn("M3", err)
+
+    def test_negative_variant_missing_behavior_ref_exit_2(self):
+        """票 39 件一 AC1：剃 behaviorRef 域副本 → exit 2 干净报错：
+        stderr 定位元素 id + behaviorRef 字样，无 traceback，不产残包文件。"""
+        self.assertTrue(NEGATIVE_NO_BEHAVIORREF.is_dir(),
+                        "fixtures 负变体（剃 behaviorRef 域副本）未落盘")
+        with tempfile.TemporaryDirectory() as td:
+            outdir = Path(td) / "out"
+            rc, _out, err = run_main([str(NEGATIVE_NO_BEHAVIORREF),
+                                      "--out", str(outdir)])
+        self.assertEqual(rc, 2)
+        self.assertIn("QR-BOHAI-001", err)
+        self.assertIn("behaviorRef", err)
+        self.assertNotIn("Traceback", err)
+        self.assertFalse(outdir.exists() and any(outdir.iterdir()),
+                         "配置错误不得产出残包文件")
 
 
 if __name__ == "__main__":

@@ -27,7 +27,8 @@ MD+JSON 双载体。生成=确定性装配非创作：输入=域目录 + 技术�
 声明模型集：M1/M2/M3/M7——域缺任一声明模型文件 → stderr 报「缺声明模型 Mx」
 退出 2，不产出残包（specs/modules.md 边界规则 5 的生成器侧首证）。模型文件
 model_type 不符 / 引用失效（behaviorRef/objectRef/appliedRules/reusedBy/
-targetAggregate 指空）同样拒绝——不硬编不产残包。
+targetAggregate 指空）/ 口径装配必备键缺失（QR 缺 behaviorRef 键，票 39 件一：
+结构化报错定位元素，不 KeyError 裸崩）同样拒绝——不硬编不产残包。
 
 头部人审状态纪律（PRD 决策 2 生成物侧落位）：status: 待Owner人审（生成物禁手
 改，可再生）。入库副本 exports/devkit/bohai/ 是派生物禁手改，防陈旧断言 =
@@ -255,8 +256,14 @@ def _validate_references(dd: dict) -> None:
         for bid in r.get("reusedBy") or []:
             check(bid, beh_set, r.get("id", "?"), "reusedBy")
     for qr in dd["queryReports"]:
-        if qr.get("behaviorRef"):
-            check(qr["behaviorRef"], beh_set, qr.get("id", "?"), "behaviorRef")
+        # 装配口径卡的必备键（票 39 件一）：缺失/为空 → 结构化配置错误，不裸崩。
+        # schema_check 是字段完备的第一道闸（required-field），但生成器不依赖闸
+        # 先行——遇残缺输入自己干净拒绝（exit 2），不产残包。
+        if not qr.get("behaviorRef"):
+            raise ConfigError(
+                f"域内 M7 元素 {qr.get('id', '?')} 缺 behaviorRef 键"
+                f"（装配口径卡需要）——先过 schema_check（required-field）")
+        check(qr["behaviorRef"], beh_set, qr.get("id", "?"), "behaviorRef")
         for src in qr.get("sourceObjects") or []:
             if isinstance(src, dict) and src.get("objectRef"):
                 check(src["objectRef"], agg_set, qr.get("id", "?"),
