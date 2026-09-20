@@ -1,0 +1,16 @@
+{
+  "target": "targets/sample-artifact.md",
+  "created": "2026-09-20",
+  "records": [
+    {
+      "target": "targets/sample-artifact.md",
+      "reviewedCommit": "348fa9cfcf1404144e771574b5742af30e16393c",
+      "reviewedSha256": "6a07321b2434f058651a880697f383165f611306586ffcf36169bc562b71b309",
+      "verdict": "已审",
+      "checkpoints": ["装配完整性", "提案内容落位"],
+      "notes": "出厂集预置样例：合法已审审记（哈希锚定=靶件真实 SHA256，verify 绿）",
+      "reviewedBy": "fixture-author",
+      "date": "2026-09-20"
+    }
+  ]
+}

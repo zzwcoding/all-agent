@@ -1,0 +1,16 @@
+{
+  "target": "targets/sample-artifact.md",
+  "created": "2026-09-20",
+  "records": [
+    {
+      "target": "targets/sample-artifact.md",
+      "reviewedCommit": "348fa9cfcf1404144e771574b5742af30e16393c",
+      "reviewedSha256": "2e1f5d9811d70c5e730b465ffe7fabebc42a139c91a3a37063f7f7b8ba6a226f",
+      "verdict": "已审",
+      "checkpoints": ["装配完整性"],
+      "notes": "出厂集预置样例：失效审记（锚定哈希≠靶件现算哈希，模拟生成物被再生，verify 红 exit 1）",
+      "reviewedBy": "fixture-author",
+      "date": "2026-09-20"
+    }
+  ]
+}

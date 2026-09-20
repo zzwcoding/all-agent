@@ -1,0 +1,15 @@
+{
+  "target": "targets/sample-artifact.md",
+  "created": "2026-09-20",
+  "records": [
+    {
+      "target": "targets/sample-artifact.md",
+      "reviewedCommit": "348fa9cfcf1404144e771574b5742af30e16393c",
+      "verdict": "已审",
+      "checkpoints": [],
+      "notes": "出厂集预置样例：缺必备字段 reviewedSha256（AC2a 负变体，verify exit 2 审记非法）",
+      "reviewedBy": "fixture-author",
+      "date": "2026-09-20"
+    }
+  ]
+}

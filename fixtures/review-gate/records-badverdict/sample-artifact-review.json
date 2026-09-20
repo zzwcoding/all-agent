@@ -1,0 +1,16 @@
+{
+  "target": "targets/sample-artifact.md",
+  "created": "2026-09-20",
+  "records": [
+    {
+      "target": "targets/sample-artifact.md",
+      "reviewedCommit": "348fa9cfcf1404144e771574b5742af30e16393c",
+      "reviewedSha256": "6a07321b2434f058651a880697f383165f611306586ffcf36169bc562b71b309",
+      "verdict": "已合入",
+      "checkpoints": [],
+      "notes": "出厂集预置样例：verdict 非法值（不在 已审/打回 二元词汇内，AC2b 负变体，verify exit 2）",
+      "reviewedBy": "fixture-author",
+      "date": "2026-09-20"
+    }
+  ]
+}

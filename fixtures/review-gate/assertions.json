@@ -1,0 +1,101 @@
+{
+  "skill": "review-gate（人审闸审记状态机，票 45）",
+  "description": "出厂集：审记靶件 targets/sample-artifact.md（内容固定逐字节稳定）+ 预置审记旁档四态（records/ 合法已审·哈希锚定=靶件真实 SHA256·verify 绿 exit 0 / records-stale/ 锚定哈希≠现算·模拟生成物被再生·verify 红 exit 1 / records-corrupt/ 不可解析损坏·verify 按待人审 exit 1 / records-missing-field/ 缺必备字段 reviewedSha256·verify exit 2 审记非法 / records-badverdict/ verdict 非法值「已合入」·verify exit 2）。出厂集是静态的：读面断言（verify）直接对预置审记跑；写面断言（init/approve/reject 状态链）用 python -c 探针在 tempfile 临时仓内跑（票 23/25/42 手法先例），零仓库写入、先清后建幂等。审记输出目录经 --review-dir 注入（exports/reviews 之外路径必须可注入，单测 tempfile 全覆盖）。AC 真源=tickets/45-人审闸审记状态机.md AC 表；退出码契约 0 一致/1 失效或缺失(含损坏·打回态)/2 配置错(含审记记录缺字段·verdict 非法值·reject 缺 routing)。AC4 由本断言集 RG-AC4 探针 + CI 第 4 闸（归档闸）双承载。",
+  "assertions": [
+    {
+      "ac": "输入（审记靶件在档，内容固定逐字节稳定）",
+      "type": "file-exists",
+      "path": "targets/sample-artifact.md"
+    },
+    {
+      "ac": "输入（预置审记旁档五态在档）",
+      "type": "file-exists",
+      "path": "records/sample-artifact-review.json"
+    },
+    {
+      "ac": "输入（预置审记旁档五态在档）",
+      "type": "file-exists",
+      "path": "records-stale/sample-artifact-review.json"
+    },
+    {
+      "ac": "输入（预置审记旁档五态在档）",
+      "type": "file-exists",
+      "path": "records-corrupt/sample-artifact-review.json"
+    },
+    {
+      "ac": "输入（预置审记旁档五态在档）",
+      "type": "file-exists",
+      "path": "records-missing-field/sample-artifact-review.json"
+    },
+    {
+      "ac": "输入（预置审记旁档五态在档）",
+      "type": "file-exists",
+      "path": "records-badverdict/sample-artifact-review.json"
+    },
+    {
+      "ac": "AC3a 读面（合法已审预置审记 + 哈希一致 → verify exit 0）",
+      "type": "cmd-succeeds",
+      "cmd": "python3 tools/review_gate.py verify {fixture_dir}/targets/sample-artifact.md --review-dir {fixture_dir}/records",
+      "outputContains": [
+        "已审且哈希一致",
+        "锚定 commit"
+      ]
+    },
+    {
+      "ac": "AC1 读面（预置失效审记：锚定哈希≠靶件现算哈希 → verify exit 1 报失效回落待人审，负变体钉死自动失效语义）",
+      "type": "cmd-fails",
+      "cmd": "python3 tools/review_gate.py verify {fixture_dir}/targets/sample-artifact.md --review-dir {fixture_dir}/records-stale",
+      "outputContains": [
+        "审记失效",
+        "回落待人审",
+        "旧审记保留可查"
+      ]
+    },
+    {
+      "ac": "损坏审记读面（不可解析 → verify 按待人审 exit 1，不重建审记，design §3.4 #2）",
+      "type": "cmd-fails",
+      "cmd": "python3 tools/review_gate.py verify {fixture_dir}/targets/sample-artifact.md --review-dir {fixture_dir}/records-corrupt",
+      "outputContains": [
+        "审记损坏",
+        "待人审",
+        "不重建"
+      ]
+    },
+    {
+      "ac": "AC2a/AC2b/AC2c（缺必备字段 / verdict 非法值「已合入」/ reject 缺 routing → 逐一钉 exit 2；reject 用例在 tempfile 内跑，零仓库写入）",
+      "type": "cmd-succeeds",
+      "cmd": "python3 -c \"import shutil,subprocess,sys,tempfile\nfx=sys.argv[1]\ndef rc(*a):\n    p=subprocess.run([sys.executable,'tools/review_gate.py',*a],capture_output=True,text=True)\n    return p.returncode,p.stdout+p.stderr\nt=fx+'/targets/sample-artifact.md'\nr1=rc('verify',t,'--review-dir',fx+'/records-missing-field')\nassert r1[0]==2 and '审记非法' in r1[1] and 'reviewedSha256' in r1[1], r1\nr2=rc('verify',t,'--review-dir',fx+'/records-badverdict')\nassert r2[0]==2 and 'verdict 非法值' in r2[1] and '已合入' in r2[1], r2\ntmp=tempfile.mkdtemp(prefix='rg-ac2-')\ntry:\n    r3=rc('reject',t,'--review-dir',tmp)\n    assert r3[0]==2 and '--routing' in r3[1], r3\nfinally:\n    shutil.rmtree(tmp,ignore_errors=True)\nprint('RG-AC2 OK：缺必备字段/verdict 非法值/reject 缺 routing 均 exit 2')\" {fixture_dir}",
+      "outputContains": [
+        "RG-AC2 OK",
+        "exit 2"
+      ]
+    },
+    {
+      "ac": "AC3a/AC3b/AC1 写面（tempfile 临时 git 仓：init→approve→verify 绿；手改目标字节（再生负变体）后 verify 红 exit 1 报失效；失效后重新 approve→verify 恢复 exit 0 且旧审记保留可查（2 条记录，首条 notes=首审））",
+      "type": "cmd-succeeds",
+      "cmd": "python3 -c \"import hashlib,json,shutil,subprocess,sys,tempfile\nfrom pathlib import Path\nfx=Path(sys.argv[1])\ntmp=Path(tempfile.mkdtemp(prefix='rg-ac3-'))\ndef g(*a):\n    subprocess.run(['git','-C',str(tmp),*a],capture_output=True,text=True,check=True)\ndef rc(*a):\n    p=subprocess.run([sys.executable,'tools/review_gate.py',*a],capture_output=True,text=True)\n    return p.returncode,p.stdout+p.stderr\ntry:\n    subprocess.run(['git','init','-q',str(tmp)],capture_output=True,text=True,check=True)\n    g('config','user.email','fixture@example.invalid')\n    g('config','user.name','fixture-runner')\n    tgt=tmp/'sample-artifact.md'\n    tgt.write_bytes((fx/'targets'/'sample-artifact.md').read_bytes())\n    g('add','sample-artifact.md')\n    g('commit','-q','-m','fixture target')\n    head=subprocess.run(['git','-C',str(tmp),'rev-parse','HEAD'],capture_output=True,text=True,check=True).stdout.strip()\n    rd=tmp/'reviews'\n    assert rc('init',str(tgt),'--review-dir',str(rd))[0]==0\n    r=rc('approve',str(tgt),'--checkpoints','装配完整性, 提案内容落位','--notes','首审','--review-dir',str(rd))\n    assert r[0]==0, r\n    rj=rd/'sample-artifact-review.json'\n    rec=json.loads(rj.read_text(encoding='utf-8'))['records'][0]\n    assert rec['verdict']=='已审' and rec['reviewedCommit']==head, rec\n    assert rec['reviewedSha256']==hashlib.sha256(tgt.read_bytes()).hexdigest(), rec\n    assert rc('verify',str(tgt),'--review-dir',str(rd))[0]==0\n    tgt.write_bytes(tgt.read_bytes()+'\\n<!-- 再生增补 -->\\n'.encode('utf-8'))\n    r=rc('verify',str(tgt),'--review-dir',str(rd))\n    assert r[0]==1 and '审记失效' in r[1], r\n    r=rc('approve',str(tgt),'--notes','变更审: 仅增补一行','--review-dir',str(rd))\n    assert r[0]==0, r\n    assert rc('verify',str(tgt),'--review-dir',str(rd))[0]==0\n    trail=json.loads(rj.read_text(encoding='utf-8'))\n    assert len(trail['records'])==2 and trail['records'][0]['notes']=='首审', trail\n    print('RG-AC3 OK：init→approve→verify 绿；再生后 verify 红(失效)；重审恢复绿且旧审记保留')\nfinally:\n    shutil.rmtree(tmp,ignore_errors=True)\" {fixture_dir}",
+      "outputContains": [
+        "RG-AC3 OK",
+        "旧审记保留"
+      ]
+    },
+    {
+      "ac": "reject 正链（--routing 落记录 verdict=打回 → verify 红 exit 1 未通过态（附 routing）→ 整改后重审 approve 恢复绿；tempfile 内跑，零仓库写入）",
+      "type": "cmd-succeeds",
+      "cmd": "python3 -c \"import json,shutil,subprocess,sys,tempfile\nfrom pathlib import Path\nfx=Path(sys.argv[1])\ntmp=Path(tempfile.mkdtemp(prefix='rg-reject-'))\ndef rc(*a):\n    p=subprocess.run([sys.executable,'tools/review_gate.py',*a],capture_output=True,text=True)\n    return p.returncode,p.stdout+p.stderr\ntry:\n    tgt=tmp/'sample-artifact.md'\n    tgt.write_bytes((fx/'targets'/'sample-artifact.md').read_bytes())\n    rd=tmp/'reviews'\n    r=rc('reject',str(tgt),'--routing','业务错:提案池起草 PROP；工程错:tickets/NN','--review-dir',str(rd))\n    assert r[0]==0, r\n    rec=json.loads((rd/'sample-artifact-review.json').read_text(encoding='utf-8'))['records'][0]\n    assert rec['verdict']=='打回' and '提案池' in rec['routing'] and 'tickets/NN' in rec['routing'], rec\n    r=rc('verify',str(tgt),'--review-dir',str(rd))\n    assert r[0]==1 and '打回' in r[1] and 'tickets/NN' in r[1], r\n    r=rc('approve',str(tgt),'--notes','整改后重审','--review-dir',str(rd))\n    assert r[0]==0, r\n    assert rc('verify',str(tgt),'--review-dir',str(rd))[0]==0\n    print('RG-REJECT OK：打回落记录(routing 在场)→verify 红(未通过)→重审恢复绿')\nfinally:\n    shutil.rmtree(tmp,ignore_errors=True)\" {fixture_dir}",
+      "outputContains": [
+        "RG-REJECT OK",
+        "恢复绿"
+      ]
+    },
+    {
+      "ac": "AC4（review-record 产物类入归档闸登记：类在场、pathPatterns=exports/reviews/*.json、必备键含 target/created/records；闸面红绿由 CI 第 4 闸 archive_check 承载）",
+      "type": "cmd-succeeds",
+      "cmd": "python3 -c \"import json\nreg=json.load(open('specs/archive-registry.json',encoding='utf-8'))\ncls=[a for a in reg['artifacts'] if a['type']=='review-record']\nassert len(cls)==1, cls\nassert cls[0]['pathPatterns']==['exports/reviews/*.json'], cls[0]\nreq=cls[0]['requiredFields']\nassert 'target' in req and 'created' in req and 'records' in req, req\nprint('RG-AC4 OK：review-record 类在档（exports/reviews/*.json，必备键 target/created/records）')\"",
+      "outputContains": [
+        "RG-AC4 OK",
+        "review-record"
+      ]
+    }
+  ]
+}
