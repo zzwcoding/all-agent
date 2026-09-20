@@ -67,7 +67,7 @@
 
 ### 战术设计（选配，第四期）
 
-**F15 DDD 建模线**：本体模型+需求行为清单 → DDD 战术设计件（聚合卡/领域事件表/聚合↔表映射/仓储边界声明，YAML 机器可闸，落 `design/ddd/<域>/` 草案走 MR）+ `tools/ddd_check.py` 设计件闸（五查：跨聚合仅 ID 引用 / 载荷与字段解析到词条 ID / 不变量三元组齐备 / 表映射无断链 / 命名合规）
+**F15 DDD 建模线**：本体模型+需求行为清单 → DDD 战术设计件（聚合卡/领域事件表/聚合↔表映射/仓储边界声明，YAML 机器可闸，落 `design/ddd/<域>/` 草案走 MR）+ `tools/ddd_check.py` 设计件闸（五查：跨聚合仅 ID 引用 / 载荷与字段解析到词条 ID / 不变量三元组齐备 / 表映射无断链 / 命名合规）（2026-09-20 注记：第四期已建，票 50–53——四类设计件格式真源 design/ddd/README.md（票 50）；ddd_check 五查闸+第八套出厂集（票 51）；ddd-modeler skill 五步切片工序（票 52）；文档对齐+订单域端到端走查留痕 docs/walkthrough/ddd-order-walkthrough.md（票 53））
 - 不做什么：不生成代码（F9/sdd-flow 的事）；不预建事件运行时（Saga/Outbox/MQ 由被建项目按需建）；聚合粒度与不变量完备性不硬闸（输出待人审清单）；第一期不改 F9（聚合卡为可选增强输入预留）
 - 选配路由：仅交易型/状态机型项目路由进入（判据表见 docs/ddd-modeler-建造交接包.md §5）；读多写少/规则薄/一次性项目不上
 - 信源：docs/ddd-modeler-建造交接包.md（Owner 对齐共识）、references/ddd-as-code-digest.md（DDD-as-code 调研）

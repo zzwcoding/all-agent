@@ -17,6 +17,8 @@
 - **信号路由表（signal routing）**：元循环的核心纪律——业务错→本体 MR；工程错→sdd-flow 票；元模型错→框架版本演进（CHANGELOG+版本号+迁移票伴随实现票）。
 - **正本/安装位**：skill 的双位置——正本 `skills/<名>/`（仓内，受边界闸+归档闸治理）、安装位 `~/.agents/skills/<名>/`（Kimi Code 路由用）；`install_skills sync/--check` 维护两处一致，pre-commit 钩子（core.hooksPath 启用）拦提交时漂移。
 - **人审闸（human review gate）**：生成物发布前的人确认承载机制（PRD 决策 2，ADR 0003）——审记旁档（`exports/reviews/`，逐版本追加不覆盖）+ 哈希锚定（`review_gate.py verify` 现算 sha256，本体再生即已审自动失效回落待人审，零宽限）+ 三档分级（manifest 免审 / skillpkg 首审+变更审 / devkit 全审，判档规则见 design-human-review-gate §3.3）；打回强制开单走信号路由表；published 态只预留字段不实现。
+- **聚合卡（aggregate card）**：DDD 战术设计件四类之一——一个聚合=一个一致性边界的全部世界（属性/实体/值对象 + 不变量三元组 + 事件 + 访问途径），格式真源 `design/ddd/README.md`；宁小勿大，一个事务只改一个聚合，跨聚合只许 ID 引用、靠领域事件串联。
+- **DDD 建模线（DDD modeling line）**：F15 选配战术设计线（第四期已建，票 50–53）——ddd-modeler skill 五步工序把本体模型+行为清单做成四类设计件草案（聚合卡/领域事件表/聚合↔表映射/仓储边界），过 `tools/ddd_check.py` 五查闸、《待人审清单》交 Owner、草案走 MR；只对交易型/状态机型项目路由，读多写少/规则薄不路由。
 
 ## 三循环
 

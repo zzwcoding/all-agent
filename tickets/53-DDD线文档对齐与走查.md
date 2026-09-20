@@ -1,6 +1,6 @@
 # 票 53：DDD 线文档对齐 + 订单域端到端走查 + Q8 清偿（小票）
 
-Status: todo
+Status: done
 
 > 注（L0 拆票时点）：依赖票 50–52 全落地。Q8 修复=Owner 已拍板并入本票（prd.md 决策追认 2026-09-20）。
 Belongs to: docs/第四期DDD线拆票方案.md 批次二；lessons/48（Q8 挂账）
@@ -20,11 +20,11 @@ Touches: docs/prd.md、CONTEXT.md、AGENTS.md、docs/walkthrough/、fixtures/sem
 
 ## 验收（注源）
 
-- [ ] AC1 PRD F15 转正 + CONTEXT 词条 ×2 + AGENTS 锚点（源：实读）
-- [ ] AC2 走查留痕在场：五步工序产出+ddd_check 绿+人审清单+Mermaid 图（源：docs/walkthrough/ 实读）
-- [ ] AC3 Q8 矛盾修复注源 + rubric 锚例同步 + check_citations/l5_score 复绿（源：实跑）
-- [ ] AC4 批收官软闸候选条款在场（源：实读）
-- [ ] AC5 `bash tools/ci.sh` 四闸绿（源：CI）
+- [x] AC1 PRD F15 转正 + CONTEXT 词条 ×2 + AGENTS 锚点（源：实读）
+- [x] AC2 走查留痕在场：五步工序产出+ddd_check 绿+人审清单+Mermaid 图（源：docs/walkthrough/ 实读）
+- [x] AC3 Q8 矛盾修复注源 + rubric 锚例同步 + check_citations/l5_score 复绿（源：实跑）
+- [x] AC4 批收官软闸候选条款在场（源：实读）
+- [x] AC5 `bash tools/ci.sh` 四闸绿（源：CI）
 
 ## 交接包（L2 自主档）
 
