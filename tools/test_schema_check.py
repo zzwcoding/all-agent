@@ -1262,5 +1262,379 @@ class DuplicateId(Base):
         self.assertNotIn("duplicate-id", self.kinds(report))
 
 
+# ---------- 票 41：L3 确定性闸（l3-*；指标/SQL/安全确定性可判子集，出厂断言 L3-AC1a–d）----------
+
+L3_REGISTRY = {
+    "version": "1.2.0",
+    "models": {
+        "M1": dict(REGISTRY["models"]["M1"], profiles=["full"]),
+        "M2": dict(REGISTRY["models"]["M2"], profiles=["full"]),
+        "M3": {
+            "name": "规则模型", "yamlFile": "m3-rule-model.yaml",
+            "modelType": "RULE", "camp": "business-core",
+            "consumers": ["runtime", "build"], "profiles": ["full"],
+            "dependsOn": ["M1", "M2"], "lockedFields": {},
+        },
+        "M7": {
+            "name": "查询统计与报表模型", "yamlFile": "m7-report-model.yaml",
+            "modelType": "REPORT", "camp": "business-core",
+            "consumers": ["runtime", "build"], "profiles": ["full"],
+            "dependsOn": ["M1", "M2"], "lockedFields": {},
+        },
+    },
+}
+
+L3_DEPS = {
+    "version": "1.2.0",
+    "idPrefixes": {"AGG-": "M1", "BH-": "M2", "RULE-": "M3", "QR-": "M7"},
+    "refKeys": ["ownerEntity", "behaviorRef"],
+    "edges": [
+        {"from": "M2", "field": "ownerEntity", "to": ["M1"]},
+        {"from": "M7", "field": "behaviorRef", "to": ["M2"]},
+    ],
+}
+
+L3_M1 = """model_type: OBJECT
+version: "1.0.0"
+domain: demo
+aggregates:
+  - id: AGG-DEMO-001
+    name: 井
+    alias: Well
+    aggregateType: AGGREGATE_ROOT
+    attributes:
+      - { name: wellCode, label: 井号, type: String }
+      - { name: currentStatus, label: 状态, type: String }
+  - id: AGG-DEMO-002
+    name: 单井日产量记录
+    alias: DailyProductionRecord
+    aggregateType: AGGREGATE_ROOT
+    attributes:
+      - { name: outputVolume, label: 产液量, type: Decimal }
+      - { name: prodDate, label: 生产日期, type: Date }
+"""
+
+L3_M2 = """model_type: BEHAVIOR
+version: "1.0.0"
+domain: demo
+behaviors:
+  - id: BH-DEMO-Query
+    name: 查询单井日产量
+    ownerEntity: AGG-DEMO-001
+    behaviorType: QUERY
+    triggerType: USER_ACTION
+    preconditions: []
+    postconditions: []
+    appliedRules: []
+    requiredPermissions: []
+"""
+
+L3_M3 = """model_type: RULE
+version: "1.0.0"
+domain: demo
+rules:
+  - id: RULE-DEMO-001
+    name: 日产量非负
+    ruleType: VALIDATION
+    inputParams:
+      - name: outputVolume
+        type: Decimal
+        sourceField: dailyProduction.outputVolume
+        required: true
+    outputType: Boolean
+    expression: outputVolume >= 0
+  - id: RULE-DEMO-002
+    name: 叙述式规则
+    ruleType: TRANSFORMATION
+    inputParams:
+      - name: wellCode
+        type: String
+        sourceField: well.wellCode
+        required: true
+    outputType: String
+    narrative: 把井号归一化为标准写法
+"""
+
+L3_M7 = """model_type: REPORT
+version: "1.0.0"
+domain: demo
+query_reports:
+  - id: QR-DEMO-001
+    name: 单井日产量查询
+    alias: wellDailyOutputQuery
+    objectType: DETAIL_QUERY
+    behaviorRef: BH-DEMO-Query
+    sourceObjects:
+      - objectRef: AGG-DEMO-001
+        alias: w
+        primary: true
+      - objectRef: AGG-DEMO-002
+        alias: d
+        primary: false
+    resultColumns:
+      - name: wellCode
+        label: 井号
+        dataType: String
+        sourceExpression: w.wellCode
+      - name: outputVolume
+        label: 产液量
+        dataType: Decimal
+        sourceExpression: d.outputVolume
+"""
+
+
+class L3Base(Base):
+    """票 41 基座：M1/M2/M3/M7 迷你注册表（OBJECT/RULE/REPORT 进 L3 扫描面；
+    RULE 无 requiredElementFields——L3 与必填闸解耦的证明面，同票 38 先例）。"""
+
+    def setUp(self):
+        super().setUp()
+        write(self.root / "schema" / "model-registry.json", json.dumps(L3_REGISTRY))
+        write(self.root / "schema" / "model-deps.json", json.dumps(L3_DEPS))
+        write(self.root / "demo" / "manifest.json", json.dumps(
+            {"domain": "demo", "profile": "full", "schemaVersion": "1.2.0",
+             "omittedModels": [
+                 {"model": k, "reason": "单测基座：模型文件按需加装"}
+                 for k in ("M1", "M2", "M3", "M7")]}))
+
+    def add_l3_domain(self):
+        self.add("m1-object-model.yaml", L3_M1)
+        self.add("m2-behavior-model.yaml", L3_M2)
+        self.add("m3-rule-model.yaml", L3_M3)
+        self.add("m7-report-model.yaml", L3_M7)
+
+    def l3_rows(self, report=None, kind=None):
+        return [v for v in (report or self.run_check())["violations"]
+                if v["level"] == "L3" and (kind is None or v["kind"] == kind)]
+
+
+class L3Helpers(unittest.TestCase):
+    """纯函数直测：匹配序分层与 sourceField 拆段（判定基准=存量反推，票 41 防踩坑）。"""
+
+    def test_match_order_layers(self):
+        # 匹配序 id→alias→name→别名驼峰词唯一包含，首层命中即解析
+        aggs = [
+            {"id": "AGG-X-001", "name": "日产", "alias": "OilProductionDaily",
+             "attrs": set()},
+            {"id": "AGG-X-002", "name": "注水", "alias": "WaterInjectionDaily",
+             "attrs": set()},
+        ]
+        agg, layer = sc.l3_resolve_object_segment("AGG-X-002", aggs)
+        self.assertEqual((agg["id"], layer), ("AGG-X-002", "id"))
+        agg, layer = sc.l3_resolve_object_segment("waterinjectiondaily", aggs)
+        self.assertEqual((agg["id"], layer), ("AGG-X-002", "alias"))  # 大小写不敏感
+        agg, layer = sc.l3_resolve_object_segment("日产", aggs)
+        self.assertEqual((agg["id"], layer), ("AGG-X-001", "name"))
+        # 自造短名（schema.md §6 示例形态）：非 id/alias/name 直配，靠末层唯一包含
+        agg, layer = sc.l3_resolve_object_segment("dailyProduction", aggs)
+        self.assertEqual((agg["id"], layer), ("AGG-X-001", "alias-tokens"))
+        self.assertEqual(sc.l3_resolve_object_segment("nope", aggs), (None, None))
+
+    def test_split_source_field_shapes(self):
+        # 双段 / 中文注记后缀剥离 / 非双段（无承载字段注记）三形态
+        self.assertEqual(
+            sc.l3_split_source_field("dailyProduction.oilOutput（区块月合计）"),
+            ("dailyProduction", "oilOutput"))
+        self.assertEqual(sc.l3_split_source_field("well.currentStatus"),
+                         ("well", "currentStatus"))
+        self.assertIsNone(sc.l3_split_source_field("存水率变动（无承载字段，待 Owner）"))
+        self.assertIsNone(sc.l3_split_source_field(None))
+
+    def test_sql_blacklist_word_boundary(self):
+        # 词边界：UPDATE 命中；updated_at/created_at 列名不误伤；大小写不敏感。
+        # 注释里出现独立黑名单词照命中（纯词扫描不解析注释——确定性取舍，lessons/41）
+        for bad in ("UPDATE t SET a=1", "update t set a=1", "TRUNCATE TABLE t",
+                    "-- 增量处理 delete 旧表"):
+            self.assertTrue(sc.L3_SQL_BLACKLIST_RE.search(bad), bad)
+        for good in ("SELECT updated_at FROM t WHERE created_at > :d",):
+            self.assertFalse(sc.L3_SQL_BLACKLIST_RE.search(good), good)
+
+
+class L3DeterministicGate(L3Base):
+    """票 41 单测面：L3 四项检查。真源 = tickets/41-L3确定性闸.md AC 表（AC1a–d）
+    + 可机判子集清单（L0 裁决）。红因纯净与文件名错挂让位沿票 13/16 先例。"""
+
+    def test_valid_l3_domain_passes(self):
+        # 正例：自造短名 dailyProduction 末层解析；叙述式规则/无 referenceSql 全绿
+        self.add_l3_domain()
+        report = self.run_check()
+        self.assertEqual(report["status"], "pass", report["violations"])
+        self.assertEqual(report["levels"], {"L1": 0, "L2": 0, "L3": 0, "L4": 0})
+
+    def test_count_line_and_json_cover_l3(self):
+        # AC4：人类输出计数行含 L3 段；--json levels 含 L3
+        self.add_l3_domain()
+        self.add("m3-rule-model.yaml",
+                 L3_M3.replace("sourceField: dailyProduction.outputVolume",
+                               "sourceField: dailyProduction.missingField"))
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            sc.main([str(self.root)])
+        self.assertIn("L1: 0 | L2: 0 | L3: 1 | L4: 0", buf.getvalue())
+        self.assertEqual(self.run_check()["levels"]["L3"], 1)
+
+    def test_source_field_missing_attribute_is_l3(self):
+        # AC1a：字段段不在所指聚合 attributes → l3-source-field（对象段解析成功，
+        # 红因钉在字段上——报文含规则 ID 与字段名，行级定位）
+        self.add_l3_domain()
+        self.add("m3-rule-model.yaml",
+                 L3_M3.replace("sourceField: dailyProduction.outputVolume",
+                               "sourceField: dailyProduction.missingField"))
+        rows = self.l3_rows(kind="l3-source-field")
+        self.assertEqual(len(rows), 1, rows)
+        v = rows[0]
+        self.assertEqual(v["level"], "L3")
+        for needle in ("RULE-DEMO-001", "missingField"):
+            self.assertIn(needle, v["message"])
+        self.assertIn("m3-rule-model.yaml", v["file"])
+        self.assertGreater(v["line"], 0)
+        self.assertEqual(quiet_main([str(self.root)]), 1)
+
+    def test_source_field_unresolvable_object_is_l3(self):
+        # AC1a 乙：对象段全匹配序未唯一命中 → 本码承载（sourceField 非 ref 键，
+        # dangling-ref 不管，红因不外溢）
+        self.add_l3_domain()
+        self.add("m3-rule-model.yaml",
+                 L3_M3.replace("sourceField: dailyProduction.outputVolume",
+                               "sourceField: noSuchObject.outputVolume"))
+        rows = self.l3_rows(kind="l3-source-field")
+        self.assertEqual(len(rows), 1, rows)
+        self.assertIn("noSuchObject", rows[0]["message"])
+
+    def test_ambiguous_relaxed_match_is_not_resolved(self):
+        # 末层防歧义：对象段驼峰词被两个聚合 alias 同时包含 → 不唯一=不解析（红）
+        self.add_l3_domain()
+        self.add("m1-object-model.yaml", L3_M1 + """  - id: AGG-DEMO-003
+    name: 日产量台账
+    alias: DailyProductionLedger
+    aggregateType: AGGREGATE_ROOT
+    attributes: []
+""")
+        rows = self.l3_rows(kind="l3-source-field")
+        self.assertEqual(len(rows), 1, rows)
+        self.assertIn("dailyProduction", rows[0]["message"])
+        self.assertIn("解析不到", rows[0]["message"])
+
+    def test_annotation_suffix_is_stripped(self):
+        # 存量形态兼容（bohai）：中文注记后缀「（区块月合计）」不挡解析与字段判定
+        self.add_l3_domain()
+        self.add("m3-rule-model.yaml",
+                 L3_M3.replace("sourceField: dailyProduction.outputVolume",
+                               "sourceField: dailyProduction.outputVolume（区块月合计）"))
+        self.assertEqual(self.l3_rows(), [])
+
+    def test_single_segment_source_field_not_judged(self):
+        # 无承载字段注记（无点值，RULE-BOHAI-008 形态）不在 L3-1 机判面
+        self.add_l3_domain()
+        self.add("m3-rule-model.yaml",
+                 L3_M3.replace("sourceField: dailyProduction.outputVolume",
+                               "sourceField: 拟合基线（无承载字段，待 Owner）"))
+        self.assertEqual(self.l3_rows(), [])
+
+    def test_expression_undeclared_alias_is_l3(self):
+        # AC1b：sourceExpression 引用未声明别名 → l3-expression-ref
+        self.add_l3_domain()
+        self.add("m7-report-model.yaml",
+                 L3_M7.replace("sourceExpression: w.wellCode",
+                               "sourceExpression: x.wellCode"))
+        rows = self.l3_rows(kind="l3-expression-ref")
+        self.assertEqual(len(rows), 1, rows)
+        v = rows[0]
+        for needle in ("QR-DEMO-001", "x.wellCode", "未在 sourceObjects 声明"):
+            self.assertIn(needle, v["message"])
+        self.assertIn("m7-report-model.yaml", v["file"])
+        self.assertGreater(v["line"], 0)
+
+    def test_expression_field_not_in_aggregate_is_l3(self):
+        # AC1b 乙：别名已声明但字段不在所指聚合 attributes → 同码
+        self.add_l3_domain()
+        self.add("m7-report-model.yaml",
+                 L3_M7.replace("sourceExpression: d.outputVolume",
+                               "sourceExpression: d.nonexistent"))
+        rows = self.l3_rows(kind="l3-expression-ref")
+        self.assertEqual(len(rows), 1, rows)
+        for needle in ("d.nonexistent", "AGG-DEMO-002"):
+            self.assertIn(needle, rows[0]["message"])
+
+    def test_dangling_objectref_stays_with_dangling_ref(self):
+        # 红因不混（票面设计裁决）：objectRef 悬空 → dangling-ref（L2）管辖，L3-2 不叠红
+        self.add_l3_domain()
+        self.add("m7-report-model.yaml",
+                 L3_M7.replace("AGG-DEMO-001", "AGG-DEMO-999"))
+        report = self.run_check()
+        self.assertEqual(self.l3_rows(report), [])
+        self.assertIn("dangling-ref", self.kinds(report))
+
+    def test_reference_sql_dml_is_l3(self):
+        # AC1c：referenceSql 在场且含 DML 词 → l3-sql-readonly（大小写不敏感）
+        self.add_l3_domain()
+        self.add("m7-report-model.yaml",
+                 L3_M7.replace(
+                     "    behaviorRef: BH-DEMO-Query",
+                     "    behaviorRef: BH-DEMO-Query\n"
+                     "    referenceSql: \"update well_info set current_status ="
+                     " '停产' where well_code = :w\""))
+        rows = self.l3_rows(kind="l3-sql-readonly")
+        self.assertEqual(len(rows), 1, rows)
+        v = rows[0]
+        self.assertIn("QR-DEMO-001", v["message"])
+        self.assertIn("UPDATE", v["message"])
+        self.assertGreater(v["line"], 0)
+        self.assertEqual(quiet_main([str(self.root)]), 1)
+
+    def test_reference_sql_column_names_not_hit(self):
+        # 词边界防误伤：updated_at/created_at 式列名出现不触发（\b 边界）
+        self.add_l3_domain()
+        self.add("m7-report-model.yaml",
+                 L3_M7.replace(
+                     "    behaviorRef: BH-DEMO-Query",
+                     "    behaviorRef: BH-DEMO-Query\n"
+                     "    referenceSql: \"SELECT well_code, updated_at FROM"
+                     " well_info WHERE created_at > :d\""))
+        report = self.run_check()
+        self.assertEqual(self.l3_rows(report), [])
+        self.assertEqual(report["status"], "pass", report["violations"])
+
+    def test_expression_type_rule_without_expression_is_l3(self):
+        # AC1d：ruleType=EXPRESSION 缺 expression → l3-rule-form
+        self.add_l3_domain()
+        self.add("m3-rule-model.yaml",
+                 L3_M3.replace("    ruleType: VALIDATION", "    ruleType: EXPRESSION")
+                 .replace("    expression: outputVolume >= 0\n", ""))
+        rows = self.l3_rows(kind="l3-rule-form")
+        self.assertEqual(len(rows), 1, rows)
+        v = rows[0]
+        for needle in ("RULE-DEMO-001", "EXPRESSION"):
+            self.assertIn(needle, v["message"])
+
+    def test_rule_without_any_form_is_l3(self):
+        # 二选一形态（schema.md §6）：expression/narrative 均不在场 → 每规则一红
+        self.add_l3_domain()
+        self.add("m3-rule-model.yaml",
+                 L3_M3.replace("    expression: outputVolume >= 0\n", "")
+                 .replace("    narrative: 把井号归一化为标准写法\n", ""))
+        rows = self.l3_rows(kind="l3-rule-form")
+        self.assertEqual(len(rows), 2, rows)
+
+    def test_rule_type_missing_not_double_reported(self):
+        # ruleType 缺失归 L1 required-field 管辖（真仓 requiredElementFields 面），
+        # L3-4 跳过不叠红因——红因不混
+        self.add_l3_domain()
+        self.add("m3-rule-model.yaml",
+                 "\n".join(l for l in L3_M3.splitlines()
+                           if not l.startswith("    ruleType")) + "\n")
+        self.assertEqual(self.l3_rows(kind="l3-rule-form"), [])
+
+    def test_filename_mismatch_file_skips_l3(self):
+        # 红因纯净：内容错挂文件名 → 跳过 L3 扫描，让位 filename-mismatch
+        self.add_l3_domain()
+        self.add("m7-report-model.yaml",
+                 L3_M3.replace("sourceField: dailyProduction.outputVolume",
+                               "sourceField: dailyProduction.missingField"))
+        report = self.run_check()
+        self.assertEqual(self.l3_rows(report), [])
+        self.assertIn("filename-mismatch", self.kinds(report))
+
+
 if __name__ == "__main__":
     unittest.main()

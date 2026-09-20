@@ -2,7 +2,7 @@
 
 > 本文是本体 YAML 的 schema 文档（人读）；机读消费方两份：
 > `model-registry.json`（模型注册表：camp/consumers/profiles/dependsOn）、`model-deps.json`（类型层依赖白名单 + ID 前缀表）。
-> 执行闸：`tools/schema_check.py`（语义 CI L1–L4，断言表 `specs/schema_check.md` AC1–7 + 票 10 GLS-AC1–4 + 票 11 一致性对 §14 + 票 13 必填闸 REQ-AC1–6 + 票 16 禁用词拦截面 BAN-AC1–4 + 票 38 重复 id DUP-AC1–2）。
+> 执行闸：`tools/schema_check.py`（语义 CI L1–L4 + 票 41 L3 确定性子集，断言表 `specs/schema_check.md` AC1–7 + 票 10 GLS-AC1–4 + 票 11 一致性对 §14 + 票 13 必填闸 REQ-AC1–6 + 票 16 禁用词拦截面 BAN-AC1–4 + 票 38 重复 id DUP-AC1–2 + 票 41 L3 确定性闸 L3-AC1a–d）。
 > 蓝本：OMF v9 七模型（references/omf-spec-digest.md §0/§16，下注 `v9 §x`）；裁剪决定均注明出处。
 > GLS 术语模型为本仓自定义扩展（OMF v6/v9 均无，票 10 走"元模型错→框架版本演进"路由进 schema，演进账见 CHANGELOG.md）。
 
@@ -273,3 +273,16 @@ OMF 规范声明的"双向一致"对（源：digest §12.2；勘误 2026-09-19�
 正例承载：`ontology/bohai` 全域（P1 四个查询出口一对一、P2 行为侧权限全回指、P3 三流程活动角色全闭合）与出厂集 `valid-domain`；负变体：出厂集 `cons-ac1/2/3` 三个最小域（断言标签 CONS-AC1–3，真源 = tickets/11-一致性对核验.md AC 表）。新增一致对 = 本章加行 + schema_check 加同款判定 + 出厂集配负变体，三件同步。
 
 **对账注记（2026-09-19，票 14）**：PRD F2 所称「8 组一致对」经 digest 全文核查仅得 **6 对**（§12.2，即上表 P1–P6 的规范出处；§16 第 2 条亦回指 §12.1/§12.2），第 7/8 组出处未找到。全仓按 **6 对**执行；Owner 若找到第 7/8 组出处，走演进票回加（加行进本表 + 检查器同款判定 + 出厂集负变体）。互指注记见 docs/prd.md F2 行。
+
+## 15. 语义 CI 分级全景与 L3 确定性闸（票 41，2026-09-20）
+
+PRD F2 五级闸全景：**L1 schema 合法 → L2 引用与一致性对（§14）→ L3 指标/SQL/安全 → L4 权限/兼容（§12/§13）→ L5 行为回归（Golden 集，LLM 评分）**。本仓现行确定性执行面覆盖 L1/L2/L4 + 必填 + 一致性对 + 禁用词；票 41 把 L3 的**确定性可判子集**落进 schema_check（报告计数行与 --json 增 L3，违规码 `l3-*` 前缀，断言 L3-AC1a–d，真源=tickets/41 可机判子集清单 L0 裁决）：
+
+| # | 检查 | 判定 | 违规码 |
+|---|---|---|---|
+| L3-1 | M3 规则 sourceField 字段存在性 | 双段（对象.属性）形态才判（非双段=无承载字段注记，不判）：对象段按匹配序 id→alias→name→**别名驼峰词唯一包含**（`L3_OBJECT_MATCH_ORDER` 可配置；末层兼容本表 §6 sourceField 示例「dailyProduction」式自造短名——与聚合 alias 非直配，bohai 存量即此形态），字段段在该聚合 attributes[].name 中；sourceField 值容忍中文注记后缀（「oilOutput（区块月合计）」截断于首个括号） | `l3-source-field` |
+| L3-2 | M7 口径表达式引用可解析 | resultColumns[].sourceExpression 内「别名.字段」token（正则提取，运算符/字面量/函数名跳过）：别名须在该报表 sourceObjects[].alias 声明集，字段须在别名所指聚合（objectRef）的 attributes 中；objectRef 悬空归 dangling-ref（红因不混） | `l3-expression-ref` |
+| L3-3 | M7 referenceSql 只读性 | 可选字段（§9 v9 降为可选）在场才扫：DML/DDL 黑名单词 INSERT/UPDATE/DELETE/DROP/ALTER/TRUNCATE/CREATE/GRANT，大小写不敏感 + `\b` 词边界（updated_at 式列名不误伤；纯词扫描不解析 SQL 注释——注释含独立黑名单词照红，确定性取舍） | `l3-sql-readonly` |
+| L3-4 | M3 规则形态完备性 | 落地形态二选一（§6）：ruleType=EXPRESSION → expression 在场且非空；其余型（值集实读=VALIDATION/CALCULATION/DERIVATION/TRANSFORMATION/RISK，无 EXPRESSION/NARRATIVE ruleType）→ expression/narrative 至少一者在场且非空；ruleType 本身缺失归 L1 required-field，不叠红因 | `l3-rule-form` |
+
+**明示不收**（防子集蔓延，防踩坑 L0 裁决）：SQL 语义正确性（需执行环境）、指标公式数学正确性（Owner 裁决域）、安全敏感度分级（需口径）、任何需 LLM 判断的项——归 L5 评分框架设计案（第三期 B 线批次三方案 1），L3 本表加行即可继续收确定性子集。存量首跑裁决：bohai 两处红（RULE-BOHAI-003 sourceField 虚挂 dailyProduction.batchRowCount/batchNullRowCount）=真缺陷已修域（数据集级派生量无行级承载，沿无承载字段注记惯例改写，裁决记录 lessons/41）。

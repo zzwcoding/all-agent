@@ -1,6 +1,6 @@
 {
-  "skill": "schema_check（语义 CI L1–L4 闸，票 03；票 10 增 GLS 套件；票 11 增一致性对套件；票 13 增必填闸套件；票 16 增禁用词拦截面套件；票 27 增缺 id 盲区套件；票 38 增重复 id 套件）",
-  "description": "最小域出厂集：两对象（井 AGG-BOHAI-001 + 单井日产量记录 AGG-BOHAI-002）七模型合法本体 + 各 AC 非法变体；票 10 增 GLS 术语模型套件（gls-valid 正变体 + gls-ac2/3/4 负变体）；票 11 增 L2 一致性对套件（cons-ac1/2/3 负变体，对应 tickets/11-一致性对核验.md AC 表 AC1–3，标签加 CONS- 前缀防与基础套件撞号，手法沿票 10）；票 13 增必填闸套件（req-ac4-reserved-fields 预留字段正例 + req-ac1/2/3a/3b 必填负变体 + req-ac5/6 AC6 反向无/有豁免对，标签加 REQ- 前缀防撞，真源=tickets/13-机读必填字段闸.md AC 表）；票 16 增禁用词拦截面套件（ban-ac1-name-hit / ban-ac2-alias-hit 负变体 + ban-ac4-valid-term-in-name 防误报正例，BAN-AC3 直接挂真仓 ontology/bohai——RULE-BOHAI-009 description 提及禁用词正是本闸不误报的活体证明；真源=tickets/16-禁用词拦截面.md AC 表）；票 27 增缺 id 盲区套件（mid-ac1-mixed-missing-id 混入形态：合法元素+无 id 元素且引用全有效——修前整域静默全绿逃逸，修后无 id 元素被 required-field 报缺 id；mid-ac2-pure-missing-id 纯无 id 域：修前每文件被空壳守卫一条吞掉，修后逐元素报缺 id；标签加 MID- 前缀防撞，真源=tickets/27-缺id盲区演进票.md AC 表；AC3 零扰动由 valid-domain/REQ-AC4/BAN-AC3 等既有绿断言承载，AC4 空壳语义不回退由 REQ-AC3b 承载）。票 38 增重复 id 套件（dup-ac1-same-domain-duplicate-id：同域两元素同 id 且必填字段齐全、引用照常解析——修前静默（枚举以 id 为锚时后者被先出现者吞、票 27 后双双枚举但无重复判定），修后报 L1 duplicate-id 双位置；唯一性判定键=manifest 域值，跨域不判（各负变体域合法复用同形 ID 的现状即证）；跨键同值（M5 actorId/roleId 式）与跨文件同域两形态由单测面钉死不立出厂断言——真仓 requiredElementFields 下该形态必连带 required-field 红因不纯净，见 lessons/38；标签加 DUP- 前缀防撞，真源=tickets/38-重复id检测.md AC 表）。既有极简域/负变体域的 manifest 于票 13 升级登记 omittedModels（AC6 反向豁免机制），红因保持唯一。基础断言 specs/schema_check.md AC1–7；GLS-AC1–4 真源=tickets/10-术语模型GLS.md AC 表；CONS-AC1–3 真源=tickets/11-一致性对核验.md AC 表；REQ-* 真源=tickets/13-机读必填字段闸.md AC 表；BAN-* 真源=tickets/16-禁用词拦截面.md AC 表；MID-* 真源=tickets/27-缺id盲区演进票.md AC 表；DUP-* 真源=tickets/38-重复id检测.md AC 表；schema 机读表经 {fixture_dir}/ontology/schema 符号链接取自仓内 ontology/schema（单一真源，不复制）。",
+  "skill": "schema_check（语义 CI L1–L4 闸，票 03；票 10 增 GLS 套件；票 11 增一致性对套件；票 13 增必填闸套件；票 16 增禁用词拦截面套件；票 27 增缺 id 盲区套件；票 38 增重复 id 套件；票 41 增 L3 确定性闸套件）",
+  "description": "最小域出厂集：两对象（井 AGG-BOHAI-001 + 单井日产量记录 AGG-BOHAI-002）七模型合法本体 + 各 AC 非法变体；票 10 增 GLS 术语模型套件（gls-valid 正变体 + gls-ac2/3/4 负变体）；票 11 增 L2 一致性对套件（cons-ac1/2/3 负变体，对应 tickets/11-一致性对核验.md AC 表 AC1–3，标签加 CONS- 前缀防与基础套件撞号，手法沿票 10）；票 13 增必填闸套件（req-ac4-reserved-fields 预留字段正例 + req-ac1/2/3a/3b 必填负变体 + req-ac5/6 AC6 反向无/有豁免对，标签加 REQ- 前缀防撞，真源=tickets/13-机读必填字段闸.md AC 表）；票 16 增禁用词拦截面套件（ban-ac1-name-hit / ban-ac2-alias-hit 负变体 + ban-ac4-valid-term-in-name 防误报正例，BAN-AC3 直接挂真仓 ontology/bohai——RULE-BOHAI-009 description 提及禁用词正是本闸不误报的活体证明；真源=tickets/16-禁用词拦截面.md AC 表）；票 27 增缺 id 盲区套件（mid-ac1-mixed-missing-id 混入形态：合法元素+无 id 元素且引用全有效——修前整域静默全绿逃逸，修后无 id 元素被 required-field 报缺 id；mid-ac2-pure-missing-id 纯无 id 域：修前每文件被空壳守卫一条吞掉，修后逐元素报缺 id；标签加 MID- 前缀防撞，真源=tickets/27-缺id盲区演进票.md AC 表；AC3 零扰动由 valid-domain/REQ-AC4/BAN-AC3 等既有绿断言承载，AC4 空壳语义不回退由 REQ-AC3b 承载）。票 38 增重复 id 套件（dup-ac1-same-domain-duplicate-id：同域两元素同 id 且必填字段齐全、引用照常解析——修前静默（枚举以 id 为锚时后者被先出现者吞、票 27 后双双枚举但无重复判定），修后报 L1 duplicate-id 双位置；唯一性判定键=manifest 域值，跨域不判（各负变体域合法复用同形 ID 的现状即证）；跨键同值（M5 actorId/roleId 式）与跨文件同域两形态由单测面钉死不立出厂断言——真仓 requiredElementFields 下该形态必连带 required-field 红因不纯净，见 lessons/38；标签加 DUP- 前缀防撞，真源=tickets/38-重复id检测.md AC 表）。票 41 增 L3 确定性闸套件（l3-ac1a-source-field-missing / l3-ac1b-expression-ref / l3-ac1c-sql-readonly / l3-ac1d-rule-form 四负变体：各从 valid-domain 七模型副本注入一处缺陷，红因唯一=恰一条 l3-* 违规码；四项检查=sourceField 字段存在性（对象段匹配序 id→alias→name→别名驼峰词唯一包含，中文注记后缀剥离，非双段形态不判）/口径表达式引用可解析（resultColumns sourceExpression 的 别名.字段 token）/referenceSql 只读性（可选字段在场才扫，DML/DDL 黑名单词 \\b 词边界）/规则形态二选一（ruleType 值集实读无 EXPRESSION/NARRATIVE 型，EXPRESSION 特判+其余 expression/narrative 至少一者在场），真源=tickets/41-L3确定性闸.md 可机判子集清单 L0 裁决，明示不收子集（SQL 语义正确性/指标公式数学正确性/安全敏感度分级/LLM 判断）归 L5 设计案；L3-AC2a/b 渤海域+仓根全绿钉存量零误报——首跑两处红经裁决=真缺陷已修域 RULE-BOHAI-003（batchRowCount/batchNullRowCount 数据集级派生量无行级承载，沿无承载字段注记惯例改写，裁决记录=lessons/41）；L3-AC3 正例零扰动；L3-AC4 --json L3 计数；标签加 L3- 前缀防撞）。既有极简域/负变体域的 manifest 于票 13 升级登记 omittedModels（AC6 反向豁免机制），红因保持唯一。基础断言 specs/schema_check.md AC1–7；GLS-AC1–4 真源=tickets/10-术语模型GLS.md AC 表；CONS-AC1–3 真源=tickets/11-一致性对核验.md AC 表；REQ-* 真源=tickets/13-机读必填字段闸.md AC 表；BAN-* 真源=tickets/16-禁用词拦截面.md AC 表；MID-* 真源=tickets/27-缺id盲区演进票.md AC 表；DUP-* 真源=tickets/38-重复id检测.md AC 表；schema 机读表经 {fixture_dir}/ontology/schema 符号链接取自仓内 ontology/schema（单一真源，不复制）。",
   "assertions": [
     {
       "ac": "AC1",
@@ -169,6 +169,54 @@
       "type": "cmd-fails",
       "cmd": "python3 tools/schema_check.py {fixture_dir}/ontology/dup-ac1-same-domain-duplicate-id",
       "outputContains": ["duplicate-id", "AGG-DUP-001", "井甲", "井乙", "m1-object-model.yaml:5", "m1-object-model.yaml:10"]
+    },
+    {
+      "ac": "L3-AC1a",
+      "type": "cmd-fails",
+      "cmd": "python3 tools/schema_check.py {fixture_dir}/ontology/l3-ac1a-source-field-missing",
+      "outputContains": ["l3-source-field", "nonExistentField", "RULE-BOHAI-001"]
+    },
+    {
+      "ac": "L3-AC1b",
+      "type": "cmd-fails",
+      "cmd": "python3 tools/schema_check.py {fixture_dir}/ontology/l3-ac1b-expression-ref",
+      "outputContains": ["l3-expression-ref", "x.wellCode", "未在 sourceObjects 声明"]
+    },
+    {
+      "ac": "L3-AC1c",
+      "type": "cmd-fails",
+      "cmd": "python3 tools/schema_check.py {fixture_dir}/ontology/l3-ac1c-sql-readonly",
+      "outputContains": ["l3-sql-readonly", "UPDATE"]
+    },
+    {
+      "ac": "L3-AC1d",
+      "type": "cmd-fails",
+      "cmd": "python3 tools/schema_check.py {fixture_dir}/ontology/l3-ac1d-rule-form",
+      "outputContains": ["l3-rule-form", "EXPRESSION", "RULE-BOHAI-002"]
+    },
+    {
+      "ac": "L3-AC2a",
+      "type": "cmd-succeeds",
+      "cmd": "python3 tools/schema_check.py ontology/bohai",
+      "outputContains": ["L1: 0 | L2: 0 | L3: 0 | L4: 0", "语义闸: 全过"]
+    },
+    {
+      "ac": "L3-AC2b",
+      "type": "cmd-succeeds",
+      "cmd": "python3 tools/schema_check.py ontology",
+      "outputContains": ["L1: 0 | L2: 0 | L3: 0 | L4: 0", "语义闸: 全过"]
+    },
+    {
+      "ac": "L3-AC3",
+      "type": "cmd-succeeds",
+      "cmd": "python3 tools/schema_check.py {fixture_dir}/ontology/valid-domain",
+      "outputContains": ["L1: 0 | L2: 0 | L3: 0 | L4: 0", "语义闸: 全过"]
+    },
+    {
+      "ac": "L3-AC4",
+      "type": "cmd-succeeds",
+      "cmd": "python3 tools/schema_check.py --json {fixture_dir}/ontology/valid-domain",
+      "outputContains": ["\"L3\": 0"]
     }
   ]
 }

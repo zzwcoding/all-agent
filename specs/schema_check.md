@@ -1,4 +1,4 @@
-# spec · schema_check（语义 CI L1–L4）
+# spec · schema_check（语义 CI L1–L4；票 41 增 L3 确定性子集）
 
 触及: tools/schema_check.py（L3 脚本）；契约: CLI `schema_check <ontology目录> [--json]`
 
@@ -70,6 +70,18 @@ GLS 套件（票 10，真源 = tickets/10-术语模型GLS.md AC 表）：
 | DUP-AC1 | 同域两元素同 id（dup-ac1-same-domain-duplicate-id：AGG-DUP-001 在同一主集合出现两次，两元素必填字段齐全、ownerEntity 引用照常解析） | 报 L1 duplicate-id 红，报文含双位置（先出现 m1-object-model.yaml:5 + 后出现 m1-object-model.yaml:10）与双元素名（井甲/井乙）；重复≠悬空，无杂音红因 |
 | DUP-AC2 | bohai / valid-domain / 全部出厂集域副本（各域合法复用同形 ID——唯一性判定键 = manifest 域值，跨域不判） | 全绿零误报（由既有绿断言 + 全量回归承载）；跨键同值（M5 actorId/roleId 式）/跨文件同域两形态由单测面（DuplicateId 类）钉死 |
 
+L3 确定性闸套件（票 41，真源 = tickets/41-L3确定性闸.md 可机判子集清单（L0 裁决）+ AC 表；L3=语义 CI 五级的指标/SQL/安全，本套件只收确定性可判子集四项，违规码 `l3-*`；明示不收 SQL 语义正确性/指标公式数学正确性/安全敏感度分级/任何需 LLM 判断的项——归 L5 设计案）：
+
+| 断言 | 给定 | 期望 |
+|---|---|---|
+| L3-AC1a | M3 sourceField 指向不存在字段（l3-ac1a-source-field-missing：RULE-BOHAI-001 sourceField 字段段 nonExistentField 不在所指聚合 attributes） | 报 L3 l3-source-field 红，报文含规则 ID 与字段段；对象段按匹配序（id→alias→name→别名驼峰词唯一包含）解析成功，红因钉在字段 |
+| L3-AC1b | M7 sourceExpression 引用未声明别名（l3-ac1b-expression-ref：QR-BOHAI-001 列引用 x.wellCode，x 不在 sourceObjects） | 报 L3 l3-expression-ref 红，报文含报表 ID、表达式与「未在 sourceObjects 声明」 |
+| L3-AC1c | referenceSql 含 UPDATE（l3-ac1c-sql-readonly：QR-BOHAI-001 增 referenceSql UPDATE 语句） | 报 L3 l3-sql-readonly 红（DML/DDL 黑名单词大小写不敏感 + \b 词边界；updated_at 式列名不误伤由单测钉死） |
+| L3-AC1d | EXPRESSION 型规则缺 expression（l3-ac1d-rule-form：RULE-BOHAI-002 ruleType=EXPRESSION 且无 expression/narrative） | 报 L3 l3-rule-form 红（schema.md §6 二选一形态；ruleType 值集实读无 EXPRESSION/NARRATIVE 型，EXPRESSION 特判 + 其余型至少一者在场；ruleType 缺失归 L1 required-field 不叠红） |
+| L3-AC2a/2b | bohai / ontology 仓根全量 | exit 0 全绿且计数行 `L1: 0 \| L2: 0 \| L3: 0 \| L4: 0`——存量零误报红线（首跑两处红经裁决=真缺陷已修域 RULE-BOHAI-003，裁决记录 lessons/41） |
+| L3-AC3 | valid-domain 正例副本 | 零倒（全绿零扰动，负变体注入即红互为印证） |
+| L3-AC4 | --json 机读输出 | levels 含 `"L3": 0`（计数与人类输出行同步进报告） |
+
 ## 违规码总表
 
 | 级别 | kind | 判定真源 |
@@ -83,6 +95,7 @@ GLS 套件（票 10，真源 = tickets/10-术语模型GLS.md AC 表）：
 | L4 | profile-disabled / field-redefinition | model-registry.json profiles / lockedFields |
 | L4 | missing-model-file（票 13：profile 启用却缺文件且 omittedModels 无带理由豁免；豁免条目缺 reason 视为无效） | manifest.json omittedModels + model-registry.json profiles |
 | L4 | banned-term（票 16：域内 GLS 术语 status 含「禁用」条目的 term+aliases 进禁用词表，全域元素 name/alias 键子串命中即红；description/notes 不扫=文档自由；GLS 以 term 承载词面不自匹配；文件名错挂的文件跳过本闸） | 域内 glossary-model.yaml 术语 status |
+| L3 | l3-source-field / l3-expression-ref / l3-sql-readonly / l3-rule-form（票 41：L3 确定性闸四项——sourceField 双段字段存在性（对象段匹配序 id→alias→name→别名驼峰词唯一包含，中文注记后缀剥离，非双段形态不判）；resultColumns sourceExpression 的 别名.字段 token 别名须声明、字段须在所指聚合 attributes（objectRef 悬空归 dangling-ref 红因不混）；referenceSql 可选字段在场才扫，DML/DDL 黑名单词大小写不敏感+词边界；规则形态二选一（EXPRESSION 特判，ruleType 缺失归 required-field）；文件名错挂的文件跳过 L3 闸） | tickets/41 可机判子集清单（L0 裁决）+ schema.md §6/§9/§15 |
 
 ## 行为约定
 
@@ -91,3 +104,4 @@ GLS 套件（票 10，真源 = tickets/10-术语模型GLS.md AC 表）：
 - 域 manifest 可选 `omittedModels: [{model, reason}]`（票 13）：登记 profile 启用但有意不建文件的模型及理由（bohai 的 MU 即此形态）；reason 缺失/空串 = 无效豁免
 - 结构性必填口径与逐模型推导表见 lessons/13；schema.md 全字段集（preconditions 等）不在必填闸内（缺口清单留后续演进票）
 - 禁用词拦截面（票 16）按域生效：禁用词表=本域 GLS 术语 status 含「禁用」条目的 term+aliases（宽进严出，不枚举状态值）；匹配面=递归收集所有字典中键恰为 `name`/`alias` 的字符串值（通用口径，不逐模型硬列挂点）；GLS 无文件的域表为空、闸静默
+- L3 确定性闸（票 41）按域生效：域内聚合目录（M1 aggregates）为 L3-1/L3-2 的解析基准；对象段匹配序 `L3_OBJECT_MATCH_ORDER`（模块常量，可配置演进=改元组不改判定逻辑）——直配层 id/alias（不区分大小写）+ name（原文精确），末层「别名驼峰词唯一包含」兼容 schema.md §6 示例的自造短名形态（dailyProduction），多命中=不解析报本码；报告计数行与 --json levels 含 L3；剩余非确定性子集归 L5 评分框架设计案（第三期 B 线批次三方案 1）

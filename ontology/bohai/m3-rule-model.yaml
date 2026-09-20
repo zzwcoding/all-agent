@@ -50,13 +50,18 @@ rules:
     ruleType: VALIDATION
     description: "R5·§4 规则 2。数据集级质量规则（非空率是对批次的统计），执行点为质检批处理（BH-BOHAI-RunDailyQualityCheck）；行级 required 不设（99.5%<100% 意味着允许缺失行存在）。"
     inputParams:
+      # 票 41 L3-1 首跑裁决（真缺陷修域）：原值 dailyProduction.batchRowCount /
+      # dailyProduction.batchNullRowCount——批级行数/空值行数是数据集级派生量，
+      # AGG-BOHAI-002 是「一井一日」行级聚合（无此承载字段），原写法虚挂不存在的
+      # 载体。沿本文件无承载字段注记惯例改写（同 RULE-BOHAI-008 retentionDelta、
+      # RULE-BOHAI-018 baselineOil 形态）；原值留档 lessons/41 裁决记录。
       - name: totalCount
         type: Integer
-        sourceField: dailyProduction.batchRowCount
+        sourceField: 批次行数 batchRowCount（数据集级派生，无承载字段）
         required: true
       - name: nullCount
         type: Integer
-        sourceField: dailyProduction.batchNullRowCount
+        sourceField: 批次空值行数 batchNullRowCount（数据集级派生，无承载字段）
         required: true
     outputType: Boolean
     expression: (totalCount - nullCount) / totalCount >= 0.995

@@ -18,6 +18,30 @@ collect_definitions：非 ref 键、带注册前缀）不得重复，撞即报�
 +后出现 file:line 与元素名）；跨域不判（fixture 各域合法复用同形 ID）。实现挂在
 票 27 元素枚举（iter_collection_items）产物上：域值→id→(file,line,键,名) 索引；
 M5 的 actorId/roleId/permissionId 跨键同值同判；文件名错挂的文件跳过（红因纯净）。
+票 41 增 L3 确定性闸（语义 CI 五级的 L3=指标/SQL/安全，只收确定性可判子集，真源=
+tickets/41-L3确定性闸.md 可机判子集清单 L0 裁决，四项违规码 l3-* 前缀）：
+  l3-source-field      M3 规则参数 sourceField 双段（对象.属性）：对象段解析到域内
+                       聚合（匹配序 id→alias→name→别名驼峰词唯一包含，可配置见
+                       L3_OBJECT_MATCH_ORDER；bohai 存量用「dailyProduction」式自造
+                       短名——schema.md §6 示例即此形态，与聚合 alias 非直配，靠末层
+                       解析），字段段在该聚合 attributes[].name 中；sourceField 容忍
+                       中文注记后缀（「oilOutput（区块月合计）」截断于首个括号），
+                       非双段形态（无承载字段注记）不在机判面不判；
+  l3-expression-ref    M7 resultColumns[].sourceExpression 内「别名.字段」token：
+                       别名须在该报表 sourceObjects[].alias 声明集，字段须在别名所指
+                       聚合（objectRef）的 attributes 中；objectRef 悬空归 dangling-ref
+                       （红因不混），运算符/字面量/非 x.y token 跳过；
+  l3-sql-readonly      M7 referenceSql（可选字段，缺省不扫）在场即扫：DML/DDL 黑名单
+                       词（INSERT/UPDATE/DELETE/DROP/ALTER/TRUNCATE/CREATE/GRANT）
+                       大小写不敏感、\b 词边界匹配（防列名 updated_at 误伤）；
+  l3-rule-form         M3 规则落地形态二选一（schema.md §6）：ruleType=EXPRESSION
+                       →expression 在场且非空；其余 ruleType（值集实读=VALIDATION/
+                       CALCULATION/DERIVATION/TRANSFORMATION/RISK，无 EXPRESSION/
+                       NARRATIVE 型）→expression/narrative 至少一者在场且非空；
+                       ruleType 本身缺失归 L1 required-field，不叠红因。
+报告计数行与 --json levels 增 L3；文件名错挂的文件跳过 L3 扫描（红因纯净，沿
+票 13/16 先例）。剩余子集（SQL 语义正确性/指标公式数学正确性/安全敏感度分级/
+任何需 LLM 判断的项）明示不收，归 L5 设计案（批次三方案 1）。
 
 对给定 ontology 目录做确定性校验：
   L1 schema 合法——YAML 可解析（AC2）、公共字段 model_type/version/domain 在场（AC3）、
@@ -56,6 +80,7 @@ CLI: python3 tools/schema_check.py <ontology目录> [--json]
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -341,6 +366,98 @@ def collect_banned_terms(data) -> list[tuple[str, str, str]]:
         for alias in iter_ref_strings(entry.get("aliases") or []):
             if isinstance(alias, str) and alias:
                 out.append((alias, gls_id, status))
+    return out
+
+
+# ---------- L3 确定性闸（票 41：指标/SQL/安全的确定性可判子集） ----------
+
+# L3-3 DML/DDL 黑名单（票面清单，大小写不敏感 + \b 词边界——防列名 updated_at 式误伤）
+L3_SQL_BLACKLIST = ("INSERT", "UPDATE", "DELETE", "DROP",
+                    "ALTER", "TRUNCATE", "CREATE", "GRANT")
+L3_SQL_BLACKLIST_RE = re.compile(
+    r"\b(" + "|".join(L3_SQL_BLACKLIST) + r")\b", re.IGNORECASE)
+# L3-2 表达式 token：只取「别名.字段」形态（x.y），数字/运算符/函数名跳过
+L3_REF_TOKEN_RE = re.compile(r"[A-Za-z_]\w*\.[A-Za-z_]\w*")
+# L3-1 对象段匹配序（票 41 防踩坑裁决：可配置匹配序，首层命中即解析）。
+# id→alias→name 为直配层（不区分大小写比 id/alias，name 按原文精确）；末层
+# 「别名驼峰词唯一包含」为自造短名兼容层——bohai 存量 sourceField 用
+# 「dailyProduction」式短名（schema.md §6 字段说明的示例即此形态），与聚合
+# alias（OilProductionDaily）非直配；该层要求全聚合唯一命中才解析（多命中=
+# 指认不了，视同未解析报本码），防「well」式泛词被 WellOverhaul/WellMeasures
+# 多吃。匹配序演进=改此元组，判定逻辑不随之分叉。
+L3_OBJECT_MATCH_ORDER = ("id", "alias", "name", "alias-tokens")
+
+
+def l3_camel_tokens(text: str) -> set:
+    """驼峰切词小写集：OilProductionDaily→{oil, production, daily}。"""
+    return {t.lower() for t in re.findall(r"[A-Z]?[a-z]+|[A-Z]+(?![a-z])", text or "")}
+
+
+def l3_split_source_field(value):
+    """sourceField 拆 (对象段, 字段段)；非「x.y」双段形态返回 None（不在 L3-1 机判面）。
+
+    字段段容忍中文注记后缀——bohai 存量「dailyProduction.oilOutput（区块月合计）」
+    式值截断于首个全角（或半角 ( 括号；无承载字段注记（「存水率变动（无承载
+    字段，待 Owner）」等无点值）天然非双段，不判（票 41 明示只收双段形态）。
+    """
+    if not isinstance(value, str) or "." not in value:
+        return None
+    obj, _, field = value.partition(".")
+    field = re.split(r"[（(]", field, maxsplit=1)[0].strip()
+    obj = obj.strip()
+    if not obj or not field:
+        return None
+    return obj, field
+
+
+def l3_resolve_object_segment(segment: str, aggregates: list):
+    """对象段→聚合目录条目；按 L3_OBJECT_MATCH_ORDER 逐层试，首个命中即解析。
+
+    返回 (聚合或 None, 命中层或 None)。末层 alias-tokens=对象段驼峰词 ⊆ 聚合
+    alias 驼峰词且全聚合唯一命中；空段/多命中不解析（红因可指认）。
+    """
+    seg_low = segment.lower()
+    for layer in L3_OBJECT_MATCH_ORDER:
+        if layer == "id":
+            for agg in aggregates:
+                if str(agg.get("id") or "").lower() == seg_low:
+                    return agg, layer
+        elif layer == "alias":
+            for agg in aggregates:
+                if str(agg.get("alias") or "").lower() == seg_low:
+                    return agg, layer
+        elif layer == "name":
+            for agg in aggregates:
+                if agg.get("name") == segment:
+                    return agg, layer
+        elif layer == "alias-tokens":
+            seg_tokens = l3_camel_tokens(segment)
+            if not seg_tokens:
+                continue
+            hits = [agg for agg in aggregates
+                    if seg_tokens <= l3_camel_tokens(str(agg.get("alias") or ""))]
+            if len(hits) == 1:
+                return hits[0], layer
+    return None, None
+
+
+def l3_aggregate_catalog(data) -> list:
+    """M1 文件→域内聚合目录：[{id,name,alias,attrs}]（顶层 aggregates[]，schema.md §4；
+    集合键与 M3 rules/M7 query_reports 同按 schema.md 顶层约定锚定，沿票 11 锚定
+    结构性承载字段的先例）。attrs=attributes[].name 集合。"""
+    out = []
+    aggs = data.get("aggregates")
+    if not isinstance(aggs, list):
+        return out
+    for agg in aggs:
+        if not isinstance(agg, dict):
+            continue
+        attrs = set()
+        for attr in agg.get("attributes") or []:
+            if isinstance(attr, dict) and isinstance(attr.get("name"), str):
+                attrs.add(attr["name"])
+        out.append({"id": agg.get("id"), "name": agg.get("name"),
+                    "alias": agg.get("alias"), "attrs": attrs})
     return out
 
 
@@ -641,6 +758,162 @@ def run(target: Path) -> dict:
                                     f"=文档自由）；真源=域内 GLS 术语表 status 含"
                                     f"「禁用」条目（票 16）")
 
+        # L3 确定性闸（票 41）：指标/SQL/安全的确定性可判子集四项，违规码 l3-*。
+        # 域内聚合目录（M1）先行——L3-1/L3-2 的解析基准；文件名错挂的文件跳过
+        # 本闸（内容与模型锚已断，让位 filename-mismatch，红因纯净沿票 13/16 先例）。
+        agg_mkey = model_by_type.get("OBJECT")
+        rule_mkey = model_by_type.get("RULE")
+        rep_mkey = model_by_type.get("REPORT")
+        if rule_mkey or rep_mkey:
+            aggregates = []
+            l3_scans = []  # (rel, data, mkey)
+            for path_l in files:
+                rel_l = str(path_l)
+                try:
+                    data_l = load_yaml(path_l)
+                except _YamlSyntaxError:
+                    continue  # 语法错误由 L1 yaml-syntax 管辖
+                if not isinstance(data_l, dict):
+                    continue
+                mtype_l = data_l.get("model_type")
+                mkey_l = (model_by_type.get(mtype_l)
+                          if isinstance(mtype_l, str) else None)
+                if mkey_l is None:
+                    continue
+                yaml_file_l = models[mkey_l].get("yamlFile")
+                if yaml_file_l and path_l.name != yaml_file_l:
+                    continue  # filename-mismatch 管辖面，不叠 L3 红因
+                l3_scans.append((rel_l, data_l, mkey_l))
+                if mkey_l == agg_mkey:
+                    aggregates.extend(l3_aggregate_catalog(data_l))
+            agg_by_id = {a["id"]: a for a in aggregates
+                         if isinstance(a.get("id"), str)}
+
+            # L3-1 M3 规则参数 sourceField 字段存在性（双段形态才判）
+            if rule_mkey:
+                for rel_l, data_l, mkey_l in l3_scans:
+                    if mkey_l != rule_mkey:
+                        continue
+                    rules_l = data_l.get("rules")
+                    if not isinstance(rules_l, list):
+                        continue
+                    for rule in rules_l:
+                        if not isinstance(rule, dict):
+                            continue
+                        rid = rule.get("id", "?")
+                        params = rule.get("inputParams")
+                        for param in (params if isinstance(params, list) else []):
+                            if not isinstance(param, dict):
+                                continue
+                            raw = param.get("sourceField")
+                            parts = l3_split_source_field(raw)
+                            if parts is None:
+                                continue  # 非双段形态（无承载字段注记）不在机判面
+                            seg, fld = parts
+                            agg, layer = l3_resolve_object_segment(seg, aggregates)
+                            if agg is None:
+                                add("L3", "l3-source-field", rel_l,
+                                    key_line(param, "sourceField"),
+                                    f"规则 {rid} 参数 sourceField「{raw}」对象段"
+                                    f"「{seg}」解析不到域内聚合（匹配序 "
+                                    f"{'→'.join(L3_OBJECT_MATCH_ORDER)} 均未唯一"
+                                    f"命中）——L3-1（票 41；sourceField 非 ref 键，"
+                                    f"悬空不由 dangling-ref 管辖，本码承载）")
+                                continue
+                            if fld not in agg["attrs"]:
+                                add("L3", "l3-source-field", rel_l,
+                                    key_line(param, "sourceField"),
+                                    f"规则 {rid} 参数 sourceField「{raw}」字段段"
+                                    f"「{fld}」不在所指聚合 {agg['id']}"
+                                    f"（alias {agg.get('alias')}，匹配层 {layer}）"
+                                    f"的 attributes 中——L3-1（票 41）")
+
+            # L3-2 / L3-3 M7 口径表达式引用一致性 + referenceSql 只读性
+            if rep_mkey:
+                for rel_l, data_l, mkey_l in l3_scans:
+                    if mkey_l != rep_mkey:
+                        continue
+                    qrs = data_l.get("query_reports")
+                    if not isinstance(qrs, list):
+                        continue
+                    for qr in qrs:
+                        if not isinstance(qr, dict):
+                            continue
+                        qid = qr.get("id", "?")
+                        alias_map = {}
+                        for so in qr.get("sourceObjects") or []:
+                            if isinstance(so, dict) and \
+                                    isinstance(so.get("alias"), str):
+                                alias_map[so["alias"]] = so.get("objectRef")
+                        for col in qr.get("resultColumns") or []:
+                            if not isinstance(col, dict):
+                                continue
+                            expr = col.get("sourceExpression")
+                            if not isinstance(expr, str) or not expr.strip():
+                                continue
+                            for token in L3_REF_TOKEN_RE.findall(expr):
+                                talias, _, tfield = token.partition(".")
+                                if talias not in alias_map:
+                                    add("L3", "l3-expression-ref", rel_l,
+                                        key_line(col, "sourceExpression"),
+                                        f"报表 {qid} sourceExpression「{expr}」"
+                                        f"引用别名「{talias}」未在 sourceObjects "
+                                        f"声明（声明集 {sorted(alias_map)}）——"
+                                        f"L3-2（票 41）")
+                                    continue
+                                agg_target = agg_by_id.get(alias_map[talias])
+                                if agg_target is None:
+                                    continue  # objectRef 悬空=dangling-ref 管辖（红因不混）
+                                if tfield not in agg_target["attrs"]:
+                                    add("L3", "l3-expression-ref", rel_l,
+                                        key_line(col, "sourceExpression"),
+                                        f"报表 {qid} sourceExpression「{expr}」"
+                                        f"字段「{token}」不在别名「{talias}」所指"
+                                        f"聚合 {alias_map[talias]} 的 attributes 中"
+                                        f"——L3-2（票 41）")
+                        sql = qr.get("referenceSql")
+                        if isinstance(sql, str) and sql.strip():
+                            hits = sorted({m.group(0).upper() for m in
+                                           L3_SQL_BLACKLIST_RE.finditer(sql)})
+                            if hits:
+                                add("L3", "l3-sql-readonly", rel_l,
+                                    key_line(qr, "referenceSql"),
+                                    f"报表 {qid} referenceSql 命中只读黑名单词 "
+                                    f"{hits}（DML/DDL，大小写不敏感+\\b 词边界）"
+                                    f"——L3-3（票 41；referenceSql 可选字段在场才扫，"
+                                    f"必须只读 SELECT 形态）")
+
+            # L3-4 M3 规则落地形态二选一（schema.md §6；票 13 缺口清单登记项）
+            if rule_mkey:
+                for rel_l, data_l, mkey_l in l3_scans:
+                    if mkey_l != rule_mkey:
+                        continue
+                    rules_l = data_l.get("rules")
+                    if not isinstance(rules_l, list):
+                        continue
+                    for rule in rules_l:
+                        if not isinstance(rule, dict):
+                            continue
+                        rtype = rule.get("ruleType")
+                        if not isinstance(rtype, str) or not rtype.strip():
+                            continue  # ruleType 缺失归 L1 required-field，不叠红因
+                        has_expr = (isinstance(rule.get("expression"), str)
+                                    and bool(rule["expression"].strip()))
+                        has_narr = (isinstance(rule.get("narrative"), str)
+                                    and bool(rule["narrative"].strip()))
+                        if rtype.strip().lower() == "expression":
+                            form_ok = has_expr
+                        else:  # 值集实读=VALIDATION/CALCULATION/DERIVATION/TRANSFORMATION/RISK
+                            form_ok = has_expr or has_narr
+                        if not form_ok:
+                            rid = rule.get("id", "?")
+                            add("L3", "l3-rule-form", rel_l,
+                                getattr(rule, "line", 0) or data_l.line,
+                                f"规则 {rid}（ruleType={rtype}）落地形态缺失："
+                                f"expression/narrative 二选一（schema.md §6）均"
+                                f"不在场或为空——L3-4（票 41；ruleType 字段本身"
+                                f"缺失归 L1 required-field 管辖，不叠红因）")
+
         # AC6 反向（票 13）：profile 启用的模型缺文件且无带理由豁免 = L4 红。
         # profile 未知时 enabled 为空、不触发（unknown-profile 已单独红）。
         if profile is not None:
@@ -796,7 +1069,7 @@ def run(target: Path) -> dict:
                         f"（依据 M6.roleRef ⊆ M6.roleRefs，schema.md §14）")
 
     by_level = {lv: sum(1 for v in violations if v["level"] == lv)
-                for lv in ("L1", "L2", "L4")}
+                for lv in ("L1", "L2", "L3", "L4")}
     return {
         "status": "fail" if violations else "pass",
         "target": str(target),
@@ -819,15 +1092,15 @@ def print_human(report: dict) -> None:
         print(f"[{v['level']}][{v['kind']}] {loc} — {v['message']}")
     lv = report["levels"]
     if report["status"] == "pass":
-        print("L1: 0 | L2: 0 | L4: 0")
+        print("L1: 0 | L2: 0 | L3: 0 | L4: 0")
         print("语义闸: 全过")
     else:
-        print(f"L1: {lv['L1']} | L2: {lv['L2']} | L4: {lv['L4']}")
+        print(f"L1: {lv['L1']} | L2: {lv['L2']} | L3: {lv['L3']} | L4: {lv['L4']}")
         print(f"语义闸: {sum(lv.values())} 处违规")
 
 
 def main(argv=None) -> int:
-    ap = argparse.ArgumentParser(description="语义 CI L1–L4 闸（specs/schema_check.md）")
+    ap = argparse.ArgumentParser(description="语义 CI L1–L4 闸（specs/schema_check.md；票 41 增 L3 确定性子集）")
     ap.add_argument("target", help="ontology 目录（仓根或单域目录）")
     ap.add_argument("--json", action="store_true", help="机读 JSON 输出（供 CI 消费）")
     args = ap.parse_args(argv)

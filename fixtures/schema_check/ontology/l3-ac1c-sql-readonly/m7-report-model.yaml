@@ -1,0 +1,34 @@
+model_type: REPORT
+version: "1.0.0"
+domain: bohai-fixture
+query_reports:
+  - id: QR-BOHAI-001
+    name: 单井日产量查询
+    alias: wellDailyOutputQuery
+    objectType: DETAIL_QUERY
+    behaviorRef: BH-BOHAI-QueryWellDailyOutput
+    referenceSql: "UPDATE well_info SET current_status = '停产' WHERE well_code = :wellCode"
+    sourceObjects:
+      - objectRef: AGG-BOHAI-001
+        alias: w
+        primary: true
+    parameters:
+      - name: wellCode
+        label: 井号
+        dataType: String
+        required: true
+        allowedOperators: [EQ, LIKE]
+    conditions:
+      - conditionId: COND-001
+        leftExpression: w.wellCode
+        operator: EQ
+        parameterRef: wellCode
+    resultColumns:
+      - name: wellCode
+        label: 井号
+        dataType: String
+        sourceExpression: w.wellCode
+      - name: outputVolume
+        label: 产液量
+        dataType: Decimal
+        sourceExpression: w.dailyOutput
