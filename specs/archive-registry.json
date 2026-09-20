@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "description": "归档登记表（项目内产物归档唯一真源，设计案「两条验收主线」主线 2）。每类产物 → 路径模式（落在 repo-layout.json 登记的目录内）+ 必备字段 + 状态字段与合法值 + 翻转人。消费方：tools/archive_check.py。本表从 sdd-flow2 票 01 版实例化到本仓：ticket 状态值 todo/doing/done；票面 NN-*.md；新增 ontology 产物类（schema 文档/注册表/域 manifest/模型 YAML，票 03）；票 23 增 MCP capability manifest 产物类（exports/mcp/，派生物禁手改）；票 26 增 proposal/walkthrough/review 三类（第四轮审查账目清偿，必备字段以实跑驱动收敛）；票 37 增 devkit/skillpack 两类（exports 生成物人审头入归档闸机判面，第六轮审查账目清偿）；票 45 增 review-record 类（人审闸审记旁档 exports/reviews/，design-human-review-gate 裁决点 4，先登记后落文件——本票只登记不接线，exports 接线在票 46）；票 46 三生成物接线与档位登记：devkit/skillpack/mcp-manifest 增 reviewTier 档位字段（免审级=manifest / 首审+变更审=skillpkg / 全审级=devkit，design-human-review-gate §3.2/§3.3+§8 七点裁决，判档依据=§3.3 四判据组合规则），devkit/skillpack status 合法值随生成器字面追加审记指针同步更新（唯一合法触碰路径=改生成器→重 gen→--check），新产物判档时机=产物随票诞生即定档（维护纪律见 fieldConventions.reviewTier）。",
+  "description": "归档登记表（项目内产物归档唯一真源，设计案「两条验收主线」主线 2）。每类产物 → 路径模式（落在 repo-layout.json 登记的目录内）+ 必备字段 + 状态字段与合法值 + 翻转人。消费方：tools/archive_check.py。本表从 sdd-flow2 票 01 版实例化到本仓：ticket 状态值 todo/doing/done；票面 NN-*.md；新增 ontology 产物类（schema 文档/注册表/域 manifest/模型 YAML，票 03）；票 23 增 MCP capability manifest 产物类（exports/mcp/，派生物禁手改）；票 26 增 proposal/walkthrough/review 三类（第四轮审查账目清偿，必备字段以实跑驱动收敛）；票 37 增 devkit/skillpack 两类（exports 生成物人审头入归档闸机判面，第六轮审查账目清偿）；票 45 增 review-record 类（人审闸审记旁档 exports/reviews/，design-human-review-gate 裁决点 4，先登记后落文件——本票只登记不接线，exports 接线在票 46）；票 46 三生成物接线与档位登记：devkit/skillpack/mcp-manifest 增 reviewTier 档位字段（免审级=manifest / 首审+变更审=skillpkg / 全审级=devkit，design-human-review-gate §3.2/§3.3+§8 七点裁决，判档依据=§3.3 四判据组合规则），devkit/skillpack status 合法值随生成器字面追加审记指针同步更新（唯一合法触碰路径=改生成器→重 gen→--check），新产物判档时机=产物随票诞生即定档（维护纪律见 fieldConventions.reviewTier）；票 50 增 design-card 类（DDD 设计件，design/ddd/ 下 YAML，被建域产物非派生物不走 --check，草案走 MR 人审；pathPatterns 收窄到 yaml——design/ddd/README.md 是格式文档不是设计件，只受布局表位置管不受本类字段检查，票 50 实跑归档闸定）。",
   "fieldConventions": {
     "pathPatterns": "仓根相对的 fnmatch glob；命中的文件接受该类产物的必备字段/状态检查。",
     "requiredFields": "必备字段。md 类为必现的行前缀或关键节名；json 类为顶层键；yaml 类为必现文本。",
@@ -216,6 +216,22 @@
       "statusNote": "审记旁档是人审结论的唯一载体（生成物本体一字不动，design §5 不做 5），逐版本追加不覆盖、verdict 二元（已审/打回）只随新记录追加演进不改旧记录——故无状态字段（status=null，最新记录即有效态，由 tools/review_gate.py verify 机判）。归档闸只查顶层必备键在场（check_json_artifact 前置登记，与 mcp-manifest 同款）；记录级 schema（必备字段/verdict 合法值/打回带 routing）与哈希锚定失效机判由 review_gate.py 承载，闸不重复判定。裁决点 4 审记落点=exports/reviews/（Owner 2026-09-20 裁决）。",
       "producer": "票 45 起 tools/review_gate.py init/approve/reject（审记旁档追加不覆盖；--review-dir 可注入到 exports/reviews 之外）",
       "flippedBy": "不适用（审记只增不改：追加新记录即状态演进，旧记录永不改写——审记可以缺，不可以编）"
+    },
+    {
+      "type": "design-card",
+      "label": "DDD 设计件（design/ddd/<域>/ 下聚合卡/领域事件表/聚合↔表映射/仓储边界 YAML，票 50 起）",
+      "layoutDir": "design/ddd",
+      "pathPatterns": ["design/ddd/*.yaml", "design/ddd/**/*.yaml"],
+      "template": "design/ddd/README.md（四类字段 schema+语义+最小样例=唯一格式真源，改 schema 走票）",
+      "requiredFields": ["status"],
+      "status": {
+        "field": "status",
+        "values": ["草案", "已审"],
+        "flippedBy": "Owner（MR 人审：草案→已审只由 Owner 翻）"
+      },
+      "statusNote": "设计件=被建域产物不是派生物：不可由工具再生，不走 --check 再制断言（与 exports 派生物相反）；草案进仓走 MR 人审。pathPatterns 收窄到 yaml（票 50 实跑归档闸定）：design/ddd/README.md 是格式文档不是设计件，不受本类字段检查、只受布局表位置管。status 是闸机判面：check_md_artifact 按文件内首个 status: 行取值，设计件 YAML 恰一处行首 status 行、不得使用含 status 子串的其他键名（design/ddd/README.md 通用约定 2）。深度检查（五查）由 tools/ddd_check.py 承载（票 51 起），归档闸只查必备字段在场与状态合法值。",
+      "producer": "ddd-modeler skill 产草案（票 52 起；票 51 起入仓前过 tools/ddd_check.py 五查）",
+      "flippedBy": "Owner（MR 人审：草案→已审）"
     },
     {
       "type": "ontology-schema-doc",

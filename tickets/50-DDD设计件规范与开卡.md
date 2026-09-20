@@ -1,6 +1,6 @@
 # 票 50：DDD 设计件规范 + ddd-modeler 开卡（阶段 2/3 性质）
 
-Status: todo
+Status: done
 
 > 注（L0 拆票时点）：本票只定规范与卡，不写 skill 正文（票 52）、不建闸（票 51）。七个开放问题裁决已落 docs/prd.md 决策追认（2026-09-20）。
 Belongs to: docs/第四期DDD线拆票方案.md 批次一；docs/ddd-modeler-建造交接包.md；references/ddd-as-code-digest.md；PRD F15
@@ -21,12 +21,12 @@ Touches: specs/modules.md、specs/ddd-modeler.md、design/ddd/README.md、refere
 
 ## 验收（注源）
 
-- [ ] AC1 设计件格式真源在场，四类 YAML 各有最小合法样例（源：本票 AC 表）
-- [ ] AC2 ddd-modeler 卡合规（skill-module-format 各槽齐；触发面写清选配路由）（源：实读）
-- [ ] AC3 边界规则节增条且边界闸消费后仍绿（源：CI）
-- [ ] AC4 repo-layout + archive-registry 登记在场，design/ddd/ 下样例文件过归档闸（源：CI）
-- [ ] AC5 架构图插入 ddd-modeler 节点且 Owner 过目留痕（lessons/50）（源：本票 AC 表）
-- [ ] AC6 `bash tools/ci.sh` 四闸绿（源：CI）
+- [x] AC1 设计件格式真源在场，四类 YAML 各有最小合法样例（源：本票 AC 表）
+- [x] AC2 ddd-modeler 卡合规（skill-module-format 各槽齐；触发面写清选配路由）（源：实读）
+- [x] AC3 边界规则节增条且边界闸消费后仍绿（源：CI）
+- [x] AC4 repo-layout + archive-registry 登记在场，design/ddd/ 下样例文件过归档闸（源：CI）
+- [x] AC5 架构图插入 ddd-modeler 节点且 Owner 过目留痕（lessons/51，卷号顺延）（源：本票 AC 表）
+- [x] AC6 `bash tools/ci.sh` 四闸绿（源：CI）
 
 ## 交接包（L2 自主档）
 

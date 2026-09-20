@@ -105,6 +105,21 @@
 - Seam 与出厂集: `fixtures/doc-extractor/`——合成制度文档两份（中性域：术语定义 6 条含 1 明示废弃+1 明示限语境，可条件化条款 5 条+纯叙述性条款 2 条）→ 断言草案过语义闸+萃取覆盖探针正例 exit 0（AC1）、草案头部声明与 file#锚点 注源+证据索引 ≥7 条且逐条含锚点（AC2）、覆盖对照表缺一条的负变体 exit 1（AC3，真源=票 32 AC 表）
 - 边界: 同 onto-modeler；草案头部必须标注"证据非权威，待 Owner 确认"；状态不洗白——文档明示废弃/仅限某语境的条目照 GLS status 纪律如实标注不丢弃；规则必须条件化——纯叙述性条款进疑点清单不硬转；每条候选注源 `文档 file#锚点`；零对象/行为/主体/界面证据不产 M1/M2 文件（omittedModels 带理由），relatedObjectRefs 无承载不硬挂
 
+## skill: ddd-modeler
+
+- 职责: DDD 战术设计工序——本体模型+行为/规则清单 → 四类设计件草案（聚合卡/领域事件表/聚合↔表映射/仓储边界，YAML 机器可闸，格式真源 `design/ddd/README.md`）
+- 层: L1 工序
+- 目录: 仓内 skills/ddd-modeler/（正本，边界闸+归档闸治理）+ ~/.agents/skills/ddd-modeler/（安装位，Kimi Code 路由）；两份内容必须一致（skill 正文票 52 落盘，本票先立卡）
+- 触发面: 选配路由——"给这个交易型/状态机型项目做 DDD 战术设计/出聚合卡"。判据表：有状态机/不变量要守→路由；规则多且持续增长、系统要活好几年→路由；多领域多团队、边界是痛→路由；读多写少规则薄（报表/工具/CRUD/MCP）→传统分层不路由；一次性脚本/原型→不上。核心判据="改一条规则要动几个地方"的风险（真源 docs/ddd-modeler-建造交接包.md §5）
+- reads: `ontology/<域>/**`（模型+glossary——无词条不建模）、`ontology/schema/**`、`design/ddd/README.md`（格式真源）
+- writes: `design/ddd/<域>/**` 草案（只产草案，进仓走 MR 人审；status 草案→已审只由 Owner 翻转）
+- 依赖:
+  - script: `tools/schema_check.py`（词条解析）
+  - script: `tools/ddd_check.py`（设计件五查自检，票 51 建）
+  - data: `ontology/**`
+- Seam 与出厂集: `fixtures/ddd-modeler/`——最小订单域：本体输入 → 期望四类设计件输出 + 五查负变体（票 51 建并落断言，本票占位 pending）
+- 边界: 不做代码生成（那是 F9/sdd-flow 的事）；不预建事件运行时（Outbox/MQ 由被建项目按需建）；无词条不建模（缺词条回 onto-modeler/提案池）；不读生成器 skill 私件；粒度/完备性只出"待人审清单"不硬裁决
+
 ## skill: app-generator
 
 - 职责: 应用生成器——本体+技术架构+开发指导书 → 导出开发包；发布前过人审闸（PRD 决策 2）；细节二期
@@ -148,6 +163,8 @@
 | semantic-service 写 `ontology/**` | 无 | 运行面只读；写意图转提案流程 |
 | 任何 skill 读另一 skill 的私有 references | 无 | 逻辑包含靠显式依赖行 |
 | 生成器读取 build-contract 之外缺少声明的模型 | 无 | 生成器声明所需模型，缺了报错不硬编 |
+| 非 ddd-modeler 工序写 `design/ddd/**`（设计件只由 ddd-modeler 工序写入，草案制） | 无 | 设计件=被建域产物，进仓走 MR 人审；status 草案→已审只由 Owner 翻 |
+| ddd-modeler 读生成器 skill 私件（F9/skill-publisher/mcp-publisher 内部件） | 无 | 战术设计只消费本体仓与共享规约；与生成器的接口是设计件文件，不是私件 |
 
 ## 规约清单（L2）
 
@@ -176,3 +193,4 @@
 | `tools/meta_probe.py` | 元循环探针（票 28 建九项，票 29 增第 10 项与豁免复核并入，F14）：十项确定性体检零 LLM——①出厂集（fixture_run 子进程逐套 PASS/PENDING/FAIL）②语义闸（schema_check 子进程 L1/L2/L4）③CORE 分布（八问逐条 semantic_service_core --json，status 分布+与 fixtures CORE-01–08 冻结期望对照；八问常量表内置、与断言 fixture 同步维护）④边界闸豁免 .skill-deps-allow 逐条+人工复核栏（复核结论由 --review 或缺省 docs/meta/exemption-reviews.json 并入留痕，票 29）⑤归档豁免 .archive-allow 同上 ⑥安装位（install_skills --check 子进程，漂移/孤儿/注册表规模）⑦skill↔卡同步（modules.md 卡名集合 vs skills/*/SKILL.md 双向差集；有 skill 无卡=违规，占位卡不判违规）⑧提案池（PROP-*.md status 计数+proposal_check 子进程退出码）⑨图基线（graph_index 节点/边快照）⑩信号路由表自检（policies/signal-routing.json：合法 JSON+routes 恰三类 业务错/工程错/元模型错+每类 instances ≥2 条且指针逐个真实——commit 逐个 git log 验存、PROP 逐个查 docs/proposals/ 在池；路由表坏=硬闸红，票 29）；判定归各闸、探针只采集呈现不复制判定逻辑；MD 十节+结论行+机读 JSON（--out 同名双落盘，缺省 stdout，留痕带时间戳非 golden）；退出码 0 硬闸全绿/1 硬闸红/2 用法，硬闸=1/2/6/7/10，3/4/5/8/9 信息项不判死；子进程工具缺席/坏输出→该项 SKIPPED 降级不崩（硬闸全绿+硬闸缺→结论 DEGRADED 仍退出 0）；留痕落 docs/meta/（布局表 docs 条目 meta/*.md+meta/*.json，票 28） | 已建（票 28 九项；票 29 增第 10 项路由表自检+豁免复核并入 --review/缺省 exemption-reviews.json+体检节奏入协议第 9 条） |
 | `tools/skill_deps_check.py` `tools/fixture_run.py` `tools/archive_check.py` 三闸 + `tools/ci.sh` | 从 sdd-flow2 实例化拷贝（含单测；fixture_run 新增 cmd-* 断言与占位 pending） | 已建（票 03 随迁） |
 | `tools/install_skills.py` | 安装位同步与落闸：仓内 skills/ 正本 → ~/.agents/skills/ 安装位的 sync（先清后拷，只清本 skill 目录）、--check（漂移三型 missing/modified/extra + 孤儿检测）、--prune（孤儿清除，默认 dry-run，--yes 才删）、symlink 拒跑（退出 2）；注册表 `tools/install-registry.json` 由 sync 原子维护（孤儿三要素=登记过+安装位在+正本已删）；`tools/hooks/pre-commit`（core.hooksPath 启用）提交前跑 --check 拦漂移；断言表 tickets/12 AC1–4 + tickets/15 AC1–6；不进 ci.sh 四闸（安装位是仓外环境状态） | 已建（票 12；票 15 增强） |
+| `tools/ddd_check.py` | DDD 设计件确定性闸（票 51 建，第四期 DDD 线）：五查违规码 ddd-cross-agg-embed（跨聚合引用仅 ID 不内嵌对方属性）/ ddd-term-ref（聚合字段与事件载荷解析到本体词条 ID，悬空=红，复用 schema_check 解析族口径）/ ddd-invariant（不变量清单非空且三元组齐备：触发操作→期望失败→指向聚合方法）/ ddd-mapping（聚合↔表映射表列可解析）/ ddd-naming（重名与 ID 前缀合规）；一次收集全部错误批量返回（failFast=false）；粒度/完备性出「待人审清单」软节不硬闸；退出码 0/1/2 同族；格式真源 design/ddd/README.md，断言面 fixtures/ddd-modeler/（票 51 同票建） | 票 51 建（planned-script：已登记未落盘，边界闸警告不红） |

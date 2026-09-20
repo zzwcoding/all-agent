@@ -48,6 +48,7 @@
       <tr><td>AGT</td><td>智慧大脑：问答/问数/问智 → 统筹指挥</td><td>本体运行期消费方</td><td>POOL</td></tr>
       <tr><td>POOL</td><td>提案池：监督/自检/交互三源信号归一（proposal-pool skill：归一标准提案+确定性冲突预检，自动化止于提案）</td><td>一次反馈=一处根因=一个 MR</td><td>MRG</td></tr>
       <tr><td>MRG</td><td>人工审批 MR</td><td>语义变更必须人拍板</td><td>CORE</td></tr>
+      <tr><td>DDD</td><td>ddd-modeler：本体模型→战术设计（聚合卡/领域事件表/聚合↔表映射/仓储边界四类 YAML 设计件，草案走 MR；选配路由=交易型/状态机型项目，无词条不建模）</td><td>本体管「说法」DDD 管「运转」；聚合卡=自带边界的 AI 上下文包</td><td>BE1</td></tr>
       <tr><td>BE1–5</td><td>应用包/Skill/MCP（已建：semantic_mcp_server stdio 服务器+exports/mcp/capability-manifest.json，消费文档 docs/mcp-server.md）/分析报告/变更影响分析</td><td>一份本体多处消费</td><td>企业系统/平台</td></tr>
       <tr><td>SDF2</td><td>sdd-flow2：建造与改造全部件</td><td>本体管不了的工程层由它接管</td><td>FE/BE/GATE/SVC</td></tr>
       <tr><td>META</td><td>元循环：跨层探针+出厂集回归+信号路由表</td><td>大架构自身的体检与进化</td><td>SDF2 / CORE / MRG</td></tr>
@@ -81,6 +82,7 @@
       AGT["智慧大脑 Agent 群——问答/问数/问智,逐步放权到指挥"]
       POOL["提案池——监督/自检/交互三源信号归一（proposal-pool:标准化提案+冲突预检,自动化止于提案）"]
       MRG["MR 人审闸——语义变更人工拍板 🛡️ 防 Agent 自改语义"]
+      DDD["ddd-modeler——本体模型→战术设计:聚合卡/事件表/表映射/仓储边界（选配:交易型·状态机型项目,草案走MR）"]
 
       SDF2["sdd-flow2 建造循环——需求→约定→开发→检查,造全部件"]
       META["元循环体检——跨层探针+出厂集回归+信号路由表"]
@@ -98,6 +100,8 @@
       POOL -.->|"只提 MR,不自动合"| MRG
       MRG -.->|"人审通过回合"| CORE
       CORE -->|"读取唯一真源"| OUT
+      CORE -->|"本体模型就位,无词条不建模（选配路由）"| DDD
+      DDD -->|"聚合卡等设计件,草案走MR（选配增强输入）"| BE1
       SDF2 -.->|"循环二:建造与改造"| IN
       SDF2 -.->|"循环二:建造与改造"| OUT
       SDF2 -.->|"循环二:建造与改造"| GATE
