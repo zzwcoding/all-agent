@@ -16,6 +16,7 @@
 - **出厂集（factory corpus）**：每个生成器/适配器的固定输入→确定性断言集，平台改版的回归闸（双门槛：全过 + 负样本不误报）。
 - **信号路由表（signal routing）**：元循环的核心纪律——业务错→本体 MR；工程错→sdd-flow 票；元模型错→框架版本演进（CHANGELOG+版本号+迁移票伴随实现票）。
 - **正本/安装位**：skill 的双位置——正本 `skills/<名>/`（仓内，受边界闸+归档闸治理）、安装位 `~/.agents/skills/<名>/`（Kimi Code 路由用）；`install_skills sync/--check` 维护两处一致，pre-commit 钩子（core.hooksPath 启用）拦提交时漂移。
+- **人审闸（human review gate）**：生成物发布前的人确认承载机制（PRD 决策 2，ADR 0003）——审记旁档（`exports/reviews/`，逐版本追加不覆盖）+ 哈希锚定（`review_gate.py verify` 现算 sha256，本体再生即已审自动失效回落待人审，零宽限）+ 三档分级（manifest 免审 / skillpkg 首审+变更审 / devkit 全审，判档规则见 design-human-review-gate §3.3）；打回强制开单走信号路由表；published 态只预留字段不实现。
 
 ## 三循环
 

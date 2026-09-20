@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "description": "信号路由表（票 29，PRD F14，CONTEXT.md「信号路由表」词条的机读真源）：三类信号各走各的修复道，本表是唯一机读登记处；人读说明见 policies/README.md。维护纪律：改路由 = 改本 JSON + 每条实例指针先核实（commit 在 git log、PROP 文件在 docs/proposals/）再写入 + 跑 python3 tools/meta_probe.py ontology/bohai（第 10 项硬闸自检，红即回改）。实例指针字段：desc=一句话；ticket=票号；commit=短哈希（probe 逐个 git log 核实）；props=涉及的提案 ID（probe 逐个查 docs/proposals/ 文件在池）。每类路由 instances 至少 2 条真实指针。 L5 红三分道（票 44 接线，design-l5-scoring §4.4）：L5 评分红灯只报告不修复、只路由不自动改——语义内容错→业务错道 / 话术工序错→工程错道 / rubric 错→元模型错道，分道登记在各路由的 l5RedDispatch 字段（探针不核该字段）；其实例指针在 L5 首跑（批收官软闸/发布前硬闸）后回填真实 commit/props，占位期如实标注、不虚构指针（虚构即第 10 项硬闸红）。",
+  "description": "信号路由表（票 29，PRD F14，CONTEXT.md「信号路由表」词条的机读真源）：三类信号各走各的修复道，本表是唯一机读登记处；人读说明见 policies/README.md。维护纪律：改路由 = 改本 JSON + 每条实例指针先核实（commit 在 git log、PROP 文件在 docs/proposals/）再写入 + 跑 python3 tools/meta_probe.py ontology/bohai（第 10 项硬闸自检，红即回改）。实例指针字段：desc=一句话；ticket=票号；commit=短哈希（probe 逐个 git log 核实）；props=涉及的提案 ID（probe 逐个查 docs/proposals/ 文件在池）。每类路由 instances 至少 2 条真实指针。 L5 红三分道（票 44 接线，design-l5-scoring §4.4）：L5 评分红灯只报告不修复、只路由不自动改——语义内容错→业务错道 / 话术工序错→工程错道 / rubric 错→元模型错道，分道登记在各路由的 l5RedDispatch 字段（探针不核该字段）；其实例指针在 L5 首跑（批收官软闸/发布前硬闸）后回填真实 commit/props，占位期如实标注、不虚构指针（虚构即第 10 项硬闸红）。 人审打回分道（票 47 接线，design-human-review-gate §4 #3 + §8 裁决点 6，ADR 0003）：人审闸审记 verdict=打回 强制当场开单、不留审记意见悬着——本体内容错→业务错道（提案池）/ 装配·生成器错→工程错道（票），分道登记在业务错/工程错路由的 reviewRejectDispatch 字段（探针不核该字段）；人审闸信号源实例=票 46 首审审记（exports/reviews/devkit-review.json，commit 6f85807），首个真实打回落地后按维护纪律回填实例。",
   "routes": [
     {
       "kind": "业务错",
@@ -11,7 +11,17 @@
         "source": "docs/design-l5-scoring.md §4.4（票 44 接线）",
         "instancePlaceholder": "占位——L5 首跑（批收官软闸/发布前硬闸）后回填真实实例指针（留痕 docs/meta/l5-评分-<日期>.json 的路由去向）；首跑前不虚构 commit/props"
       },
+      "reviewRejectDispatch": {
+        "signal": "人审打回·本体内容错（审记 verdict=打回 且打回因=本体内容错：人审闸审出派生物转译保真度问题根因在本体语义有缺有错）",
+        "source": "docs/design-human-review-gate.md §4 #3 + §8 裁决点 6（票 47 接线）",
+        "instance": "票 46 首审审记 exports/reviews/devkit-review.json（commit 6f85807）为人审闸信号源首基线；首个真实打回按本道当场起草提案"
+      },
       "instances": [
+        {
+          "desc": "人审闸信号源首审基线（票 46 首审审记 exports/reviews/devkit-review.json verdict=已审；首个真实打回·本体内容错将沿本道当场起草提案）",
+          "ticket": "46",
+          "commit": "6f85807"
+        },
         {
           "desc": "裁决队列实弹落池（票 19；31 提案=5 闭环回填+26 开放待 Owner 裁决）",
           "ticket": "19",
@@ -35,7 +45,17 @@
         "source": "docs/design-l5-scoring.md §4.4（票 44 接线）",
         "instancePlaceholder": "占位——L5 首跑（批收官软闸/发布前硬闸）后回填真实实例指针（留痕 docs/meta/l5-评分-<日期>.json 的路由去向）；首跑前不虚构 commit/props"
       },
+      "reviewRejectDispatch": {
+        "signal": "人审打回·装配/生成器错（审记 verdict=打回 且打回因=装配或生成器缺陷：本体没错，生成器装配错位/漏装）",
+        "source": "docs/design-human-review-gate.md §4 #3 + §8 裁决点 6（票 47 接线）",
+        "instance": "票 46 首审审记 exports/reviews/devkit-review.json（commit 6f85807）为人审闸信号源首基线；首个真实打回按本道当场开票"
+      },
       "instances": [
+        {
+          "desc": "人审闸信号源首审基线（票 46 首审审记 exports/reviews/devkit-review.json verdict=已审；首个真实打回·装配/生成器错将沿本道当场开票）",
+          "ticket": "46",
+          "commit": "6f85807"
+        },
         {
           "desc": "图索引构建器（纯内存图+闭包/影响链 CLI）",
           "ticket": "04",
