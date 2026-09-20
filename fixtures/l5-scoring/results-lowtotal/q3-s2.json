@@ -8,7 +8,7 @@
     },
     {
       "id": "accuracy",
-      "score": 0,
+      "score": 1,
       "reason": "按锚定例对锚打分（票 42 mock 注入，零模型调用）。"
     }
   ],

@@ -3,7 +3,7 @@
   "dimensions": [
     {
       "id": "coverage",
-      "score": 1,
+      "score": 4,
       "reason": "按锚定例对锚打分（票 42 mock 注入，零模型调用）。"
     },
     {

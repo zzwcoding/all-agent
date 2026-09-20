@@ -18,13 +18,15 @@ rubric（YAML）三红（机判，AC1）：某维缺 anchors 或 anchors 缺 5/3
   定位），不进聚合。逐问采样数必须恰为 3（design §4.3：3 次独立子 agent 派发），
   多/少/缺 = exit 2。
 
-聚合与判定（先算术后结论，AC3/AC4）：
+聚合与判定（先算术后结论，AC3/AC4；票 49 归一化裁决）：
   逐问逐维 3 采样取中位 → 分差 max-min ≥2 标「不稳定」（只标记，仲裁升级票 44
-  接线，不判死）→ 任一采样 disqualifier_triggered=true 的问按 0 分计且一票否决
-  → 总分 = 该问各维 score×weight 加权和（不常态化，L0 定稿：weight 只要求正整数）
-  → 通过线三条件同时满足才绿：① 每问总分 ≥3 ② 问总分集的中位 ≥4.0
-  ③ 无 disqualifier 触发问。注意：门槛数值作用在加权和量纲上，含义随 rubric
-  权重集取值变化——权重集是 rubric 内容 Owner 的定稿责任（specs 注意事项节）。
+  接线，不判死）→ 归零判定：任一采样 disqualifier_triggered=true 的问一票否决；
+  任一维度中位 0 分的问同样归零（票 49：任一维度 0 分=该问 0 分，按中位口径）
+  → 归一总分（normalized）= Σ(维中位×weight) / Σweight，归零问按 0 计——门槛
+  回到 0–5 量纲（design §4.2 原语义，Owner 裁决票 49），权重集调整不再连动门槛；
+  原始加和（rawTotal）= Σ(维中位×weight) 仅作报告追溯列 → 通过线三条件同时满足
+  才绿：① 每问归一分 ≥3 ② 归一分集的中位 ≥4.0 ③ 无 0 分问。报告逐问双列：
+  归一分（判定用）+ 原始加和（可追溯）。
 
 报告：--out <路径>.md 同时落同名 .json 机读伴生；同名已存在加 -2/-3 序号，
   不覆盖旧留痕（照 meta_probe 体检留痕惯例，AGENTS.md 续跑协议第 9 条同款）。
@@ -56,8 +58,8 @@ SCORE_MIN, SCORE_MAX = 0, 5
 SAMPLES_PER_QUESTION = 3          # design §4.3：每问 3 次独立子 agent 派发
 REQUIRED_ANCHOR_TIERS = (5, 3, 1)  # 锚定例三档，缺一即红
 UNSTABLE_SPREAD = 2                # 分差 ≥2 标不稳定
-PASS_QUESTION_TOTAL_MIN = 3        # 通过线条件①
-PASS_SET_MEDIAN_MIN = 4.0          # 通过线条件②
+PASS_QUESTION_NORMALIZED_MIN = 3   # 通过线条件①（归一分，票 49）
+PASS_SET_MEDIAN_MIN = 4.0          # 通过线条件②（归一分集中位，票 49）
 EXIT_OK, EXIT_RED, EXIT_CONFIG = 0, 1, 2
 
 # 红灯三分道（design §4.4；本脚本只报告不修复，分道人工裁决）
@@ -292,12 +294,19 @@ def validate_results(rubrics: dict, files: list[Path]) -> dict:
     return grouped
 
 
-# ---------- 聚合与判定（AC3/AC4） ----------
+# ---------- 聚合与判定（AC3/AC4；票 49 归一化） ----------
+
+def _fmt(value) -> str:
+    """归一分显示格式：round 2 位（4.333…→4.33 / 4.4→4.4 / 0.0→0.0），确定性好。"""
+    return f"{round(float(value), 2)}"
+
 
 def aggregate_question(rubric: dict, qid: str, samples: list) -> dict:
-    """逐问聚合：逐维 3 采样中位 + 分差 → 加权和总分 → disqualifier 一票否决。
+    """逐问聚合：逐维 3 采样中位 + 分差 → 归一总分 + 原始加和双列 → 归零判定。
 
     samples = 该问的评分结果 dict 列表（协议 JSON 解析产物，非文件包装）。
+    归零（票 49）：disqualifier 触发（任一采样 true，一票否决）或任一维度中位
+    0 分 → 该问归一分与原始加和都按 0 计，zero_reasons 记归零缘由（报告展示）。
     """
     dims = []
     for d in rubric["dimensions"]:
@@ -312,32 +321,51 @@ def aggregate_question(rubric: dict, qid: str, samples: list) -> dict:
     disq_votes = sum(1 for s in samples if s["disqualifier_triggered"])
     disqualified = disq_votes > 0
     unstable_dims = [d for d in dims if d["spread"] >= UNSTABLE_SPREAD]
-    total = 0 if disqualified else sum(d["median"] * d["weight"] for d in dims)
+    zero_reasons: list[str] = []
+    if disqualified:
+        zero_reasons.append(f"一票否决（disqualifier_triggered："
+                            f"{SAMPLES_PER_QUESTION} 采样中 {disq_votes} 票为 true，"
+                            "按 0 分计）")
+    zero_dims = [d for d in dims if d["median"] == 0]
+    for d in zero_dims:
+        zero_reasons.append(f"维度 0 分按 0 分计（{d['id']} 三采样中位 0）")
+    zeroed = disqualified or bool(zero_dims)
+    raw = sum(d["median"] * d["weight"] for d in dims)
+    weight_sum = sum(d["weight"] for d in dims)
+    normalized = 0.0 if zeroed else raw / weight_sum
     rubric_path = rubric.get("path")
     return {"question_id": qid, "rubric_file": rubric_path.name if rubric_path else "",
-            "total": total, "stable": not unstable_dims,
+            "normalized": normalized, "rawTotal": 0 if zeroed else raw,
+            "stable": not unstable_dims,
             "disqualified": disqualified, "disq_votes": disq_votes,
+            "zeroed": zeroed, "zero_reasons": zero_reasons,
             "unstable_dims": unstable_dims, "dimensions": dims}
 
 
 def set_median(totals: list):
-    """问总分集的中位（奇数取中、偶数取两中均值，statistics 同款）。"""
+    """归一分集的中位（奇数取中、偶数取两中均值，statistics 同款）。"""
     return statistics.median(totals)
 
 
 def evaluate(questions: list) -> "tuple[str, dict]":
-    """通过线三条件（design §4.2）同时满足才 PASS，返回 (verdict, conditions)。"""
-    totals = [q["total"] for q in questions]
-    below = [{"question_id": q["question_id"], "total": q["total"]}
-             for q in questions if q["total"] < PASS_QUESTION_TOTAL_MIN]
-    median = set_median(totals)
-    triggered = [q["question_id"] for q in questions if q["disqualified"]]
+    """通过线三条件（design §4.2 原语义，票 49 归一化）同时满足才 PASS。
+
+    返回 (verdict, conditions)：① 每问归一分 ≥3；② 归一分集的中位 ≥4.0；
+    ③ 无 0 分问（disqualifier 触发或维度 0 分 → 归一 0）。
+    """
+    below = [{"question_id": q["question_id"], "normalized": q["normalized"],
+              "rawTotal": q["rawTotal"]}
+             for q in questions
+             if q["normalized"] < PASS_QUESTION_NORMALIZED_MIN]
+    median = set_median([q["normalized"] for q in questions])
+    zeroed = [{"question_id": q["question_id"], "reasons": q["zero_reasons"]}
+              for q in questions if q["zeroed"]]
     conditions = {
-        "perQuestionTotal": {"pass": not below, "below": below,
-                             "threshold": PASS_QUESTION_TOTAL_MIN},
+        "perQuestionNormalized": {"pass": not below, "below": below,
+                                  "threshold": PASS_QUESTION_NORMALIZED_MIN},
         "setMedian": {"pass": median >= PASS_SET_MEDIAN_MIN, "value": median,
                       "threshold": PASS_SET_MEDIAN_MIN},
-        "noDisqualifier": {"pass": not triggered, "triggered": triggered},
+        "noZeroScore": {"pass": not zeroed, "zeroed": zeroed},
     }
     verdict = "PASS" if all(c["pass"] for c in conditions.values()) else "FAIL"
     return verdict, conditions
@@ -397,47 +425,51 @@ def render_md(questions: list, verdict: str, conditions: dict, exit_code: int,
         "",
         f"**结论: {verdict}**（退出码 {exit_code}）",
     ]
-    c1, c2, c3 = (conditions["perQuestionTotal"], conditions["setMedian"],
-                  conditions["noDisqualifier"])
+    c1, c2, c3 = (conditions["perQuestionNormalized"], conditions["setMedian"],
+                  conditions["noZeroScore"])
     if c1["pass"]:
-        lowest = min(questions, key=lambda q: q["total"])
-        lines.append(f"- 条件① 单问总分 ≥{c1['threshold']}: PASS"
-                     f"（最低 {lowest['question_id']} = {lowest['total']}）")
+        lowest = min(questions, key=lambda q: q["normalized"])
+        lines.append(f"- 条件① 单问归一分 ≥{c1['threshold']}: PASS"
+                     f"（最低 {lowest['question_id']} = {_fmt(lowest['normalized'])}）")
     else:
-        detail = "、".join(f"{b['question_id']} 总分 {b['total']} < {c1['threshold']}"
+        detail = "、".join(f"{b['question_id']} 归一 {_fmt(b['normalized'])}"
+                          f"（原始加和 {b['rawTotal']}）< {c1['threshold']}"
                           for b in c1["below"])
-        lines.append(f"- 条件① 单问总分 ≥{c1['threshold']}: **FAIL** —— {detail}")
+        lines.append(f"- 条件① 单问归一分 ≥{c1['threshold']}: **FAIL** —— {detail}")
     mark2 = "PASS" if c2["pass"] else "**FAIL**"
     op2 = "≥" if c2["pass"] else "<"
-    totals_list = [q["total"] for q in questions]
+    normalized_list = [_fmt(q["normalized"]) for q in questions]
     lines.append(f"- 条件② 全集中位 ≥{c2['threshold']}: {mark2}"
-                 f"（全集中位 {c2['value']} {op2} {c2['threshold']}，"
-                 f"问总分集 {totals_list}）" if c2["pass"] else
+                 f"（全集中位 {_fmt(c2['value'])} {op2} {c2['threshold']}，"
+                 f"归一分集 [{', '.join(normalized_list)}]）" if c2["pass"] else
                  f"- 条件② 全集中位 ≥{c2['threshold']}: {mark2} —— 全集中位 "
-                 f"{c2['value']} {op2} {c2['threshold']}"
-                 f"（问总分集 {totals_list}）")
+                 f"{_fmt(c2['value'])} {op2} {c2['threshold']}"
+                 f"（归一分集 [{', '.join(normalized_list)}]）")
     if c3["pass"]:
-        lines.append(f"- 条件③ 无 disqualifier: PASS（0 问触发）")
+        lines.append(f"- 条件③ 无 0 分问: PASS（0 问触发）")
     else:
-        lines.append(f"- 条件③ 无 disqualifier: **FAIL** —— "
-                     f"{len(c3['triggered'])} 问触发（{'、'.join(c3['triggered'])}）")
+        detail3 = "；".join(f"{z['question_id']}：{'；'.join(z['reasons'])}"
+                           for z in c3["zeroed"])
+        lines.append(f"- 条件③ 无 0 分问: **FAIL** —— "
+                     f"{len(c3['zeroed'])} 问触发（{detail3}）")
     lines.append("")
 
     lines += ["## 逐问明细", ""]
     for q in questions:
         lines.append(f"### {q['question_id']}")
         lines.append(f"- rubric: {q['rubric_file']}")
-        if q["disqualified"]:
-            lines.append(f"- 判定: FAIL ｜ 总分: {q['total']} ｜ 一票否决"
-                         f"（disqualifier_triggered：{SAMPLES_PER_QUESTION} 采样中 "
-                         f"{q['disq_votes']} 票为 true，按 0 分计）")
+        if q["zeroed"]:
+            lines.append(f"- 判定: FAIL ｜ 归一分: {_fmt(q['normalized'])} ｜ "
+                         f"原始加和: {q['rawTotal']} ｜ {'；'.join(q['zero_reasons'])}")
         elif not q["stable"]:
             detail = "；".join(f"{d['id']} 采样 {d['samples']}（分差 {d['spread']}）"
                               for d in q["unstable_dims"])
-            lines.append(f"- 判定: PASS ｜ 总分: {q['total']} ｜ 不稳定（分差 "
+            lines.append(f"- 判定: PASS ｜ 归一分: {_fmt(q['normalized'])} ｜ "
+                         f"原始加和: {q['rawTotal']} ｜ 不稳定（分差 "
                          f"≥{UNSTABLE_SPREAD}: {detail}）")
         else:
-            lines.append(f"- 判定: PASS ｜ 总分: {q['total']} ｜ 稳定")
+            lines.append(f"- 判定: PASS ｜ 归一分: {_fmt(q['normalized'])} ｜ "
+                         f"原始加和: {q['rawTotal']} ｜ 稳定")
         lines += ["", "| 维度 | 权重 | 三采样 | 中位 | 分差 |", "|---|---|---|---|---|"]
         for d in q["dimensions"]:
             lines.append(f"| {d['id']} | {d['weight']} | {d['samples']} "
@@ -458,7 +490,7 @@ def render_md(questions: list, verdict: str, conditions: dict, exit_code: int,
     lines.append("")
 
     red_qs = sorted({b["question_id"] for b in c1["below"]}
-                    | set(c3["triggered"]))
+                    | {z["question_id"] for z in c3["zeroed"]})
     lines += ["## 红灯路由去向（只报告不修复；分道人工裁决，"
               "路由表: policies/signal-routing.json）", ""]
     for title, mech in ROUTING_CHANNELS:

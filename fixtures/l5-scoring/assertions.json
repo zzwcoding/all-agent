@@ -1,6 +1,6 @@
 {
   "skill": "l5-scoring（L5 评分器确定性骨架，票 42）",
-  "description": "出厂集：rubric 样例 3 份（rubrics/，合法：每维 5/3/1 三档锚定例+正整数权重+可达 reference+scoring_prompt 提示词载体字段）+ 参照答案占位 3 份（expected/，rubric reference 的相对解析目标，真参照答案归票 43）+ 合法 mock 评分 JSON 四态（results-green 全绿 exit 0 / results-unstable 分差≥2 标不稳定不判死 exit 0 / results-disq 一票否决 exit 1 / results-lowtotal 单问总分 1<3 exit 1 / results-lowmedian 全集中位 3<4.0 exit 1，后两者各只踩一条通过线条件以证三条件逐一可红可绿）+ 负变体（negative-rubrics/ 三红×各一：整缺 anchors/weight=0/reference 指向 ghost-answer.md；results-dirty-* 三形态：漏维/score=6 越界/混入非 JSON 文本）。l5_score.py 零模型调用——mock 注入=预置评分结果 JSON 文件（裁决①）。AC 真源=tickets/42-L5评分器骨架.md AC 表；聚合口径：逐问恰 3 采样逐维取中位、总分=各维 score×weight 加权和（不常态化，L0 定稿）、问总分集取中位对照 4.0、disqualifier 触发问按 0 分计且一票否决。AC3a/AC4c 用 python -c 探针（票 23/25 手法先例）跑 --json 机读面断言中位数与双落盘；探针先清 out/ 保证幂等不触后缀改道。 票 48 P2-B：报告零时间戳零机器路径（generatedAt/rubricsDir/resultsPaths 字段删除，输入身份=输入指纹 sha256 前 16 位）——out/green.* 成为确定性工件，每轮 CI 重 gen 字节一致，不再漂移工作树；--keep-results <目录> 缺省不落采样副本（首跑采样留仓 docs/meta/ 用）。",
+  "description": "出厂集：rubric 样例 3 份（rubrics/，合法：每维 5/3/1 三档锚定例+正整数权重+可达 reference+scoring_prompt 提示词载体字段）+ 参照答案占位 3 份（expected/，rubric reference 的相对解析目标，真参照答案归票 43）+ 合法 mock 评分 JSON 六态（results-green 全绿 exit 0 / results-unstable 分差≥2 标不稳定不判死 exit 0 / results-disq 一票否决 exit 1 / results-lowtotal 单问归一 1.0<3 exit 1 / results-lowmedian 归一分集中位 3.0<4.0 exit 1，后两者各只踩一条通过线条件以证三条件逐一可红可绿 / results-allones 全 1 分域逐维全 1→归一 1.0 必红 exit 1，票 49 P2-A 反向回归 mock 面）+ 负变体（negative-rubrics/ 三红×各一：整缺 anchors/weight=0/reference 指向 ghost-answer.md；results-dirty-* 三形态：漏维/score=6 越界/混入非 JSON 文本）。l5_score.py 零模型调用——mock 注入=预置评分结果 JSON 文件（裁决①）。AC 真源=tickets/49-L5门槛归一化.md AC 表（票 49 起，原 tickets/42 AC 表被归一化裁决演进）；聚合口径（票 49 归一化，Owner 裁决）：逐问恰 3 采样逐维取中位、归一分=Σ(维中位×weight)/Σweight（0–5 量纲，权重集调整不再连动门槛）、disqualifier 触发问或任一维度中位 0 分的问按 0 分计（一票否决/维度 0 分归零，zero_reasons 记缘由）、归一分集取中位对照 4.0；报告逐问双列=归一分（判定用）+原始加和（可追溯），--json questions[].normalized/rawTotal 同步。票 49 mock 对照（重造记 lessons/50）：lowtotal Q3 旧样本 acc=0 在归一语义下误触维度归零（量纲失真）→ 重造为三采样 (1,1) 归一 1.0；lowmedian Q1/Q2 旧加和 3/3 换算归一 0.6/1.0 连带踩条件①（只踩②语义失真）→ 重造为 Q1 (3,3,3)=3.0、Q2 (4,1)=3.0。AC3a/AC4c 用 python -c 探针（票 23/25 手法先例）跑 --json 机读面断言中位数与双落盘；探针先清 out/ 保证幂等不触后缀改道。 票 48 P2-B：报告零时间戳零机器路径（generatedAt/rubricsDir/resultsPaths 字段删除，输入身份=输入指纹 sha256 前 16 位）——out/green.* 成为确定性工件，每轮 CI 重 gen 字节一致，不再漂移工作树；--keep-results <目录> 缺省不落采样副本（首跑采样留仓 docs/meta/ 用）。",
   "assertions": [
     {
       "ac": "输入（rubric 样例三份在档）",
@@ -18,29 +18,34 @@
       "path": "rubrics/q3-rubric.yaml"
     },
     {
-      "ac": "输入（mock 四态结果目录在档，各含 9 份采样）",
+      "ac": "输入（mock 评分结果六态在档，各含 9 份采样）",
       "type": "file-exists",
       "path": "results-green/q1-s1.json"
     },
     {
-      "ac": "输入（mock 四态结果目录在档，各含 9 份采样）",
+      "ac": "输入（mock 评分结果六态在档，各含 9 份采样）",
       "type": "file-exists",
       "path": "results-unstable/q1-s2.json"
     },
     {
-      "ac": "输入（mock 四态结果目录在档，各含 9 份采样）",
+      "ac": "输入（mock 评分结果六态在档，各含 9 份采样）",
       "type": "file-exists",
       "path": "results-disq/q1-s2.json"
     },
     {
-      "ac": "输入（mock 四态结果目录在档，各含 9 份采样）",
+      "ac": "输入（mock 评分结果六态在档，各含 9 份采样）",
       "type": "file-exists",
       "path": "results-lowtotal/q3-s3.json"
     },
     {
-      "ac": "输入（mock 四态结果目录在档，各含 9 份采样）",
+      "ac": "输入（mock 评分结果六态在档，各含 9 份采样）",
       "type": "file-exists",
       "path": "results-lowmedian/q1-s3.json"
+    },
+    {
+      "ac": "输入（mock 评分结果六态在档，各含 9 份采样；票 49 P2-A 全 1 分域 mock）",
+      "type": "file-exists",
+      "path": "results-allones/q2-s1.json"
     },
     {
       "ac": "AC1a（rubric 整缺某维 anchors → 红 rubric 非法）",
@@ -133,7 +138,7 @@
       ]
     },
     {
-      "ac": "AC3c（mock 含 disqualifier_triggered=true → 该问按 0 分计、一票否决、整体红 exit 1）",
+      "ac": "AC3c（mock 含 disqualifier_triggered=true → 该问归一 0 分、一票否决、整体红 exit 1；断言措辞随票 49 报告双列演进：总分: 0 → 归一分: 0.0）",
       "type": "cmd-fails",
       "cmd": "python3 tools/l5_score.py --rubrics {fixture_dir}/rubrics --results {fixture_dir}/results-disq",
       "outputContains": [
@@ -141,21 +146,21 @@
         "一票否决",
         "disqualifier_triggered",
         "Q1",
-        "总分: 0"
+        "归一分: 0.0"
       ]
     },
     {
-      "ac": "AC4a（单问总分 <3 → exit 1；本变体只踩条件①：全集中位 12≥4.0、无 disqualifier）",
+      "ac": "AC4a（单问归一分 <3 → exit 1；本变体只踩条件①：归一分集 [4.4, 4.0, 1.0] 中位 4.0≥4.0、无 0 分问。票 49 重造：旧样本 Q3 acc=0 在归一语义下误触维度归零，改三采样 (1,1) → 归一 1.0（原始加和 3））",
       "type": "cmd-fails",
       "cmd": "python3 tools/l5_score.py --rubrics {fixture_dir}/rubrics --results {fixture_dir}/results-lowtotal",
       "outputContains": [
         "结论: FAIL",
         "条件①",
-        "Q3 总分 1"
+        "Q3 归一 1.0"
       ]
     },
     {
-      "ac": "AC4b（全集中位 <4.0 → exit 1；本变体只踩条件②：单问总分 [3,3,13] 均≥3、无 disqualifier）",
+      "ac": "AC4b（归一分集中位 <4.0 → exit 1；本变体只踩条件②：三问归一 [3.0, 3.0, 4.33] 均≥3、无 0 分问。票 49 重造：旧加和量纲样本 [3,3,13] 换算归一 0.6/1.0 会连带踩条件①，改为 Q1 (3,3,3)=3.0、Q2 (4,1)=3.0、Q3 (5,4)=4.33）",
       "type": "cmd-fails",
       "cmd": "python3 tools/l5_score.py --rubrics {fixture_dir}/rubrics --results {fixture_dir}/results-lowmedian",
       "outputContains": [
@@ -163,6 +168,16 @@
         "条件②",
         "全集中位 3",
         "4.0"
+      ]
+    },
+    {
+      "ac": "AC2-P2A（全 1 分域反向回归，票 49：三问逐维全 1 → 归一 1.0 <3 → verdict 红 exit 1，门槛失配防再犯；12 问形态由单测 NormalizationTicket49 钉死）",
+      "type": "cmd-fails",
+      "cmd": "python3 tools/l5_score.py --rubrics {fixture_dir}/rubrics --results {fixture_dir}/results-allones",
+      "outputContains": [
+        "结论: FAIL",
+        "条件①",
+        "归一 1.0"
       ]
     },
     {

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""l5_score.py 的单测（票 42：L5 评分器确定性骨架，脚本轨 TDD）。
+"""l5_score.py 的单测（票 42：L5 评分器确定性骨架，脚本轨 TDD；票 49 归一化演进）。
 
 覆盖面（票面 AC1–4 的单测层；出厂端到端面在 fixtures/l5-scoring/）：
   rubric 校验：合法装载 / 三红（缺锚定例·含缺单档·空串 / 权重非法·含 0/负/浮点/
@@ -9,7 +9,9 @@
     分数越界（6、-1、浮点、字符串、布尔）/ reason 空 / disqualifier 非布尔 /
     孤儿问 id / 缺采样 / 采样数≠3；
   聚合与判定：中位算术（[5,3,4]→4）/ 分差 ≥2 标不稳定 / disqualifier 一票否决
-    按 0 分计 / 总分=score×weight 加权和 / 问总分集中位 / 通过线三条件逐条单点红；
+    按 0 分计 / 归一总分=Σ(score×weight)/Σweight（票 49，权重 2/2/1 算术样例）/
+    原始加和双列 / 维度 0 分（中位口径）该问归零 / 归一分集中位 /
+    通过线三条件逐条单点红 / 全 1 分域 12 问 verdict 红（P2-A 反向回归钉死）；
   报告与 CLI：MD/JSON 渲染稳定标记 / --out 双落盘 / 同名 -2/-3 序号不覆盖 /
     退出码 0/1/2 契约 / 错误走 stderr；
   报告确定性与采样留仓（票 48）：同输入两次生成字节一致（零时间戳零机器路径，
@@ -325,11 +327,12 @@ class Aggregation(L5Base):
         self.assertEqual(d1["samples"], [5, 3, 4])
         self.assertEqual(d1["median"], 4)
 
-    def test_weighted_total_sum_of_medians(self):
+    def test_normalized_and_raw_total(self):
         q = self.agg([self.sample({"d1": s1, "d2": s2})
                       for s1, s2 in ((5, 4), (4, 5), (4, 4))])
-        # 中位 d1=4 d2=4 → 总分 = 4*2 + 4*1 = 12（加权和，不常态化，L0 定稿）
-        self.assertEqual(q["total"], 12)
+        # 中位 d1=4 d2=4 → 原始加和 = 4*2+4*1 = 12；归一分 = 12/3 = 4.0（票 49 归一化）
+        self.assertEqual(q["rawTotal"], 12)
+        self.assertAlmostEqual(q["normalized"], 4.0)
 
     def test_spread_two_marks_unstable(self):
         q = self.agg([self.sample({"d1": s, "d2": 4}) for s in (5, 3, 4)])
@@ -338,13 +341,15 @@ class Aggregation(L5Base):
         self.assertTrue(q2["stable"])
 
     def test_disqualifier_zeroes_question(self):
-        # AC3c：任一采样 disqualifier_triggered=true → 该问 0 分 + 一票否决
+        # AC3c：任一采样 disqualifier_triggered=true → 该问归一 0 分 + 一票否决
         samples = [self.sample({"d1": 5, "d2": 5}),
                    self.sample({"d1": 5, "d2": 5}, disq=True),
                    self.sample({"d1": 4, "d2": 4})]
         q = self.agg(samples)
         self.assertTrue(q["disqualified"])
-        self.assertEqual(q["total"], 0)
+        self.assertTrue(q["zeroed"])
+        self.assertAlmostEqual(q["normalized"], 0.0)
+        self.assertEqual(q["rawTotal"], 0)
         self.assertEqual(q["disq_votes"], 1)
 
     def test_set_median_odd_and_even(self):
@@ -352,45 +357,144 @@ class Aggregation(L5Base):
         self.assertEqual(l5.set_median([3, 5, 13, 21]), 9.0)
 
     def test_pass_all_three_conditions(self):
-        qs = [{"question_id": "Q1", "total": 22, "stable": True,
-               "disqualified": False, "dimensions": []},
-              {"question_id": "Q2", "total": 12, "stable": True,
-               "disqualified": False, "dimensions": []}]
+        base = {"stable": True, "disqualified": False, "zeroed": False,
+                "zero_reasons": [], "dimensions": []}
+        qs = [dict({"question_id": "Q1", "normalized": 4.4, "rawTotal": 22, **base}),
+              dict({"question_id": "Q2", "normalized": 4.0, "rawTotal": 12, **base})]
         verdict, conds = l5.evaluate(qs)
         self.assertEqual(verdict, "PASS")
         self.assertTrue(all(c["pass"] for c in conds.values()))
 
     def test_fail_each_condition_alone(self):
-        base = {"stable": True, "disqualified": False, "dimensions": []}
+        base = {"stable": True, "disqualified": False, "zeroed": False,
+                "zero_reasons": [], "dimensions": []}
 
-        def qs(*totals, **kw):
-            return [dict({"question_id": f"Q{i}", "total": t, **base, **kw})
-                    for i, t in enumerate(totals, 1)]
+        def qs(*normalized):
+            return [dict({"question_id": f"Q{i}", "normalized": n,
+                          "rawTotal": int(n * 3), **base})
+                    for i, n in enumerate(normalized, 1)]
 
-        # 条件①单点红：某问总分 <3，其余条件绿
-        v, c = l5.evaluate(qs(22, 12, 1))
+        # 条件①单点红：某问归一分 <3，其余条件绿（中位 (4.4+4.0+1.0)/3… 取三问中位 4.0）
+        v, c = l5.evaluate(qs(4.4, 1.0, 4.5))
         self.assertEqual(v, "FAIL")
-        self.assertFalse(c["perQuestionTotal"]["pass"])
+        self.assertFalse(c["perQuestionNormalized"]["pass"])
         self.assertTrue(c["setMedian"]["pass"])
-        self.assertTrue(c["noDisqualifier"]["pass"])
-        # 条件②单点红：中位 <4.0
-        v, c = l5.evaluate(qs(3, 3, 13))
+        self.assertTrue(c["noZeroScore"]["pass"])
+        # 条件②单点红：归一分集中位 <4.0（全部 ≥3、无归零问）
+        v, c = l5.evaluate(qs(3.5, 3.5, 4.4))
         self.assertEqual(v, "FAIL")
-        self.assertTrue(c["perQuestionTotal"]["pass"])
+        self.assertTrue(c["perQuestionNormalized"]["pass"])
         self.assertFalse(c["setMedian"]["pass"])
-        # 条件③红：disqualifier 触发（evaluate 层分道逻辑单测——真实聚合里
-        # 触发问已按 0 分计会连带条件①，故此处总分取 12 隔离条件③单点）
+        # 条件③红：0 分问（evaluate 层分道逻辑单测——真实聚合里归零问归一为 0 会连带
+        # 条件①，故此处 normalized 取 4.0 隔离条件③单点，与旧版同款手法）
         qs_list = [
-            {"question_id": "Q1", "total": 22, "stable": True,
-             "disqualified": False, "dimensions": []},
-            {"question_id": "Q2", "total": 12, "stable": True,
-             "disqualified": True, "dimensions": []},
+            dict({"question_id": "Q1", "normalized": 4.4, "rawTotal": 22, **base}),
+            dict({"question_id": "Q2", "normalized": 4.0, "rawTotal": 12,
+                  "stable": True, "disqualified": True, "zeroed": True,
+                  "zero_reasons": ["一票否决（disqualifier_triggered：3 采样中 1 票"
+                                   "为 true，按 0 分计）"], "dimensions": []}),
         ]
         v, c = l5.evaluate(qs_list)
         self.assertEqual(v, "FAIL")
-        self.assertTrue(c["perQuestionTotal"]["pass"])
+        self.assertTrue(c["perQuestionNormalized"]["pass"])
         self.assertTrue(c["setMedian"]["pass"])
-        self.assertFalse(c["noDisqualifier"]["pass"])
+        self.assertFalse(c["noZeroScore"]["pass"])
+        self.assertEqual(c["noZeroScore"]["zeroed"][0]["question_id"], "Q2")
+
+
+class NormalizationTicket49(L5Base):
+    """票 49 归一化门槛：问总分（归一）= Σ(score×weight)/Σweight → 0–5 量纲。
+
+    门槛回到 design-l5-scoring §4.2 原语义：单问归一 ≥3 且全集中位（归一分集
+    中位）≥4.0 且无 0 分问（disqualifier 触发或任一维度 0 分 → 该问归一 0 分）。
+    """
+
+    @staticmethod
+    def rubric(weights):
+        return {"question_id": "Q1",
+                "dimensions": [{"id": f"d{i}", "weight": w}
+                               for i, w in enumerate(weights, 1)]}
+
+    @staticmethod
+    def sample(scores, disq=False):
+        return {"question_id": "Q1",
+                "dimensions": [{"id": k, "score": v, "reason": "r"}
+                               for k, v in scores.items()],
+                "disqualifier_triggered": disq}
+
+    def agg(self, weights, samples):
+        return l5.aggregate_question(self.rubric(weights), "Q1", samples)
+
+    def test_all_fours_normalized_four(self):
+        # 票面算术样例：2/2/1 权重逐维 4 → (8+8+4)/5 = 20/5 = 4.0
+        q = self.agg((2, 2, 1),
+                     [self.sample({"d1": 4, "d2": 4, "d3": 4}) for _ in range(3)])
+        self.assertAlmostEqual(q["normalized"], 4.0)
+        self.assertEqual(q["rawTotal"], 20)
+        self.assertFalse(q["zeroed"])
+
+    def test_all_ones_normalized_one(self):
+        # 2/2/1 权重逐维 1 → 5/5 = 1.0（< 3 → 必红）
+        q = self.agg((2, 2, 1),
+                     [self.sample({"d1": 1, "d2": 1, "d3": 1}) for _ in range(3)])
+        self.assertAlmostEqual(q["normalized"], 1.0)
+        self.assertEqual(q["rawTotal"], 5)
+
+    def test_mixed_scores_normalized_three_point_four(self):
+        # 票面算术样例：2/2/1 权重逐维 5/3/1 → (10+6+1)/5 = 17/5 = 3.4
+        q = self.agg((2, 2, 1),
+                     [self.sample({"d1": 5, "d2": 3, "d3": 1}) for _ in range(3)])
+        self.assertAlmostEqual(q["normalized"], 3.4)
+        self.assertEqual(q["rawTotal"], 17)
+
+    def test_all_ones_domain_twelve_questions_red(self):
+        # P2-A 反向回归钉死：全 1 分域（12 问逐维全 1）→ 归一 1.0 < 3.0 → verdict 红
+        qs = []
+        for i in range(1, 13):
+            q = self.agg((2, 2, 1),
+                         [self.sample({"d1": 1, "d2": 1, "d3": 1}) for _ in range(3)])
+            q["question_id"] = f"Q{i}"
+            qs.append(q)
+        verdict, conds = l5.evaluate(qs)
+        self.assertEqual(verdict, "FAIL")
+        self.assertFalse(conds["perQuestionNormalized"]["pass"])
+        self.assertEqual(len(conds["perQuestionNormalized"]["below"]), 12)
+        self.assertAlmostEqual(conds["setMedian"]["value"], 1.0)
+
+    def test_dimension_median_zero_zeroes_question(self):
+        # 任一维度 0 分（三采样中位 0）= 该问归一 0 分——非 disqualifier 触发也归零
+        # （算术归一 3.2 本可过条件①，归零语义压过算术）
+        q = self.agg((2, 2, 1),
+                     [self.sample({"d1": 4, "d2": 4, "d3": s}) for s in (0, 0, 3)])
+        self.assertTrue(q["zeroed"])
+        self.assertFalse(q["disqualified"])
+        self.assertAlmostEqual(q["normalized"], 0.0)
+        self.assertEqual(q["rawTotal"], 0)
+        self.assertTrue(any("d3" in r for r in q["zero_reasons"]), q["zero_reasons"])
+
+    def test_zero_in_single_sample_median_nonzero_not_zeroed(self):
+        # 「维度 0 分」按中位口径：单采样 0 分但维中位非 0 → 不归零（specs 票 49）
+        # d3 采样 (0,3,4) 中位 3 → 加和 4*2+4*2+3*1 = 19 → 归一 19/5 = 3.8
+        q = self.agg((2, 2, 1),
+                     [self.sample({"d1": 4, "d2": 4, "d3": s}) for s in (0, 3, 4)])
+        self.assertFalse(q["zeroed"])
+        self.assertAlmostEqual(q["normalized"], 3.8)
+
+    def test_report_dual_column_and_json_normalized_field(self):
+        # 报告双列（归一分 + 原始加和，可追溯）+ --json 增 normalized/rawTotal 字段
+        for n in ("s1", "s2", "s3"):  # LEGAL_RUBRIC 权重 2/1：逐维 4 → 加和 12 → 归一 4.0
+            self.write_result(f"q1-{n}.json", legal_result())
+        rc, out, _ = run_main(["--rubrics", str(self.rubrics),
+                               "--results", str(self.root / "results"),
+                               "--out", str(self.root / "r.md")])
+        self.assertEqual(rc, 0)
+        self.assertIn("归一分: 4.0", out)
+        self.assertIn("原始加和: 12", out)
+        j = json.loads((self.root / "r.json").read_text(encoding="utf-8"))
+        q0 = j["questions"][0]
+        self.assertAlmostEqual(q0["normalized"], 4.0)
+        self.assertEqual(q0["rawTotal"], 12)
+        self.assertFalse(q0["zeroed"])
 
 
 class ReportAndCli(L5Base):
@@ -399,12 +503,13 @@ class ReportAndCli(L5Base):
         (self.rubrics / "q2.yaml").write_text(
             LEGAL_RUBRIC.replace("Q1", "Q2").replace("semantic_fidelity", "coverage")
             .replace("caliber_quality", "citation_fit"), encoding="utf-8")
-        scores = {"Q1": {"semantic_fidelity": 5, "caliber_quality": 4},
+        scores = {"Q1": {"semantic_fidelity": 5, "caliber_quality": 5},
                   "Q2": {"coverage": 4, "citation_fit": 4}}
         for q, sc in scores.items():
             for n in ("s1", "s2", "s3"):
                 self.write_result(f"{q.lower()}-{n}.json", legal_result(q, sc))
-        # 中位算术（LEGAL_RUBRIC 权重 sf=2/cq=1）：Q1 = 5*2+4*1 = 14，Q2 = 12
+        # 归一算术（LEGAL_RUBRIC 权重 sf=2/cq=1）：Q1 = (5*2+5*1)/3 = 5.0（加和 15），
+        # Q2 = (4*2+4*1)/3 = 4.0（加和 12）；归一分集 [5.0, 4.0] 中位 4.5 ≥4.0
         return scores
 
     def test_render_md_stable_markers(self):
@@ -412,8 +517,9 @@ class ReportAndCli(L5Base):
         rc, out, _ = run_main(["--rubrics", str(self.rubrics),
                                "--results", str(self.root / "results")])
         self.assertEqual(rc, 0)
-        for needle in ("结论: PASS", "条件①", "条件②", "条件③", "总分: 14",
-                       "红灯路由去向", "业务错道", "工程错道", "元模型错道"):
+        for needle in ("结论: PASS", "条件①", "条件②", "条件③", "归一分: 5.0",
+                       "原始加和: 15", "红灯路由去向", "业务错道", "工程错道",
+                       "元模型错道"):
             self.assertIn(needle, out)
 
     def test_cli_out_writes_md_and_json(self):
@@ -461,17 +567,18 @@ class ReportAndCli(L5Base):
 
     def test_exit_1_low_total(self):
         self.build_env()
-        # 覆写 Q1 三采样：中位 sf=0（×2）+ cq=0（×1）→ 总分 0 <3；Q2 照旧 12
-        # → 问总分集 [0, 12] 中位 6 ≥4.0、无 disqualifier，条件①单点红。
-        for n, sc in (("s1", {"semantic_fidelity": 0, "caliber_quality": 0}),
-                      ("s2", {"semantic_fidelity": 1, "caliber_quality": 0}),
-                      ("s3", {"semantic_fidelity": 0, "caliber_quality": 1})):
-            self.write_result(f"q1-{n}.json", legal_result("Q1", sc))
+        # 覆写 Q1 三采样：中位 sf=1（×2）+ cq=1（×1）→ 加和 3 → 归一 1.0 <3；
+        # Q2 照旧 4.0 → 归一分集 [1.0, 4.0] 中位 2.5 连带条件②红（两问形态下
+        # ①-only 不可达——①-only 形态由出厂集 AC4a 三问 mock 钉死），条件①必红。
+        for n in ("s1", "s2", "s3"):
+            self.write_result(f"q1-{n}.json",
+                              legal_result("Q1", {"semantic_fidelity": 1,
+                                                  "caliber_quality": 1}))
         rc, out, _ = run_main(["--rubrics", str(self.rubrics),
                                "--results", str(self.root / "results")])
         self.assertEqual(rc, 1)
         self.assertIn("结论: FAIL", out)
-        self.assertIn("Q1 总分 0", out)
+        self.assertIn("Q1 归一 1.0", out)
 
     def test_exit_2_rubrics_dir_missing(self):
         rc, out, err = run_main(["--rubrics", str(self.root / "nope"),
@@ -488,7 +595,7 @@ class DeterminismAndKeepResults(L5Base):
         (self.rubrics / "q2.yaml").write_text(
             LEGAL_RUBRIC.replace("Q1", "Q2").replace("semantic_fidelity", "coverage")
             .replace("caliber_quality", "citation_fit"), encoding="utf-8")
-        scores = {"Q1": {"semantic_fidelity": 5, "caliber_quality": 4},
+        scores = {"Q1": {"semantic_fidelity": 5, "caliber_quality": 5},
                   "Q2": {"coverage": 4, "citation_fit": 4}}
         for q, sc in scores.items():
             for n in ("s1", "s2", "s3"):
@@ -523,10 +630,11 @@ class DeterminismAndKeepResults(L5Base):
                      (self.root / "r.json").read_text(encoding="utf-8")):
             self.assertNotIn(str(self.root), text)  # 机器路径零泄漏
             self.assertNotIn("生成时间", text)
-        # 输入指纹随内容变：改一份评分内容 → 指纹变
+        # 输入指纹随内容变：改一份评分内容 → 指纹变（基线 Q1 采样为 (5,5)，
+        # 改写为 (4,5)——内容变即指纹变，中位数不变结论仍 PASS）
         fp1 = j["inputFingerprint"]
         self.write_result("q1-s1.json", legal_result(
-            "Q1", {"semantic_fidelity": 5, "caliber_quality": 5}))
+            "Q1", {"semantic_fidelity": 4, "caliber_quality": 5}))
         rc, _, _ = run_main(["--rubrics", str(self.rubrics),
                              "--results", str(self.root / "results"),
                              "--out", str(self.root / "r2.md")])
