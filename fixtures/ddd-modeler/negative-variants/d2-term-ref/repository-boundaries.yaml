@@ -1,0 +1,13 @@
+# 票 51 绿灯样本·仓储边界声明（形照 design/ddd/README.md §4；每聚合一个仓储）
+kind: repository-boundaries
+status: 草案
+domain: order
+repositories:
+  - repository: OrderRepository
+    aggregate: AGG-ORDER-001      # 每聚合一个仓储
+    returns: "仅本聚合（订单+订单项+值对象整体），不返回他聚合对象"
+    persistence: "整体存取：save/load 整个聚合，不暴露逐字段 UPDATE"
+  - repository: PaymentRepository
+    aggregate: AGG-ORDER-003
+    returns: "仅本聚合（支付整体），不返回他聚合对象"
+    persistence: "整体存取：save/load 整个聚合，不暴露逐字段 UPDATE"

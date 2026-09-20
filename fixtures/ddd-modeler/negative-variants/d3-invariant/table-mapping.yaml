@@ -1,0 +1,29 @@
+# 票 51 绿灯样本·聚合↔表映射（形照 design/ddd/README.md §3；列↔词条双向可解析）
+kind: table-mapping
+status: 草案
+domain: order
+mappings:
+  - aggregate: AGG-ORDER-001
+    tables:
+      - table: t_order
+        columns:
+          - column: order_no
+            term: GLS-ORDER-001    # 列↔词条，防映射腐烂
+          - column: created_at
+            term: GLS-ORDER-002
+      - table: t_order_item        # 聚合内多表=一个事务整体保存
+        columns:
+          - column: quantity
+            term: GLS-ORDER-003
+          - column: unit_price
+            term: GLS-ORDER-004
+    write_side: "仅订单模块代码库写；跨聚合不 JOIN"
+  - aggregate: AGG-ORDER-003
+    tables:
+      - table: t_payment
+        columns:
+          - column: amount
+            term: GLS-ORDER-006
+          - column: status
+            term: GLS-ORDER-007
+    write_side: "仅支付模块代码库写"

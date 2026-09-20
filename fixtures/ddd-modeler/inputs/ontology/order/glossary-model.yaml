@@ -1,0 +1,48 @@
+# 最小订单域 · GLS 术语模型（票 51 第八套出厂集本体输入）
+# 词条集合输入：GLS-ORDER-001..007，聚合卡属性/事件载荷/映射列 term 的解析目标。
+model_type: GLOSSARY
+version: "1.0.0"
+domain: order
+terms:
+  - id: GLS-ORDER-001
+    term: 订单编号
+    termType: 术语
+    definition: 订单唯一编号（票 51 出厂集合成词条）。
+    status: 有效
+    source: 合成·票 51 出厂集
+  - id: GLS-ORDER-002
+    term: 下单时间
+    termType: 术语
+    definition: 订单创建时间戳（票 51 出厂集合成词条）。
+    status: 有效
+    source: 合成·票 51 出厂集
+  - id: GLS-ORDER-003
+    term: 行数量
+    termType: 术语
+    definition: 订单项购买数量（票 51 出厂集合成词条）。
+    status: 有效
+    source: 合成·票 51 出厂集
+  - id: GLS-ORDER-004
+    term: 行单价
+    termType: 术语
+    definition: 订单项单价（票 51 出厂集合成词条）。
+    status: 有效
+    source: 合成·票 51 出厂集
+  - id: GLS-ORDER-005
+    term: 收货地址
+    termType: 术语
+    definition: 订单收货地址值对象（票 51 出厂集合成词条）。
+    status: 有效
+    source: 合成·票 51 出厂集
+  - id: GLS-ORDER-006
+    term: 支付金额
+    termType: 术语
+    definition: 支付单实付金额（票 51 出厂集合成词条）。
+    status: 有效
+    source: 合成·票 51 出厂集
+  - id: GLS-ORDER-007
+    term: 支付状态
+    termType: 术语
+    definition: 支付单状态（待支付/已支付/已退款；票 51 出厂集合成词条）。
+    status: 有效
+    source: 合成·票 51 出厂集

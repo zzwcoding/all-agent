@@ -1,0 +1,28 @@
+# 头注释：设计件=草案，业务裁决待 Owner 确认（design/ddd/README.md §0.7）
+# 票 51 绿灯样本·聚合卡（订单）——形照 design/ddd/README.md §1 最小合法样例，
+# 消费侧聚合取支付（任务口径中性订单域：订单/订单项/支付）
+kind: aggregate-card
+status: 草案                      # 唯一合法值 草案/已审，恰一处
+domain: order
+aggregate: AGG-ORDER-001          # 聚合根（订单）
+aggregate_root: true
+domain_vision: "订单与订单项必须同时成立、同时改，不出现中间态"
+properties:
+  - GLS-ORDER-001                 # 订单编号（引用即类型：词条 ID 即属性类型来源）
+  - GLS-ORDER-002                 # 下单时间
+entities:
+  - entity: AGG-ORDER-002         # 订单项（有身份：行号）
+    properties:
+      - GLS-ORDER-003             # 行数量
+      - GLS-ORDER-004             # 行单价
+value_objects:
+  - value_object: GLS-ORDER-005   # 收货地址（无身份、不可变）
+invariants: []
+corrective_policies:
+  - on: "DomainError: PAYMENT_FAILED"
+    action: "订单回退待支付态并发出 PAYMENT_FAILED 事件，不静默吞"
+domain_events:
+  - ORDER_SUBMITTED
+ways_to_access:
+  - repository: "OrderRepository" # 每聚合一个仓储（见 §4）
+  - factory: "Order.place()"

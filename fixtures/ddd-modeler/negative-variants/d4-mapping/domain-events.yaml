@@ -1,0 +1,21 @@
+# 票 51 绿灯样本·领域事件表（形照 design/ddd/README.md §2；载荷=词条 ID 表禁裸列名）
+kind: domain-events
+status: 草案
+domain: order
+events:
+  - event: ORDER_SUBMITTED
+    producer: AGG-ORDER-001        # 生产聚合=订单
+    consumers:
+      - AGG-ORDER-003              # 消费聚合=支付（跨聚合拆事务+事件串联）
+    payload:                       # 载荷=词条 ID 表
+      - GLS-ORDER-001
+      - GLS-ORDER-002
+    delivery: outbox
+  - event: PAYMENT_SUCCEEDED
+    producer: AGG-ORDER-003        # 生产聚合=支付
+    consumers:
+      - AGG-ORDER-001              # 消费聚合=订单
+    payload:
+      - GLS-ORDER-006
+      - GLS-ORDER-007
+    delivery: inprocess

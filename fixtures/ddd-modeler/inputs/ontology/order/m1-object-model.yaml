@@ -1,0 +1,38 @@
+# =====================================================================
+# 最小订单域 · M1 对象模型（票 51 第八套出厂集本体输入）
+# ────────────────────────────────────────────────────────────────
+# 词条集合输入（自造，不借真域 bohai）：三聚合 = 订单 AGG-ORDER-001 /
+#   订单项 AGG-ORDER-002 / 支付 AGG-ORDER-003，形照 bohai 式惯例
+#   （前缀-域-序号）；DDD 设计件（expected/ 与 negative-variants/）的
+#   aggregate/entity 引用全部解析到本文件，属性词条解析到 glossary-model.yaml。
+# =====================================================================
+model_type: OBJECT
+version: "1.0.0"
+domain: order
+aggregates:
+  - id: AGG-ORDER-001
+    name: 订单
+    alias: Order
+    description: "订单聚合根（票 51 出厂集合成词条，对应源表 t_order/t_order_item 投影）"
+    aggregateType: AGGREGATE_ROOT
+    lifecycle: [待支付, 已支付, 已取消]
+    attributes:
+      - { name: orderNo, label: 订单编号, type: String, unique: true }
+      - { name: createdAt, label: 下单时间, type: Date }
+  - id: AGG-ORDER-002
+    name: 订单项
+    alias: OrderItem
+    description: "订单行实体（有身份：行号；票 51 出厂集合成词条）"
+    aggregateType: AGGREGATE_ROOT
+    attributes:
+      - { name: quantity, label: 行数量, type: Decimal }
+      - { name: unitPrice, label: 行单价, type: Decimal }
+  - id: AGG-ORDER-003
+    name: 支付
+    alias: Payment
+    description: "支付聚合根（票 51 出厂集合成词条，对应源表 t_payment 投影）"
+    aggregateType: AGGREGATE_ROOT
+    lifecycle: [待支付, 已支付, 已退款]
+    attributes:
+      - { name: amount, label: 支付金额, type: Decimal }
+      - { name: status, label: 支付状态, type: Enum, enumValues: [待支付, 已支付, 已退款] }

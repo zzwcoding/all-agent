@@ -1,6 +1,6 @@
 # 票 51：tools/ddd_check.py + fixtures 第八套（脚本轨 TDD）
 
-Status: todo
+Status: done
 
 > 注（L0 拆票时点）：依赖票 50（设计件格式真源与样例以其为准）。闸与出厂集同票（负变体即闸的测试）。
 Belongs to: docs/第四期DDD线拆票方案.md 批次一；references/ddd-as-code-digest.md §3/§6；PRD F15
@@ -34,12 +34,12 @@ fixtures 第八套 `fixtures/ddd-modeler/`：最小订单域绿灯样本（本�
 
 ## 验收（注源）
 
-- [ ] AC1 D1–D5 负变体各红、红因可指认（源：本票 AC 表）
-- [ ] AC2 绿灯样本（最小订单域）绿（源：本票 AC 表）
-- [ ] AC3 批量报文断言：多错误一次收齐（failFast=false）+ 人审清单软节在场不影响退出码（源：本票 AC 表）
-- [ ] AC4 退出码 0/1/2 契约断言（源：本票 AC 表）
-- [ ] AC5 specs/ddd-modeler.md 断言表填充注源本票（源：实读）
-- [ ] AC6 `bash tools/ci.sh` 四闸绿（源：CI）
+- [x] AC1 D1–D5 负变体各红、红因可指认（源：本票 AC 表）
+- [x] AC2 绿灯样本（最小订单域）绿（源：本票 AC 表）
+- [x] AC3 批量报文断言：多错误一次收齐（failFast=false）+ 人审清单软节在场不影响退出码（源：本票 AC 表）
+- [x] AC4 退出码 0/1/2 契约断言（源：本票 AC 表）
+- [x] AC5 specs/ddd-modeler.md 断言表填充注源本票（源：实读）
+- [x] AC6 `bash tools/ci.sh` 四闸绿（源：CI）
 
 ## 交接包（L2 自主档）
 

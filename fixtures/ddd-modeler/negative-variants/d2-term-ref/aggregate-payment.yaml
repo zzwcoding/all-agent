@@ -1,0 +1,25 @@
+# 头注释：设计件=草案，业务裁决待 Owner 确认（design/ddd/README.md §0.7）
+# 票 51 绿灯样本·聚合卡（支付）
+kind: aggregate-card
+status: 草案
+domain: order
+aggregate: AGG-ORDER-003          # 聚合根（支付）
+aggregate_root: true
+domain_vision: "支付金额与支付状态同时成立，支付一旦成功不可变"
+properties:
+  - GLS-ORDER-006                 # 支付金额
+  - GLS-ORDER-007                 # 支付状态
+entities: []
+value_objects: []
+invariants:
+  - trigger: "capture（支付扣款）"
+    expect_fail: "已支付再扣则拒，DomainError: ALREADY_PAID"
+    method: "Payment.capture()"
+corrective_policies:
+  - on: "DomainError: INSUFFICIENT_FUNDS"
+    action: "支付单转待重试态并发出 PAYMENT_FAILED 事件，不静默吞"
+domain_events:
+  - PAYMENT_SUCCEEDED
+ways_to_access:
+  - repository: "PaymentRepository"
+  - factory: "Payment.create()"

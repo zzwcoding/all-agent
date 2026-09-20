@@ -1,0 +1,72 @@
+{
+  "skill": "ddd-modeler（DDD 战术设计，票 50 开卡；本套=tools/ddd_check.py 五查闸出厂集，票 51 建）",
+  "description": "第八套出厂集（fixtures 7→8 套，真源=tickets/51-ddd_check闸与第八套出厂集.md 票面 AC 表，DDD- 前缀标签防撞沿 CONS-/REQ- 先例）：最小订单域（中性：订单 AGG-ORDER-001/订单项 AGG-ORDER-002/支付 AGG-ORDER-003，词条 GLS-ORDER-001..007）。目录形态：inputs/ontology/order=自造本体词条输入（不借真域 bohai——避免与真域词条耦合，取舍见 lessons/52；schema 机读表经 ../schema 符号链接取自仓内 ontology/schema，单一真源沿 schema_check 套先例）；expected/=绿灯样本（四类设计件全齐，形照 design/ddd/README.md §1–§4 最小合法样例，即 ddd-modeler 工序的期望产物形态——ddd_check 是闸不是生成器，设计件本身就是产物，故 expected/ 即正例对象、不另设生成物）；negative-variants/ 七目录=五查负变体各一（每目录 README.md 注明变体缺陷与期望码；由绿灯副本精确单点变异生成，保证红因唯一）+ ac3a-multi-error（三类错误一次收齐，failFast=false）+ ac3b-granularity（支付聚合零事件→人审清单软节在场、exit 仍 0）。判定细则：D1 点号路径左段解析到另一聚合卡聚合主词条即内嵌红（本聚合自身结构引用合法；左段解析不到归 D2 红因不混）；D2 词条集合=collect_definitions 同族口径（id/*Id 定义键非 ref 键带 model-deps.json idPrefixes 注册前缀，独立实现对齐、单测 ResolutionFamilyAlignment 钉死）；D3 清单空与三元组缺项同码（AC1c 两形态各一实例）；D4 缺表名/列名/term 与映射聚合不在设计件集合；D5 四命名空间（聚合/实体/事件/仓储）重名报双位置+ID-role 注册前缀+事件名大写下划线；kind 不可判读文件报 ddd-file-kind（票 51 五查之外的结构兜底，防坏文件静默逃逸，lessons/52 记边界）。退出码 0/1/2 契约：本套 cmd-succeeds/cmd-fails 断言钉 0 与非零路径，2 路径以「配置错误」报文钉（该报文仅在退出码 2 分支输出），精确退出码整数由 tools/test_ddd_check.py ExitCodes 类断言（AC4 双层实证）。",
+  "assertions": [
+    {
+      "ac": "AC1a",
+      "type": "cmd-fails",
+      "cmd": "python3 tools/ddd_check.py {fixture_dir}/negative-variants/d1-cross-agg-embed --ontology {fixture_dir}/inputs/ontology/order",
+      "outputContains": ["ddd-cross-agg-embed", "AGG-ORDER-003.amount", "字段级内嵌"]
+    },
+    {
+      "ac": "AC1b",
+      "type": "cmd-fails",
+      "cmd": "python3 tools/ddd_check.py {fixture_dir}/negative-variants/d2-term-ref --ontology {fixture_dir}/inputs/ontology/order",
+      "outputContains": ["ddd-term-ref", "GLS-ORDER-999", "悬空"]
+    },
+    {
+      "ac": "AC1c",
+      "type": "cmd-fails",
+      "cmd": "python3 tools/ddd_check.py {fixture_dir}/negative-variants/d3-invariant --ontology {fixture_dir}/inputs/ontology/order",
+      "outputContains": ["ddd-invariant", "清单为空", "expect_fail"]
+    },
+    {
+      "ac": "AC1d",
+      "type": "cmd-fails",
+      "cmd": "python3 tools/ddd_check.py {fixture_dir}/negative-variants/d4-mapping --ontology {fixture_dir}/inputs/ontology/order",
+      "outputContains": ["ddd-mapping", "t_order_item", "缺列名"]
+    },
+    {
+      "ac": "AC1e",
+      "type": "cmd-fails",
+      "cmd": "python3 tools/ddd_check.py {fixture_dir}/negative-variants/d5-naming --ontology {fixture_dir}/inputs/ontology/order",
+      "outputContains": ["ddd-naming", "ORDER_SUBMITTED", "重名"]
+    },
+    {
+      "ac": "AC2",
+      "type": "cmd-succeeds",
+      "cmd": "python3 tools/ddd_check.py {fixture_dir}/expected --ontology {fixture_dir}/inputs/ontology/order",
+      "outputContains": ["五查: cross-agg-embed 0 | term-ref 0 | invariant 0 | mapping 0 | naming 0", "DDD 闸: 全过"]
+    },
+    {
+      "ac": "AC3a",
+      "type": "cmd-fails",
+      "cmd": "python3 tools/ddd_check.py {fixture_dir}/negative-variants/ac3a-multi-error --ontology {fixture_dir}/inputs/ontology/order",
+      "outputContains": ["ddd-cross-agg-embed", "ddd-term-ref", "ddd-invariant", "3 处违规"]
+    },
+    {
+      "ac": "AC3b",
+      "type": "cmd-succeeds",
+      "cmd": "python3 tools/ddd_check.py {fixture_dir}/negative-variants/ac3b-granularity --ontology {fixture_dir}/inputs/ontology/order",
+      "outputContains": ["待人审清单", "AGG-ORDER-003 零事件", "DDD 闸: 全过"]
+    },
+    {
+      "ac": "AC4a",
+      "type": "cmd-succeeds",
+      "cmd": "python3 tools/ddd_check.py --json {fixture_dir}/expected --ontology {fixture_dir}/inputs/ontology/order",
+      "outputContains": ["\"status\": \"pass\"", "\"violations\": []"]
+    },
+    {
+      "ac": "AC4b",
+      "type": "cmd-fails",
+      "cmd": "python3 tools/ddd_check.py {fixture_dir}/negative-variants/d2-term-ref --ontology {fixture_dir}/inputs/ontology/order",
+      "outputContains": ["ddd-term-ref"]
+    },
+    {
+      "ac": "AC4c",
+      "type": "cmd-fails",
+      "cmd": "python3 tools/ddd_check.py {fixture_dir}/negative-variants/nonexistent-dir",
+      "outputContains": ["配置错误", "目标目录不存在"]
+    }
+  ]
+}

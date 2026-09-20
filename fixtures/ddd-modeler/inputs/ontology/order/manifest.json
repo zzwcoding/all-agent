@@ -1,0 +1,14 @@
+{
+  "domain": "order",
+  "label": "票 51 第八套出厂集本体输入：最小订单域词条集合（自造，不借真域 bohai——避免与真域词条耦合，取舍见 lessons/52）",
+  "profile": "v9-full",
+  "schemaVersion": "1.0.0",
+  "omittedModels": [
+    { "model": "M2", "reason": "词条集合输入，票 51 出厂集只备 M1+GLS" },
+    { "model": "M3", "reason": "词条集合输入，票 51 出厂集只备 M1+GLS" },
+    { "model": "M5", "reason": "词条集合输入，票 51 出厂集只备 M1+GLS" },
+    { "model": "M6", "reason": "词条集合输入，票 51 出厂集只备 M1+GLS" },
+    { "model": "M7", "reason": "词条集合输入，票 51 出厂集只备 M1+GLS" },
+    { "model": "MU", "reason": "词条集合输入，票 51 出厂集只备 M1+GLS" }
+  ]
+}

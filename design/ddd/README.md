@@ -188,3 +188,5 @@ repositories:
 | 确定性闸 | `tools/ddd_check.py` 五查：跨聚合仅 ID 引用 / 字段与载荷解析到词条 ID（悬空=红）/ 不变量三元组齐备 / 表映射无断链 / 重名与前缀合规；一次收集全部错误批量返回；粒度/完备性不硬闸，出「待人审清单」 | 票 51 |
 | 工序 | ddd-modeler skill：本体模型+行为清单 → 四类设计件草案 → 闸自检 → 草案走 MR | 票 52 |
 | 状态翻转 | `status: 草案 → 已审` 只由 Owner 在 MR 人审翻转（归档闸机判合法值） | 票 50 登记 |
+
+> 票 51 判定补注（README 未覆盖的机判边界，落闸细则见 tools/ddd_check.py 头注与 lessons/52）：字段路径点号条目（`AGG-X.field` 形态）归 ddd-cross-agg-embed 判定——左段解析到**另一聚合卡**聚合主词条即红、本聚合自身结构引用合法、左段解析不到归 ddd-term-ref（红因不混）；词条集合=schema_check collect_definitions 同族口径（`id`/`*Id` 定义键、非 ref 键、值带 `model-deps.json` idPrefixes 注册前缀，覆盖 M1 聚合/DICT/GLS 词条）；事件生产者/消费者/仓储聚合不在设计件聚合集合属完备性，出「待人审清单」软节不硬闸（映射聚合缺席例外，硬闸 ddd-mapping）；文件不可判读（语法错/顶层非映射/kind 不在四类）报兜底码 ddd-file-kind，防坏文件静默逃逸五查。
