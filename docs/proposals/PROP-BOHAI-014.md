@@ -31,3 +31,9 @@ rationale: "同一属性面上的两个待裁信号合靶：(a) D9——layerSpl
 - A 级：`ontology/bohai/m1-object-model.yaml#AGG-BOHAI-003`——layerSplit 注记「D9 不结构化；§6『配注合格率』缺配注目标承载字段」；`ontology/bohai/glossary-model.yaml#GLS-BOHAI-009`。
 - B 级：`docs/walkthrough/step1-db-reverse-draft/dirty-signs.md` D9；`docs/walkthrough/step2-mr-adjudication.md` §二 D9 行（仍待 Owner：分层格式规范）。
 - 影响面：单属性级裁决；配注合格率指标化（如有）另走 add M3 规则提案，不在本提案内私加。
+
+## 裁决进展记录（Owner，2026-09-21，部分裁决——status 维持 open）
+
+**(a) 方向已裁：保持 String 不结构化**——结构化需要格式规范（层号/层段/目标/实注几元组、两层三层口径、"偶为累计值"甄别判据），那是业务事实，发明格式=违反不发明红线。已落 AGG-BOHAI-003 layerSplit 属性注记与对象 description。
+
+**两项缺素材待 Owner**（入问题清单）：① layerSplit 格式规范与甄别判据——素材到后再裁结构化演进；② 配注目标承载位置（AGG-003 新增属性 or M3 达标判定规则参数）——依赖①先定格式。配注合格率指标化不在本提案内（另走 add 提案）。

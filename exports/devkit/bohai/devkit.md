@@ -76,7 +76,7 @@ status: 待Owner人审（生成物禁手改，可再生；审记旁档exports/re
 ### AGG-BOHAI-003 注水日计量（WaterInjectionDaily）
 
 - 注源: R5·A.3 + §5
-- AGGREGATE_ROOT；描述: 源表 water_injection_daily（R5·设定书附录 A.3），键=井号+日期，复合主键（wellId, injDate）；injDate 为列名转写补记。疑点残留：layerSplit 两层/三层口径不一、偶为累计值（D9，保持 String 待 Owner）。§5：oil_production_daily ⋈ 本对象直连禁止（须经 AGG-BOHAI-009 受效关系）。
+- AGGREGATE_ROOT；描述: 源表 water_injection_daily（R5·设定书附录 A.3），键=井号+日期，复合主键（wellId, injDate）；injDate 为列名转写补记。layerSplit 保持 String 已裁决确认（D9，PROP-BOHAI-014 方向裁决 2026-09-21：不发明格式，规范待 Owner 素材）。§5：oil_production_daily ⋈ 本对象直连禁止（须经 AGG-BOHAI-009 受效关系）。
 
 | 属性 | 标签 | 类型 | 约束与字典 |
 |---|---|---|---|

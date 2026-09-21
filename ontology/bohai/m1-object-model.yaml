@@ -72,7 +72,7 @@ aggregates:
   - id: AGG-BOHAI-003
     name: 注水日计量
     alias: WaterInjectionDaily
-    description: "源表 water_injection_daily（R5·设定书附录 A.3），键=井号+日期，复合主键（wellId, injDate）；injDate 为列名转写补记。疑点残留：layerSplit 两层/三层口径不一、偶为累计值（D9，保持 String 待 Owner）。§5：oil_production_daily ⋈ 本对象直连禁止（须经 AGG-BOHAI-009 受效关系）。"
+    description: "源表 water_injection_daily（R5·设定书附录 A.3），键=井号+日期，复合主键（wellId, injDate）；injDate 为列名转写补记。layerSplit 保持 String 已裁决确认（D9，PROP-BOHAI-014 方向裁决 2026-09-21：不发明格式，规范待 Owner 素材）。§5：oil_production_daily ⋈ 本对象直连禁止（须经 AGG-BOHAI-009 受效关系）。"
     aggregateType: AGGREGATE_ROOT
     attributes:
       - name: wellRef            # [R5·§5 注水井实体 + A.3 键列]
@@ -83,7 +83,7 @@ aggregates:
       - { name: injDate, label: 注水日期, type: Date }               # [R5·A.3 列名补记]
       - { name: injVolume, label: 注水量（方）, type: Decimal }      # [R5·A.3] §3 指标 6/7/12 承载
       - { name: pumpPressure, label: 泵压（MPa）, type: Decimal }    # [R5·A.3]
-      - { name: layerSplit, label: 分层配注, type: String }          # [R5·A.3] D9 不结构化；§6「配注合格率」缺配注目标承载字段
+      - { name: layerSplit, label: 分层配注, type: String }          # [R5·A.3] D9 方向裁决（PROP-BOHAI-014，2026-09-21）：保持 String 不结构化（结构化=发明格式，格式规范属业务事实待 Owner 素材）；两层/三层口径甄别与「偶为累计值」判据同待素材；§6「配注合格率」配注目标承载待 Owner 裁决（入问题清单）
   # [R5·A.4] 检修台账；§3 指标 2（剔检）/13 承载；票 09 影响分析变更的台账面
   - id: AGG-BOHAI-004
     name: 井检修记录
