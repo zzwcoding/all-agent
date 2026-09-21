@@ -342,3 +342,25 @@ rules:
     narrative: 剔检支：区块月合计中剔除当前状态为「检修」的井后求和；开井日历折算支公式待 Owner 补全后并列
     reusedBy:
       - BH-BOHAI-QueryBlockMonthlyCompletion
+  # [D1 存量面] 吨方混写存量误录行批扫检出（Owner 2026-09-21，PROP-BOHAI-006 采纳=判据两级+处置A）
+  - id: RULE-BOHAI-020
+    name: 吨方混写存量行检出
+    ruleType: VALIDATION
+    description: "D1 存量面（R5·A.2「oil_output DECIMAL(10,2) 吨（个别行误录为方）」；增量防呆=RULE-BOHAI-001）。判据两级（Owner 2026-09-21，PROP-BOHAI-006）：确诊=油>液（物理不可能，硬证据）；疑似=按区块密度基准（渤南 0.86/渤中 0.89/渤西 0.91，R5·§2.2）折算后仍越出合理吨值域（软证据，须人复核）。处置=A 出清单交业务修复（语义层不吞存量修复，step2 §二 D1 先例）——定期批扫出确诊/疑似两级清单，修复动作回业务系统，不在查询层做换算遮羞。"
+    inputParams:
+      - name: oilOutput
+        type: Decimal
+        sourceField: dailyProduction.oilOutput
+        required: true
+      - name: liquidOutput
+        type: Decimal
+        sourceField: dailyProduction.liquidOutput
+        required: true
+      - name: blockName
+        type: String
+        sourceField: well.blockName（区块密度基准索引）
+        required: true
+    outputType: Boolean
+    expression: oilOutput <= liquidOutput   # 确诊级：违反=物理不可能（误录为方致油值虚放大约 13%）
+    narrative: 疑似级（表达式外批扫）：oilOutput ÷ 区块密度基准（渤南 0.86/渤中 0.89/渤西 0.91）折算后越出合理吨值域者入疑似清单，须人复核；确诊/疑似两级清单定期批扫产出交业务系统修复（处置 A）
+    reusedBy: []

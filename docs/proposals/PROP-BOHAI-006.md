@@ -1,7 +1,7 @@
 ---
 id: PROP-BOHAI-006
 title: 新增吨方混写存量行检出规则（RULE-BOHAI-020）
-status: open
+status: accepted
 source-signal:
   kind: 疑点
   ref: docs/walkthrough/step1-db-reverse-draft/dirty-signs.md#D1-吨方混写
@@ -28,3 +28,9 @@ rationale: "D1 吨方混写的增量检出面已落 RULE-BOHAI-001（折算密�
 - B 级：`docs/walkthrough/step2-mr-adjudication.md` §二 D1 行——「仍待 Owner：存量误录行的数据修复（语义层不吞）」。
 - A 级：`ontology/bohai/m1-object-model.yaml#AGG-BOHAI-002`——oilOutput 属性注记「D1 吨方混写」；`ontology/bohai/m3-rule-model.yaml#RULE-BOHAI-001`——增量检出面已建，本提案补存量面。
 - 靶 ID 核对：RULE-BOHAI-020 未占用（m3 现有 001–019，grep 核实）。
+
+## 裁决记录（Owner，2026-09-21）
+
+**裁决：判据两级 + 处置 A**——确诊=油>液（物理不可能，硬证据，expression 承载）；疑似=按区块密度基准（0.86/0.89/0.91）折算后越合理吨值域（软证据须人复核，narrative 承载）；处置=出清单交业务修复（守"语义层不吞存量修复"先例，不做查询层换算遮羞）。
+
+落点：m3 RULE-BOHAI-020（VALIDATION，expression+narrative 两级，reusedBy 留空待批扫行为二期补）。
