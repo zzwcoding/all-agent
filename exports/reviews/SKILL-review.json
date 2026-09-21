@@ -169,6 +169,20 @@
       "notes": "同上",
       "reviewedBy": "divh",
       "date": "2026-09-21"
+    },
+    {
+      "target": "exports/skillpkg/bohai/SKILL.md",
+      "reviewedCommit": "c53b21b2554f399dc0833106de7b7f6836fc7145",
+      "reviewedSha256": "6626425e579a09104d7c71755fd2f1ba693f1259c79d33bd3282be12cfa3a4b4",
+      "verdict": "已审",
+      "checkpoints": [
+        "装配完整性",
+        "提案内容落位(AGG-010在M1切片)",
+        "切片声明原样"
+      ],
+      "notes": "同上",
+      "reviewedBy": "divh",
+      "date": "2026-09-21"
     }
   ]
 }
