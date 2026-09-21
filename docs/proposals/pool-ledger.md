@@ -24,7 +24,7 @@
 | A13 | D13 统一前使用边界（step2§二） | PROP-BOHAI-018 | open | 与 A25 同靶合并（RULE-BOHAI-018） |
 | A14 | D14 停机码映射表全集（step2§二） | PROP-BOHAI-019 | open（纯缺素材） | 方向已定无需再裁（承载位 RULE-006/不建枚举/reusedBy 二期）；映射全集缺素材待 Owner，与 PROP-011 同族入问题清单 |
 | A15 | D15 商品量 vs 井口仲裁（step2§二） | PROP-BOHAI-020 | **accepted** | 裁决 ①+②+③（并存披露+使用边界+输差率折算关系，阈值挂后续提案）；AGG-008+QR-003 同步落定；commit `048aa32`；事故 7/13 同源问题有标准答案 |
-| A16 | MU 全模型无素材（step2§一/§四） | PROP-BOHAI-022 | open | add SCR-BOHAI-001 维形占位；二选一可裁 |
+| A16 | MU 全模型无素材（step2§一/§四） | PROP-BOHAI-022 | **rejected** | 裁维持不建（R5 无 UI 证据+产物形态无界面面；素材到另立提案）；commit `881b041` |
 | A17 | AGG-BOHAI-009 物理落表（step2§三/§四） | PROP-BOHAI-021 | **accepted** | 裁 维持无源虚拟实体（劈分人工台账；新建源表归源系统侧建议；推导缺素材入问题清单）；commit `e3ab3d6` |
 | A18 | 提取件二 8 条规则 §4 规则 13–20（step2§四） | PROP-BOHAI-023 | open | add RULE-BOHAI-026 批次占位（026–033 预留）；判据转录入仓后拆分 |
 | A19 | 指标 8 措施有效率判据（fidelity§二/收官§6.9） | PROP-BOHAI-024 | open | add RULE-BOHAI-034；「有效」判据待 Owner |
