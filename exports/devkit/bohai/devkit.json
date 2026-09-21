@@ -375,7 +375,7 @@
         "name": "流体化验记录",
         "alias": "FluidTest",
         "aggregateType": "AGGREGATE_ROOT",
-        "description": "源表 fluid_test（R5·设定书附录 A.6），键=井号+取样日期，复合主键（wellId, sampleDate）；sampleDate 为列名转写补记。疑点残留：取样频次不齐（高产周报/低产半月报）、插补规则争议；waterCutLab 与 AGG-BOHAI-002.waterCut 打架（D3，RULE-BOHAI-002 容差 ≤5pp）。§5 Join 白名单：oil_production_daily ⋈ 本对象直连禁止（须井号+取样日期双键+时间容差经中间视图）。",
+        "description": "源表 fluid_test（R5·设定书附录 A.6），键=井号+取样日期，复合主键（wellId, sampleDate）；sampleDate 为列名转写补记。权威源裁决已落定（Owner 2026-09-21，PROP-BOHAI-008=C）：本表化验实测为月度/正式指标权威源，日度监控用计量折算，>5pp 以化验校正（容差检测 RULE-BOHAI-002）。疑点残留：取样频次不齐（高产周报/低产半月报）、插补规则争议——仍待 Owner。§5 Join 白名单：oil_production_daily ⋈ 本对象直连禁止（须井号+取样日期双键+时间容差经中间视图）。",
         "sourceNote": "R5·A.6",
         "attributes": [
           {
@@ -1658,16 +1658,6 @@
         "signalKind": "疑点",
         "signalRef": "docs/walkthrough/step1-db-reverse-draft/dirty-signs.md#D2-班次重复行",
         "path": "docs/proposals/PROP-BOHAI-007.md"
-      },
-      {
-        "id": "PROP-BOHAI-008",
-        "title": "为日产计量 waterCut 补权威源归属裁决注记（AGG-BOHAI-002）",
-        "change": "modify",
-        "targetModel": "M1",
-        "targetElement": "AGG-BOHAI-002",
-        "signalKind": "疑点",
-        "signalRef": "docs/walkthrough/step1-db-reverse-draft/dirty-signs.md#D3-化验折算打架",
-        "path": "docs/proposals/PROP-BOHAI-008.md"
       },
       {
         "id": "PROP-BOHAI-009",

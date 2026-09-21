@@ -1,7 +1,7 @@
 ---
 id: PROP-BOHAI-008
 title: 为日产计量 waterCut 补权威源归属裁决注记（AGG-BOHAI-002）
-status: open
+status: accepted
 source-signal:
   kind: 疑点
   ref: docs/walkthrough/step1-db-reverse-draft/dirty-signs.md#D3-化验折算打架
@@ -31,3 +31,9 @@ rationale: "D3 化验含水（AGG-BOHAI-006.waterCutLab）与折算含水（AGG-
 - B 级：`docs/walkthrough/step2-mr-adjudication.md` §二 D3 行——「仍待 Owner：权威源归属」。
 - A 级：`ontology/bohai/m3-rule-model.yaml#RULE-BOHAI-002`——容差检测面；`ontology/bohai/m1-object-model.yaml#AGG-BOHAI-006`——waterCutLab 注记「D3」。
 - 影响面：单属性注记级增补，不改引用结构；RULE-BOHAI-010（综合含水率）取数方向随裁决更新（见 PROP-BOHAI-031，不同靶不相冲）。
+
+## 裁决记录（Owner，2026-09-21）
+
+**裁决：C 并存分场景**——日度监控用计量折算含水（AGG-BOHAI-002.waterCut）；月度/正式指标取数以化验实测（AGG-BOHAI-006.waterCutLab）为准；偏差 >5pp（RULE-BOHAI-002 容差）时以化验校正。
+
+落点：m1-object-model.yaml 三处注记（AGG-BOHAI-002.waterCut / AGG-BOHAI-006 description / waterCutLab）。RULE-BOHAI-010 取数方向由 PROP-BOHAI-031 按本裁决落定（联动未闭，下一份过）。

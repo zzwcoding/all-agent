@@ -121,7 +121,7 @@ status: 待Owner人审（生成物禁手改，可再生；审记旁档exports/re
 ### AGG-BOHAI-006 流体化验记录（FluidTest）
 
 - 注源: R5·A.6
-- AGGREGATE_ROOT；描述: 源表 fluid_test（R5·设定书附录 A.6），键=井号+取样日期，复合主键（wellId, sampleDate）；sampleDate 为列名转写补记。疑点残留：取样频次不齐（高产周报/低产半月报）、插补规则争议；waterCutLab 与 AGG-BOHAI-002.waterCut 打架（D3，RULE-BOHAI-002 容差 ≤5pp）。§5 Join 白名单：oil_production_daily ⋈ 本对象直连禁止（须井号+取样日期双键+时间容差经中间视图）。
+- AGGREGATE_ROOT；描述: 源表 fluid_test（R5·设定书附录 A.6），键=井号+取样日期，复合主键（wellId, sampleDate）；sampleDate 为列名转写补记。权威源裁决已落定（Owner 2026-09-21，PROP-BOHAI-008=C）：本表化验实测为月度/正式指标权威源，日度监控用计量折算，>5pp 以化验校正（容差检测 RULE-BOHAI-002）。疑点残留：取样频次不齐（高产周报/低产半月报）、插补规则争议——仍待 Owner。§5 Join 白名单：oil_production_daily ⋈ 本对象直连禁止（须井号+取样日期双键+时间容差经中间视图）。
 
 | 属性 | 标签 | 类型 | 约束与字典 |
 |---|---|---|---|
@@ -295,11 +295,10 @@ status: 待Owner人审（生成物禁手改，可再生；审记旁档exports/re
 
 ## 四、开放疑点（docs/proposals 扫描）
 
-指向本域的 open 提案 26 条（裁决与详情看提案原文）:
+指向本域的 open 提案 25 条（裁决与详情看提案原文）:
 
 - PROP-BOHAI-006 新增吨方混写存量行检出规则（RULE-BOHAI-020）［add → M3/RULE-BOHAI-020］（docs/proposals/PROP-BOHAI-006.md）
 - PROP-BOHAI-007 新增同井同日班次重复行校验规则（RULE-BOHAI-021）［add → M3/RULE-BOHAI-021］（docs/proposals/PROP-BOHAI-007.md）
-- PROP-BOHAI-008 为日产计量 waterCut 补权威源归属裁决注记（AGG-BOHAI-002）［modify → M1/AGG-BOHAI-002］（docs/proposals/PROP-BOHAI-008.md）
 - PROP-BOHAI-009 新增配产单值校验规则承载双值行版本语义裁决（RULE-BOHAI-022）［add → M3/RULE-BOHAI-022］（docs/proposals/PROP-BOHAI-009.md）
 - PROP-BOHAI-010 新增停井日 openDays 与井状态联动校验规则（RULE-BOHAI-023）［add → M3/RULE-BOHAI-023］（docs/proposals/PROP-BOHAI-010.md）
 - PROP-BOHAI-011 补齐井号归一化映射表全集与归一位置裁决（RULE-BOHAI-005）［modify → M3/RULE-BOHAI-005］（docs/proposals/PROP-BOHAI-011.md）

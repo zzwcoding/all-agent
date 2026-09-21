@@ -49,7 +49,7 @@ aggregates:
       - { name: prodDate, label: 生产日期, type: Date }              # [R5·A.2 复合主键成分]
       - { name: oilOutput, label: 日产油量（吨）, type: Decimal }    # [R5·A.2] D1 吨方混写；§3 指标 1/2/3/4/10/14 的分子/基线承载
       - { name: liquidOutput, label: 日产液量（方）, type: Decimal } # [R5·A.2] §3 指标 5/6/7/12 承载
-      - name: waterCut          # [R5·A.2 化验折算] D3 与 fluid_test 打架；§4 规则 5 值域下沉
+      - name: waterCut          # [R5·A.2 化验折算] §4 规则 5 值域下沉。权威源裁决（Owner 2026-09-21，PROP-BOHAI-008 采纳=C 并存分场景）：本属性（计量折算）为日度监控口径；月度/正式指标取数以 AGG-BOHAI-006.waterCutLab 化验实测为准（RULE-BOHAI-010 取数方向随 PROP-BOHAI-031 落定）；与化验偏差 >5pp（RULE-BOHAI-002 容差）时以化验校正
         label: 含水率（%）
         type: Decimal
         refRules:
@@ -123,7 +123,7 @@ aggregates:
   - id: AGG-BOHAI-006
     name: 流体化验记录
     alias: FluidTest
-    description: "源表 fluid_test（R5·设定书附录 A.6），键=井号+取样日期，复合主键（wellId, sampleDate）；sampleDate 为列名转写补记。疑点残留：取样频次不齐（高产周报/低产半月报）、插补规则争议；waterCutLab 与 AGG-BOHAI-002.waterCut 打架（D3，RULE-BOHAI-002 容差 ≤5pp）。§5 Join 白名单：oil_production_daily ⋈ 本对象直连禁止（须井号+取样日期双键+时间容差经中间视图）。"
+    description: "源表 fluid_test（R5·设定书附录 A.6），键=井号+取样日期，复合主键（wellId, sampleDate）；sampleDate 为列名转写补记。权威源裁决已落定（Owner 2026-09-21，PROP-BOHAI-008=C）：本表化验实测为月度/正式指标权威源，日度监控用计量折算，>5pp 以化验校正（容差检测 RULE-BOHAI-002）。疑点残留：取样频次不齐（高产周报/低产半月报）、插补规则争议——仍待 Owner。§5 Join 白名单：oil_production_daily ⋈ 本对象直连禁止（须井号+取样日期双键+时间容差经中间视图）。"
     aggregateType: AGGREGATE_ROOT
     attributes:
       - name: wellRef            # [R5·§5「化验样—取样自→井」+ A.6 键列]
@@ -132,7 +132,7 @@ aggregates:
         targetAggregate: AGG-BOHAI-001
       - { name: wellId, label: 井号, type: String }                  # [R5·A.6 复合主键成分]
       - { name: sampleDate, label: 取样日期, type: Date }            # [R5·A.6 列名补记]
-      - { name: waterCutLab, label: 化验含水率（%）, type: Decimal } # [R5·A.6] D3
+      - { name: waterCutLab, label: 化验含水率（%）, type: Decimal } # [R5·A.6] 权威源裁决（PROP-BOHAI-008=C，2026-09-21）：月度/正式指标权威源；取样频次/插补争议仍待 Owner
       - { name: density, label: 密度（t/m³）, type: Decimal }        # [R5·A.6] §4 规则 3 折算密度域 [0.82,0.98]
       - { name: apiGravity, label: API 度, type: Decimal }           # [R5·A.6]
   # [R5·A.7] 设备台账；§4 规则 8/11 关联面
