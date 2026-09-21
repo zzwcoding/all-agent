@@ -99,6 +99,20 @@
       "notes": "PROP-009采纳后再生；Owner批量授权代裁（按推荐），增量审落记",
       "reviewedBy": "divh",
       "date": "2026-09-21"
+    },
+    {
+      "target": "exports/devkit/bohai/devkit.md",
+      "reviewedCommit": "8765c7e76b3d8e3fd55c8f80290f7b9f72f661af",
+      "reviewedSha256": "1ff8e353c3664381f55e4a6cfa5a7b70e6cb4ca30558d754a824efcc99eb77a8",
+      "verdict": "已审",
+      "checkpoints": [
+        "装配完整性",
+        "提案内容落位(PROP-010 RULE-023)",
+        "约束节原样"
+      ],
+      "notes": "PROP-010采纳后再生；Owner批量授权代裁，增量审落记",
+      "reviewedBy": "divh",
+      "date": "2026-09-21"
     }
   ]
 }
