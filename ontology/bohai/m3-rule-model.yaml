@@ -416,6 +416,20 @@ rules:
     expression: 待 Owner 阈值素材（落定形如 (today - businessDate) <= T-n；超窗处置=转问题单闭环已裁）
     narrative: 方向已裁：超窗不拒收、收单转问题单闭环（出清单+特批核实）；阈值数值属业务素材不猜；reusedBy 待阈值落定后挂 BH-BOHAI-RecordOverhaul
     reusedBy: []
+  # [§4 规则 11 批面近似] 设备电流零值告警（Owner 2026-09-21，PROP-BOHAI-028 采纳=批面近似）
+  - id: RULE-BOHAI-038
+    name: 设备电流零值告警
+    ruleType: VALIDATION
+    description: "R5·§4 规则 11（设备 current 零值告警）。实时面归属裁决（Owner 2026-09-21，PROP-BOHAI-028）：**批面近似**——15 分钟级调度是 ETL 批闭环非流式，实时域建设属平台演进另案；批面判据=当日批内 current 全零即告警入清单（无需窗口参数，不发明 N）。load/current 单位字典未声明不影响零值判据（零无单位）；单位口径随 PROP-BOHAI-025 公式素材一并裁。"
+    inputParams:
+      - name: current
+        type: Decimal
+        sourceField: equipStatus.current
+        required: true
+    outputType: Boolean
+    expression: not (当日批内全部记录 current == 0)   # 违反=当日全零告警；入清单不阻断
+    narrative: 批面近似判据：当日批内 current 全零即疑似设备/采集异常，出清单交业务核实（清单制先例 PROP-006/010）；实时流式面（15 分钟级连续窗口）待实时域建设另案
+    reusedBy: []
   # [D1 存量面] 吨方混写存量误录行批扫检出（Owner 2026-09-21，PROP-BOHAI-006 采纳=判据两级+处置A）
   - id: RULE-BOHAI-020
     name: 吨方混写存量行检出

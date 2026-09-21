@@ -1,7 +1,7 @@
 ---
 id: PROP-BOHAI-028
 title: 受理 §4 规则 11 实时零值告警待实时面（RULE-BOHAI-038）
-status: open
+status: accepted
 source-signal:
   kind: 对账缺口
   ref: docs/walkthrough/step2-mr-adjudication.md#三-M3未建清单-规则11
@@ -28,3 +28,7 @@ rationale: "R5·§4 规则 11（设备电流零值告警）属实时域：数据
 - B 级：`docs/一期收官报告.md` §6 业务面 10；`docs/walkthrough/step1-db-reverse-draft/dirty-signs.md` 低烈度注记 3（load/current 单位待 Owner——关联裁决点）。
 - A 级：`ontology/bohai/m1-object-model.yaml#AGG-BOHAI-007`——current 注记「单位待 Owner；§4 规则 11 零值告警属实时域未建」。
 - 靶 ID 核对：RULE-BOHAI-038 未占用。
+
+## 裁决记录（Owner，2026-09-21）
+
+**裁决：批面近似**——15 分钟级调度是 ETL 批闭环非流式，实时域建设属平台演进另案；批面判据=当日批内 current 全零即告警入清单（零值无单位依赖，不发明窗口参数 N）。落点：新增 RULE-BOHAI-038（VALIDATION，检出即入清单不阻断，reusedBy 留空待巡检行为挂接）。load/current 单位口径随 PROP-BOHAI-025 素材一并裁（入问题清单联动）。

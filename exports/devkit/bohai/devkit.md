@@ -282,7 +282,7 @@ status: 待Owner人审（生成物禁手改，可再生；审记旁档exports/re
 - BH-BOHAI-QueryBlockWaterCut 查询区块综合含水率 [QUERY/USER_ACTION] ownerEntity=AGG-BOHAI-002 appliedRules=RULE-BOHAI-010 — 注源: R5·§3 指标 5 综合含水率
 - BH-BOHAI-QueryMonthlySettlement 查询区块月度商品量结算 [QUERY/USER_ACTION] ownerEntity=AGG-BOHAI-008 appliedRules=— — 注源: R5·§3 指标 11 商品量
 
-### 规则（M3 · 24 条）
+### 规则（M3 · 25 条）
 
 - RULE-BOHAI-001 化验折算密度值域校验 [VALIDATION] — 注源: R5·§4 规则 3 — density >= 0.82 and density <= 0.98
 - RULE-BOHAI-002 计量化验含水偏差校验 [VALIDATION] — 注源: R5·§4 规则 4 — abs(waterCut - waterCutLab) <= 5
@@ -307,11 +307,12 @@ status: 待Owner人审（生成物禁手改，可再生；审记旁档exports/re
 - RULE-BOHAI-023 停井日 openDays 联动校验 [VALIDATION]  — openDays > 0 implies well.currentStatus in [生产中]
 - RULE-BOHAI-024 跨月检修归属期切割 [CALCULATION]  — overlapDays(overhaulStart, overhaulEnd, 当自然月)
 - RULE-BOHAI-025 补录窗口阈值校验 [VALIDATION]  — 待 Owner 阈值素材（落定形如 (today - businessDate) <= T-n；超窗处置=转问题单闭环已裁）
+- RULE-BOHAI-038 设备电流零值告警 [VALIDATION]  — not (当日批内全部记录 current == 0)
 - RULE-BOHAI-020 吨方混写存量行检出 [VALIDATION]  — oilOutput <= liquidOutput
 
 ## 四、开放疑点（docs/proposals 扫描）
 
-指向本域的 open 提案 12 条（裁决与详情看提案原文）:
+指向本域的 open 提案 11 条（裁决与详情看提案原文）:
 
 - PROP-BOHAI-011 补齐井号归一化映射表全集与归一位置裁决（RULE-BOHAI-005）［modify → M3/RULE-BOHAI-005］（docs/proposals/PROP-BOHAI-011.md）
 - PROP-BOHAI-014 为注水日计量 layerSplit 补格式规范与配注目标承载裁决（AGG-BOHAI-003）［modify → M1/AGG-BOHAI-003］（docs/proposals/PROP-BOHAI-014.md）
@@ -322,6 +323,5 @@ status: 待Owner人审（生成物禁手改，可再生；审记旁档exports/re
 - PROP-BOHAI-024 新增措施有效率指标位待判据（RULE-BOHAI-034）［add → M3/RULE-BOHAI-034］（docs/proposals/PROP-BOHAI-024.md）
 - PROP-BOHAI-025 新增机采系统能效指标位待公式（RULE-BOHAI-035）［add → M3/RULE-BOHAI-035］（docs/proposals/PROP-BOHAI-025.md）
 - PROP-BOHAI-026 新增桶油增产成本指标位待投入字段（RULE-BOHAI-036）［add → M3/RULE-BOHAI-036］（docs/proposals/PROP-BOHAI-026.md）
-- PROP-BOHAI-028 受理 §4 规则 11 实时零值告警待实时面（RULE-BOHAI-038）［add → M3/RULE-BOHAI-038］（docs/proposals/PROP-BOHAI-028.md）
 - PROP-BOHAI-029 补全有效产量开井日历折算支公式（RULE-BOHAI-019）［modify → M3/RULE-BOHAI-019］（docs/proposals/PROP-BOHAI-029.md）
 - PROP-BOHAI-030 补全自然递减率年化指数拟合实现（RULE-BOHAI-013）［modify → M3/RULE-BOHAI-013］（docs/proposals/PROP-BOHAI-030.md）
