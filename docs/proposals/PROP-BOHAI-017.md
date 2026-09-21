@@ -1,7 +1,7 @@
 ---
 id: PROP-BOHAI-017
 title: 裁决措施有效期缺失行统计分母口径（RULE-BOHAI-015）
-status: open
+status: accepted
 source-signal:
   kind: 对账缺口
   ref: docs/walkthrough/step5-fidelity.md#二-指标9-缺失行是否计入分母
@@ -28,3 +28,7 @@ rationale: "D12：约 30% 措施行 effective_from/to 缺失；进仓裁决两�
 - B 级：`docs/walkthrough/step2-mr-adjudication.md` §二 D12 行——「effectiveFrom/To 不设 required……仍待 Owner：缺失行是否计入统计分母」。
 - A 级：`ontology/bohai/m3-rule-model.yaml#RULE-BOHAI-015`——description「D12：约 30% 行 effective_from/to 缺失——缺失行是否计入统计分母待 Owner」；`ontology/bohai/m1-object-model.yaml#AGG-BOHAI-005`——effectiveFrom/To 注记「D12 约 30% 缺失，不设 required」。
 - 影响面：单规则 description/表达式注记；措施有效期（§3 指标 9）口径随之定案。
+
+## 裁决记录（Owner，2026-09-21）
+
+**裁决：缺失行不计入分母 + 缺失率单列报告 + 缺失行入清单核实性质**——塞入分母会拉偏平均值且掩盖缺失问题；30% 缺失率本身作为数据质量指标单列可见；缺失属正常业务还是质量问题由清单核实结论回填（不预设）。落点：RULE-BOHAI-015 description/expression 注记。

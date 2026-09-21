@@ -301,13 +301,12 @@ status: 待Owner人审（生成物禁手改，可再生；审记旁档exports/re
 
 ## 四、开放疑点（docs/proposals 扫描）
 
-指向本域的 open 提案 17 条（裁决与详情看提案原文）:
+指向本域的 open 提案 16 条（裁决与详情看提案原文）:
 
 - PROP-BOHAI-011 补齐井号归一化映射表全集与归一位置裁决（RULE-BOHAI-005）［modify → M3/RULE-BOHAI-005］（docs/proposals/PROP-BOHAI-011.md）
 - PROP-BOHAI-013 新增区块维形对象承载无源业务实体族裁决（AGG-BOHAI-010）［add → M1/AGG-BOHAI-010］（docs/proposals/PROP-BOHAI-013.md）
 - PROP-BOHAI-014 为注水日计量 layerSplit 补格式规范与配注目标承载裁决（AGG-BOHAI-003）［modify → M1/AGG-BOHAI-003］（docs/proposals/PROP-BOHAI-014.md）
 - PROP-BOHAI-016 新增补录窗口阈值校验规则（RULE-BOHAI-025）［modify → M3/RULE-BOHAI-025］（docs/proposals/PROP-BOHAI-016.md）
-- PROP-BOHAI-017 裁决措施有效期缺失行统计分母口径（RULE-BOHAI-015）［modify → M3/RULE-BOHAI-015］（docs/proposals/PROP-BOHAI-017.md）
 - PROP-BOHAI-018 补齐递减增油基线拟合参数与统一前使用边界（RULE-BOHAI-018）［modify → M3/RULE-BOHAI-018］（docs/proposals/PROP-BOHAI-018.md）
 - PROP-BOHAI-019 补齐停机原因码新旧映射表全集（RULE-BOHAI-006）［modify → M3/RULE-BOHAI-006］（docs/proposals/PROP-BOHAI-019.md）
 - PROP-BOHAI-021 裁决受效关系实体物理落表方案（AGG-BOHAI-009）［modify → M1/AGG-BOHAI-009］（docs/proposals/PROP-BOHAI-021.md）

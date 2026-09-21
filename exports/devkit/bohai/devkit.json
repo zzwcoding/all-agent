@@ -1607,7 +1607,7 @@
         "id": "RULE-BOHAI-015",
         "name": "措施有效期",
         "ruleType": "CALCULATION",
-        "description": "R5·§3 指标 9（Owner=采油工艺所，数据源 2.5）。D12：约 30% 行 effective_from/to 缺失——缺失行是否计入统计分母待 Owner。",
+        "description": "R5·§3 指标 9（Owner=采油工艺所，数据源 2.5）。D12 分母口径已裁（Owner 2026-09-21，PROP-BOHAI-017）：**缺失行不计入分母**（平均有效期只对可算行计算，塞入分母会拉偏且掩盖缺失问题）+**缺失率单列报告**（30% 缺失本身是数据质量指标，随行可见）+缺失行入清单核实性质（正常业务 or 质量问题，待业务核实——清单制先例 PROP-006/010）。",
         "expression": "effectiveTo - effectiveFrom",
         "narrative": "",
         "reusedBy": [],
@@ -1742,16 +1742,6 @@
         "signalKind": "疑点",
         "signalRef": "docs/walkthrough/step1-db-reverse-draft/dirty-signs.md#D11-迟到补录",
         "path": "docs/proposals/PROP-BOHAI-016.md"
-      },
-      {
-        "id": "PROP-BOHAI-017",
-        "title": "裁决措施有效期缺失行统计分母口径（RULE-BOHAI-015）",
-        "change": "modify",
-        "targetModel": "M3",
-        "targetElement": "RULE-BOHAI-015",
-        "signalKind": "对账缺口",
-        "signalRef": "docs/walkthrough/step5-fidelity.md#二-指标9-缺失行是否计入分母",
-        "path": "docs/proposals/PROP-BOHAI-017.md"
       },
       {
         "id": "PROP-BOHAI-018",

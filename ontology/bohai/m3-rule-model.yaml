@@ -278,7 +278,7 @@ rules:
   - id: RULE-BOHAI-015
     name: 措施有效期
     ruleType: CALCULATION
-    description: "R5·§3 指标 9（Owner=采油工艺所，数据源 2.5）。D12：约 30% 行 effective_from/to 缺失——缺失行是否计入统计分母待 Owner。"
+    description: "R5·§3 指标 9（Owner=采油工艺所，数据源 2.5）。D12 分母口径已裁（Owner 2026-09-21，PROP-BOHAI-017）：**缺失行不计入分母**（平均有效期只对可算行计算，塞入分母会拉偏且掩盖缺失问题）+**缺失率单列报告**（30% 缺失本身是数据质量指标，随行可见）+缺失行入清单核实性质（正常业务 or 质量问题，待业务核实——清单制先例 PROP-006/010）。"
     inputParams:
       - name: effectiveFrom
         type: Date
@@ -289,7 +289,7 @@ rules:
         sourceField: wellMeasures.effectiveTo
         required: true
     outputType: Integer
-    expression: effectiveTo - effectiveFrom   # 天（R5·§3 指标 9）
+    expression: effectiveTo - effectiveFrom   # 天（R5·§3 指标 9）；仅对非缺失行可算，聚合时缺失行不入分母、缺失率单列（PROP-BOHAI-017，2026-09-21）
   # [R5·§3 指标 13] ☆检泵周期 = 本次检泵日−上次检泵日（单井/天，Owner 采油工艺所）
   - id: RULE-BOHAI-016
     name: 检泵周期
