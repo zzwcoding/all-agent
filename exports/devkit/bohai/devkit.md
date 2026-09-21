@@ -288,7 +288,7 @@ status: 待Owner人审（生成物禁手改，可再生；审记旁档exports/re
 - BH-BOHAI-QueryBlockWaterCut 查询区块综合含水率 [QUERY/USER_ACTION] ownerEntity=AGG-BOHAI-002 appliedRules=RULE-BOHAI-010 — 注源: R5·§3 指标 5 综合含水率
 - BH-BOHAI-QueryMonthlySettlement 查询区块月度商品量结算 [QUERY/USER_ACTION] ownerEntity=AGG-BOHAI-008 appliedRules=— — 注源: R5·§3 指标 11 商品量
 
-### 规则（M3 · 33 条）
+### 规则（M3 · 34 条）
 
 - RULE-BOHAI-001 化验折算密度值域校验 [VALIDATION] — 注源: R5·§4 规则 3 — density >= 0.82 and density <= 0.98
 - RULE-BOHAI-002 计量化验含水偏差校验 [VALIDATION] — 注源: R5·§4 规则 4 — abs(waterCut - waterCutLab) <= 5
@@ -323,14 +323,14 @@ status: 待Owner人审（生成物禁手改，可再生；审记旁档exports/re
 - RULE-BOHAI-032 停机码非空与映射命中校验 [VALIDATION]  — stopReasonCode 非空且命中 RULE-BOHAI-006 新码表
 - RULE-BOHAI-033 检修补录批次号格式校验 [VALIDATION]  — match(batchId, '^\\d{8}-T\\d+$')
 - RULE-BOHAI-020 吨方混写存量行检出 [VALIDATION]  — oilOutput <= liquidOutput
+- RULE-BOHAI-034 措施有效率 [CALCULATION]  — 100 * count(有效措施) / count(判据齐备措施)
 
 ## 四、开放疑点（docs/proposals 扫描）
 
-指向本域的 open 提案 6 条（裁决与详情看提案原文）:
+指向本域的 open 提案 5 条（裁决与详情看提案原文）:
 
 - PROP-BOHAI-014 为注水日计量 layerSplit 补格式规范与配注目标承载裁决（AGG-BOHAI-003）［modify → M1/AGG-BOHAI-003］（docs/proposals/PROP-BOHAI-014.md）
 - PROP-BOHAI-018 补齐递减增油基线拟合参数与统一前使用边界（RULE-BOHAI-018）［modify → M3/RULE-BOHAI-018］（docs/proposals/PROP-BOHAI-018.md）
-- PROP-BOHAI-024 新增措施有效率指标位待判据（RULE-BOHAI-034）［add → M3/RULE-BOHAI-034］（docs/proposals/PROP-BOHAI-024.md）
 - PROP-BOHAI-025 新增机采系统能效指标位待公式（RULE-BOHAI-035）［add → M3/RULE-BOHAI-035］（docs/proposals/PROP-BOHAI-025.md）
 - PROP-BOHAI-026 新增桶油增产成本指标位待投入字段（RULE-BOHAI-036）［add → M3/RULE-BOHAI-036］（docs/proposals/PROP-BOHAI-026.md）
 - PROP-BOHAI-029 补全有效产量开井日历折算支公式（RULE-BOHAI-019）［modify → M3/RULE-BOHAI-019］（docs/proposals/PROP-BOHAI-029.md）

@@ -582,3 +582,25 @@ rules:
     expression: oilOutput <= liquidOutput   # 确诊级：违反=物理不可能（误录为方致油值虚放大约 13%）
     narrative: 疑似级（表达式外批扫）：oilOutput ÷ 区块密度基准（渤南 0.86/渤中 0.89/渤西 0.91）折算后越出合理吨值域者入疑似清单，须人复核；确诊/疑似两级清单定期批扫产出交业务系统修复（处置 A）
     reusedBy: []
+  # [§3 指标 8] 措施有效率（Owner 素材 owner-materials-2026-09-21 §PROP-024，Owner 确认 2026-09-21——与 PROP-018 基线参数阈值整体生效）
+  - id: RULE-BOHAI-034
+    name: 措施有效率
+    ruleType: CALCULATION
+    description: "R5·§3 指标 8（Owner=采油工艺所）。「有效」判据（Owner 素材 2026-09-21）：措施日后 30 日为见效观察期起点，见效期 90 日；判据=见效期内累增油 ≥80 t（相对 RULE-BOHAI-018 基线）**或**有效期 ≥180 日（effectiveTo−effectiveFrom），满足其一即有效；两条判据字段齐备才可判，缺 effective_from/to 的行记「待判」不默认有效（D12 缺失行处置承接 PROP-BOHAI-017 清单制）。承载面：AGG-BOHAI-005 措施台账。"
+    inputParams:
+      - name: incrementalOil90d
+        type: Decimal
+        sourceField: 见效期90日累增油（数据集级派生：相对 RULE-BOHAI-018 基线，无承载字段）
+        required: true
+      - name: effectiveFrom
+        type: Date
+        sourceField: wellMeasures.effectiveFrom
+        required: true
+      - name: effectiveTo
+        type: Date
+        sourceField: wellMeasures.effectiveTo
+        required: true
+    outputType: Decimal
+    expression: 100 * count(有效措施) / count(判据齐备措施)   # 有效=(累增油90d≥80t) or (有效期≥180日)；判据缺field记「待判」不入分母
+    narrative: 双判据任一满足即有效；「待判」行不进分母（与 PROP-017 缺失行不入分母口径一致）；阈值 80t/90日/180日与 PROP-018 基线参数（基期6个月/dₐ∈[0,0.05]）整体生效，单独调整须复核咬合
+    reusedBy: []

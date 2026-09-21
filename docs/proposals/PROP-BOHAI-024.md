@@ -1,7 +1,7 @@
 ---
 id: PROP-BOHAI-024
 title: 新增措施有效率指标位待判据（RULE-BOHAI-034）
-status: open
+status: accepted
 source-signal:
   kind: 对账缺口
   ref: docs/walkthrough/step5-fidelity.md#二-指标8-措施有效率未建
@@ -32,3 +32,5 @@ rationale: "§3 指标 8「措施有效率 η」未建——「有效」判据�
 ## 裁决进展记录（Owner，2026-09-21，未裁——status 维持 open）
 
 **缺判据，不可代裁**：「有效」的业务判据设定书明文未定义（§3 争议注记原文即「有效」判据），措施后累增油阈值/含水下降门槛/有效期下限任一形态都是业务事实，发明判据=替业务定 KPI 定义，超代裁边界。**指标位预留维持**（RULE-BOHAI-034 号位池内登记），不落占位元素进本体（PROP-023 同判据：无判据空壳不建）。待 Owner 提供「有效」判据后落表达式即关箱。入问题清单。
+
+**关箱（2026-09-21）**：判据到齐（Owner 素材 docs/proposals/evidence/owner-materials-2026-09-21.md §PROP-024，Owner 确认，与 PROP-018 阈值整体生效）——见效期 90 日累增油 ≥80t 或有效期 ≥180 日，满足其一即有效；缺字段行记「待判」不入分母。已落 RULE-BOHAI-034。
