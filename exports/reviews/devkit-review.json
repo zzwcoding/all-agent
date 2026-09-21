@@ -85,6 +85,20 @@
       "notes": "PROP-007裁决后再生，增量审通过",
       "reviewedBy": "divh",
       "date": "2026-09-21"
+    },
+    {
+      "target": "exports/devkit/bohai/devkit.md",
+      "reviewedCommit": "15baa449307ac5366c55fc4984f17b32be6d0671",
+      "reviewedSha256": "02a26c2db91e47bfc13eb3a404b1081c73b885baf20f7836bb8f7261d7601c59",
+      "verdict": "已审",
+      "checkpoints": [
+        "装配完整性",
+        "提案内容落位(PROP-009 RULE-022取版口径)",
+        "约束节原样"
+      ],
+      "notes": "PROP-009采纳后再生；Owner批量授权代裁（按推荐），增量审落记",
+      "reviewedBy": "divh",
+      "date": "2026-09-21"
     }
   ]
 }
