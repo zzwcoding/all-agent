@@ -1,7 +1,7 @@
 ---
 id: PROP-BOHAI-016
 title: 新增补录窗口阈值校验规则（RULE-BOHAI-025）
-status: open
+status: accepted
 source-signal:
   kind: 疑点
   ref: docs/walkthrough/step1-db-reverse-draft/dirty-signs.md#D11-迟到补录
@@ -33,4 +33,4 @@ rationale: "D11 补录：补录行为 BH-BOHAI-RecordOverhaul 前置条件已要
 
 **处置方向已裁：超窗不拒收（数据不丢是底线）、收单转问题单闭环（不静默——出清单走特批核实）**。已落 RULE-BOHAI-025 骨架（description/narrative 落定方向，expression 占位）。
 
-**阈值数值（T-?）缺素材待 Owner**——窗口天数是业务管理细则，不猜数（入问题清单）。素材到后 expression 落 `(today - businessDate) <= T-n`、reusedBy 挂 BH-BOHAI-RecordOverhaul，本提案关箱。
+**阈值数值（T-?）缺素材待 Owner**——**已到齐关箱（2026-09-21）**：Owner 素材（docs/proposals/evidence/owner-materials-2026-09-21.md §PROP-016，Owner 确认）——窗口=T-5 日（管理依据：次月 5 个工作日关账，关账前 5 日冻结预备期）。已落 RULE-BOHAI-025 expression `(today - businessDate) <= 5`、reusedBy 挂 BH-BOHAI-RecordOverhaul。本提案关箱。

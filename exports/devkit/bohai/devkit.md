@@ -312,7 +312,7 @@ status: 待Owner人审（生成物禁手改，可再生；审记旁档exports/re
 - RULE-BOHAI-019 有效产量（剔检口径） [CALCULATION] — 注源: R5·§3 指标 2 — SUM(dailyProduction.oilOutput WHERE well.currentStatus <> '检修')
 - RULE-BOHAI-023 停井日 openDays 联动校验 [VALIDATION]  — openDays > 0 implies well.currentStatus in [生产中]
 - RULE-BOHAI-024 跨月检修归属期切割 [CALCULATION]  — overlapDays(overhaulStart, overhaulEnd, 当自然月)
-- RULE-BOHAI-025 补录窗口阈值校验 [VALIDATION]  — 待 Owner 阈值素材（落定形如 (today - businessDate) <= T-n；超窗处置=转问题单闭环已裁）
+- RULE-BOHAI-025 补录窗口阈值校验 [VALIDATION]  — (today - businessDate) <= 5
 - RULE-BOHAI-038 设备电流零值告警 [VALIDATION]  — not (当日批内全部记录 current == 0)
 - RULE-BOHAI-026 注水恒值滑窗预警 [VALIDATION]  — not (injVolume 连续 7 日逐字节相同)
 - RULE-BOHAI-027 日产油突变告警 [VALIDATION]  — not (日降幅 > 40% 且次日未恢复至降幅前 70%)
@@ -326,10 +326,9 @@ status: 待Owner人审（生成物禁手改，可再生；审记旁档exports/re
 
 ## 四、开放疑点（docs/proposals 扫描）
 
-指向本域的 open 提案 7 条（裁决与详情看提案原文）:
+指向本域的 open 提案 6 条（裁决与详情看提案原文）:
 
 - PROP-BOHAI-014 为注水日计量 layerSplit 补格式规范与配注目标承载裁决（AGG-BOHAI-003）［modify → M1/AGG-BOHAI-003］（docs/proposals/PROP-BOHAI-014.md）
-- PROP-BOHAI-016 新增补录窗口阈值校验规则（RULE-BOHAI-025）［modify → M3/RULE-BOHAI-025］（docs/proposals/PROP-BOHAI-016.md）
 - PROP-BOHAI-018 补齐递减增油基线拟合参数与统一前使用边界（RULE-BOHAI-018）［modify → M3/RULE-BOHAI-018］（docs/proposals/PROP-BOHAI-018.md）
 - PROP-BOHAI-024 新增措施有效率指标位待判据（RULE-BOHAI-034）［add → M3/RULE-BOHAI-034］（docs/proposals/PROP-BOHAI-024.md）
 - PROP-BOHAI-025 新增机采系统能效指标位待公式（RULE-BOHAI-035）［add → M3/RULE-BOHAI-035］（docs/proposals/PROP-BOHAI-025.md）

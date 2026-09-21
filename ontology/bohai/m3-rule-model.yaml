@@ -402,7 +402,7 @@ rules:
   - id: RULE-BOHAI-025
     name: 补录窗口阈值校验
     ruleType: VALIDATION
-    description: "D11 迟到/补录（R5·A.4「补录：N-11 batch=20260911-T3」——T-3 案例）。处置方向裁决（Owner 2026-09-21，PROP-BOHAI-016）：**超窗不拒收**（数据不丢是底线）**、收单转问题单闭环**（不静默收单——超窗必须留痕出清单走特批核实）。窗口阈值（T-?）待 Owner 提供素材后落表达式（占位先行，判据不猜数）。"
+    description: "D11 迟到/补录（R5·A.4「补录：N-11 batch=20260911-T3」——T-3 案例）。处置方向裁决（Owner 2026-09-21，PROP-BOHAI-016）：**超窗不拒收**（数据不丢是底线）**、收单转问题单闭环**（不静默收单——超窗必须留痕出清单走特批核实）。窗口阈值已到（Owner 素材 owner-materials-2026-09-21 §PROP-016）：**T-5 日**（管理依据：月度结算次月 5 个工作日内关账，关账前 5 日为数据冻结预备期）。"
     inputParams:
       - name: businessDate
         type: Date
@@ -413,9 +413,10 @@ rules:
         sourceField: wellOverhaul.batchId（补录标记载体）
         required: true
     outputType: Boolean
-    expression: 待 Owner 阈值素材（落定形如 (today - businessDate) <= T-n；超窗处置=转问题单闭环已裁）
-    narrative: 方向已裁：超窗不拒收、收单转问题单闭环（出清单+特批核实）；阈值数值属业务素材不猜；reusedBy 待阈值落定后挂 BH-BOHAI-RecordOverhaul
-    reusedBy: []
+    expression: (today - businessDate) <= 5   # T-5 窗口（Owner 素材 2026-09-21）；超窗不拒收→转特批问题单闭环
+    narrative: 超窗不拒收、收单转问题单闭环（出清单+特批核实）；批次号格式校验由 RULE-BOHAI-033 承载（提取件二 R-20）
+    reusedBy:
+      - BH-BOHAI-RecordOverhaul
   # [§4 规则 11 批面近似] 设备电流零值告警（Owner 2026-09-21，PROP-BOHAI-028 采纳=批面近似）
   - id: RULE-BOHAI-038
     name: 设备电流零值告警
