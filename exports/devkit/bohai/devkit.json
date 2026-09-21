@@ -1617,7 +1617,7 @@
         "id": "RULE-BOHAI-016",
         "name": "检泵周期",
         "ruleType": "CALCULATION",
-        "description": "R5·§3 指标 13（Owner=采油工艺所，数据源 2.4）。判据 overhaulType=检泵 的相邻两次 overhaulStart 之差；D10 跨月切割争议注记（归属期规则待 Owner）。",
+        "description": "R5·§3 指标 13（Owner=采油工艺所，数据源 2.4）。判据 overhaulType=检泵 的相邻两次 overhaulStart 之差；D10 跨月切割已由 RULE-BOHAI-024 承载（PROP-BOHAI-015，2026-09-21：按日历天数劈分）。",
         "expression": "currentOverhaulStart - previousOverhaulStart",
         "narrative": "",
         "reusedBy": [],
@@ -1647,9 +1647,9 @@
         "id": "RULE-BOHAI-019",
         "name": "有效产量（剔检口径）",
         "ruleType": "CALCULATION",
-        "description": "R5·§3 指标 2（★，Owner=开发室，数据源 2.2+2.4）。两支口径并列（R5 原文）：（a）开井日历折算——公式细节设定书未给全，待 Owner；（b）检修剔除（别名「剔检产量」，R5·§6）——把 currentStatus=检修 的井从日产量统计合计中剔除（即票 09 影响分析变更「产量口径剔除检修井」的口径落点）。跨月检修切割争议（D10）注记：检泵跨月（8-28→9-06）时当月口径归属待 Owner。",
+        "description": "R5·§3 指标 2（★，Owner=开发室，数据源 2.2+2.4）。两支口径并列（R5 原文）：（a）开井日历折算——公式细节设定书未给全，待 Owner；（b）检修剔除（别名「剔检产量」，R5·§6）——把 currentStatus=检修 的井从日产量统计合计中剔除（即票 09 影响分析变更「产量口径剔除检修井」的口径落点）。跨月检修切割已落定（PROP-BOHAI-015=按日历天数劈分，RULE-BOHAI-024）。",
         "expression": "SUM(dailyProduction.oilOutput WHERE well.currentStatus <> '检修')",
-        "narrative": "剔检支：区块月合计中剔除当前状态为「检修」的井后求和；开井日历折算支公式待 Owner 补全后并列",
+        "narrative": "剔检支：区块月合计中剔除当前状态为「检修」的井后求和；跨月检修按 RULE-BOHAI-024 日历天数劈分扣减（PROP-BOHAI-015，2026-09-21）；开井日历折算支公式待 Owner 补全后并列",
         "reusedBy": [
           "BH-BOHAI-QueryBlockMonthlyCompletion"
         ],
@@ -1665,6 +1665,16 @@
         "reusedBy": [
           "BH-BOHAI-RunDailyQualityCheck"
         ],
+        "sourceNote": ""
+      },
+      {
+        "id": "RULE-BOHAI-024",
+        "name": "跨月检修归属期切割",
+        "ruleType": "CALCULATION",
+        "description": "D10 跨期切割（R5·A.4「跨月 8-28→9-06：当月口径切割争议源」）。归属期裁决（Owner 2026-09-21，PROP-BOHAI-015）：**按日历天数劈分**——跨月检修按自然月劈开，当月只承担落在当月的天数（检泵 8-28→9-06：8 月计 4 天、9 月计 6 天）；不按起算月/终止月整记（长检修会使单月失真）。检泵周期（RULE-BOHAI-016）与剔检口径（RULE-BOHAI-019）的跨月争议统一引用本规则。",
+        "expression": "overlapDays(overhaulStart, overhaulEnd, 当自然月)",
+        "narrative": "归属期=按日历天数劈分：当月检修天数=overlap(overhaulStart→overhaulEnd, 自然月)；剔检口径（RULE-BOHAI-019）按月扣减当月检修天数；检泵周期（RULE-BOHAI-016）为相邻起算日差值不受影响，跨月注记统一引本规则",
+        "reusedBy": [],
         "sourceNote": ""
       },
       {
@@ -1722,16 +1732,6 @@
         "signalKind": "对账缺口",
         "signalRef": "docs/walkthrough/step5-fidelity.md#三-术语-配注合格率-分母目标双侧缺",
         "path": "docs/proposals/PROP-BOHAI-014.md"
-      },
-      {
-        "id": "PROP-BOHAI-015",
-        "title": "新增跨月检修归属期切割规则（RULE-BOHAI-024）",
-        "change": "add",
-        "targetModel": "M3",
-        "targetElement": "RULE-BOHAI-024",
-        "signalKind": "疑点",
-        "signalRef": "docs/walkthrough/step1-db-reverse-draft/dirty-signs.md#D10-跨期切割",
-        "path": "docs/proposals/PROP-BOHAI-015.md"
       },
       {
         "id": "PROP-BOHAI-016",

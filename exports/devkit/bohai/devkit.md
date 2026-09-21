@@ -272,7 +272,7 @@ status: 待Owner人审（生成物禁手改，可再生；审记旁档exports/re
 - BH-BOHAI-QueryBlockWaterCut 查询区块综合含水率 [QUERY/USER_ACTION] ownerEntity=AGG-BOHAI-002 appliedRules=RULE-BOHAI-010 — 注源: R5·§3 指标 5 综合含水率
 - BH-BOHAI-QueryMonthlySettlement 查询区块月度商品量结算 [QUERY/USER_ACTION] ownerEntity=AGG-BOHAI-008 appliedRules=— — 注源: R5·§3 指标 11 商品量
 
-### 规则（M3 · 22 条）
+### 规则（M3 · 23 条）
 
 - RULE-BOHAI-001 化验折算密度值域校验 [VALIDATION] — 注源: R5·§4 规则 3 — density >= 0.82 and density <= 0.98
 - RULE-BOHAI-002 计量化验含水偏差校验 [VALIDATION] — 注源: R5·§4 规则 4 — abs(waterCut - waterCutLab) <= 5
@@ -295,17 +295,17 @@ status: 待Owner人审（生成物禁手改，可再生；审记旁档exports/re
 - RULE-BOHAI-018 递减增油 [CALCULATION] — 注源: R5·§3 指标 10 — (actualOil - baselineOil) * splitCoefficient
 - RULE-BOHAI-019 有效产量（剔检口径） [CALCULATION] — 注源: R5·§3 指标 2 — SUM(dailyProduction.oilOutput WHERE well.currentStatus <> '检修')
 - RULE-BOHAI-023 停井日 openDays 联动校验 [VALIDATION]  — openDays > 0 implies well.currentStatus in [生产中]
+- RULE-BOHAI-024 跨月检修归属期切割 [CALCULATION]  — overlapDays(overhaulStart, overhaulEnd, 当自然月)
 - RULE-BOHAI-020 吨方混写存量行检出 [VALIDATION]  — oilOutput <= liquidOutput
 
 ## 四、开放疑点（docs/proposals 扫描）
 
-指向本域的 open 提案 19 条（裁决与详情看提案原文）:
+指向本域的 open 提案 18 条（裁决与详情看提案原文）:
 
 - PROP-BOHAI-011 补齐井号归一化映射表全集与归一位置裁决（RULE-BOHAI-005）［modify → M3/RULE-BOHAI-005］（docs/proposals/PROP-BOHAI-011.md）
 - PROP-BOHAI-012 为井 currentStatus 补状态时效责任方裁决注记（AGG-BOHAI-001）［modify → M1/AGG-BOHAI-001］（docs/proposals/PROP-BOHAI-012.md）
 - PROP-BOHAI-013 新增区块维形对象承载无源业务实体族裁决（AGG-BOHAI-010）［add → M1/AGG-BOHAI-010］（docs/proposals/PROP-BOHAI-013.md）
 - PROP-BOHAI-014 为注水日计量 layerSplit 补格式规范与配注目标承载裁决（AGG-BOHAI-003）［modify → M1/AGG-BOHAI-003］（docs/proposals/PROP-BOHAI-014.md）
-- PROP-BOHAI-015 新增跨月检修归属期切割规则（RULE-BOHAI-024）［add → M3/RULE-BOHAI-024］（docs/proposals/PROP-BOHAI-015.md）
 - PROP-BOHAI-016 新增补录窗口阈值校验规则（RULE-BOHAI-025）［add → M3/RULE-BOHAI-025］（docs/proposals/PROP-BOHAI-016.md）
 - PROP-BOHAI-017 裁决措施有效期缺失行统计分母口径（RULE-BOHAI-015）［modify → M3/RULE-BOHAI-015］（docs/proposals/PROP-BOHAI-017.md）
 - PROP-BOHAI-018 补齐递减增油基线拟合参数与统一前使用边界（RULE-BOHAI-018）［modify → M3/RULE-BOHAI-018］（docs/proposals/PROP-BOHAI-018.md）
