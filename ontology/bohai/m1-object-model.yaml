@@ -123,7 +123,7 @@ aggregates:
   - id: AGG-BOHAI-006
     name: 流体化验记录
     alias: FluidTest
-    description: "源表 fluid_test（R5·设定书附录 A.6），键=井号+取样日期，复合主键（wellId, sampleDate）；sampleDate 为列名转写补记。权威源裁决已落定（Owner 2026-09-21，PROP-BOHAI-008=C）：本表化验实测为月度/正式指标权威源，日度监控用计量折算，>5pp 以化验校正（容差检测 RULE-BOHAI-002）。疑点残留：取样频次不齐（高产周报/低产半月报）、插补规则争议——仍待 Owner。§5 Join 白名单：oil_production_daily ⋈ 本对象直连禁止（须井号+取样日期双键+时间容差经中间视图）。"
+    description: "源表 fluid_test（R5·设定书附录 A.6），键=井号+取样日期，复合主键（wellId, sampleDate）；sampleDate 为列名转写补记。权威源裁决已落定（Owner 2026-09-21，PROP-BOHAI-008=C）：本表化验实测为月度/正式指标权威源，日度监控用计量折算，>5pp 以化验校正（容差检测 RULE-BOHAI-002）。取样频次与插补已由 RULE-BOHAI-029 承载（提取件二 R-16，2026-09-21）。§5 Join 白名单：oil_production_daily ⋈ 本对象直连禁止（须井号+取样日期双键+时间容差经中间视图）。"
     aggregateType: AGGREGATE_ROOT
     attributes:
       - name: wellRef            # [R5·§5「化验样—取样自→井」+ A.6 键列]

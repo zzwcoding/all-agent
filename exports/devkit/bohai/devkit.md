@@ -121,7 +121,7 @@ status: 待Owner人审（生成物禁手改，可再生；审记旁档exports/re
 ### AGG-BOHAI-006 流体化验记录（FluidTest）
 
 - 注源: R5·A.6
-- AGGREGATE_ROOT；描述: 源表 fluid_test（R5·设定书附录 A.6），键=井号+取样日期，复合主键（wellId, sampleDate）；sampleDate 为列名转写补记。权威源裁决已落定（Owner 2026-09-21，PROP-BOHAI-008=C）：本表化验实测为月度/正式指标权威源，日度监控用计量折算，>5pp 以化验校正（容差检测 RULE-BOHAI-002）。疑点残留：取样频次不齐（高产周报/低产半月报）、插补规则争议——仍待 Owner。§5 Join 白名单：oil_production_daily ⋈ 本对象直连禁止（须井号+取样日期双键+时间容差经中间视图）。
+- AGGREGATE_ROOT；描述: 源表 fluid_test（R5·设定书附录 A.6），键=井号+取样日期，复合主键（wellId, sampleDate）；sampleDate 为列名转写补记。权威源裁决已落定（Owner 2026-09-21，PROP-BOHAI-008=C）：本表化验实测为月度/正式指标权威源，日度监控用计量折算，>5pp 以化验校正（容差检测 RULE-BOHAI-002）。取样频次与插补已由 RULE-BOHAI-029 承载（提取件二 R-16，2026-09-21）。§5 Join 白名单：oil_production_daily ⋈ 本对象直连禁止（须井号+取样日期双键+时间容差经中间视图）。
 
 | 属性 | 标签 | 类型 | 约束与字典 |
 |---|---|---|---|
@@ -282,7 +282,7 @@ status: 待Owner人审（生成物禁手改，可再生；审记旁档exports/re
 - BH-BOHAI-QueryBlockWaterCut 查询区块综合含水率 [QUERY/USER_ACTION] ownerEntity=AGG-BOHAI-002 appliedRules=RULE-BOHAI-010 — 注源: R5·§3 指标 5 综合含水率
 - BH-BOHAI-QueryMonthlySettlement 查询区块月度商品量结算 [QUERY/USER_ACTION] ownerEntity=AGG-BOHAI-008 appliedRules=— — 注源: R5·§3 指标 11 商品量
 
-### 规则（M3 · 25 条）
+### 规则（M3 · 33 条）
 
 - RULE-BOHAI-001 化验折算密度值域校验 [VALIDATION] — 注源: R5·§4 规则 3 — density >= 0.82 and density <= 0.98
 - RULE-BOHAI-002 计量化验含水偏差校验 [VALIDATION] — 注源: R5·§4 规则 4 — abs(waterCut - waterCutLab) <= 5
@@ -308,16 +308,23 @@ status: 待Owner人审（生成物禁手改，可再生；审记旁档exports/re
 - RULE-BOHAI-024 跨月检修归属期切割 [CALCULATION]  — overlapDays(overhaulStart, overhaulEnd, 当自然月)
 - RULE-BOHAI-025 补录窗口阈值校验 [VALIDATION]  — 待 Owner 阈值素材（落定形如 (today - businessDate) <= T-n；超窗处置=转问题单闭环已裁）
 - RULE-BOHAI-038 设备电流零值告警 [VALIDATION]  — not (当日批内全部记录 current == 0)
+- RULE-BOHAI-026 注水恒值滑窗预警 [VALIDATION]  — not (injVolume 连续 7 日逐字节相同)
+- RULE-BOHAI-027 日产油突变告警 [VALIDATION]  — not (日降幅 > 40% 且次日未恢复至降幅前 70%)
+- RULE-BOHAI-028 配注量量纲核验 [VALIDATION]  — injVolume >= 0 and injVolume <= 500
+- RULE-BOHAI-029 化验取样频次与插补 [VALIDATION]  — 取样间隔 <= (高产 7 日 / 低产 15 日)
+- RULE-BOHAI-030 日产键完整性校验 [VALIDATION]  — count(rows by (wellId, prodDate, reportShift)) == 1 and reportShift in [A, B, C]
+- RULE-BOHAI-031 结算对账容差校验 [VALIDATION]  — abs(netWeight - 当月井口合计) / 当月井口合计 <= 0.015
+- RULE-BOHAI-032 停机码非空与映射命中校验 [VALIDATION]  — stopReasonCode 非空且命中 RULE-BOHAI-006 新码表
+- RULE-BOHAI-033 检修补录批次号格式校验 [VALIDATION]  — match(batchId, '^\\d{8}-T\\d+$')
 - RULE-BOHAI-020 吨方混写存量行检出 [VALIDATION]  — oilOutput <= liquidOutput
 
 ## 四、开放疑点（docs/proposals 扫描）
 
-指向本域的 open 提案 8 条（裁决与详情看提案原文）:
+指向本域的 open 提案 7 条（裁决与详情看提案原文）:
 
 - PROP-BOHAI-014 为注水日计量 layerSplit 补格式规范与配注目标承载裁决（AGG-BOHAI-003）［modify → M1/AGG-BOHAI-003］（docs/proposals/PROP-BOHAI-014.md）
 - PROP-BOHAI-016 新增补录窗口阈值校验规则（RULE-BOHAI-025）［modify → M3/RULE-BOHAI-025］（docs/proposals/PROP-BOHAI-016.md）
 - PROP-BOHAI-018 补齐递减增油基线拟合参数与统一前使用边界（RULE-BOHAI-018）［modify → M3/RULE-BOHAI-018］（docs/proposals/PROP-BOHAI-018.md）
-- PROP-BOHAI-023 批次受理提取件二规则 13–20 判据（RULE-BOHAI-026 占位）［add → M3/RULE-BOHAI-026］（docs/proposals/PROP-BOHAI-023.md）
 - PROP-BOHAI-024 新增措施有效率指标位待判据（RULE-BOHAI-034）［add → M3/RULE-BOHAI-034］（docs/proposals/PROP-BOHAI-024.md）
 - PROP-BOHAI-025 新增机采系统能效指标位待公式（RULE-BOHAI-035）［add → M3/RULE-BOHAI-035］（docs/proposals/PROP-BOHAI-025.md）
 - PROP-BOHAI-026 新增桶油增产成本指标位待投入字段（RULE-BOHAI-036）［add → M3/RULE-BOHAI-036］（docs/proposals/PROP-BOHAI-026.md）

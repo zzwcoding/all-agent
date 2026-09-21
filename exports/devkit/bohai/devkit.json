@@ -375,7 +375,7 @@
         "name": "流体化验记录",
         "alias": "FluidTest",
         "aggregateType": "AGGREGATE_ROOT",
-        "description": "源表 fluid_test（R5·设定书附录 A.6），键=井号+取样日期，复合主键（wellId, sampleDate）；sampleDate 为列名转写补记。权威源裁决已落定（Owner 2026-09-21，PROP-BOHAI-008=C）：本表化验实测为月度/正式指标权威源，日度监控用计量折算，>5pp 以化验校正（容差检测 RULE-BOHAI-002）。疑点残留：取样频次不齐（高产周报/低产半月报）、插补规则争议——仍待 Owner。§5 Join 白名单：oil_production_daily ⋈ 本对象直连禁止（须井号+取样日期双键+时间容差经中间视图）。",
+        "description": "源表 fluid_test（R5·设定书附录 A.6），键=井号+取样日期，复合主键（wellId, sampleDate）；sampleDate 为列名转写补记。权威源裁决已落定（Owner 2026-09-21，PROP-BOHAI-008=C）：本表化验实测为月度/正式指标权威源，日度监控用计量折算，>5pp 以化验校正（容差检测 RULE-BOHAI-002）。取样频次与插补已由 RULE-BOHAI-029 承载（提取件二 R-16，2026-09-21）。§5 Join 白名单：oil_production_daily ⋈ 本对象直连禁止（须井号+取样日期双键+时间容差经中间视图）。",
         "sourceNote": "R5·A.6",
         "attributes": [
           {
@@ -1575,7 +1575,7 @@
         "id": "RULE-BOHAI-010",
         "name": "综合含水率",
         "ruleType": "CALCULATION",
-        "description": "R5·§3 指标 5（Owner=开发室，数据源 2.2+2.6）。Q_w 换算口径裁决已落定（Owner 2026-09-21，PROP-BOHAI-031=B′）：默认差值推算 Q_w=Q_液−Q_油；该井当月化验含水与计量折算偏差 >5pp（RULE-BOHAI-002 容差）时，该井当月以化验实测重算（化验校正分支，承接 PROP-BOHAI-008=C 的月度化验权威）；无当月化验的井走差值推算。取样频次不齐/插补规则争议仍待 Owner（FluidTest 残留）——本口径使其升为指标正确性的前置条件。与注采比同受物质平衡强约束（§3 注记）。",
+        "description": "R5·§3 指标 5（Owner=开发室，数据源 2.2+2.6）。Q_w 换算口径裁决已落定（Owner 2026-09-21，PROP-BOHAI-031=B′）：默认差值推算 Q_w=Q_液−Q_油；该井当月化验含水与计量折算偏差 >5pp（RULE-BOHAI-002 容差）时，该井当月以化验实测重算（化验校正分支，承接 PROP-BOHAI-008=C 的月度化验权威）；无当月化验的井走差值推算。取样频次与插补已由 RULE-BOHAI-029 承载（提取件二 R-16：高产周/低产半月、线性插值、超 30 日剔除+披露——Owner 看点 2 确认）。与注采比同受物质平衡强约束（§3 注记）。",
         "expression": "sum(case when waterCutLab is not null and abs(waterCutLab - waterCut) > 5 then liquidOutput * waterCutLab / 100 else liquidOutput - oilOutput end) / sum(liquidOutput) * 100  # B′ 化验校正（PROP-031，2026-09-21）：井·月粒度；化验配对经 RULE-BOHAI-002 中间视图（井号+取样日期双键+时间容差）",
         "narrative": "",
         "reusedBy": [
@@ -1718,6 +1718,96 @@
         "sourceNote": ""
       },
       {
+        "id": "RULE-BOHAI-026",
+        "name": "注水恒值滑窗预警",
+        "ruleType": "VALIDATION",
+        "description": "提取件二 R-13（Owner 素材 2026-09-21）。既有恒值 30 日（RULE-BOHAI-004）之外，对注水单井新增 7 日滑窗恒值预警：配注量连续 7 日逐字节相同→疑似抄表复制，只预警不拦截。",
+        "expression": "not (injVolume 连续 7 日逐字节相同)",
+        "narrative": "",
+        "reusedBy": [
+          "BH-BOHAI-RunDailyQualityCheck"
+        ],
+        "sourceNote": ""
+      },
+      {
+        "id": "RULE-BOHAI-027",
+        "name": "日产油突变告警",
+        "ruleType": "VALIDATION",
+        "description": "提取件二 R-14（Owner 素材 2026-09-21）。单井日产油环比日降幅 >40% 且次日未恢复至降幅前 70%→触发核实单；月度结算前须闭环，否则结算页挂「待核实」标记。",
+        "expression": "not (日降幅 > 40% 且次日未恢复至降幅前 70%)",
+        "narrative": "",
+        "reusedBy": [
+          "BH-BOHAI-RunDailyQualityCheck"
+        ],
+        "sourceNote": ""
+      },
+      {
+        "id": "RULE-BOHAI-028",
+        "name": "配注量量纲核验",
+        "ruleType": "VALIDATION",
+        "description": "提取件二 R-15（Owner 素材 2026-09-21）。配注量单位仅允许 m³/d（吨方混写由 RULE-BOHAI-001/020 管油侧，本条管配注侧）：单值越出 0–500 m³/d 值域拒收并落问题单。",
+        "expression": "injVolume >= 0 and injVolume <= 500",
+        "narrative": "越域拒收+问题单闭环（拒收位=录入闸；注水录入行为未建，reusedBy 留空待行为落位后挂接——同 RULE-006 先例）",
+        "reusedBy": [],
+        "sourceNote": ""
+      },
+      {
+        "id": "RULE-BOHAI-029",
+        "name": "化验取样频次与插补",
+        "ruleType": "VALIDATION",
+        "description": "提取件二 R-16（Owner 素材 2026-09-21；综合含水率 RULE-BOHAI-010 的取样前置）。频次判据：高产井（近 30 日均产液 ≥50 t/d）化验 ≥1 次/7 日；低产井 ≥1 次/15 日。插补：缺口日含水率取前后最近两次化验线性插值；缺口任一侧超 30 日无化验→该井该段含水率记「无依据」，综合含水率当期**剔除该井并在口径页披露剔除井数与涉及产量占比**（Owner 看点 2 确认）——不得用井口含水估测值顶替。",
+        "expression": "取样间隔 <= (高产 7 日 / 低产 15 日)",
+        "narrative": "50 t/d 分界；线性插值最远跨度 30 日；剔除披露项=井数与涉及产量占比；与 RULE-BOHAI-002 容差/PROP-008 月度化验权威衔接不冲突",
+        "reusedBy": [
+          "BH-BOHAI-RecordFluidTest"
+        ],
+        "sourceNote": ""
+      },
+      {
+        "id": "RULE-BOHAI-030",
+        "name": "日产键完整性校验",
+        "ruleType": "VALIDATION",
+        "description": "提取件二 R-17（Owner 素材 2026-09-21；承接 PROP-BOHAI-007=A 班次粒度主键）。oil_production_daily 每行（wellId, prodDate, reportShift）三元组唯一；班次仅允许 A/B/C；缺失或重复行进问题单，不静默去重。",
+        "expression": "count(rows by (wellId, prodDate, reportShift)) == 1 and reportShift in [A, B, C]",
+        "narrative": "",
+        "reusedBy": [
+          "BH-BOHAI-RecordDailyOutput"
+        ],
+        "sourceNote": ""
+      },
+      {
+        "id": "RULE-BOHAI-031",
+        "name": "结算对账容差校验",
+        "ruleType": "VALIDATION",
+        "description": "提取件二 R-18（Owner 素材 2026-09-21；承接 PROP-BOHAI-020 折算关系框架的阈值落位）。monthly_settlement.netWeight 与当月各井日产合计偏差 ≤1.5% 直通；>1.5% 转人工核对（自用油与输差拆解），不自动修正。",
+        "expression": "abs(netWeight - 当月井口合计) / 当月井口合计 <= 0.015",
+        "narrative": "1.5% 容差=PROP-020 输差率框架的阈值落位（Owner 素材 2026-09-21）；差异拆解=自用油+输差（折算关系见 AGG-BOHAI-008）",
+        "reusedBy": [],
+        "sourceNote": ""
+      },
+      {
+        "id": "RULE-BOHAI-032",
+        "name": "停机码非空与映射命中校验",
+        "ruleType": "VALIDATION",
+        "description": "提取件二 R-19（Owner 素材 2026-09-21）。equip_status 停机状态行 stopReasonCode 必填且须命中 RULE-BOHAI-006 新码表（12 对全集）；空码行拒收。",
+        "expression": "stopReasonCode 非空且命中 RULE-BOHAI-006 新码表",
+        "narrative": "",
+        "reusedBy": [],
+        "sourceNote": ""
+      },
+      {
+        "id": "RULE-BOHAI-033",
+        "name": "检修补录批次号格式校验",
+        "ruleType": "VALIDATION",
+        "description": "提取件二 R-20（Owner 素材 2026-09-21）。well_overhaul 批次号形如 YYYYMMDD-T<n>（n=整数，为追认天数；20260911-T3=T-3 已有案例）；格式不符进问题单，不阻断入库。",
+        "expression": "match(batchId, '^\\\\d{8}-T\\\\d+$')",
+        "narrative": "",
+        "reusedBy": [
+          "BH-BOHAI-RecordOverhaul"
+        ],
+        "sourceNote": ""
+      },
+      {
         "id": "RULE-BOHAI-020",
         "name": "吨方混写存量行检出",
         "ruleType": "VALIDATION",
@@ -1762,16 +1852,6 @@
         "signalKind": "对账缺口",
         "signalRef": "docs/walkthrough/step5-fidelity.md#二-指标10-基线拟合参数未给",
         "path": "docs/proposals/PROP-BOHAI-018.md"
-      },
-      {
-        "id": "PROP-BOHAI-023",
-        "title": "批次受理提取件二规则 13–20 判据（RULE-BOHAI-026 占位）",
-        "change": "add",
-        "targetModel": "M3",
-        "targetElement": "RULE-BOHAI-026",
-        "signalKind": "对账缺口",
-        "signalRef": "docs/walkthrough/step2-mr-adjudication.md#四-提取件二8条规则",
-        "path": "docs/proposals/PROP-BOHAI-023.md"
       },
       {
         "id": "PROP-BOHAI-024",
