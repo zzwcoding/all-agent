@@ -1,7 +1,7 @@
 ---
 id: PROP-BOHAI-019
 title: 补齐停机原因码新旧映射表全集（RULE-BOHAI-006）
-status: open
+status: accepted
 source-signal:
   kind: 疑点
   ref: docs/walkthrough/step1-db-reverse-draft/dirty-signs.md#D14-新旧停机码
@@ -31,3 +31,7 @@ rationale: "D14 新旧停机码并存：映射规则已建（TRANSFORMATION）�
 ## 裁决进展记录（Owner，2026-09-21，无本体改动——status 维持 open）
 
 **无新裁决面**：承载位（RULE-BOHAI-006）、属性侧不建枚举（进仓裁决）、reusedBy 二期补挂——方向均已定，唯一缺口是**映射表全集素材**（字典只示例 R3→BELT 一对，全集=业务事实，不可代裁不可发明）。与 PROP-011（井号归一表全集）同属"映射全集缺素材"族，入问题清单统一待 Owner 提供。素材到后 narrative/expression 落显式映射全表即关箱。
+
+## 裁决记录（Owner，2026-09-21，关箱）
+
+**映射表全集已到齐并落仓**（上一节"待素材"状态由本节关闭）：Owner 素材（docs/proposals/evidence/owner-materials-2026-09-21.md §PROP-019，Owner 确认）——12 对映射（R3↔BELT 原样保留），新码唯一、旧码一码一义、双录以新码为准；看点 1 裁决：**R11（仪表故障）不折减产量日历的差异保留**，其余码按停机起止折减。已落 RULE-BOHAI-006 description/narrative。reusedBy 待设备域质检行为二期补挂。

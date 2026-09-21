@@ -99,14 +99,14 @@ rules:
   - id: RULE-BOHAI-006
     name: 停机原因码归一化
     ruleType: TRANSFORMATION
-    description: "R5·§4 规则 8（D14 新旧编码并存）。字典只示例一对映射（旧 R3=皮带断，新 BELT），映射表全集待 Owner 补齐后再挂接执行行为（设备域质检行为二期补，本期 reusedBy 留空）。"
+    description: "R5·§4 规则 8（D14 新旧编码并存）。映射表全集已到（Owner 素材 owner-materials-2026-09-21 §PROP-019，Owner 确认）：12 对映射（R3↔BELT 原样保留）。规则：新码唯一、旧码一码一义；同停机事件只允许一侧编码，双录以新码为准；**R11（仪表故障）不折减产量日历**、其余码按停机起止折减（差异保留，Owner 看点 1 确认）。设备域质检行为二期补挂 reusedBy。"
     inputParams:
       - name: rawStopCode
         type: String
         sourceField: equipStatus.stopReasonCode
         required: true
     outputType: String
-    narrative: 按新旧编码映射表把旧码翻译为新码（已知一对：R3→BELT，皮带断）；映射表全命中为通过判据
+    narrative: "新旧映射全集（Owner 素材 2026-09-21）：R1↔PUMP_CHK 检泵作业 / R2↔CIRCUIT 电路故障 / R3↔BELT 皮带断 / R4↔PIPE_LEAK 管线刺漏 / R5↔MOTOR_BURN 电机烧毁 / R6↔SAND_CTRL 防砂失效 / R7↔OP_COORD 作业配合 / R8↔WELL_TEST 测井测试占用 / R9↔POWER_OUT 平台电力中断 / R10↔VALVE_JAM 阀门卡死 / R11↔INSTR_FAIL 计量仪表故障（不折减产量日历） / R12↔WEATHER 海况恶劣关井；映射表全命中为通过判据"
   # [R5·§4 规则 9] 唯一性/一致性：well_id 主键 + 状态机合法迁移（生产中→停产 有记录）
   - id: RULE-BOHAI-007
     name: 井状态迁移校验

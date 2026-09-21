@@ -289,7 +289,7 @@ status: 待Owner人审（生成物禁手改，可再生；审记旁档exports/re
 - RULE-BOHAI-003 日产油非空率校验 [VALIDATION] — 注源: R5·§4 规则 2 — (totalCount - nullCount) / totalCount >= 0.995
 - RULE-BOHAI-004 日产恒值检测 [VALIDATION] — 注源: R5·§4 规则 10 — 同井生产日期连续 30 日内 oilOutput 全部相同时判为恒值异常，返回 false（告警）
 - RULE-BOHAI-005 井号归一化 [TRANSFORMATION] — 注源: R5·§4 规则 7 — normalizeWellId(rawWellId)：trim→upper→全角连字符/下划线归一→去内部空格→匹配 ^([A-Z]+)\-?(\d{1,3})$ → 前缀+'-'+数字左补零至2位；匹配失败返回 not-ok 落问题单（不猜测归一）。示例：N2/N-2/N02/n-02/N 02 → N-02（Owner 素材 2026-09-21 §PROP-011）
-- RULE-BOHAI-006 停机原因码归一化 [TRANSFORMATION] — 注源: R5·§4 规则 8 — 按新旧编码映射表把旧码翻译为新码（已知一对：R3→BELT，皮带断）；映射表全命中为通过判据
+- RULE-BOHAI-006 停机原因码归一化 [TRANSFORMATION] — 注源: R5·§4 规则 8 — 新旧映射全集（Owner 素材 2026-09-21）：R1↔PUMP_CHK 检泵作业 / R2↔CIRCUIT 电路故障 / R3↔BELT 皮带断 / R4↔PIPE_LEAK 管线刺漏 / R5↔MOTOR_BURN 电机烧毁 / R6↔SAND_CTRL 防砂失效 / R7↔OP_COORD 作业配合 / R8↔WELL_TEST 测井测试占用 / R9↔POWER_OUT 平台电力中断 / R10↔VALVE_JAM 阀门卡死 / R11↔INSTR_FAIL 计量仪表故障（不折减产量日历） / R12↔WEATHER 海况恶劣关井；映射表全命中为通过判据
 - RULE-BOHAI-007 井状态迁移校验 [VALIDATION] — 注源: R5·§4 规则 9 — fromStatus→toStatus 落在合法迁移表内才返回 true；生产中→停产 必须存在检修/停产台账记录佐证（R5·§4 规则 9）
 - RULE-BOHAI-008 区块物质平衡校验 [VALIDATION] — 注源: R5·§4 规则 12 — abs(blockInjVolume - blockLiquidVolume - retentionDelta) / blockLiquidVolume <= 0.03
 - RULE-BOHAI-009 产量完成率 [CALCULATION] — 注源: R5·§3 指标 1 — actualOilSum / planOutputSum * 100
@@ -312,12 +312,11 @@ status: 待Owner人审（生成物禁手改，可再生；审记旁档exports/re
 
 ## 四、开放疑点（docs/proposals 扫描）
 
-指向本域的 open 提案 9 条（裁决与详情看提案原文）:
+指向本域的 open 提案 8 条（裁决与详情看提案原文）:
 
 - PROP-BOHAI-014 为注水日计量 layerSplit 补格式规范与配注目标承载裁决（AGG-BOHAI-003）［modify → M1/AGG-BOHAI-003］（docs/proposals/PROP-BOHAI-014.md）
 - PROP-BOHAI-016 新增补录窗口阈值校验规则（RULE-BOHAI-025）［modify → M3/RULE-BOHAI-025］（docs/proposals/PROP-BOHAI-016.md）
 - PROP-BOHAI-018 补齐递减增油基线拟合参数与统一前使用边界（RULE-BOHAI-018）［modify → M3/RULE-BOHAI-018］（docs/proposals/PROP-BOHAI-018.md）
-- PROP-BOHAI-019 补齐停机原因码新旧映射表全集（RULE-BOHAI-006）［modify → M3/RULE-BOHAI-006］（docs/proposals/PROP-BOHAI-019.md）
 - PROP-BOHAI-023 批次受理提取件二规则 13–20 判据（RULE-BOHAI-026 占位）［add → M3/RULE-BOHAI-026］（docs/proposals/PROP-BOHAI-023.md）
 - PROP-BOHAI-024 新增措施有效率指标位待判据（RULE-BOHAI-034）［add → M3/RULE-BOHAI-034］（docs/proposals/PROP-BOHAI-024.md）
 - PROP-BOHAI-025 新增机采系统能效指标位待公式（RULE-BOHAI-035）［add → M3/RULE-BOHAI-035］（docs/proposals/PROP-BOHAI-025.md）
