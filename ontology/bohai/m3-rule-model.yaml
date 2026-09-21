@@ -334,7 +334,7 @@ rules:
         required: true
       - name: baselineOil
         type: Decimal
-        sourceField: 拟合基线 q_0(1−d_a)^t（参数已定：基期措施前6个月，q₀=末7日均值，dₐ=1−(q末月均/q首月均)^(1/5)∈[0,0.05]——Owner 素材 2026-09-21 §PROP-018）
+        sourceField: 拟合基线指数递减式（参数已定见 description——Owner 素材 2026-09-21 §PROP-018，数据集级派生无承载字段）
         required: true
       - name: splitCoefficient
         type: Decimal
