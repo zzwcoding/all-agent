@@ -328,7 +328,6 @@ status: 待Owner人审（生成物禁手改，可再生；审记旁档exports/re
 
 ## 四、开放疑点（docs/proposals 扫描）
 
-指向本域的 open 提案 2 条（裁决与详情看提案原文）:
+指向本域的 open 提案 1 条（裁决与详情看提案原文）:
 
 - PROP-BOHAI-014 为注水日计量 layerSplit 补格式规范与配注目标承载裁决（AGG-BOHAI-003）［modify → M1/AGG-BOHAI-003］（docs/proposals/PROP-BOHAI-014.md）
-- PROP-BOHAI-026 新增桶油增产成本指标位待投入字段（RULE-BOHAI-036）［add → M3/RULE-BOHAI-036］（docs/proposals/PROP-BOHAI-026.md）

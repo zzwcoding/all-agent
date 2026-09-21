@@ -1917,16 +1917,6 @@
         "signalKind": "对账缺口",
         "signalRef": "docs/walkthrough/step5-fidelity.md#三-术语-配注合格率-分母目标双侧缺",
         "path": "docs/proposals/PROP-BOHAI-014.md"
-      },
-      {
-        "id": "PROP-BOHAI-026",
-        "title": "新增桶油增产成本指标位待投入字段（RULE-BOHAI-036）",
-        "change": "add",
-        "targetModel": "M3",
-        "targetElement": "RULE-BOHAI-036",
-        "signalKind": "对账缺口",
-        "signalRef": "docs/walkthrough/step5-fidelity.md#二-指标15-桶油成本未建",
-        "path": "docs/proposals/PROP-BOHAI-026.md"
       }
     ]
   },
