@@ -12,5 +12,6 @@
 | R6 | sdd-flow2 设计案 | skill=深模块、四层半、两条验收主线 | docs/design-sdd-flow2.md |
 | R7 | Frank Coyle《为什么 Agentic 系统需要本体论》 | 神经符号护栏："Pydantic at the door, ontology at the ledger"；Agent 无副作用先行 | /Users/divh/Downloads/资料/本体论/ 字幕稿 |
 | R8 | 《Fundamentals of Analytics Engineering》 | 数据底座生命周期、语义层落地条件、治理三支柱 | /Users/divh/Downloads/资料/技术书籍/…/原书提取/ |
+| R9 | DDD-as-code 方法论调研摘要（ContextMapper/EventModeling/jMolecules/Codely Blueprint/TUM 论文五源） | 四类设计件字段骨架与切片法、新鲜上下文纪律、ddd_check 静态可判子集依据，第四期 DDD 线全链注源 | `references/ddd-as-code-digest.md` |
 
 数字弹药（引用时注 R2/R4）：语义自动覆盖 70~80%；企业可被 AI 理解的数据仅 5~10%；95% 生死线阶梯（语义层 70-75% → +记忆反馈 80-90% → +Loop Engineering 逼近 95%）。

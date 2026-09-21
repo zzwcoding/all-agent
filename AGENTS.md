@@ -27,9 +27,9 @@
 | `diagrams/` | 三张图：all-agent（大总架构）/ skill-structure（skill 组织）/ sdd-flow2（建造流内部） |
 | `specs/` `tickets/` `policies/` | 骨架已立，随阶段推进填充 |
 | `ontology/` | 本体仓：schema/（八模型 schema+模型注册表+依赖白名单，票 03 立七模型、票 10 增 GLS）；首个业务域渤海域已进仓（bohai/：6 模型+glossary+manifest，语义闸全绿） |
-| `tools/` | schema_check（L1/L2/L4+必填/一致性对/禁用词）+ graph_index + install_skills（+hooks/ pre-commit 安装位闸）+ proposal_check + check_citations + guard_corpus_check + 三闸（skill_deps/fixture_run/archive_check）+ ci.sh |
-| `fixtures/` | 出厂集七套全建 7/7：schema_check / graph_index / onto-modeler / db-reverse / semantic-service（含 guard-corpus 守卫例集）/ impact-analyzer / proposal-pool |
-| `lessons/` | 施工日志：每票一篇（03 起） |
+| `tools/` | schema_check（L1/L2/L4+必填/一致性对/禁用词）+ graph_index + semantic_service_core + mcp_manifest_gen + semantic_mcp_server + mcp_smoke_client + app_pack_gen + skill_pack_gen + l5_score + review_gate + meta_probe + ddd_check + install_skills（+hooks/ pre-commit 安装位闸）+ proposal_check + check_citations + guard_corpus_check + 三闸（skill_deps/fixture_run/archive_check）+ ci.sh |
+| `fixtures/` | 出厂集 17 套全建 17/17（含 guard-corpus 守卫例集；l5-scoring/app-pack-gen/skill-pack-gen/mcp-publisher/review-gate/pattern-library/ddd-modeler 等随票逐建） |
+| `lessons/` | 施工日志：每票一篇（03 起；卷号按序顺延，票面 Touches 卷号与实际不一致处各票 lessons 已留痕） |
 
 ## 流水线续跑协议（一期票 04–09 已收官；二期票同协议）
 
