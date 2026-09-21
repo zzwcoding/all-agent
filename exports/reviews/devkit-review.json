@@ -71,6 +71,20 @@
       "notes": "PROP-006采纳后再生，增量审通过",
       "reviewedBy": "divh",
       "date": "2026-09-21"
+    },
+    {
+      "target": "exports/devkit/bohai/devkit.md",
+      "reviewedCommit": "9570b62d9e21d22a8d3e9549f54d0c7d73352090",
+      "reviewedSha256": "13d605a18d6e6ece704343d96652d4e0e33730538db59360a98467a2b065fb3d",
+      "verdict": "已审",
+      "checkpoints": [
+        "装配完整性",
+        "提案内容落位(PROP-007=A班次粒度声明)",
+        "约束节原样"
+      ],
+      "notes": "PROP-007裁决后再生，增量审通过",
+      "reviewedBy": "divh",
+      "date": "2026-09-21"
     }
   ]
 }
