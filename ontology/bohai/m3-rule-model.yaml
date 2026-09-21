@@ -85,7 +85,7 @@ rules:
   - id: RULE-BOHAI-005
     name: 井号归一化
     ruleType: TRANSFORMATION
-    description: "R5·§4 规则 7（D6 旧写法并存的归一面）。归一化在源侧还是语义层待 Owner 确认；归一表全集待 Owner（字典只给 N2/N-2→N-02 形态示例）。"
+    description: "R5·§4 规则 7（D6 旧写法并存的归一面）。位置裁决已落定（Owner 2026-09-21，PROP-BOHAI-011(b)）：**映射表=语义资产**（本规则承载唯一真源），**执行归源侧 ETL**，语义层保留旧写法残留检出告警（出清单，语义层不替源系统改数据——PROP-BOHAI-006 先例）。归一表全集仍待 Owner 提供素材（字典只给 N2/N-2→N-02 形态示例），全集到后 expression 落显式映射集。"
     inputParams:
       - name: rawWellId
         type: String

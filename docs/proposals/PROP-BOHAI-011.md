@@ -29,3 +29,9 @@ rationale: "井号归一化规则已建（TRANSFORMATION，N2/N-2→N-02 形态�
 - B 级：`docs/walkthrough/step2-mr-adjudication.md` §二 D6 行——「仍待 Owner：归一表全集」。
 - A 级：`ontology/bohai/m3-rule-model.yaml#RULE-BOHAI-005`——description「归一化在源侧还是语义层待 Owner 确认；归一表全集待 Owner（字典只给 N2/N-2→N-02 形态示例）」。
 - 影响面：单规则 description/expression 修改；关联脏特征检出（RULE-BOHAI-020 等批扫规则的键归一前置）。
+
+## 裁决进展记录（Owner，2026-09-21，部分裁决——status 维持 open）
+
+**(b) 归一化位置已裁**：映射表=语义资产（RULE-BOHAI-005 承载唯一真源）+ 执行归源侧 ETL + 语义层保留旧写法残留检出告警。已落 RULE-005 description。
+
+**(a) 归一表全集：未裁——缺素材**。全集是业务事实（哪些井号有旧写法、各映射到什么新写法），字典只给一对形态示例，不可代裁不可发明。**待 Owner 提供归一表全集素材**后 expression 落显式映射集，本提案方可关箱。已记入问题清单。
