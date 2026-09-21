@@ -346,7 +346,7 @@ rules:
   - id: RULE-BOHAI-019
     name: 有效产量（剔检口径）
     ruleType: CALCULATION
-    description: "R5·§3 指标 2（★，Owner=开发室，数据源 2.2+2.4）。两支口径并列（R5 原文）：（a）开井日历折算——公式细节设定书未给全，待 Owner；（b）检修剔除（别名「剔检产量」，R5·§6）——把 currentStatus=检修 的井从日产量统计合计中剔除（即票 09 影响分析变更「产量口径剔除检修井」的口径落点）。跨月检修切割已落定（PROP-BOHAI-015=按日历天数劈分，RULE-BOHAI-024）。"
+    description: "R5·§3 指标 2（★，Owner=开发室，数据源 2.2+2.4）。两支口径并列（R5 原文）：（a）开井日历折算——公式已到（Owner 素材 owner-materials-2026-09-21 §PROP-029，2026-09-21）：Σ(oilOutput × openDays/24)，openDays 按开井小时数（0.5h 粒度）；（b）检修剔除（别名「剔检产量」，R5·§6）——把 currentStatus=检修 的井从日产量统计合计中剔除（即票 09 影响分析变更「产量口径剔除检修井」的口径落点）。双口径披露：剔检支用于与历史可比，日历支用于当月真实贡献；两支差异 >3% 时口径页并列展示并注明差异来源（Owner 素材）。跨月检修切割已落定（PROP-BOHAI-015=按日历天数劈分，RULE-BOHAI-024）。"
     inputParams:
       - name: oilOutputSum
         type: Decimal
@@ -358,7 +358,7 @@ rules:
         required: true
     outputType: Decimal
     expression: SUM(dailyProduction.oilOutput WHERE well.currentStatus <> '检修')
-    narrative: 剔检支：区块月合计中剔除当前状态为「检修」的井后求和；跨月检修按 RULE-BOHAI-024 日历天数劈分扣减（PROP-BOHAI-015，2026-09-21）；开井日历折算支公式待 Owner 补全后并列
+    narrative: 剔检支：区块月合计中剔除当前状态为「检修」的井后求和；跨月检修按 RULE-BOHAI-024 日历天数劈分扣减（PROP-BOHAI-015，2026-09-21）；开井日历折算支已补（PROP-BOHAI-029，2026-09-21）：Σ(oilOutput × openDays/24)，两支并列双口径披露（差异>3% 注明来源，Owner 素材）
     reusedBy:
       - BH-BOHAI-QueryBlockMonthlyCompletion
   # [D5 联动校验] 停井日 openDays 矛盾行检出（Owner 2026-09-21，PROP-BOHAI-010 采纳=标注出清单交业务核实）

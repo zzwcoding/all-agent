@@ -1,7 +1,7 @@
 ---
 id: PROP-BOHAI-029
 title: 补全有效产量开井日历折算支公式（RULE-BOHAI-019）
-status: open
+status: accepted
 source-signal:
   kind: 对账缺口
   ref: docs/walkthrough/step5-fidelity.md#二-指标2-开井日历支未译
@@ -33,3 +33,5 @@ rationale: "§3 指标 2「有效产量」是两支口径并列：剔检支已�
 ## 裁决进展记录（Owner，2026-09-21，未裁——status 维持 open）
 
 **缺公式，不可代裁**：开井日历折算支公式设定书未给全，补公式=发明业务算法（提案草案已明示「以 Owner 原文为准，不猜」）。剔检支已全译可用（PROP-015 跨月劈分已接入），GLS-BOHAI-003 一词两译的消歧注记维持「剔检支可用/日历支待补」现状。待 Owner 提供日历支公式后 modify 落 (b) 支即关箱。入问题清单。
+
+**关箱（2026-09-21）**：日历支公式到齐（Owner 素材 docs/proposals/evidence/owner-materials-2026-09-21.md §PROP-029，Owner 确认）——Σ(oilOutput × openDays/24)，openDays 按开井小时数（0.5h 粒度）；双口径披露：剔检支与历史可比、日历支当月真实贡献，差异 >3% 口径页并列注明来源。已落 RULE-BOHAI-019 description/narrative。GLS-BOHAI-003 一词两译消歧自此两支齐备。
