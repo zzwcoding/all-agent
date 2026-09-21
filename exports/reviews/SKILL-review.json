@@ -43,6 +43,20 @@
       "notes": "PROP-020采纳后再生（QR-003在M7切片），增量审通过",
       "reviewedBy": "divh",
       "date": "2026-09-21"
+    },
+    {
+      "target": "exports/skillpkg/bohai/SKILL.md",
+      "reviewedCommit": "85776bc44161107911884ed6b3eae6775d0f96a5",
+      "reviewedSha256": "9564307e7cface710e6c8c76bf753bf2b8112bda65370748389272be70760762",
+      "verdict": "已审",
+      "checkpoints": [
+        "装配完整性",
+        "提案内容落位(PROP-006 RULE-020在M3切片)",
+        "切片声明原样"
+      ],
+      "notes": "PROP-006采纳后再生，增量审通过",
+      "reviewedBy": "divh",
+      "date": "2026-09-21"
     }
   ]
 }
