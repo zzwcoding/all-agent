@@ -1,7 +1,7 @@
 ---
 id: PROP-BOHAI-014
 title: 为注水日计量 layerSplit 补格式规范与配注目标承载裁决（AGG-BOHAI-003）
-status: open
+status: accepted
 source-signal:
   kind: 对账缺口
   ref: docs/walkthrough/step5-fidelity.md#三-术语-配注合格率-分母目标双侧缺
@@ -37,3 +37,5 @@ rationale: "同一属性面上的两个待裁信号合靶：(a) D9——layerSpl
 **(a) 方向已裁：保持 String 不结构化**——结构化需要格式规范（层号/层段/目标/实注几元组、两层三层口径、"偶为累计值"甄别判据），那是业务事实，发明格式=违反不发明红线。已落 AGG-BOHAI-003 layerSplit 属性注记与对象 description。
 
 **两项缺素材待 Owner**（入问题清单）：① layerSplit 格式规范与甄别判据——素材到后再裁结构化演进；② 配注目标承载位置（AGG-003 新增属性 or M3 达标判定规则参数）——依赖①先定格式。配注合格率指标化不在本提案内（另走 add 提案）。
+
+**关箱（2026-09-21）**：素材到齐（Owner 素材 docs/proposals/evidence/owner-materials-2026-09-21.md §PROP-014，Owner 确认）。落定：① 格式规范（`层段号:配注量;…`、键数区分两/三层、累计值甄别=层和≈日注量≤2% 进问题单）落 AGG-BOHAI-003 description+属性注记；② 承载取舍偏离素材建议并注记理由——schema 无数组类型（合法类型仅 String/Integer/Decimal/Date/…，见 schema.md），不新增 layerSplitParsed 结构化属性：规范格式本身机读可判，消费方现场解析；若配注合格率指标化（另走 add 提案）确需结构化承载，届时走 schema 演进票裁决。

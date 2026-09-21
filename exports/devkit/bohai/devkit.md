@@ -76,7 +76,7 @@ status: 待Owner人审（生成物禁手改，可再生；审记旁档exports/re
 ### AGG-BOHAI-003 注水日计量（WaterInjectionDaily）
 
 - 注源: R5·A.3 + §5
-- AGGREGATE_ROOT；描述: 源表 water_injection_daily（R5·设定书附录 A.3），键=井号+日期，复合主键（wellId, injDate）；injDate 为列名转写补记。layerSplit 保持 String 已裁决确认（D9，PROP-BOHAI-014 方向裁决 2026-09-21：不发明格式，规范待 Owner 素材）。§5：oil_production_daily ⋈ 本对象直连禁止（须经 AGG-BOHAI-009 受效关系）。
+- AGGREGATE_ROOT；描述: 源表 water_injection_daily（R5·设定书附录 A.3），键=井号+日期，复合主键（wellId, injDate）；injDate 为列名转写补记。layerSplit 格式规范已到（Owner 素材 owner-materials-2026-09-21 §PROP-014，2026-09-21）：`层段号:配注量;…`（分号分隔、冒号键值、两侧无空格，配注量 m³/d，如 F1:40;F2:35）；两层/三层按键数区分（≥4 或 =1 为异常形态进问题单）；「偶为累计值」甄别=各层和≈当日日注量（相对偏差 ≤2%）且前后行为日注量形态→判累计值误填，进问题单不参与分层聚合。承载取舍：schema 无数组类型，不新增结构化属性——规范格式本身机读可判，消费方按规范现场解析；配注合格率指标化另走 add 提案。§5：oil_production_daily ⋈ 本对象直连禁止（须经 AGG-BOHAI-009 受效关系）。
 
 | 属性 | 标签 | 类型 | 约束与字典 |
 |---|---|---|---|
@@ -328,6 +328,4 @@ status: 待Owner人审（生成物禁手改，可再生；审记旁档exports/re
 
 ## 四、开放疑点（docs/proposals 扫描）
 
-指向本域的 open 提案 1 条（裁决与详情看提案原文）:
-
-- PROP-BOHAI-014 为注水日计量 layerSplit 补格式规范与配注目标承载裁决（AGG-BOHAI-003）［modify → M1/AGG-BOHAI-003］（docs/proposals/PROP-BOHAI-014.md）
+无开放提案。
