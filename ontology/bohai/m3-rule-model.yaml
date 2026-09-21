@@ -398,6 +398,24 @@ rules:
     expression: overlapDays(overhaulStart, overhaulEnd, 当自然月)   # 当月检修天数=检修区间与自然月的交集天数
     narrative: 归属期=按日历天数劈分：当月检修天数=overlap(overhaulStart→overhaulEnd, 自然月)；剔检口径（RULE-BOHAI-019）按月扣减当月检修天数；检泵周期（RULE-BOHAI-016）为相邻起算日差值不受影响，跨月注记统一引本规则
     reusedBy: []
+  # [D11 补录窗口] 迟到/补录超窗处置（Owner 2026-09-21，PROP-BOHAI-016 部分裁决：方向已裁、阈值待素材）
+  - id: RULE-BOHAI-025
+    name: 补录窗口阈值校验
+    ruleType: VALIDATION
+    description: "D11 迟到/补录（R5·A.4「补录：N-11 batch=20260911-T3」——T-3 案例）。处置方向裁决（Owner 2026-09-21，PROP-BOHAI-016）：**超窗不拒收**（数据不丢是底线）**、收单转问题单闭环**（不静默收单——超窗必须留痕出清单走特批核实）。窗口阈值（T-?）待 Owner 提供素材后落表达式（占位先行，判据不猜数）。"
+    inputParams:
+      - name: businessDate
+        type: Date
+        sourceField: wellOverhaul.overhaulStart（业务日期）
+        required: true
+      - name: batchId
+        type: String
+        sourceField: wellOverhaul.batchId（补录标记载体）
+        required: true
+    outputType: Boolean
+    expression: 待 Owner 阈值素材（落定形如 (today - businessDate) <= T-n；超窗处置=转问题单闭环已裁）
+    narrative: 方向已裁：超窗不拒收、收单转问题单闭环（出清单+特批核实）；阈值数值属业务素材不猜；reusedBy 待阈值落定后挂 BH-BOHAI-RecordOverhaul
+    reusedBy: []
   # [D1 存量面] 吨方混写存量误录行批扫检出（Owner 2026-09-21，PROP-BOHAI-006 采纳=判据两级+处置A）
   - id: RULE-BOHAI-020
     name: 吨方混写存量行检出

@@ -1678,6 +1678,16 @@
         "sourceNote": ""
       },
       {
+        "id": "RULE-BOHAI-025",
+        "name": "补录窗口阈值校验",
+        "ruleType": "VALIDATION",
+        "description": "D11 迟到/补录（R5·A.4「补录：N-11 batch=20260911-T3」——T-3 案例）。处置方向裁决（Owner 2026-09-21，PROP-BOHAI-016）：**超窗不拒收**（数据不丢是底线）**、收单转问题单闭环**（不静默收单——超窗必须留痕出清单走特批核实）。窗口阈值（T-?）待 Owner 提供素材后落表达式（占位先行，判据不猜数）。",
+        "expression": "待 Owner 阈值素材（落定形如 (today - businessDate) <= T-n；超窗处置=转问题单闭环已裁）",
+        "narrative": "方向已裁：超窗不拒收、收单转问题单闭环（出清单+特批核实）；阈值数值属业务素材不猜；reusedBy 待阈值落定后挂 BH-BOHAI-RecordOverhaul",
+        "reusedBy": [],
+        "sourceNote": ""
+      },
+      {
         "id": "RULE-BOHAI-020",
         "name": "吨方混写存量行检出",
         "ruleType": "VALIDATION",
@@ -1726,7 +1736,7 @@
       {
         "id": "PROP-BOHAI-016",
         "title": "新增补录窗口阈值校验规则（RULE-BOHAI-025）",
-        "change": "add",
+        "change": "modify",
         "targetModel": "M3",
         "targetElement": "RULE-BOHAI-025",
         "signalKind": "疑点",

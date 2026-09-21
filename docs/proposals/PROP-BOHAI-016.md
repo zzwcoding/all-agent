@@ -8,7 +8,7 @@ source-signal:
 target:
   model: M3
   element: RULE-BOHAI-025
-change: add
+change: modify
 rationale: "D11 补录：补录行为 BH-BOHAI-RecordOverhaul 前置条件已要求批次号带补录标记（样本 20260911-T3，T-3 案例），标记语义有承载；但「T-3 之外的迟到数据怎么办」无任何承载——补录窗口阈值与超窗处置（拒收/收单挂特批/收单转问题单闭环）待 Owner。提议新增 M3 补录窗口校验规则作为裁决执行位；阈值判据待 Owner 提供，rationale 照实登记。"
 ---
 
@@ -28,3 +28,9 @@ rationale: "D11 补录：补录行为 BH-BOHAI-RecordOverhaul 前置条件已要
 - B 级：`docs/walkthrough/step2-mr-adjudication.md` §二 D11 行——「仍待 Owner：补录窗口阈值（T-3 之外）」。
 - A 级：`ontology/bohai/m2-behavior-model.yaml#BH-BOHAI-RecordOverhaul`——preconditions「批次号带补录标记……补录窗口阈值待 Owner 确认」。
 - 靶 ID 核对：RULE-BOHAI-025 未占用。
+
+## 裁决进展记录（Owner，2026-09-21，部分裁决——status 维持 open）
+
+**处置方向已裁：超窗不拒收（数据不丢是底线）、收单转问题单闭环（不静默——出清单走特批核实）**。已落 RULE-BOHAI-025 骨架（description/narrative 落定方向，expression 占位）。
+
+**阈值数值（T-?）缺素材待 Owner**——窗口天数是业务管理细则，不猜数（入问题清单）。素材到后 expression 落 `(today - businessDate) <= T-n`、reusedBy 挂 BH-BOHAI-RecordOverhaul，本提案关箱。
