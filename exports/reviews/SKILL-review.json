@@ -337,6 +337,20 @@
       "notes": "同上",
       "reviewedBy": "divh",
       "date": "2026-09-21"
+    },
+    {
+      "target": "exports/skillpkg/bohai/SKILL.md",
+      "reviewedCommit": "168640cbe70353852f128d540350914607b008ea",
+      "reviewedSha256": "7f6eeccc2a70529d5815bcbe235c40243fb4fb41bd0b30d60d1f51cf203358f7",
+      "verdict": "已审",
+      "checkpoints": [
+        "装配完整性",
+        "提案内容落位(RULE-018)",
+        "切片声明原样"
+      ],
+      "notes": "同上",
+      "reviewedBy": "divh",
+      "date": "2026-09-21"
     }
   ]
 }
