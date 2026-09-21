@@ -17,7 +17,7 @@
 | A6 | D6 归一表全集+归一位置（step2§二） | PROP-BOHAI-011 | **accepted** | (a) 全集到齐关箱：四类变体+幂等算法落 RULE-005（commit `b059e8d`）；(b) 位置裁决见 `4b0b5e6` |
 | A7 | D7 状态时效责任方（step2§二） | PROP-BOHAI-012 | **accepted** | 裁 责任方=作业区录入+治理稽核检出（SLA 时限值入问题清单）；commit `9e2286d`；剔检口径时效获解释 |
 | A8 | D8 是否提升「油田」对象（step2§二） | PROP-BOHAI-013 | **accepted** | 裁不提升（无业务驱动，fieldName 保持行内冗余）；随 A28 族一并关（commit `9d0b0c4`） |
-| A9 | D9 分层格式规范（step2§二） | PROP-BOHAI-014 | open（部分裁决） | (a) 方向已裁：保持 String 不发明格式（commit `bfbeca0`）；格式规范+配注目标承载缺素材待 Owner，入问题清单 |
+| A9 | D9 分层格式规范（step2§二） | PROP-BOHAI-014 | **accepted** | 格式规范到齐关箱（commit `24368ab`）；承载取舍：schema 无数组类型不新增属性，注记理由 |
 | A10 | D10 跨月归属期规则（step2§二） | PROP-BOHAI-015 | **accepted** | 裁 按日历天数劈分（当月只承担当月天数）；RULE-024 落地、016/019 注记升级引用；commit `cea7095` |
 | A11 | D11 补录窗口阈值（step2§二） | PROP-BOHAI-016 | **accepted** | T-5 到齐关箱：RULE-025 表达式+挂接落定（commit `043613f`） |
 | A12 | D12 缺失行计入分母（step2§二） | PROP-BOHAI-017 | **accepted** | 裁 缺失行不入分母+缺失率单列+入清单核实性质；RULE-015 定案；commit `fc21fb8` |
