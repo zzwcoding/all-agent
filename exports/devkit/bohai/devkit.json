@@ -1627,7 +1627,7 @@
         "id": "RULE-BOHAI-017",
         "name": "抽油机时率",
         "ruleType": "CALCULATION",
-        "description": "R5·§3 指标 14（Owner=采油工艺所，数据源 2.2）。术语注记（R5·§6）：简称「时率」。openDays 值域 [0,24]（M1 refRules）与 D5 停井矛盾行直接影响本口径。",
+        "description": "R5·§3 指标 14（Owner=采油工艺所，数据源 2.2）。术语注记（R5·§6）：简称「时率」。openDays 值域 [0,24]（M1 refRules）；D5 停井矛盾行已由 RULE-BOHAI-023 检出（PROP-BOHAI-010，2026-09-21）：矛盾行按原值计入、全量入清单交业务核实——状态侧滞后（D7）未裁前不归零。",
         "expression": "openDaysSum / calendarDaysSum * 100",
         "narrative": "",
         "reusedBy": [],
@@ -1656,6 +1656,18 @@
         "sourceNote": "R5·§3 指标 2"
       },
       {
+        "id": "RULE-BOHAI-023",
+        "name": "停井日 openDays 联动校验",
+        "ruleType": "VALIDATION",
+        "description": "D5 矛盾行（R5·A.2「停井日仍>0」）。跨属性联动面（值域 [0,24] 已下沉 M1 refRules，四层下沉第 2 层只承载单属性）。处置裁决（Owner 2026-09-21，PROP-BOHAI-010）：标注出清单交业务核实，不归零不直改——矛盾归属未定（openDays 错 or 状态滞后 D7/PROP-BOHAI-012 未裁），清洗为 0 会在状态滞后侧误杀。抽油机时率（RULE-BOHAI-017）口径：矛盾行按原值计入并在清单中标注。",
+        "expression": "openDays > 0 implies well.currentStatus in [生产中]",
+        "narrative": "命中行=矛盾行（停井日开井时长>0）；处置=标注出清单交业务核实归属（openDays 误录 or 状态滞后），不归零不直改（语义层不吞存量修复，PROP-BOHAI-006 先例）；时率指标暂按原值计入，清单标注待核",
+        "reusedBy": [
+          "BH-BOHAI-RunDailyQualityCheck"
+        ],
+        "sourceNote": ""
+      },
+      {
         "id": "RULE-BOHAI-020",
         "name": "吨方混写存量行检出",
         "ruleType": "VALIDATION",
@@ -1671,16 +1683,6 @@
     "enabled": true,
     "scannedDir": "docs/proposals",
     "items": [
-      {
-        "id": "PROP-BOHAI-010",
-        "title": "新增停井日 openDays 与井状态联动校验规则（RULE-BOHAI-023）",
-        "change": "add",
-        "targetModel": "M3",
-        "targetElement": "RULE-BOHAI-023",
-        "signalKind": "疑点",
-        "signalRef": "docs/walkthrough/step1-db-reverse-draft/dirty-signs.md#D5-停井矛盾行",
-        "path": "docs/proposals/PROP-BOHAI-010.md"
-      },
       {
         "id": "PROP-BOHAI-011",
         "title": "补齐井号归一化映射表全集与归一位置裁决（RULE-BOHAI-005）",

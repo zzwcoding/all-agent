@@ -1,7 +1,7 @@
 ---
 id: PROP-BOHAI-010
 title: 新增停井日 openDays 与井状态联动校验规则（RULE-BOHAI-023）
-status: open
+status: accepted
 source-signal:
   kind: 疑点
   ref: docs/walkthrough/step1-db-reverse-draft/dirty-signs.md#D5-停井矛盾行
@@ -28,3 +28,7 @@ rationale: "D5「停井日仍>0」矛盾行：openDays 值域 [0,24] 已下沉 M
 - B 级：`docs/walkthrough/step2-mr-adjudication.md` §二 D5 行——「值域 [0,24] 下沉 M1 refRules……仍待 Owner：矛盾行清洗规则」。
 - A 级：`ontology/bohai/m3-rule-model.yaml#RULE-BOHAI-017`——description「openDays 值域 [0,24]（M1 refRules）与 D5 停井矛盾行直接影响本口径」。
 - 靶 ID 核对：RULE-BOHAI-023 未占用。
+
+## 裁决记录（Owner，2026-09-21）
+
+**裁决：标注出清单交业务核实，不归零不直改**——矛盾归属未定（openDays 误录 or 状态滞后，D7/PROP-BOHAI-012 未裁），清洗为 0 会在状态滞后侧误杀；守 PROP-BOHAI-006 先例（语义层不吞存量修复）。落点：新增 RULE-BOHAI-023（跨属性联动校验，检出即入清单不阻断）；RULE-BOHAI-017 注记同步（矛盾行按原值计入+清单标注）。D7 裁决后本规则的处置可再细化。
