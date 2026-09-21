@@ -139,14 +139,14 @@ aggregates:
   - id: AGG-BOHAI-007
     name: 设备状态记录
     alias: EquipStatus
-    description: "源表 equip_status（R5·设定书附录 A.7），键=设备号+时间戳，复合主键（equipId, statusTime）；equipId/statusTime 为列名转写补记。疑点残留：stopReasonCode 新旧编码并存（D14，RULE-BOHAI-006 映射）；load/current 单位字典未声明。§5 未声明设备—井关系，故不建 wellRef（零证据零引用，待 Owner）。"
+    description: "源表 equip_status（R5·设定书附录 A.7），键=设备号+时间戳，复合主键（equipId, statusTime）；equipId/statusTime 为列名转写补记。疑点残留：stopReasonCode 新旧编码并存（D14，RULE-BOHAI-006 映射全集已到）。load/current 单位已声明（kN/A，Owner 素材 2026-09-21 §PROP-025）。§5 未声明设备—井关系，故不建 wellRef（零证据零引用，待 Owner）。"
     aggregateType: AGGREGATE_ROOT
     attributes:
       - { name: equipId, label: 设备号, type: String }               # [R5·A.7 复合主键成分；列名补记]
       - { name: statusTime, label: 状态时间戳, type: DateTime }      # [R5·A.7 复合主键成分；列名补记]
       - { name: equipType, label: 设备类型, type: Enum, enumValues: [电泵, 螺杆泵, 加热炉] }   # [R5·A.7 字典值集]
-      - { name: load, label: 负载, type: Decimal }                   # [R5·A.7] 单位待 Owner
-      - { name: current, label: 电流, type: Decimal }                # [R5·A.7] 单位待 Owner；§4 规则 11 零值告警属实时域未建
+      - { name: load, label: 负载, type: Decimal }                   # [R5·A.7] 单位=kN（Owner 素材 2026-09-21 §PROP-025）；设备级光杆功率核算用
+      - { name: current, label: 电流, type: Decimal }                # [R5·A.7] 单位=A（Owner 素材 2026-09-21 §PROP-025）；RULE-038 零值告警（批面近似）不依赖单位
       - { name: stopReasonCode, label: 停机原因码, type: String }    # [R5·A.7] D14 新旧编码并存，不建枚举
   # [R5·A.8] 经营侧事实源；§3 指标 11 商品量承载
   - id: AGG-BOHAI-008

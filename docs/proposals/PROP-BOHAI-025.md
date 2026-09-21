@@ -1,7 +1,7 @@
 ---
 id: PROP-BOHAI-025
 title: 新增机采系统能效指标位待公式（RULE-BOHAI-035）
-status: open
+status: accepted
 source-signal:
   kind: 对账缺口
   ref: docs/walkthrough/step5-fidelity.md#二-指标12-机采能效未建
@@ -32,3 +32,5 @@ rationale: "§3 指标 12「机采系统能效」未建——三级（系统/单
 ## 裁决进展记录（Owner，2026-09-21，未裁——status 维持 open）
 
 **缺公式，不可代裁**：三级（系统/单元/设备）公式设定书未给，仅优良/合格档名——公式是业务事实不硬译。关联缺口：AGG-BOHAI-007.load/current 单位字典未声明（单位判据随公式一并裁，同待素材）。指标位预留维持（RULE-BOHAI-035 池内登记），不落占位元素。入问题清单。
+
+**关箱（2026-09-21）**：三级公式与单位到齐（Owner 素材 docs/proposals/evidence/owner-materials-2026-09-21.md §PROP-025，Owner 确认）——三级同构 η=有效/输入功率×100%；load=kN、current=A（m1 注记落定）。已落 RULE-BOHAI-035；优良/合格档值作为规则参数待 Owner（随档值素材另裁，不阻塞本提案）。

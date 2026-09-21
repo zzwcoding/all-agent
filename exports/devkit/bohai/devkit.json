@@ -418,7 +418,7 @@
         "name": "设备状态记录",
         "alias": "EquipStatus",
         "aggregateType": "AGGREGATE_ROOT",
-        "description": "源表 equip_status（R5·设定书附录 A.7），键=设备号+时间戳，复合主键（equipId, statusTime）；equipId/statusTime 为列名转写补记。疑点残留：stopReasonCode 新旧编码并存（D14，RULE-BOHAI-006 映射）；load/current 单位字典未声明。§5 未声明设备—井关系，故不建 wellRef（零证据零引用，待 Owner）。",
+        "description": "源表 equip_status（R5·设定书附录 A.7），键=设备号+时间戳，复合主键（equipId, statusTime）；equipId/statusTime 为列名转写补记。疑点残留：stopReasonCode 新旧编码并存（D14，RULE-BOHAI-006 映射全集已到）。load/current 单位已声明（kN/A，Owner 素材 2026-09-21 §PROP-025）。§5 未声明设备—井关系，故不建 wellRef（零证据零引用，待 Owner）。",
         "sourceNote": "R5·A.7",
         "attributes": [
           {
@@ -1891,6 +1891,16 @@
         "narrative": "双判据任一满足即有效；「待判」行不进分母（与 PROP-017 缺失行不入分母口径一致）；阈值 80t/90日/180日与 PROP-018 基线参数（基期6个月/dₐ∈[0,0.05]）整体生效，单独调整须复核咬合",
         "reusedBy": [],
         "sourceNote": ""
+      },
+      {
+        "id": "RULE-BOHAI-035",
+        "name": "机采系统能效",
+        "ruleType": "CALCULATION",
+        "description": "R5·§3 指标 12。三级公式（Owner 素材 2026-09-21）：系统级 η_sys=Σ各井有效功率/Σ各井输入功率×100%；单元级 η_unit=P_eff/P_in×100%（P_eff=Δp×Q，kW；P_in=实测输入电功率）；设备级 η_dev=设备输出/输入功率×100%（电机/皮带/泵分段连乘校核）。单位随裁：load=kN、current=A（用于设备级功率核算，不直接进 η_unit 分子）。优良/合格档名待 Owner 定档值（档值=规则参数不进本体）。",
+        "expression": "effectivePower / inputPower * 100",
+        "narrative": "三级同构「有效功率/输入功率×100%」；load（kN）/current（A）单位已声明（m1 注记）；优良/合格档值属规则参数待 Owner",
+        "reusedBy": [],
+        "sourceNote": ""
       }
     ]
   },
@@ -1917,16 +1927,6 @@
         "signalKind": "对账缺口",
         "signalRef": "docs/walkthrough/step5-fidelity.md#二-指标10-基线拟合参数未给",
         "path": "docs/proposals/PROP-BOHAI-018.md"
-      },
-      {
-        "id": "PROP-BOHAI-025",
-        "title": "新增机采系统能效指标位待公式（RULE-BOHAI-035）",
-        "change": "add",
-        "targetModel": "M3",
-        "targetElement": "RULE-BOHAI-035",
-        "signalKind": "对账缺口",
-        "signalRef": "docs/walkthrough/step5-fidelity.md#二-指标12-机采能效未建",
-        "path": "docs/proposals/PROP-BOHAI-025.md"
       },
       {
         "id": "PROP-BOHAI-026",

@@ -604,3 +604,21 @@ rules:
     expression: 100 * count(有效措施) / count(判据齐备措施)   # 有效=(累增油90d≥80t) or (有效期≥180日)；判据缺field记「待判」不入分母
     narrative: 双判据任一满足即有效；「待判」行不进分母（与 PROP-017 缺失行不入分母口径一致）；阈值 80t/90日/180日与 PROP-018 基线参数（基期6个月/dₐ∈[0,0.05]）整体生效，单独调整须复核咬合
     reusedBy: []
+  # [§3 指标 12] 机采系统能效（Owner 素材 owner-materials-2026-09-21 §PROP-025，Owner 确认 2026-09-21）
+  - id: RULE-BOHAI-035
+    name: 机采系统能效
+    ruleType: CALCULATION
+    description: "R5·§3 指标 12。三级公式（Owner 素材 2026-09-21）：系统级 η_sys=Σ各井有效功率/Σ各井输入功率×100%；单元级 η_unit=P_eff/P_in×100%（P_eff=Δp×Q，kW；P_in=实测输入电功率）；设备级 η_dev=设备输出/输入功率×100%（电机/皮带/泵分段连乘校核）。单位随裁：load=kN、current=A（用于设备级功率核算，不直接进 η_unit 分子）。优良/合格档名待 Owner 定档值（档值=规则参数不进本体）。"
+    inputParams:
+      - name: effectivePower
+        type: Decimal
+        sourceField: 有效功率 P_eff=Δp×Q（数据集级派生，kW）
+        required: true
+      - name: inputPower
+        type: Decimal
+        sourceField: 输入电功率（数据集级派生，kW；current×电压采集面）
+        required: true
+    outputType: Decimal
+    expression: effectivePower / inputPower * 100   # 单元级 η_unit；系统级=聚合口径同构加权；设备级分段连乘校核
+    narrative: 三级同构「有效功率/输入功率×100%」；load（kN）/current（A）单位已声明（m1 注记）；优良/合格档值属规则参数待 Owner
+    reusedBy: []
