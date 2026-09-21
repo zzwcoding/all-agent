@@ -22,7 +22,7 @@
 | A11 | D11 补录窗口阈值（step2§二） | PROP-BOHAI-016 | open（部分裁决） | 方向已裁：超窗不拒收+收单转问题单闭环；RULE-025 骨架入仓（change 转 modify，commit `03827ba`）；阈值 T-? 缺素材入问题清单 |
 | A12 | D12 缺失行计入分母（step2§二） | PROP-BOHAI-017 | **accepted** | 裁 缺失行不入分母+缺失率单列+入清单核实性质；RULE-015 定案；commit `fc21fb8` |
 | A13 | D13 统一前使用边界（step2§二） | PROP-BOHAI-018 | open（部分裁决） | (b) 使用边界已裁：统一前限井组年尺度内部评估不入对外报表（commit `69ce96c`） |
-| A14 | D14 停机码映射表全集（step2§二） | PROP-BOHAI-019 | open（纯缺素材） | 方向已定无需再裁（承载位 RULE-006/不建枚举/reusedBy 二期）；映射全集缺素材待 Owner，与 PROP-011 同族入问题清单 |
+| A14 | D14 停机码映射表全集（step2§二） | PROP-BOHAI-019 | **accepted** | 全集 12 对到齐落 RULE-006（R11 不折减差异保留）；commit `db6a517` |
 | A15 | D15 商品量 vs 井口仲裁（step2§二） | PROP-BOHAI-020 | **accepted** | 裁决 ①+②+③（并存披露+使用边界+输差率折算关系，阈值挂后续提案）；AGG-008+QR-003 同步落定；commit `048aa32`；事故 7/13 同源问题有标准答案 |
 | A16 | MU 全模型无素材（step2§一/§四） | PROP-BOHAI-022 | **rejected** | 裁维持不建（R5 无 UI 证据+产物形态无界面面；素材到另立提案）；commit `881b041` |
 | A17 | AGG-BOHAI-009 物理落表（step2§三/§四） | PROP-BOHAI-021 | **accepted** | 裁 维持无源虚拟实体（劈分人工台账；新建源表归源系统侧建议；推导缺素材入问题清单）；commit `e3ab3d6` |
