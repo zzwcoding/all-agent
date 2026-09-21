@@ -197,7 +197,7 @@
           "name": "综合含水率",
           "type": "CALCULATION",
           "point": {
-            "expression": "(liquidSum - oilSum) / liquidSum * 100"
+            "expression": "sum(case when waterCutLab is not null and abs(waterCutLab - waterCut) > 5 then liquidOutput * waterCutLab / 100 else liquidOutput - oilOutput end) / sum(liquidOutput) * 100  # B′ 化验校正（PROP-031，2026-09-21）：井·月粒度；化验配对经 RULE-BOHAI-002 中间视图（井号+取样日期双键+时间容差）"
           },
           "via": "ownerObjectBehaviors(AGG-BOHAI-002)"
         }
@@ -327,7 +327,7 @@
           "name": "综合含水率",
           "type": "CALCULATION",
           "point": {
-            "expression": "(liquidSum - oilSum) / liquidSum * 100"
+            "expression": "sum(case when waterCutLab is not null and abs(waterCutLab - waterCut) > 5 then liquidOutput * waterCutLab / 100 else liquidOutput - oilOutput end) / sum(liquidOutput) * 100  # B′ 化验校正（PROP-031，2026-09-21）：井·月粒度；化验配对经 RULE-BOHAI-002 中间视图（井号+取样日期双键+时间容差）"
           },
           "via": "ownerObjectBehaviors(AGG-BOHAI-002)"
         }
@@ -430,7 +430,7 @@
           "name": "综合含水率",
           "type": "CALCULATION",
           "point": {
-            "expression": "(liquidSum - oilSum) / liquidSum * 100"
+            "expression": "sum(case when waterCutLab is not null and abs(waterCutLab - waterCut) > 5 then liquidOutput * waterCutLab / 100 else liquidOutput - oilOutput end) / sum(liquidOutput) * 100  # B′ 化验校正（PROP-031，2026-09-21）：井·月粒度；化验配对经 RULE-BOHAI-002 中间视图（井号+取样日期双键+时间容差）"
           },
           "via": "behavior.appliedRules(BH-BOHAI-QueryBlockWaterCut)"
         },

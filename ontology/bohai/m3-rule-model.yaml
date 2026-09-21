@@ -169,18 +169,26 @@ rules:
   - id: RULE-BOHAI-010
     name: 综合含水率
     ruleType: CALCULATION
-    description: "R5·§3 指标 5（Owner=开发室，数据源 2.2+2.6）。8 表无独立产水量列，Q_w=Q_液−Q_油 换算口径待 Owner 确认；化验 vs 计量打架（D3）由 RULE-BOHAI-002 容差承载；与注采比同受物质平衡强约束（§3 注记）。"
+    description: "R5·§3 指标 5（Owner=开发室，数据源 2.2+2.6）。Q_w 换算口径裁决已落定（Owner 2026-09-21，PROP-BOHAI-031=B′）：默认差值推算 Q_w=Q_液−Q_油；该井当月化验含水与计量折算偏差 >5pp（RULE-BOHAI-002 容差）时，该井当月以化验实测重算（化验校正分支，承接 PROP-BOHAI-008=C 的月度化验权威）；无当月化验的井走差值推算。取样频次不齐/插补规则争议仍待 Owner（FluidTest 残留）——本口径使其升为指标正确性的前置条件。与注采比同受物质平衡强约束（§3 注记）。"
     inputParams:
-      - name: liquidSum
+      - name: liquidOutput
         type: Decimal
-        sourceField: dailyProduction.liquidOutput（区块月合计）
+        sourceField: dailyProduction.liquidOutput（井·月粒度）
         required: true
-      - name: oilSum
+      - name: oilOutput
         type: Decimal
-        sourceField: dailyProduction.oilOutput（区块月合计）
+        sourceField: dailyProduction.oilOutput（井·月粒度）
         required: true
+      - name: waterCut
+        type: Decimal
+        sourceField: dailyProduction.waterCut（计量折算，校正判据）
+        required: true
+      - name: waterCutLab
+        type: Decimal
+        sourceField: fluidTest.waterCutLab（当月化验，可无——无则走差值推算）
+        required: false
     outputType: Decimal
-    expression: (liquidSum - oilSum) / liquidSum * 100
+    expression: "sum(case when waterCutLab is not null and abs(waterCutLab - waterCut) > 5 then liquidOutput * waterCutLab / 100 else liquidOutput - oilOutput end) / sum(liquidOutput) * 100  # B′ 化验校正（PROP-031，2026-09-21）：井·月粒度；化验配对经 RULE-BOHAI-002 中间视图（井号+取样日期双键+时间容差）"
     reusedBy:
       - BH-BOHAI-QueryBlockWaterCut
   # [R5·§3 指标 6] ☆注采比 β = 月注水量/月产液量（体积折算，月/无量纲，Owner 采油工艺所）
