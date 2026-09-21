@@ -15,6 +15,20 @@
       "notes": "首审基线（票 46）：--check 再制一致绿；四节+固定输入约束节齐；开放疑点节 26 条 open 提案带 PROP 指针落位；档位=全审级",
       "reviewedBy": "divh",
       "date": "2026-09-20"
+    },
+    {
+      "target": "exports/devkit/bohai/devkit.md",
+      "reviewedCommit": "93b970172f7768f35da5f574b2481ee3ed2f1270",
+      "reviewedSha256": "cb0fe50a311e1707abcc0ec8966cfeb3afd6f8024de179306cda30bfd204a811",
+      "verdict": "已审",
+      "checkpoints": [
+        "装配完整性",
+        "提案内容落位(PROP-008 C口径入FluidTest描述)",
+        "约束节原样"
+      ],
+      "notes": "PROP-BOHAI-008采纳后再生；变更仅两处：C口径描述+open清单26→25，增量审通过",
+      "reviewedBy": "divh",
+      "date": "2026-09-21"
     }
   ]
 }
