@@ -69,7 +69,7 @@ status: 待Owner人审（生成物禁手改，可再生；审记旁档exports/re
 ### 口径 QR-BOHAI-003 · 区块月度商品量结算查询
 
 - 问题样例: 区块月度商品量结算查询
-- 描述: 商品量=净重（扣自用油与输差，R5·A.8/§3 指标 11）；与井口口径天然不等=事故 7 另一面（D15），两口径并列展示不互替。
+- 描述: 商品量=净重（扣自用油与输差，R5·A.8/§3 指标 11）。口径仲裁（PROP-BOHAI-020=①+②+③，2026-09-21）：与井口口径并存披露不互替——本查询为经营/结算口径；生产口径请走井口合计（AGG-BOHAI-002.oilOutput）；两口径之差=自用+输差，折算关系见 AGG-BOHAI-008 description。
 - 查询出口: QR-BOHAI-003（DETAIL_QUERY）
 - 行为: BH-BOHAI-QueryMonthlySettlement 查询区块月度商品量结算（QUERY，ownerEntity=AGG-BOHAI-008）
 - 承载对象: AGG-BOHAI-008 区块月度结算（主）

@@ -465,7 +465,7 @@
         "name": "区块月度结算",
         "alias": "MonthlySettlement",
         "aggregateType": "AGGREGATE_ROOT",
-        "description": "源表 monthly_settlement（R5·设定书附录 A.8），键=区块+结算月，复合主键（blockName, settleDate），settleDate 粒度为月（v2 兼容声明：规范名）。疑点残留：netWeight 扣自用油与输差、与井口口径天然不等=事故 7 另一面（D15）；§8 事故 13（A11 实时加和 vs E7 统计上报差 3.2%）同源——口径仲裁待 Owner。",
+        "description": "源表 monthly_settlement（R5·设定书附录 A.8），键=区块+结算月，复合主键（blockName, settleDate），settleDate 粒度为月（v2 兼容声明：规范名）。口径仲裁已落定（Owner 2026-09-21，PROP-BOHAI-020=①+②+③）：商品量（netWeight，扣自用油与输差）与井口口径（AGG-BOHAI-002.oilOutput 区块合计）**并存披露不互替**；使用边界：生产类指标用井口口径、经营/结算类指标用商品量；折算关系成文：商品量 = 井口合计 ×（1−自用率−输差率）——输差率口径框架本裁确立，具体阈值待 Owner 后续提案（事故 7/13 同源问题的标准答案：两口径之差=自用+输差）。",
         "sourceNote": "R5·A.8",
         "attributes": [
           {
@@ -993,7 +993,7 @@
       "objectType": "DETAIL_QUERY",
       "questionSample": "区块月度商品量结算查询",
       "sourceNote": "R5·§3 指标 11 商品量",
-      "description": "商品量=净重（扣自用油与输差，R5·A.8/§3 指标 11）；与井口口径天然不等=事故 7 另一面（D15），两口径并列展示不互替。",
+      "description": "商品量=净重（扣自用油与输差，R5·A.8/§3 指标 11）。口径仲裁（PROP-BOHAI-020=①+②+③，2026-09-21）：与井口口径并存披露不互替——本查询为经营/结算口径；生产口径请走井口合计（AGG-BOHAI-002.oilOutput）；两口径之差=自用+输差，折算关系见 AGG-BOHAI-008 description。",
       "behavior": {
         "id": "BH-BOHAI-QueryMonthlySettlement",
         "name": "查询区块月度商品量结算",
@@ -1768,16 +1768,6 @@
         "signalKind": "疑点",
         "signalRef": "docs/walkthrough/step1-db-reverse-draft/dirty-signs.md#D14-新旧停机码",
         "path": "docs/proposals/PROP-BOHAI-019.md"
-      },
-      {
-        "id": "PROP-BOHAI-020",
-        "title": "裁决商品量与井口口径仲裁注记（AGG-BOHAI-008）",
-        "change": "modify",
-        "targetModel": "M1",
-        "targetElement": "AGG-BOHAI-008",
-        "signalKind": "对账缺口",
-        "signalRef": "docs/walkthrough/step2-mr-adjudication.md#二-D15-净重口径",
-        "path": "docs/proposals/PROP-BOHAI-020.md"
       },
       {
         "id": "PROP-BOHAI-021",

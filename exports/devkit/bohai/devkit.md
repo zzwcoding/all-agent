@@ -149,7 +149,7 @@ status: 待Owner人审（生成物禁手改，可再生；审记旁档exports/re
 ### AGG-BOHAI-008 区块月度结算（MonthlySettlement）
 
 - 注源: R5·A.8
-- AGGREGATE_ROOT；描述: 源表 monthly_settlement（R5·设定书附录 A.8），键=区块+结算月，复合主键（blockName, settleDate），settleDate 粒度为月（v2 兼容声明：规范名）。疑点残留：netWeight 扣自用油与输差、与井口口径天然不等=事故 7 另一面（D15）；§8 事故 13（A11 实时加和 vs E7 统计上报差 3.2%）同源——口径仲裁待 Owner。
+- AGGREGATE_ROOT；描述: 源表 monthly_settlement（R5·设定书附录 A.8），键=区块+结算月，复合主键（blockName, settleDate），settleDate 粒度为月（v2 兼容声明：规范名）。口径仲裁已落定（Owner 2026-09-21，PROP-BOHAI-020=①+②+③）：商品量（netWeight，扣自用油与输差）与井口口径（AGG-BOHAI-002.oilOutput 区块合计）**并存披露不互替**；使用边界：生产类指标用井口口径、经营/结算类指标用商品量；折算关系成文：商品量 = 井口合计 ×（1−自用率−输差率）——输差率口径框架本裁确立，具体阈值待 Owner 后续提案（事故 7/13 同源问题的标准答案：两口径之差=自用+输差）。
 
 | 属性 | 标签 | 类型 | 约束与字典 |
 |---|---|---|---|
@@ -295,7 +295,7 @@ status: 待Owner人审（生成物禁手改，可再生；审记旁档exports/re
 
 ## 四、开放疑点（docs/proposals 扫描）
 
-指向本域的 open 提案 24 条（裁决与详情看提案原文）:
+指向本域的 open 提案 23 条（裁决与详情看提案原文）:
 
 - PROP-BOHAI-006 新增吨方混写存量行检出规则（RULE-BOHAI-020）［add → M3/RULE-BOHAI-020］（docs/proposals/PROP-BOHAI-006.md）
 - PROP-BOHAI-007 新增同井同日班次重复行校验规则（RULE-BOHAI-021）［add → M3/RULE-BOHAI-021］（docs/proposals/PROP-BOHAI-007.md）
@@ -310,7 +310,6 @@ status: 待Owner人审（生成物禁手改，可再生；审记旁档exports/re
 - PROP-BOHAI-017 裁决措施有效期缺失行统计分母口径（RULE-BOHAI-015）［modify → M3/RULE-BOHAI-015］（docs/proposals/PROP-BOHAI-017.md）
 - PROP-BOHAI-018 补齐递减增油基线拟合参数与统一前使用边界（RULE-BOHAI-018）［modify → M3/RULE-BOHAI-018］（docs/proposals/PROP-BOHAI-018.md）
 - PROP-BOHAI-019 补齐停机原因码新旧映射表全集（RULE-BOHAI-006）［modify → M3/RULE-BOHAI-006］（docs/proposals/PROP-BOHAI-019.md）
-- PROP-BOHAI-020 裁决商品量与井口口径仲裁注记（AGG-BOHAI-008）［modify → M1/AGG-BOHAI-008］（docs/proposals/PROP-BOHAI-020.md）
 - PROP-BOHAI-021 裁决受效关系实体物理落表方案（AGG-BOHAI-009）［modify → M1/AGG-BOHAI-009］（docs/proposals/PROP-BOHAI-021.md）
 - PROP-BOHAI-022 裁决 MU 模型补建或维持不建（SCR-BOHAI-001 维形位）［add → MU/SCR-BOHAI-001］（docs/proposals/PROP-BOHAI-022.md）
 - PROP-BOHAI-023 批次受理提取件二规则 13–20 判据（RULE-BOHAI-026 占位）［add → M3/RULE-BOHAI-026］（docs/proposals/PROP-BOHAI-023.md）
