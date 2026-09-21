@@ -917,6 +917,15 @@
           "via": "behavior.appliedRules(BH-BOHAI-QueryBlockMonthlyCompletion)"
         },
         {
+          "id": "RULE-BOHAI-022",
+          "name": "配产单值校验",
+          "type": "VALIDATION",
+          "point": {
+            "expression": "count(non-null planOutput rows by (wellId, prodDate)) <= 1"
+          },
+          "via": "reusedBy(BH-BOHAI-QueryBlockMonthlyCompletion)"
+        },
+        {
           "id": "RULE-BOHAI-005",
           "name": "井号归一化",
           "type": "TRANSFORMATION",
@@ -978,6 +987,7 @@
         "AGG-BOHAI-001",
         "RULE-BOHAI-009",
         "RULE-BOHAI-019",
+        "RULE-BOHAI-022",
         "RULE-BOHAI-005",
         "RULE-BOHAI-002",
         "RULE-BOHAI-003",
@@ -1521,13 +1531,25 @@
         "id": "RULE-BOHAI-009",
         "name": "产量完成率",
         "ruleType": "CALCULATION",
-        "description": "R5·§3 指标 1（★，Owner=开发室，数据源 2.2+配产表）。争议注记：计划版本切换日双值行（AGG-BOHAI-002.planOutput，D4）。术语注记（R5·§6）：禁用旧称「老完成率」——v1 口径（不含自用油折算），2024 年废弃，替代即本指标。",
+        "description": "R5·§3 指标 1（★，Owner=开发室，数据源 2.2+配产表）。分母口径已落定（Owner 2026-09-21，PROP-BOHAI-009=A 经 RULE-BOHAI-022）：配产版本切换日双值行按「当日最后班次非空值」取版。术语注记（R5·§6）：禁用旧称「老完成率」——v1 口径（不含自用油折算），2024 年废弃，替代即本指标。",
         "expression": "actualOilSum / planOutputSum * 100",
         "narrative": "",
         "reusedBy": [
           "BH-BOHAI-QueryBlockMonthlyCompletion"
         ],
         "sourceNote": "R5·§3 指标 1"
+      },
+      {
+        "id": "RULE-BOHAI-022",
+        "name": "配产单值校验",
+        "ruleType": "VALIDATION",
+        "description": "D4 配产版本切换日双值行（R5·A.2）。版本语义裁决（Owner 2026-09-21，PROP-BOHAI-009=A）：双值=版本事实（承接 PROP-BOHAI-007=A 班次粒度——切换日早班旧版/晚班新版），日配产口径=当日最后班次的非空 planOutput（取版规则）；全部双值行出清单供人复核（取版假设的兜底，不阻断）。",
+        "expression": "count(non-null planOutput rows by (wellId, prodDate)) <= 1",
+        "narrative": "检出双值行不阻断（版本事实非脏行）；日配产口径=当日最后班次非空 planOutput；双值行全量入清单供人复核取版正确性；产量完成率（RULE-BOHAI-009）分母按本口径净化",
+        "reusedBy": [
+          "BH-BOHAI-QueryBlockMonthlyCompletion"
+        ],
+        "sourceNote": ""
       },
       {
         "id": "RULE-BOHAI-010",
@@ -1649,16 +1671,6 @@
     "enabled": true,
     "scannedDir": "docs/proposals",
     "items": [
-      {
-        "id": "PROP-BOHAI-009",
-        "title": "新增配产单值校验规则承载双值行版本语义裁决（RULE-BOHAI-022）",
-        "change": "add",
-        "targetModel": "M3",
-        "targetElement": "RULE-BOHAI-022",
-        "signalKind": "疑点",
-        "signalRef": "docs/walkthrough/step1-db-reverse-draft/dirty-signs.md#D4-配产双值行",
-        "path": "docs/proposals/PROP-BOHAI-009.md"
-      },
       {
         "id": "PROP-BOHAI-010",
         "title": "新增停井日 openDays 与井状态联动校验规则（RULE-BOHAI-023）",

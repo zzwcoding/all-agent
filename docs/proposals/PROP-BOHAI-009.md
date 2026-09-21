@@ -1,7 +1,7 @@
 ---
 id: PROP-BOHAI-009
 title: 新增配产单值校验规则承载双值行版本语义裁决（RULE-BOHAI-022）
-status: open
+status: accepted
 source-signal:
   kind: 疑点
   ref: docs/walkthrough/step1-db-reverse-draft/dirty-signs.md#D4-配产双值行
@@ -29,3 +29,7 @@ rationale: "D4 配产版本切换日双值行目前只有 RULE-BOHAI-009（产�
 - A 级：`ontology/bohai/m3-rule-model.yaml#RULE-BOHAI-009`——description 争议注记「计划版本切换日双值行（AGG-BOHAI-002.planOutput，D4）」。
 - 影响面：纯新增规则元素；裁决后承接方为产量完成率（RULE-BOHAI-009）口径净化。
 - 靶 ID 核对：RULE-BOHAI-022 未占用。
+
+## 裁决记录（Owner，2026-09-21）
+
+**裁决：A 版本事实，日口径取切换后版本**——双值=配产版本切换的真实记录（承接 PROP-BOHAI-007=A 班次粒度：切换日早班旧版/晚班新版）；日配产口径=当日最后班次的非空 planOutput；全部双值行出清单供人复核（取版假设兜底，不阻断）。落点：新增 RULE-BOHAI-022（VALIDATION，检出+取版口径，reusedBy 挂产量完成率查询行为）；RULE-BOHAI-009 分母口径注记同步净化。

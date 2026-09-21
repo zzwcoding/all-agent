@@ -151,7 +151,7 @@ rules:
   - id: RULE-BOHAI-009
     name: 产量完成率
     ruleType: CALCULATION
-    description: "R5·§3 指标 1（★，Owner=开发室，数据源 2.2+配产表）。争议注记：计划版本切换日双值行（AGG-BOHAI-002.planOutput，D4）。术语注记（R5·§6）：禁用旧称「老完成率」——v1 口径（不含自用油折算），2024 年废弃，替代即本指标。"
+    description: "R5·§3 指标 1（★，Owner=开发室，数据源 2.2+配产表）。分母口径已落定（Owner 2026-09-21，PROP-BOHAI-009=A 经 RULE-BOHAI-022）：配产版本切换日双值行按「当日最后班次非空值」取版。术语注记（R5·§6）：禁用旧称「老完成率」——v1 口径（不含自用油折算），2024 年废弃，替代即本指标。"
     inputParams:
       - name: actualOilSum
         type: Decimal
@@ -163,6 +163,25 @@ rules:
         required: true
     outputType: Decimal
     expression: actualOilSum / planOutputSum * 100
+    reusedBy:
+      - BH-BOHAI-QueryBlockMonthlyCompletion
+  # [D4 版本语义] 配产双值行校验与取版口径（Owner 2026-09-21，PROP-BOHAI-009 采纳=A 版本事实）
+  - id: RULE-BOHAI-022
+    name: 配产单值校验
+    ruleType: VALIDATION
+    description: "D4 配产版本切换日双值行（R5·A.2）。版本语义裁决（Owner 2026-09-21，PROP-BOHAI-009=A）：双值=版本事实（承接 PROP-BOHAI-007=A 班次粒度——切换日早班旧版/晚班新版），日配产口径=当日最后班次的非空 planOutput（取版规则）；全部双值行出清单供人复核（取版假设的兜底，不阻断）。"
+    inputParams:
+      - name: planOutput
+        type: Decimal
+        sourceField: dailyProduction.planOutput
+        required: true
+      - name: reportShift
+        type: Enum
+        sourceField: dailyProduction.reportShift（班次序=取版依据）
+        required: true
+    outputType: Boolean
+    expression: count(non-null planOutput rows by (wellId, prodDate)) <= 1   # 违反=版本切换日双值行；不阻断，取版与清单见 narrative
+    narrative: 检出双值行不阻断（版本事实非脏行）；日配产口径=当日最后班次非空 planOutput；双值行全量入清单供人复核取版正确性；产量完成率（RULE-BOHAI-009）分母按本口径净化
     reusedBy:
       - BH-BOHAI-QueryBlockMonthlyCompletion
   # [R5·§3 指标 5] ☆综合含水率 f_w = Q_w/(Q_o+Q_w)×100%（月/%，Owner 开发室）

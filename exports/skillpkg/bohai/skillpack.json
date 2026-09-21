@@ -278,6 +278,15 @@
           "via": "behavior.appliedRules(BH-BOHAI-QueryBlockMonthlyCompletion)"
         },
         {
+          "id": "RULE-BOHAI-022",
+          "name": "配产单值校验",
+          "type": "VALIDATION",
+          "point": {
+            "expression": "count(non-null planOutput rows by (wellId, prodDate)) <= 1"
+          },
+          "via": "reusedBy(BH-BOHAI-QueryBlockMonthlyCompletion)"
+        },
+        {
           "id": "RULE-BOHAI-005",
           "name": "井号归一化",
           "type": "TRANSFORMATION",
@@ -339,6 +348,7 @@
         "AGG-BOHAI-001",
         "RULE-BOHAI-009",
         "RULE-BOHAI-019",
+        "RULE-BOHAI-022",
         "RULE-BOHAI-005",
         "RULE-BOHAI-002",
         "RULE-BOHAI-003",
