@@ -30,7 +30,7 @@
 | A19 | 指标 8 措施有效率判据（fidelity§二/收官§6.9） | PROP-BOHAI-024 | **accepted** | 判据到齐关箱：RULE-034（90日累增油≥80t或有效期≥180日）；commit `3898cc9` |
 | A20 | 指标 12 机采能效公式（fidelity§二/收官§6.9） | PROP-BOHAI-025 | **accepted** | 三级公式+单位（kN/A）到齐关箱：RULE-035+AGG-007 注记；commit `38bee60` |
 | A21 | 指标 15 桶油成本投入字段（fidelity§二/收官§6.9） | PROP-BOHAI-026 | open（部分裁决） | 方向裁：本期不引入（ERP 扩源归源系统侧决策）；指标位池内预留；入问题清单 |
-| A22 | 指标 2 开井日历支公式（fidelity§二/收官§6.9） | PROP-BOHAI-029 | open（缺公式） | 日历支公式未给全不猜；剔检支已全译可用；入问题清单 |
+| A22 | 指标 2 开井日历支公式（fidelity§二/收官§6.9） | PROP-BOHAI-029 | **accepted** | 日历支到齐关箱：RULE-019 双口径并列；commit `4c2c970` |
 | A23 | 指标 3 年化拟合（fidelity§二/收官§6.9） | PROP-BOHAI-030 | **accepted** | 裁 实现层=对数线性回归+滚动 12 月窗口+扣减口径沿月度式（注记级可逆）；commit `d7f4e1d` |
 | A24 | 指标 5 Q_w 换算口径（fidelity§二/收官§6.9） | PROP-BOHAI-031 | **accepted** | 裁决 B′ 默认推算+化验校正（>5pp 井月以化验重算）；RULE-BOHAI-010 条件式落定；commit `8e5e334`；A3 联动闭环 |
 | A25 | 指标 10 基线拟合参数（fidelity§二/收官§6.9） | PROP-BOHAI-018 | **accepted** | 参数到齐关箱（与 A13 同靶）；commit `ebec39a` |
