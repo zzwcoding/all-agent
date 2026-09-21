@@ -407,6 +407,20 @@
       "notes": "Owner素材已确认，增量审落记",
       "reviewedBy": "divh",
       "date": "2026-09-21"
+    },
+    {
+      "target": "exports/devkit/bohai/devkit.md",
+      "reviewedCommit": "f8f2ac371da48c2ae4c8c50e73291336cb457d30",
+      "reviewedSha256": "fbacd4255087b94b4b3ee92270a653287484d6df424d9419750c6fe4fb79b552",
+      "verdict": "已审",
+      "checkpoints": [
+        "装配完整性",
+        "提案内容落位(PROP-029日历支)",
+        "约束节原样"
+      ],
+      "notes": "Owner素材已确认，增量审落记",
+      "reviewedBy": "divh",
+      "date": "2026-09-21"
     }
   ]
 }
