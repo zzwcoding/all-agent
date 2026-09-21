@@ -15,7 +15,9 @@
                       非映射同归此类。schema 红的文件不再进 ②③④（红因纯净，脏数据
                       不进池内比对，避免连环误报）。
 
-  ② proposal-target   target 存在性：change=modify/deprecate → target.element 必须
+  ② proposal-target   target 存在性（**仅判 draft/open**，票 56：已裁决提案的靶在场
+                      =实施完成的预期态，不判——A 线 PROP-006 实弹发现的盲区）：
+                      change=modify/deprecate → target.element 必须
                       已在 ontology/ 真域；change=add → 必须不存在（防重复建，要改
                       既有元素应走 modify）。元素判定口径照票 04 图索引：定义键
                       id/*Id（ref 键除外）且值为字符串、且带 ontology/schema/
@@ -287,14 +289,18 @@ def run(pool_dir: Path, root: Path) -> dict:
     for fname, data in valid:
         element = data["target"]["element"]
         change = data["change"]
-        if change == "add":
-            if element in elements:
+        # target 存在性只判 draft/open（票 56：已裁决提案的靶在场=实施完成的预期态，
+        # 一刀切会把每份被采纳的 add 提案误报成红——A 线 PROP-006 实弹发现）；
+        # ④ evidence 维持全状态（证据链终身有效）。
+        if data["status"] in ("draft", "open"):
+            if change == "add":
+                if element in elements:
+                    add("proposal-target", fname,
+                        f"add 的靶元素在 ontology/ 真域已存在（要改既有元素应走 "
+                        f"modify）: {element}")
+            elif element not in elements:
                 add("proposal-target", fname,
-                    f"add 的靶元素在 ontology/ 真域已存在（要改既有元素应走 "
-                    f"modify）: {element}")
-        elif element not in elements:
-            add("proposal-target", fname,
-                f"{change} 的靶元素在 ontology/ 真域不存在: {element}")
+                    f"{change} 的靶元素在 ontology/ 真域不存在: {element}")
         missing = evidence_missing(root, pool_dir,
                                    data["source-signal"]["ref"])
         if missing is not None:

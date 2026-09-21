@@ -246,6 +246,24 @@ class TargetTests(Base):
         self.assertIn("AGG-DEMO-001", out)
         self.assertIn("已存在", out)
 
+    def test_accepted_add_already_exist_ok(self):
+        """票 56 AC1：accepted add 的靶在场=实施完成预期态，不判（A 线 PROP-006 实弹盲区）。"""
+        self.write_evidence()
+        self.write_proposal(change="add", element="AGG-DEMO-001", model="M1",
+                            status="accepted")
+        code, out, _ = self.check()
+        self.assertEqual(code, 0, out)
+        self.assertNotIn("proposal-target", out)
+
+    def test_rejected_modify_not_exist_ok(self):
+        """票 56：rejected 提案靶在不在都合法（modify+不存在也不判）。"""
+        self.write_evidence()
+        self.write_proposal(change="modify", element="AGG-DEMO-999", model="M1",
+                            status="rejected")
+        code, out, _ = self.check()
+        self.assertEqual(code, 0, out)
+        self.assertNotIn("proposal-target", out)
+
     def test_modify_exist_ok(self):
         self.write_evidence()
         self.write_proposal(change="modify", element="AGG-DEMO-001",

@@ -9,7 +9,7 @@
 
 | 草表号 | 素材条目（来源） | PROP ID | 状态 | 证据与备注 |
 |---|---|---|---|---|
-| A1 | D1 吨方混写——存量误录行修复（step2§二） | PROP-BOHAI-006 | open | add RULE-BOHAI-020；修复判据待 Owner |
+| A1 | D1 吨方混写——存量误录行修复（step2§二） | PROP-BOHAI-006 | **accepted** | 裁决 判据两级+处置A（确诊=油>液/疑似=密度越界，出清单交业务修复）；RULE-BOHAI-020 落地；commit `50da7f3`（提案闸盲区实弹发现→票 56 清偿） |
 | A2 | D2 A/B 班重复行——去重/键约束（step2§二） | PROP-BOHAI-007 | open | add RULE-BOHAI-021；裁「业务事实」则 rejected 归档 |
 | A3 | D3 权威源归属（step2§二） | PROP-BOHAI-008 | **accepted** | 裁决 C 并存分场景（日度=计量折算/月度正式指标=化验/>5pp 化验校正），m1 三处注记落定；commit `203d7fa`；RULE-BOHAI-010 取数方向→PROP-031 联动未闭 |
 | A4 | D4 配产双值行版本语义（step2§二） | PROP-BOHAI-009 | open | add RULE-BOHAI-022；裁决前仅告警 |

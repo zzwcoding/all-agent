@@ -1,6 +1,6 @@
 {
   "skill": "proposal-pool（提案池，票 18）",
-  "description": "出厂集：正例 cases/（两份 open 提案：add RULE-BOHAI-020 渤海新规则 + modify AGG-BOHAI-002 真实元素，附证据附件与非提案 README）→ 断言 proposal_check exit 0 且只解析 PROP-*.md（AC1）；负变体 negative-variants/ 五类各一（missing-field / target-not-exist / target-already-exists / same-target-conflict / evidence-missing）另加 bad-enum（AC4 后半枚举面），各自独立目录、cmd-fails 且 outputContains 钉死对应违规码（proposal-schema / proposal-target / proposal-conflict / proposal-evidence）与关键细节（缺失字段名、非法枚举值、靶 ID、矛盾双方 change、证据文件名），红因纯净不连带。target 存在性判定打 ontology/bohai 真域（fixture_run cmd cwd=仓根，沿票 16/17 先例；RULE-BOHAI-020 未占用、AGG-BOHAI-001/002 在域，证据文件均随 fixture 落盘走提案目录相对解析）。AC 真源=tickets/18-proposal-pool-skill.md AC 表。",
+  "description": "出厂集：正例 cases/（两份 open 提案：add RULE-BOHAI-099 渤海新规则 + modify AGG-BOHAI-002 真实元素，附证据附件与非提案 README）→ 断言 proposal_check exit 0 且只解析 PROP-*.md（AC1）；负变体 negative-variants/ 五类各一（missing-field / target-not-exist / target-already-exists / same-target-conflict / evidence-missing）另加 bad-enum（AC4 后半枚举面），各自独立目录、cmd-fails 且 outputContains 钉死对应违规码（proposal-schema / proposal-target / proposal-conflict / proposal-evidence）与关键细节（缺失字段名、非法枚举值、靶 ID、矛盾双方 change、证据文件名），红因纯净不连带。target 存在性判定打 ontology/bohai 真域（fixture_run cmd cwd=仓根，沿票 16/17 先例；RULE-BOHAI-099 未占用（2026-09-21 换锚：原锚 020 被真域 PROP-BOHAI-006 采纳占用——出厂集锚定真域 ID 的前提随真域演进失效的实证，见 lessons/57）、AGG-BOHAI-001/002 在域，证据文件均随 fixture 落盘走提案目录相对解析）。AC 真源=tickets/18-proposal-pool-skill.md AC 表。",
   "assertions": [
     {
       "ac": "输入（正例两份在档）",

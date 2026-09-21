@@ -7,7 +7,7 @@ source-signal:
   ref: evidence/ghost-note.md#交互
 target:
   model: M3
-  element: RULE-BOHAI-020
+  element: RULE-BOHAI-099
 change: add
 rationale: 本文件 source-signal.ref 指向的 evidence/ghost-note.md 在仓根相对与提案目录相对两个位置都不存在——proposal-evidence 应红（AC6）。提案无证据=不可追溯，不可进池。
 ---
