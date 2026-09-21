@@ -253,6 +253,20 @@
       "notes": "Owner批量授权代裁，增量审落记",
       "reviewedBy": "divh",
       "date": "2026-09-21"
+    },
+    {
+      "target": "exports/devkit/bohai/devkit.md",
+      "reviewedCommit": "9655f92cb2fb38b3f0078653194b1e4b48ad2b8e",
+      "reviewedSha256": "859db713f76872385d642044255838d229d2deb5a919bbc4dae4e8c912e59dd9",
+      "verdict": "已审",
+      "checkpoints": [
+        "装配完整性",
+        "提案内容落位(PROP-027 rejected计数)",
+        "约束节原样"
+      ],
+      "notes": "Owner批量授权代裁，增量审落记",
+      "reviewedBy": "divh",
+      "date": "2026-09-21"
     }
   ]
 }
