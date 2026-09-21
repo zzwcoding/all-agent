@@ -13,7 +13,7 @@
 | A2 | D2 A/B 班重复行——去重/键约束（step2§二） | PROP-BOHAI-007 | **rejected** | 裁 A 班次行=业务事实（提案预设路径）：RULE-021 不建；AGG-002 主键声明修正为班次粒度（commit `9b606f5`） |
 | A3 | D3 权威源归属（step2§二） | PROP-BOHAI-008 | **accepted** | 裁决 C 并存分场景（日度=计量折算/月度正式指标=化验/>5pp 化验校正），m1 三处注记落定；commit `203d7fa`；RULE-BOHAI-010 取数方向→PROP-031 联动未闭 |
 | A4 | D4 配产双值行版本语义（step2§二） | PROP-BOHAI-009 | **accepted** | 裁 A 版本事实：RULE-022 检出+取版（当日最后班次非空值）；RULE-009 分母净化；commit `a001af7` |
-| A5 | D5 openDays 矛盾行清洗（step2§二） | PROP-BOHAI-010 | open | add RULE-BOHAI-023；跨属性判定落 M3 |
+| A5 | D5 openDays 矛盾行清洗（step2§二） | PROP-BOHAI-010 | **accepted** | 裁 标注出清单交业务核实（不归零——归属未定，联动 D7）；RULE-023 落地；commit `4f793e1` |
 | A6 | D6 归一表全集+归一位置（step2§二） | PROP-BOHAI-011 | open | modify RULE-BOHAI-005；全集+位置双裁决 |
 | A7 | D7 状态时效责任方（step2§二） | PROP-BOHAI-012 | open | modify AGG-BOHAI-001；波及剔检口径时效 |
 | A8 | D8 是否提升「油田」对象（step2§二） | PROP-BOHAI-013 | open | 并入无源实体族（同表 A28 行） |
