@@ -21,7 +21,7 @@
 | A10 | D10 跨月归属期规则（step2§二） | PROP-BOHAI-015 | **accepted** | 裁 按日历天数劈分（当月只承担当月天数）；RULE-024 落地、016/019 注记升级引用；commit `cea7095` |
 | A11 | D11 补录窗口阈值（step2§二） | PROP-BOHAI-016 | **accepted** | T-5 到齐关箱：RULE-025 表达式+挂接落定（commit `043613f`） |
 | A12 | D12 缺失行计入分母（step2§二） | PROP-BOHAI-017 | **accepted** | 裁 缺失行不入分母+缺失率单列+入清单核实性质；RULE-015 定案；commit `fc21fb8` |
-| A13 | D13 统一前使用边界（step2§二） | PROP-BOHAI-018 | open（部分裁决） | (b) 使用边界已裁：统一前限井组年尺度内部评估不入对外报表（commit `69ce96c`） |
+| A13 | D13 统一前使用边界（step2§二） | PROP-BOHAI-018 | **accepted** | (b) 边界已裁（`69ce96c`）；(a) 参数到齐关箱（`ebec39a`） |
 | A14 | D14 停机码映射表全集（step2§二） | PROP-BOHAI-019 | **accepted** | 全集 12 对到齐落 RULE-006（R11 不折减差异保留）；commit `db6a517` |
 | A15 | D15 商品量 vs 井口仲裁（step2§二） | PROP-BOHAI-020 | **accepted** | 裁决 ①+②+③（并存披露+使用边界+输差率折算关系，阈值挂后续提案）；AGG-008+QR-003 同步落定；commit `048aa32`；事故 7/13 同源问题有标准答案 |
 | A16 | MU 全模型无素材（step2§一/§四） | PROP-BOHAI-022 | **rejected** | 裁维持不建（R5 无 UI 证据+产物形态无界面面；素材到另立提案）；commit `881b041` |
@@ -33,7 +33,7 @@
 | A22 | 指标 2 开井日历支公式（fidelity§二/收官§6.9） | PROP-BOHAI-029 | open（缺公式） | 日历支公式未给全不猜；剔检支已全译可用；入问题清单 |
 | A23 | 指标 3 年化拟合（fidelity§二/收官§6.9） | PROP-BOHAI-030 | **accepted** | 裁 实现层=对数线性回归+滚动 12 月窗口+扣减口径沿月度式（注记级可逆）；commit `d7f4e1d` |
 | A24 | 指标 5 Q_w 换算口径（fidelity§二/收官§6.9） | PROP-BOHAI-031 | **accepted** | 裁决 B′ 默认推算+化验校正（>5pp 井月以化验重算）；RULE-BOHAI-010 条件式落定；commit `8e5e334`；A3 联动闭环 |
-| A25 | 指标 10 基线拟合参数（fidelity§二/收官§6.9） | PROP-BOHAI-018 | open（部分裁决） | (a) 拟合参数缺素材待 Owner，入问题清单（同靶 A13 已部分裁决） |
+| A25 | 指标 10 基线拟合参数（fidelity§二/收官§6.9） | PROP-BOHAI-018 | **accepted** | 参数到齐关箱（与 A13 同靶）；commit `ebec39a` |
 | A26 | §4 规则 6 完井不在 8 表（step2§三/收官§6.10） | PROP-BOHAI-027 | **rejected** | 裁挂起（扩源=域面变更须 Owner 主动引入另立提案）；RULE-037 号位回收；commit 见本行翻转批次 |
 | A27 | §4 规则 11 实时域（m3 头注/收官§6.10） | PROP-BOHAI-028 | **accepted** | 裁 批面近似（当日批内 current 全零即告警；实时面另案）；RULE-038 落地；commit `f930be8` |
 | A28 | 区块/油田/平台/井筒/配注层未建（fidelity§一/收官§6.12） | PROP-BOHAI-013 | **accepted** | 区块建维形 AGG-BOHAI-010（族首）；油田/平台/井筒/配注层裁不建（无素材建即空壳，素材到另立提案）；commit `9d0b0c4` |
