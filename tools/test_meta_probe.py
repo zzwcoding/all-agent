@@ -672,9 +672,9 @@ class MetaProbeReviewMerge(unittest.TestCase):
     def tearDown(self):
         self.repo.cleanup()
 
-    def _run(self, extra_argv, review_file=None):
+    def _run(self, extra_argv, review_file=None, entries=None):
         review = {"reviewedBy": "L0", "reviewedAt": "2026-09-19",
-                  "entries": [
+                  "entries": entries or [
                       {"file": "fixtures/onto/**", "verdict": "保留",
                        "reason": "Seam 声明面闸不解析，机制性豁免"},
                       {"file": "fixtures/db/**", "verdict": "保留",
@@ -734,6 +734,45 @@ class MetaProbeReviewMerge(unittest.TestCase):
                           "reason": "r"}]}, ensure_ascii=False))
         rc, out = self._run([])
         self.assertIn("1 条结论模式未匹配豁免清单（fixtures/ghost/**）", out)
+
+    # ---- 票 54（第八轮 P2-B）：豁免复核双向检查 ----
+
+    def test_unmatched_review_pattern_red(self):
+        """注入「复核有、豁免无」→ 第 4 项信息红（信息项语义，rc 仍 0）。"""
+        rc, out = self._run([],
+                            review_file="docs/meta/exemption-reviews.json",
+                            entries=[
+                                {"file": "fixtures/onto/**", "verdict": "保留",
+                                 "reason": "机制性"},
+                                {"file": "fixtures/db/**", "verdict": "保留",
+                                 "reason": "机制性"},
+                                {"file": "fixtures/ghost/**", "verdict": "可收敛",
+                                 "reason": "r"}])
+        self.assertEqual(rc, 0)
+        self.assertIn("1 条结论模式未匹配豁免清单（fixtures/ghost/**）", out)
+        self.assertIn("| 边界闸豁免 | 信息 | RED |", out)
+        self.assertIn("（信息红）", out)
+
+    def test_unreviewed_allow_pattern_red(self):
+        """注入「豁免有、复核无」→ 第 4 项信息红（P2-B：防新增豁免漏复核被绿灯掩盖）。"""
+        rc, out = self._run([],
+                            review_file="docs/meta/exemption-reviews.json",
+                            entries=[{"file": "fixtures/onto/**",
+                                      "verdict": "保留", "reason": "机制性"}])
+        self.assertEqual(rc, 0)
+        self.assertIn("1 条豁免无复核结论（fixtures/db/**）", out)
+        self.assertIn("| 边界闸豁免 | 信息 | RED |", out)
+        self.assertIn("（信息红）", out)
+
+    def test_bidirectional_zero_diff_green(self):
+        """双向零差（2 豁免 2 复核）→ 第 4 项保持 GREEN、无红注记。"""
+        rc, out = self._run([], review_file="docs/meta/exemption-reviews.json")
+        self.assertEqual(rc, 0)
+        self.assertIn("| 边界闸豁免 | 信息 | GREEN | 2 条豁免"
+                      "（复核结论已并入 2 条，复核人 L0，复核日期 2026-09-19） |",
+                      out)
+        self.assertNotIn("条豁免无复核结论", out)
+        self.assertNotIn("条结论模式未匹配豁免清单", out)
 
 
 class MetaProbeCli(unittest.TestCase):

@@ -203,7 +203,10 @@ def attach_reviews(root: Path, items: list[dict],
 
     byPattern: 模式 → {verdict, reason, reviewedBy, reviewedAt}（entry 级署名
     优先，缺省回落顶层）；unmatched: 结论文件里有、豁免清单里没有的模式
-    （注记，防结论文件与豁免清单漂移后静默失配）。
+    （注记，防结论文件与豁免清单漂移后静默失配）；unreviewed: 豁免清单里有、
+    结论文件里没有的模式（票 54 反向检查，防新增豁免漏复核被绿灯掩盖——
+    第八轮 P2-B）。第 4 项两向差集任一非空 → 信息红（红灯形态照该项现行
+    信息项语义，不进硬闸结论；双向零差才绿）。复核文件缺席仍留空栏不算差。
     """
     data, err = load_reviews(review_path)
     for item in items:
@@ -240,6 +243,8 @@ def attach_reviews(root: Path, items: list[dict],
         patterns = [e["pattern"] for e in item["data"].get("entries", [])]
         rv["byPattern"] = {p: c for p, c in by_pattern.items() if p in patterns}
         rv["unmatched"] = sorted(set(by_pattern) - set(patterns))
+        # 票 54（第八轮 P2-B）反向检查：豁免有、复核无
+        rv["unreviewed"] = sorted(set(patterns) - set(by_pattern))
         if rv["byPattern"]:
             # 摘要行同步改口，防"总表说留空、正文已填"的自相矛盾留痕
             who = rv.get("reviewedBy") or "—"
@@ -248,6 +253,16 @@ def attach_reviews(root: Path, items: list[dict],
             item["summary"] = (f"{n_entries} 条豁免（复核结论已并入 "
                                f"{len(rv['byPattern'])} 条，复核人 {who}，"
                                f"复核日期 {when}）")
+        # 第 4 项双向差集任一非空 → 信息红（信息项语义，不进硬闸结论；
+        # 第 5 项维持注记形态——复核结论按节归属，零条目节不背另一节噪音）
+        if item["id"] == "4" and (rv["unmatched"] or rv["unreviewed"]):
+            diffs = []
+            if rv["unmatched"]:
+                diffs.append(f"{len(rv['unmatched'])} 条结论模式未匹配豁免清单")
+            if rv["unreviewed"]:
+                diffs.append(f"{len(rv['unreviewed'])} 条豁免无复核结论")
+            item["status"] = "red"
+            item["summary"] += "；" + "、".join(diffs) + "（信息红）"
     return items
 
 
@@ -739,6 +754,9 @@ def render_md(items: list[dict], conclusion: str, target: Path, root: Path,
                 if rv.get("unmatched"):
                     note += (f"；{len(rv['unmatched'])} 条结论模式未匹配豁免清单"
                              f"（{'、'.join(rv['unmatched'])}）")
+                if rv.get("unreviewed"):
+                    note += (f"；{len(rv['unreviewed'])} 条豁免无复核结论"
+                             f"（{'、'.join(rv['unreviewed'])}）")
                 lines += [note, ""]
             if rv.get("error"):
                 lines.append(f"复核结论文件注记: {rv['error']}")

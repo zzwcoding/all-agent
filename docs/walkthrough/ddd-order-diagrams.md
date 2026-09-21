@@ -1,7 +1,7 @@
 # 订单域走查 · Mermaid 三图（票 53 走查留痕件 5）
 
 > 副产物：人审靠图，不靠逐行读 YAML（slicing-playbook §6；SKILL.md 工序步 5）。
-> 导出规则：聚合卡→classDiagram（不变量方法入类，跨聚合引用不画线，只画事件流）；事件表→flowChart LR（生产聚合→事件→消费聚合，逐事件一链）；映射→erDiagram（聚合↔表投影）。
+> 导出规则：聚合卡→classDiagram（不变量方法入类，跨聚合引用不画线，只画事件流）；事件表→flowchart LR（生产聚合→事件→消费聚合，逐事件一链）；映射→erDiagram（聚合↔表投影）。
 > 本件为走查演示件（真产物区运行时=design/ddd/<域>/diagrams.md，随《待人审清单》一起交 Owner）。
 
 ## 1. 聚合结构图（classDiagram ← 两张聚合卡）
@@ -31,10 +31,10 @@ classDiagram
 
 > Order 与 Payment 之间**不画线**：跨聚合引用不画线（只看事件流图）；订单随支付变已支付是事件串联不是字段共享。
 
-## 2. 跨聚合事件流图（flowChart LR ← 事件表）
+## 2. 跨聚合事件流图（flowchart LR ← 事件表）
 
 ```mermaid
-flowChart LR
+flowchart LR
     P["支付 AGG-ORDER-003"] -- "PAYMENT_SUCCEEDED（载荷 GLS-ORDER-006/007 · delivery=inprocess）" --> O["订单 AGG-ORDER-001"]
 ```
 

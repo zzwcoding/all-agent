@@ -18,7 +18,7 @@
 | AC3a | DDD-AC3a | 含 ≥3 类错误样本（D1+D2+D3，negative-variants/ac3a-multi-error） | 一次报文收齐全部错误（failFast=false），exit 1 |
 | AC3b | DDD-AC3b | 粒度异常样本（支付聚合零事件，negative-variants/ac3b-granularity） | 人审清单软节在场、exit 仍 0 |
 | AC4 | DDD-AC4a/b/c | 正常（--json 绿）/违规/配置错（目标目录不存在）三路径 | exit 0/1/2（出厂集钉报文路径，精确退出码整数由 tools/test_ddd_check.py ExitCodes 断言） |
-| AC7 | （票 52 填充：skill 出厂集——固定本体输入） | 断言产出四类设计件结构与工序中间件清单 |
+| AC7 | S1–S13（skill 轨，固定本体输入 skill-corpus/ + human-review.md） | 五步工序逐轮中间件样例在场（轮 1 时间轴/轮 2 命令/轮 3 聚合候选/轮 4 合并追问）+ 聚合卡结构（aggregateRoot+不变量三元组，成稿终态=expected/ 单一真源）+ 新鲜上下文链条逐轮衔接 + 中间件非设计件（无 status 面） | 13 条 S- 断言全过（fixture_run 第 8 套随 CI）。断言真源：tickets/52 票面 AC 表（AC3）+ fixtures/ddd-modeler/assertions.json S- 条目；本表为指针（照票 26 先例） |
 
 ## 行为约定
 

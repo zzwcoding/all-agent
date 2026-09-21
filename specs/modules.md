@@ -117,7 +117,7 @@
   - script: `tools/schema_check.py`（词条解析）
   - script: `tools/ddd_check.py`（设计件五查自检，票 51 建）
   - data: `ontology/**`
-- Seam 与出厂集: `fixtures/ddd-modeler/`——最小订单域：本体输入 → 期望四类设计件输出 + 五查负变体（票 51 建并落断言，本票占位 pending）
+- Seam 与出厂集: `fixtures/ddd-modeler/`——最小订单域：本体输入 → 期望四类设计件输出 + 五查负变体（已建：票 51 闸轨 DDD- 断言 11 条 + 票 52 skill 轨 S- 断言 13 条，第八批收官时点零 pending）
 - 边界: 不做代码生成（那是 F9/sdd-flow 的事）；不预建事件运行时（Outbox/MQ 由被建项目按需建）；无词条不建模（缺词条回 onto-modeler/提案池）；不读生成器 skill 私件；粒度/完备性只出"待人审清单"不硬裁决
 
 ## skill: app-generator

@@ -88,7 +88,7 @@ open_questions: []                               # 或逐条列出（轮 4 为 p
 ## 6. Mermaid 图导出（副产物，人审靠图）
 
 - 聚合卡 → `classDiagram`：聚合/实体/值对象为类，不变量方法入类，跨聚合引用不画线（只画事件流）；
-- 事件表 → `flowChart LR`：生产聚合→事件→消费聚合，逐事件一链；
+- 事件表 → `flowchart LR`：生产聚合→事件→消费聚合，逐事件一链；
 - 映射 → `erDiagram`：聚合↔表投影关系。
 
 三图合成 `design/ddd/<域>/diagrams.md`，与《待人审清单》一起交 Owner——设计评审靠图，不靠逐行读 YAML。

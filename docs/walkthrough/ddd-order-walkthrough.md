@@ -13,7 +13,7 @@
 | 2 | `docs/walkthrough/ddd-order-rounds.md` | 行为清单素材原文 + 轮 1–4 中间件 YAML 全文（`input_of_round` 链条可核） |
 | 3 | `docs/walkthrough/ddd-order-design-artifacts.md` | 四类设计件五份 YAML 全文（聚合卡×2/事件表/映射/仓储边界，走查演示件） |
 | 4 | `docs/walkthrough/ddd-order-human-review.md` | 《待人审清单》演示件（机器软节转写+粒度完备性+分流挂起） |
-| 5 | `docs/walkthrough/ddd-order-diagrams.md` | Mermaid 三图（classDiagram/flowChart/erDiagram） |
+| 5 | `docs/walkthrough/ddd-order-diagrams.md` | Mermaid 三图（classDiagram/flowchart/erDiagram） |
 
 工作区说明：工序运行时中间件与成稿 YAML 落 `tmp/ddd/order*/`（`tmp/` 不入仓，票 52 已设；`ddd_check` target 取「等价物」），仓内留痕=本目录五件 .md 内嵌全文。
 
@@ -90,7 +90,7 @@ DDD 闸: 全过
 
 ## 五、步 5 · Mermaid 图（人审靠图）
 
-三图合成见件 5：聚合卡→classDiagram（不变量方法入类，跨聚合不画线）、事件表→flowChart LR（生产→事件→消费逐事件一链）、映射→erDiagram（聚合↔表投影）。与《待人审清单》一起交 Owner。
+三图合成见件 5：聚合卡→classDiagram（不变量方法入类，跨聚合不画线）、事件表→flowchart LR（生产→事件→消费逐事件一链）、映射→erDiagram（聚合↔表投影）。与《待人审清单》一起交 Owner。
 
 ## 六、与票 51 出厂集样本（`fixtures/ddd-modeler/expected/`）的差异对照
 
