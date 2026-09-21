@@ -43,6 +43,20 @@
       "notes": "PROP-031采纳后再生；变更=RULE-010条件式+open清单25→24，增量审通过",
       "reviewedBy": "divh",
       "date": "2026-09-21"
+    },
+    {
+      "target": "exports/devkit/bohai/devkit.md",
+      "reviewedCommit": "7a9e2b2ec0e99fc51af22e336bbe09001eecdfd2",
+      "reviewedSha256": "a9aac4fdf2bc2cc41d35fa6e4b22662f666568d0dca559c8ef2f2330ae84e7c6",
+      "verdict": "已审",
+      "checkpoints": [
+        "装配完整性",
+        "提案内容落位(PROP-020 ①+②+③注记+QR-003提示)",
+        "约束节原样"
+      ],
+      "notes": "PROP-020采纳后再生，增量审通过",
+      "reviewedBy": "divh",
+      "date": "2026-09-21"
     }
   ]
 }
