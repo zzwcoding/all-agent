@@ -345,9 +345,9 @@
       ]
     },
     {
-      "ac": "票25 CORE-01（AC2：Q1 日产量口径 hits 期望集精确相等，citations 含承载 AGG-BOHAI-002 与质检规则 RULE-BOHAI-002）",
+      "ac": "票25 CORE-01（AC2：Q1 日产量口径 hits 期望集精确相等，citations 含承载 AGG-BOHAI-002 与质检规则 RULE-BOHAI-002）；2026-09-21 期望集扩集（PROP-023 提取件二落地+装配接线 BH-QueryWellDailyOutput.appliedRules 增 RULE-027/030，core 命中集随装配面合法增长——Owner 授权 A 线关箱批）",
       "type": "cmd-succeeds",
-      "cmd": "python3 -c \"import json,subprocess,sys; p=subprocess.run(['python3','tools/semantic_service_core.py','ontology/bohai','--ask','日产量口径是什么？','--json'],capture_output=True,text=True); v=json.loads(p.stdout); g=sorted(h['id'] for h in v['hits']); e=['AGG-BOHAI-002','BH-BOHAI-QueryWellDailyOutput','QR-BOHAI-001','RULE-BOHAI-003','RULE-BOHAI-004']; cm=[i for i in ('AGG-BOHAI-002','RULE-BOHAI-002') if i not in v['citations']]; print('hits期望',e,'实际',g,'citations缺',cm); sys.exit(0 if p.returncode==0 and v['status']=='answered' and g==e and not cm else 1)\""
+      "cmd": "python3 -c \"import json,subprocess,sys; p=subprocess.run(['python3','tools/semantic_service_core.py','ontology/bohai','--ask','日产量口径是什么？','--json'],capture_output=True,text=True); v=json.loads(p.stdout); g=sorted(h['id'] for h in v['hits']); e=['AGG-BOHAI-002','BH-BOHAI-QueryWellDailyOutput','QR-BOHAI-001','RULE-BOHAI-003','RULE-BOHAI-004','RULE-BOHAI-027','RULE-BOHAI-030']; cm=[i for i in ('AGG-BOHAI-002','RULE-BOHAI-002') if i not in v['citations']]; print('hits期望',e,'实际',g,'citations缺',cm); sys.exit(0 if p.returncode==0 and v['status']=='answered' and g==e and not cm else 1)\""
     },
     {
       "ac": "票25 CORE-02（AC2：Q3 显式锚定 hits 期望集精确相等=锚点+7×BH 反向，waterfall_level=一级·显式锚定）",

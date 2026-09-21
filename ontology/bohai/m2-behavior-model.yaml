@@ -88,7 +88,11 @@ behaviors:
     triggerType: USER_ACTION
     preconditions: []
     postconditions: []
-    appliedRules: []
+    # 提取件二落地后装配接线（2026-09-21，PROP-023）：日产突变告警与班次键完整性属日产量口径面，
+    # 出厂集同源断言（core 文本命中 ⊆ 卡片装配闭包）实弹照出——新规则须接线进装配面，非fixture误报
+    appliedRules:
+      - RULE-BOHAI-027
+      - RULE-BOHAI-030
     requiredPermissions:
       - PERM-BOHAI-QueryWellDailyOutput
   # [R5·§3 指标 1 产量完成率 + 指标 2 有效产量（两支口径）] 本票影响分析变更的消费枢纽

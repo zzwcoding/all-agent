@@ -722,6 +722,24 @@
       ],
       "rules": [
         {
+          "id": "RULE-BOHAI-027",
+          "name": "日产油突变告警",
+          "type": "VALIDATION",
+          "point": {
+            "expression": "not (日降幅 > 40% 且次日未恢复至降幅前 70%)"
+          },
+          "via": "behavior.appliedRules(BH-BOHAI-QueryWellDailyOutput)"
+        },
+        {
+          "id": "RULE-BOHAI-030",
+          "name": "日产键完整性校验",
+          "type": "VALIDATION",
+          "point": {
+            "expression": "count(rows by (wellId, prodDate, reportShift)) == 1 and reportShift in [A, B, C]"
+          },
+          "via": "behavior.appliedRules(BH-BOHAI-QueryWellDailyOutput)"
+        },
+        {
           "id": "RULE-BOHAI-005",
           "name": "井号归一化",
           "type": "TRANSFORMATION",
@@ -799,6 +817,8 @@
         "BH-BOHAI-QueryWellDailyOutput",
         "AGG-BOHAI-002",
         "AGG-BOHAI-001",
+        "RULE-BOHAI-027",
+        "RULE-BOHAI-030",
         "RULE-BOHAI-005",
         "RULE-BOHAI-002",
         "RULE-BOHAI-003",
@@ -998,6 +1018,24 @@
             "expression": "sum(case when waterCutLab is not null and abs(waterCutLab - waterCut) > 5 then liquidOutput * waterCutLab / 100 else liquidOutput - oilOutput end) / sum(liquidOutput) * 100  # B′ 化验校正（PROP-031，2026-09-21）：井·月粒度；化验配对经 RULE-BOHAI-002 中间视图（井号+取样日期双键+时间容差）"
           },
           "via": "ownerObjectBehaviors(AGG-BOHAI-002)"
+        },
+        {
+          "id": "RULE-BOHAI-027",
+          "name": "日产油突变告警",
+          "type": "VALIDATION",
+          "point": {
+            "expression": "not (日降幅 > 40% 且次日未恢复至降幅前 70%)"
+          },
+          "via": "ownerObjectBehaviors(AGG-BOHAI-001)"
+        },
+        {
+          "id": "RULE-BOHAI-030",
+          "name": "日产键完整性校验",
+          "type": "VALIDATION",
+          "point": {
+            "expression": "count(rows by (wellId, prodDate, reportShift)) == 1 and reportShift in [A, B, C]"
+          },
+          "via": "ownerObjectBehaviors(AGG-BOHAI-001)"
         }
       ],
       "hitIds": [
@@ -1013,7 +1051,9 @@
         "RULE-BOHAI-003",
         "RULE-BOHAI-004",
         "RULE-BOHAI-008",
-        "RULE-BOHAI-010"
+        "RULE-BOHAI-010",
+        "RULE-BOHAI-027",
+        "RULE-BOHAI-030"
       ]
     },
     {
@@ -1259,6 +1299,24 @@
             "expression": "SUM(dailyProduction.oilOutput WHERE well.currentStatus <> '检修')"
           },
           "via": "ownerObjectBehaviors(AGG-BOHAI-002)"
+        },
+        {
+          "id": "RULE-BOHAI-027",
+          "name": "日产油突变告警",
+          "type": "VALIDATION",
+          "point": {
+            "expression": "not (日降幅 > 40% 且次日未恢复至降幅前 70%)"
+          },
+          "via": "ownerObjectBehaviors(AGG-BOHAI-001)"
+        },
+        {
+          "id": "RULE-BOHAI-030",
+          "name": "日产键完整性校验",
+          "type": "VALIDATION",
+          "point": {
+            "expression": "count(rows by (wellId, prodDate, reportShift)) == 1 and reportShift in [A, B, C]"
+          },
+          "via": "ownerObjectBehaviors(AGG-BOHAI-001)"
         }
       ],
       "hitIds": [
@@ -1273,7 +1331,9 @@
         "RULE-BOHAI-004",
         "RULE-BOHAI-008",
         "RULE-BOHAI-009",
-        "RULE-BOHAI-019"
+        "RULE-BOHAI-019",
+        "RULE-BOHAI-027",
+        "RULE-BOHAI-030"
       ]
     }
   ],
@@ -1396,7 +1456,10 @@
         "ownerEntity": "AGG-BOHAI-001",
         "preconditions": [],
         "postconditions": [],
-        "appliedRules": [],
+        "appliedRules": [
+          "RULE-BOHAI-027",
+          "RULE-BOHAI-030"
+        ],
         "requiredPermissions": [
           "PERM-BOHAI-QueryWellDailyOutput"
         ],

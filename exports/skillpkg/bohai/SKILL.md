@@ -36,8 +36,10 @@ status: 待Owner人审（生成物禁手改，可再生；审记旁档exports/re
 - 行为: BH-BOHAI-QueryWellDailyOutput 查询单井日产量（QUERY，ownerEntity=AGG-BOHAI-001）
 - 承载对象: AGG-BOHAI-002 日产计量（主）、AGG-BOHAI-001 井
 - 参数: wellId（井号，String，必填）
-- 命中 ID 集: QR-BOHAI-001 BH-BOHAI-QueryWellDailyOutput AGG-BOHAI-002 AGG-BOHAI-001 RULE-BOHAI-005 RULE-BOHAI-002 RULE-BOHAI-003 RULE-BOHAI-004 RULE-BOHAI-008 RULE-BOHAI-009 RULE-BOHAI-019 RULE-BOHAI-010
+- 命中 ID 集: QR-BOHAI-001 BH-BOHAI-QueryWellDailyOutput AGG-BOHAI-002 AGG-BOHAI-001 RULE-BOHAI-027 RULE-BOHAI-030 RULE-BOHAI-005 RULE-BOHAI-002 RULE-BOHAI-003 RULE-BOHAI-004 RULE-BOHAI-008 RULE-BOHAI-009 RULE-BOHAI-019 RULE-BOHAI-010
 - 口径要点（关联规则 expression/narrative 摘录）:
+  - RULE-BOHAI-027 日产油突变告警（VALIDATION；via=behavior.appliedRules(BH-BOHAI-QueryWellDailyOutput)）: not (日降幅 > 40% 且次日未恢复至降幅前 70%)
+  - RULE-BOHAI-030 日产键完整性校验（VALIDATION；via=behavior.appliedRules(BH-BOHAI-QueryWellDailyOutput)）: count(rows by (wellId, prodDate, reportShift)) == 1 and reportShift in [A, B, C]
   - RULE-BOHAI-005 井号归一化（TRANSFORMATION；via=ownerObjectBehaviors(AGG-BOHAI-002)）: normalizeWellId(rawWellId)：trim→upper→全角连字符/下划线归一→去内部空格→匹配 ^([A-Z]+)\-?(\d{1,3})$ → 前缀+'-'+数字左补零至2位；匹配失败返回 not-ok 落问题单（不猜测归一）。示例：N2/N-2/N02/n-02/N 02 → N-02（Owner 素材 2026-09-21 §PROP-011）
   - RULE-BOHAI-002 计量化验含水偏差校验（VALIDATION；via=ownerObjectBehaviors(AGG-BOHAI-002)）: abs(waterCut - waterCutLab) <= 5
   - RULE-BOHAI-003 日产油非空率校验（VALIDATION；via=ownerObjectBehaviors(AGG-BOHAI-002)）: (totalCount - nullCount) / totalCount >= 0.995
@@ -55,7 +57,7 @@ status: 待Owner人审（生成物禁手改，可再生；审记旁档exports/re
 - 行为: BH-BOHAI-QueryBlockMonthlyCompletion 查询区块月度产量完成率（QUERY，ownerEntity=AGG-BOHAI-002）
 - 承载对象: AGG-BOHAI-002 日产计量（主）、AGG-BOHAI-001 井
 - 参数: blockName（区块，String）；statMonth（统计月，String，必填）
-- 命中 ID 集: QR-BOHAI-002 BH-BOHAI-QueryBlockMonthlyCompletion AGG-BOHAI-002 AGG-BOHAI-001 RULE-BOHAI-009 RULE-BOHAI-019 RULE-BOHAI-022 RULE-BOHAI-005 RULE-BOHAI-002 RULE-BOHAI-003 RULE-BOHAI-004 RULE-BOHAI-008 RULE-BOHAI-010
+- 命中 ID 集: QR-BOHAI-002 BH-BOHAI-QueryBlockMonthlyCompletion AGG-BOHAI-002 AGG-BOHAI-001 RULE-BOHAI-009 RULE-BOHAI-019 RULE-BOHAI-022 RULE-BOHAI-005 RULE-BOHAI-002 RULE-BOHAI-003 RULE-BOHAI-004 RULE-BOHAI-008 RULE-BOHAI-010 RULE-BOHAI-027 RULE-BOHAI-030
 - 口径要点（关联规则 expression/narrative 摘录）:
   - RULE-BOHAI-009 产量完成率（CALCULATION；via=behavior.appliedRules(BH-BOHAI-QueryBlockMonthlyCompletion)）: actualOilSum / planOutputSum * 100
   - RULE-BOHAI-019 有效产量（剔检口径）（CALCULATION；via=behavior.appliedRules(BH-BOHAI-QueryBlockMonthlyCompletion)）: SUM(dailyProduction.oilOutput WHERE well.currentStatus <> '检修')
@@ -66,6 +68,8 @@ status: 待Owner人审（生成物禁手改，可再生；审记旁档exports/re
   - RULE-BOHAI-004 日产恒值检测（VALIDATION；via=ownerObjectBehaviors(AGG-BOHAI-002)）: 同井生产日期连续 30 日内 oilOutput 全部相同时判为恒值异常，返回 false（告警）
   - RULE-BOHAI-008 区块物质平衡校验（VALIDATION；via=ownerObjectBehaviors(AGG-BOHAI-002)）: abs(blockInjVolume - blockLiquidVolume - retentionDelta) / blockLiquidVolume <= 0.03
   - RULE-BOHAI-010 综合含水率（CALCULATION；via=ownerObjectBehaviors(AGG-BOHAI-002)）: sum(case when waterCutLab is not null and abs(waterCutLab - waterCut) > 5 then liquidOutput * waterCutLab / 100 else liquidOutput - oilOutput end) / sum(liquidOutput) * 100  # B′ 化验校正（PROP-031，2026-09-21）：井·月粒度；化验配对经 RULE-BOHAI-002 中间视图（井号+取样日期双键+时间容差）
+  - RULE-BOHAI-027 日产油突变告警（VALIDATION；via=ownerObjectBehaviors(AGG-BOHAI-001)）: not (日降幅 > 40% 且次日未恢复至降幅前 70%)
+  - RULE-BOHAI-030 日产键完整性校验（VALIDATION；via=ownerObjectBehaviors(AGG-BOHAI-001)）: count(rows by (wellId, prodDate, reportShift)) == 1 and reportShift in [A, B, C]
 
 ### 口径 QR-BOHAI-003 · 区块月度商品量结算查询
 
@@ -87,7 +91,7 @@ status: 待Owner人审（生成物禁手改，可再生；审记旁档exports/re
 - 行为: BH-BOHAI-QueryBlockWaterCut 查询区块综合含水率（QUERY，ownerEntity=AGG-BOHAI-002）
 - 承载对象: AGG-BOHAI-002 日产计量（主）、AGG-BOHAI-001 井
 - 参数: blockName（区块，String）；statMonth（统计月，String，必填）
-- 命中 ID 集: QR-BOHAI-004 BH-BOHAI-QueryBlockWaterCut AGG-BOHAI-002 AGG-BOHAI-001 RULE-BOHAI-010 RULE-BOHAI-005 RULE-BOHAI-002 RULE-BOHAI-003 RULE-BOHAI-004 RULE-BOHAI-008 RULE-BOHAI-009 RULE-BOHAI-019
+- 命中 ID 集: QR-BOHAI-004 BH-BOHAI-QueryBlockWaterCut AGG-BOHAI-002 AGG-BOHAI-001 RULE-BOHAI-010 RULE-BOHAI-005 RULE-BOHAI-002 RULE-BOHAI-003 RULE-BOHAI-004 RULE-BOHAI-008 RULE-BOHAI-009 RULE-BOHAI-019 RULE-BOHAI-027 RULE-BOHAI-030
 - 口径要点（关联规则 expression/narrative 摘录）:
   - RULE-BOHAI-010 综合含水率（CALCULATION；via=behavior.appliedRules(BH-BOHAI-QueryBlockWaterCut)）: sum(case when waterCutLab is not null and abs(waterCutLab - waterCut) > 5 then liquidOutput * waterCutLab / 100 else liquidOutput - oilOutput end) / sum(liquidOutput) * 100  # B′ 化验校正（PROP-031，2026-09-21）：井·月粒度；化验配对经 RULE-BOHAI-002 中间视图（井号+取样日期双键+时间容差）
   - RULE-BOHAI-005 井号归一化（TRANSFORMATION；via=ownerObjectBehaviors(AGG-BOHAI-002)）: normalizeWellId(rawWellId)：trim→upper→全角连字符/下划线归一→去内部空格→匹配 ^([A-Z]+)\-?(\d{1,3})$ → 前缀+'-'+数字左补零至2位；匹配失败返回 not-ok 落问题单（不猜测归一）。示例：N2/N-2/N02/n-02/N 02 → N-02（Owner 素材 2026-09-21 §PROP-011）
@@ -97,6 +101,8 @@ status: 待Owner人审（生成物禁手改，可再生；审记旁档exports/re
   - RULE-BOHAI-008 区块物质平衡校验（VALIDATION；via=ownerObjectBehaviors(AGG-BOHAI-002)）: abs(blockInjVolume - blockLiquidVolume - retentionDelta) / blockLiquidVolume <= 0.03
   - RULE-BOHAI-009 产量完成率（CALCULATION；via=ownerObjectBehaviors(AGG-BOHAI-002)）: actualOilSum / planOutputSum * 100
   - RULE-BOHAI-019 有效产量（剔检口径）（CALCULATION；via=ownerObjectBehaviors(AGG-BOHAI-002)）: SUM(dailyProduction.oilOutput WHERE well.currentStatus <> '检修')
+  - RULE-BOHAI-027 日产油突变告警（VALIDATION；via=ownerObjectBehaviors(AGG-BOHAI-001)）: not (日降幅 > 40% 且次日未恢复至降幅前 70%)
+  - RULE-BOHAI-030 日产键完整性校验（VALIDATION；via=ownerObjectBehaviors(AGG-BOHAI-001)）: count(rows by (wellId, prodDate, reportShift)) == 1 and reportShift in [A, B, C]
 
 ## 三、引用纪律与拒答边界
 
