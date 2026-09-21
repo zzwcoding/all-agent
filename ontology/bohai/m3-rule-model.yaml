@@ -246,7 +246,7 @@ rules:
   - id: RULE-BOHAI-013
     name: 自然递减率（月度）
     ruleType: CALCULATION
-    description: "R5·§3 指标 3（Owner=开发室，数据源 2.2）。「扣新井」按 firstProdDate 判新井（AGG-BOHAI-001）、「扣措施增油」取 incrOilAnnual（AGG-BOHAI-005）；年化指数拟合 q(t)=q_i·e^(−Dt) 非闭式未译（待 Owner 选实现层）；措施扣除口径争议注记（§3 原文）。"
+    description: "R5·§3 指标 3（Owner=开发室，数据源 2.2）。「扣新井」按 firstProdDate 判新井（AGG-BOHAI-001）、「扣措施增油」取 incrOilAnnual（AGG-BOHAI-005）。年化支实现层已裁（Owner 2026-09-21，PROP-BOHAI-030）：**对数线性回归**（ln q(t) 对 t 最小二乘拟合，斜率即 −D）+**滚动 12 月窗口**+扣新井/扣措施口径与月度式保持一致（同 sourceField 口径链）——标准工程实现层，非业务发明；若业务有既定拟合工具口径可推翻本注记（注记级可逆）。月度式 expression 不变。"
     inputParams:
       - name: qt
         type: Decimal
@@ -257,7 +257,7 @@ rules:
         sourceField: dailyProduction.oilOutput（上月合计，同口径）
         required: true
     outputType: Decimal
-    expression: (1 - qt / qtPrev) * 100
+    expression: (1 - qt / qtPrev) * 100   # 月度式；年化支=对数线性回归 ln(q)~t 滚动 12 月窗口（PROP-BOHAI-030，2026-09-21），expression 载体待年化支消费面出现时补（当前无 M7 出口引用年化支）
   # [R5·§3 指标 4] ☆综合递减率 D_c：不扣措施的对比期递减（月·年/%，Owner 开发室）
   - id: RULE-BOHAI-014
     name: 综合递减率（月度）

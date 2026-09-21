@@ -1,7 +1,7 @@
 ---
 id: PROP-BOHAI-030
 title: 补全自然递减率年化指数拟合实现（RULE-BOHAI-013）
-status: open
+status: accepted
 source-signal:
   kind: 对账缺口
   ref: docs/walkthrough/step5-fidelity.md#二-指标3-年化拟合未译
@@ -27,3 +27,7 @@ rationale: "§3 指标 3「自然递减率 D_n」部分译：月度式 1−q_t/q
 - B 级：`docs/一期收官报告.md` §6 业务面 9（指标 3 一段未译）。
 - A 级：`ontology/bohai/m3-rule-model.yaml#RULE-BOHAI-013`——description「年化指数拟合 q(t)=q_i·e^(−Dt) 非闭式未译（待 Owner 选实现层）」。
 - 影响面：单规则注记级修改；与 RULE-BOHAI-014（综合递减率）的「名近义不可互替」注记联动复核。
+
+## 裁决记录（Owner，2026-09-21）
+
+**裁决：实现层落定**——对数线性回归（ln q(t) 对 t 最小二乘，斜率=−D）+ 滚动 12 月窗口 + 扣新井/扣措施口径与月度式一致。性质：标准工程实现层（公式 q(t)=q_i·e^(−Dt) 已给定，拟合方法非业务事实），**注记级可逆**——业务若有既定拟合工具口径可推翻。与 RULE-BOHAI-014 联动复核：综合递减率「不扣措施」边界不受本裁决影响（名近义不可互替注记维持）。落点：RULE-BOHAI-013 description/expression 注记；年化支 expression 载体待消费面出现时补（当前无 M7 出口引用年化支，不落空表达式）。
