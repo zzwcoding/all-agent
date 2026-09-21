@@ -3,6 +3,7 @@
 - Golden Question: 「老完成率还能用吗？」
 - 走到的瀑布级: 二级 ID/名称解析（术语词先落 GLS）→ GLS 命中禁用术语 → 禁用词处置（回答=禁用说明+替代口径真实 ID 指路，不把禁用词当作可用口径作答）
 - 证据域: 解析自 bohai 真域（ontology/bohai——GLS 术语条目在真域；票 04 最小域无 GLS 文件，问答本体不扩）
+- A 线对照更新（2026-09-21，票 57 整改）：替代口径分母处原文「配产双值行争议 D4 注记在案」已随 A 线裁决过时——双值行版本语义与取版口径已裁。改动依据：RULE-BOHAI-009 注记（分母口径净化：配产版本切换日双值行按当日最后班次非空值取版，双值行检出不阻断、全量出清单供人复核），正文分子分母行同步更新。
 - 断言面: 禁用说明 + 替代指路（RULE-BOHAI-009/QR-BOHAI-002）+ 守卫正则（禁用词不得被答成可用口径）+ 引用清单齐
 
 ## 答案（示范格式）
@@ -13,7 +14,7 @@
 
 **替代口径指路（真实 ID，可追溯）**：请改以产量完成率作答——
 
-- 口径真源：`RULE-BOHAI-009`（产量完成率，CALCULATION）expression `actualOilSum / planOutputSum * 100`（Σ实际产油/Σ计划配产×100%，月/区块/%）；字段承载于 `AGG-BOHAI-002` 的 oilOutput（分子）与 planOutput（配产分母；配产双值行争议 D4 注记在案）；
+- 口径真源：`RULE-BOHAI-009`（产量完成率，CALCULATION）expression `actualOilSum / planOutputSum * 100`（Σ实际产油/Σ计划配产×100%，月/区块/%）；字段承载于 `AGG-BOHAI-002` 的 oilOutput（分子）与 planOutput（配产分母；配产双值行取版口径已裁——双值=版本事实，按当日最后班次非空值取版，检出不阻断出清单，RULE-BOHAI-009 注记在案）；
 - 执行行为：`BH-BOHAI-QueryBlockMonthlyCompletion`（查询区块月度产量完成率）appliedRules 引用 `RULE-BOHAI-009`；
 - 查询出口：`QR-BOHAI-002`（区块月度产量完成率统计）结果列 completionPct（产量完成率，%）。
 

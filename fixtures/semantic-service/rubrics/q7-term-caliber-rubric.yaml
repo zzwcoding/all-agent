@@ -1,4 +1,6 @@
 # 票 43 · Q7 存量问补 rubric（GLS 术语命中+闭包装配；参照答案 ac7-term-caliber.md）
+# 票 57 对照同步（2026-09-21）：dispute_notes 锚定例与 disqualifier 第 2 条随参照答案 A 线对照更新同步
+#   （RULE-BOHAI-019 双口径并列与跨月劈分已裁，原「待 Owner」注记过时——A 线裁决 PROP-BOHAI-029/PROP-BOHAI-015）。
 question_id: Q7
 reference: ../expected-answers/ac7-term-caliber.md
 scoring_prompt: |
@@ -24,10 +26,10 @@ dimensions:
   - id: dispute_notes
     weight: 1
     anchors:
-      5: "「与开井日历折算支两支口径并列，该支公式待 Owner」「跨月检修的当月口径归属待 Owner（D10）」注记照登不洗白，与参照一致"
-      3: "提到两支并列但待 Owner 表述含糊"
-      1: "把待定公式说成已定稿口径"
+      5: "双口径并列注记如实转达：与开井日历折算支两支口径并列、日历支公式已到（Σ(oilOutput × openDays/24)，差异>3% 口径页并列注明来源）、跨月检修按日历天数劈分已裁——照登不洗白，与参照一致"
+      3: "提到两支并列与劈分已裁，但公式或差异披露表述含糊"
+      1: "把已裁口径说成仍待 Owner，或漏双口径并列披露"
 disqualifiers:
   - "把开井日历支与剔检支混同（误导性强调）"
-  - "把「待 Owner」的公式缺口说成已定稿口径"
+  - "把参照未载的公式细节补猜进答案（超出 RULE-BOHAI-019 注记承载面）"
   - "答案内部自相矛盾（同文前后对同一事实给出冲突陈述）"

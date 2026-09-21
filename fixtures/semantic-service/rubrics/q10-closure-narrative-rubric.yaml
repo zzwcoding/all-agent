@@ -1,4 +1,6 @@
 # 票 43 · Q10 新增问 rubric（口径正答-闭包叙述完整度；design §3.2 槽位②；L0 过目 2026-09-20）
+# 票 57 对照同步（2026-09-21）：dispute_notes 锚定例随参照答案 A 线对照更新同步
+#   （配产双值行取版口径已裁——RULE-BOHAI-009 分母口径净化，A 线裁决 PROP-BOHAI-009）。
 question_id: Q10
 reference: ../expected-answers/ac10-closure-narrative.md
 scoring_prompt: |
@@ -24,9 +26,9 @@ dimensions:
   - id: dispute_notes
     weight: 1
     anchors:
-      5: "「分母 planOutput 存在配产双值行（D4，待 Owner）」与禁用旧称注记照登不洗白，与参照一致"
-      3: "注记有但待 Owner 表述含糊"
-      1: "漏注记，或把争议说成已定"
+      5: "「分母 planOutput 配产双值行已裁：双值=版本事实，按当日最后班次非空值取版、双值行全量出清单供人复核」与禁用旧称注记照登不洗白，与参照一致"
+      3: "注记有但取版口径表述含糊"
+      1: "漏注记，或把已裁取版口径说成仍待 Owner"
 disqualifiers:
   - "误导性强调：把 RULE-BOHAI-019 剔检口径或 FLOW-BOHAI-001 流程说成本口径主答"
   - "宣称口径完整却漏月/区块粒度等适用条件"
