@@ -253,6 +253,20 @@
       "notes": "同上",
       "reviewedBy": "divh",
       "date": "2026-09-21"
+    },
+    {
+      "target": "exports/skillpkg/bohai/SKILL.md",
+      "reviewedCommit": "e7924990d670d8a41e16cd652cc07d38f76a8494",
+      "reviewedSha256": "d3e266bf9fdc0d3425911690d53a5a67ee3bccb6ba7ff795be2d64aa122b140e",
+      "verdict": "已审",
+      "checkpoints": [
+        "装配完整性",
+        "提案内容落位(RULE-006)",
+        "切片声明原样"
+      ],
+      "notes": "同上",
+      "reviewedBy": "divh",
+      "date": "2026-09-21"
     }
   ]
 }
