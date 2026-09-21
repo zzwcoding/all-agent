@@ -1,7 +1,7 @@
 ---
 id: PROP-BOHAI-012
 title: 为井 currentStatus 补状态时效责任方裁决注记（AGG-BOHAI-001）
-status: open
+status: accepted
 source-signal:
   kind: 疑点
   ref: docs/walkthrough/step1-db-reverse-draft/dirty-signs.md#D7-状态滞后
@@ -31,3 +31,7 @@ rationale: "D7 状态滞后（N-11 已停仍记「生产中」）的时效责任
 - B 级：`docs/walkthrough/step2-mr-adjudication.md` §二 D7 行——「仍待 Owner：状态时效责任方」。
 - A 级：`ontology/bohai/m1-object-model.yaml#AGG-BOHAI-001`——currentStatus 注记「状态滞后 D7；『检修』值是 RULE-BOHAI-019 剔检口径的判定字段」。
 - 影响面：单属性注记级增补；下游 RULE-BOHAI-019 剔检口径的时效性随责任方裁决获得解释。
+
+## 裁决记录（Owner，2026-09-21）
+
+**裁决：责任方=作业区录入（源侧生产责任）+ 治理面稽核滞后检出出清单**——与 PROP-006/011 同源原则（源侧对数据及时性负责，语义层检出告警不替改）。不增设状态时间戳属性（字典无此列，不发明）。**SLA 具体时限值未定**（流程约束数值属治理面细则，入问题清单待 Owner/治理面定）。落点：AGG-BOHAI-001 currentStatus 属性注记 + 对象 description 疑点残留更新。RULE-019 剔检口径时效性获得解释（状态滞后由治理检出面兜底）。

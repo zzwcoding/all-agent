@@ -21,7 +21,7 @@ aggregates:
   - id: AGG-BOHAI-001
     name: 井
     alias: Well
-    description: "源表 well_info（R5·设定书附录 A.1，字典标题「井档案」；§5 实体草案名「井」），一井一行。§1 组织规模：3 作业区 120 口在产井（采油 86/注水 34）、5 平台。疑点残留：井号旧写法 N2/N-2 并存（D6，归一化落 RULE-BOHAI-005）；currentStatus 状态滞后（D7）；fieldName 行内冗余（D8）——均待 Owner 确认。"
+    description: "源表 well_info（R5·设定书附录 A.1，字典标题「井档案」；§5 实体草案名「井」），一井一行。§1 组织规模：3 作业区 120 口在产井（采油 86/注水 34）、5 平台。疑点残留：井号旧写法 N2/N-2 并存（D6，归一化落 RULE-BOHAI-005，全集待素材）；fieldName 行内冗余（D8）——待 Owner 确认。状态滞后（D7）已裁：责任方=作业区录入+治理稽核检出（PROP-BOHAI-012，2026-09-21）。"
     aggregateType: AGGREGATE_ROOT
     lifecycle: [生产中, 停产, 检修, 待弃置]   # [R5·A.1 current_status 值集 + §5 井「状态机」] 迁移合法性校验 RULE-BOHAI-007
     attributes:
@@ -32,7 +32,7 @@ aggregates:
       - { name: platform, label: 平台, type: String }               # [R5·A.1] 样本 CEP-A/B；§5「平台—承载→井」未建对象（无源表，待 Owner）
       - { name: blockName, label: 区块, type: String }              # [R5·A.1] 渤南/渤中/渤西；§5「井—隶属→区块」未建对象（无源表，待 Owner）
       - { name: fieldName, label: 油田, type: String }              # [R5·A.1] 行内冗余=反规范化样例（D8 待 Owner）
-      - { name: currentStatus, label: 当前状态, type: Enum, enumValues: [生产中, 停产, 检修, 待弃置] }   # [R5·A.1] 状态滞后 D7；「检修」值是 RULE-BOHAI-019 剔检口径的判定字段
+      - { name: currentStatus, label: 当前状态, type: Enum, enumValues: [生产中, 停产, 检修, 待弃置] }   # [R5·A.1] 状态时效裁决（PROP-BOHAI-012，2026-09-21）：更新责任方=作业区录入（源侧生产责任），治理面稽核滞后检出出清单；不增设状态时间戳属性（字典无此列，不发明）；SLA 时限值待治理面定（入问题清单）；「检修」值是 RULE-BOHAI-019 剔检口径的判定字段
       - { name: remarks, label: 备注, type: String }                # [R5·A.1] 供应商导入曾塞入注入指令
   # [R5·A.2 日产计量（★核心事实源）+ §5 Join 白名单 oil ⋈ well ✓]
   - id: AGG-BOHAI-002

@@ -40,7 +40,7 @@ status: 待Owner人审（生成物禁手改，可再生；审记旁档exports/re
 ### AGG-BOHAI-001 井（Well）
 
 - 注源: R5·A.1 井档案 + §5 实体「井」
-- AGGREGATE_ROOT；描述: 源表 well_info（R5·设定书附录 A.1，字典标题「井档案」；§5 实体草案名「井」），一井一行。§1 组织规模：3 作业区 120 口在产井（采油 86/注水 34）、5 平台。疑点残留：井号旧写法 N2/N-2 并存（D6，归一化落 RULE-BOHAI-005）；currentStatus 状态滞后（D7）；fieldName 行内冗余（D8）——均待 Owner 确认。
+- AGGREGATE_ROOT；描述: 源表 well_info（R5·设定书附录 A.1，字典标题「井档案」；§5 实体草案名「井」），一井一行。§1 组织规模：3 作业区 120 口在产井（采油 86/注水 34）、5 平台。疑点残留：井号旧写法 N2/N-2 并存（D6，归一化落 RULE-BOHAI-005，全集待素材）；fieldName 行内冗余（D8）——待 Owner 确认。状态滞后（D7）已裁：责任方=作业区录入+治理稽核检出（PROP-BOHAI-012，2026-09-21）。
 - lifecycle: 生产中/停产/检修/待弃置
 
 | 属性 | 标签 | 类型 | 约束与字典 |
@@ -300,10 +300,9 @@ status: 待Owner人审（生成物禁手改，可再生；审记旁档exports/re
 
 ## 四、开放疑点（docs/proposals 扫描）
 
-指向本域的 open 提案 18 条（裁决与详情看提案原文）:
+指向本域的 open 提案 17 条（裁决与详情看提案原文）:
 
 - PROP-BOHAI-011 补齐井号归一化映射表全集与归一位置裁决（RULE-BOHAI-005）［modify → M3/RULE-BOHAI-005］（docs/proposals/PROP-BOHAI-011.md）
-- PROP-BOHAI-012 为井 currentStatus 补状态时效责任方裁决注记（AGG-BOHAI-001）［modify → M1/AGG-BOHAI-001］（docs/proposals/PROP-BOHAI-012.md）
 - PROP-BOHAI-013 新增区块维形对象承载无源业务实体族裁决（AGG-BOHAI-010）［add → M1/AGG-BOHAI-010］（docs/proposals/PROP-BOHAI-013.md）
 - PROP-BOHAI-014 为注水日计量 layerSplit 补格式规范与配注目标承载裁决（AGG-BOHAI-003）［modify → M1/AGG-BOHAI-003］（docs/proposals/PROP-BOHAI-014.md）
 - PROP-BOHAI-016 新增补录窗口阈值校验规则（RULE-BOHAI-025）［add → M3/RULE-BOHAI-025］（docs/proposals/PROP-BOHAI-016.md）
