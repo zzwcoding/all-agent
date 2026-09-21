@@ -18,7 +18,7 @@
 | A7 | D7 状态时效责任方（step2§二） | PROP-BOHAI-012 | open | modify AGG-BOHAI-001；波及剔检口径时效 |
 | A8 | D8 是否提升「油田」对象（step2§二） | PROP-BOHAI-013 | open | 并入无源实体族（同表 A28 行） |
 | A9 | D9 分层格式规范（step2§二） | PROP-BOHAI-014 | open | modify AGG-BOHAI-003；与配注目标同束裁决 |
-| A10 | D10 跨月归属期规则（step2§二） | PROP-BOHAI-015 | open | add RULE-BOHAI-024；波及 RULE-016/019 |
+| A10 | D10 跨月归属期规则（step2§二） | PROP-BOHAI-015 | **accepted** | 裁 按日历天数劈分（当月只承担当月天数）；RULE-024 落地、016/019 注记升级引用；commit `cea7095` |
 | A11 | D11 补录窗口阈值（step2§二） | PROP-BOHAI-016 | open | add RULE-BOHAI-025；阈值待 Owner |
 | A12 | D12 缺失行计入分母（step2§二） | PROP-BOHAI-017 | open | modify RULE-BOHAI-015；分母口径 |
 | A13 | D13 统一前使用边界（step2§二） | PROP-BOHAI-018 | open | 与 A25 同靶合并（RULE-BOHAI-018） |
