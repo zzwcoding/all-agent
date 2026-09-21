@@ -11,7 +11,7 @@
 |---|---|---|---|---|
 | A1 | D1 吨方混写——存量误录行修复（step2§二） | PROP-BOHAI-006 | open | add RULE-BOHAI-020；修复判据待 Owner |
 | A2 | D2 A/B 班重复行——去重/键约束（step2§二） | PROP-BOHAI-007 | open | add RULE-BOHAI-021；裁「业务事实」则 rejected 归档 |
-| A3 | D3 权威源归属（step2§二） | PROP-BOHAI-008 | open | modify AGG-BOHAI-002；与 PROP-031 联动 |
+| A3 | D3 权威源归属（step2§二） | PROP-BOHAI-008 | **accepted** | 裁决 C 并存分场景（日度=计量折算/月度正式指标=化验/>5pp 化验校正），m1 三处注记落定；commit `203d7fa`；RULE-BOHAI-010 取数方向→PROP-031 联动未闭 |
 | A4 | D4 配产双值行版本语义（step2§二） | PROP-BOHAI-009 | open | add RULE-BOHAI-022；裁决前仅告警 |
 | A5 | D5 openDays 矛盾行清洗（step2§二） | PROP-BOHAI-010 | open | add RULE-BOHAI-023；跨属性判定落 M3 |
 | A6 | D6 归一表全集+归一位置（step2§二） | PROP-BOHAI-011 | open | modify RULE-BOHAI-005；全集+位置双裁决 |
