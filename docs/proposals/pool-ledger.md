@@ -26,7 +26,7 @@
 | A15 | D15 商品量 vs 井口仲裁（step2§二） | PROP-BOHAI-020 | **accepted** | 裁决 ①+②+③（并存披露+使用边界+输差率折算关系，阈值挂后续提案）；AGG-008+QR-003 同步落定；commit `048aa32`；事故 7/13 同源问题有标准答案 |
 | A16 | MU 全模型无素材（step2§一/§四） | PROP-BOHAI-022 | **rejected** | 裁维持不建（R5 无 UI 证据+产物形态无界面面；素材到另立提案）；commit `881b041` |
 | A17 | AGG-BOHAI-009 物理落表（step2§三/§四） | PROP-BOHAI-021 | **accepted** | 裁 维持无源虚拟实体（劈分人工台账；新建源表归源系统侧建议；推导缺素材入问题清单）；commit `e3ab3d6` |
-| A18 | 提取件二 8 条规则 §4 规则 13–20（step2§四） | PROP-BOHAI-023 | open | add RULE-BOHAI-026 批次占位（026–033 预留）；判据转录入仓后拆分 |
+| A18 | 提取件二 8 条规则 §4 规则 13–20（step2§四） | PROP-BOHAI-023 | open（部分裁决） | 占位机制已裁：落池不落仓（号位 026–033 池内登记）；提取件二素材待 Owner（取样频次/插补类优先——031=B′ 前置条件）；入问题清单 |
 | A19 | 指标 8 措施有效率判据（fidelity§二/收官§6.9） | PROP-BOHAI-024 | open | add RULE-BOHAI-034；「有效」判据待 Owner |
 | A20 | 指标 12 机采能效公式（fidelity§二/收官§6.9） | PROP-BOHAI-025 | open | add RULE-BOHAI-035；三级公式待 Owner |
 | A21 | 指标 15 桶油成本投入字段（fidelity§二/收官§6.9） | PROP-BOHAI-026 | open | add RULE-BOHAI-036；ERP 缺源裁决 |
@@ -60,5 +60,5 @@
 
 - 提案 31 份：**accepted 5**（PROP-001..005，已闭环回填）、**open 26**（PROP-006..031）、draft 0、rejected 0。
 - 同靶冲突：无（26 份 open 靶元素两两不同；5 份 accepted 不参战）。`python3 tools/proposal_check.py docs/proposals` → 全过，exit 0。
-- 预留号位：RULE-BOHAI-020..025（已由 open 提案占用）、026..033（PROP-BOHAI-023 批次预留）、034..038（已由 open 提案占用）；AGG-BOHAI-010（族首）；SCR-BOHAI-001（MU 维形）。
+- 预留号位（2026-09-21 A 线裁决后现值）：RULE-BOHAI-020/022/023/024/025 已建（accepted 落地）、021 回收可用（PROP-007 rejected 不建）、026..033（PROP-BOHAI-023 批次预留）、034..038（open 提案占用）；AGG-BOHAI-010 已建（区块维形，PROP-013）；SCR-BOHAI-001 保留可用（PROP-022 rejected 不建）。
 - 裁决入口：Owner 按 status=open 逐份裁 accepted/rejected；裁决落痕=改 status+正文注记，不删档（proposal-format.md §4）。
