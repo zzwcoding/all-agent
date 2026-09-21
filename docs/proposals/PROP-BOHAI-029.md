@@ -29,3 +29,7 @@ rationale: "§3 指标 2「有效产量」是两支口径并列：剔检支已�
 - B 级：`docs/一期收官报告.md` §6 业务面 9（指标 2 一支未译）。
 - A 级：`ontology/bohai/m3-rule-model.yaml#RULE-BOHAI-019`——description「（a）开井日历折算——公式细节设定书未给全，待 Owner」；`ontology/bohai/glossary-model.yaml#GLS-BOHAI-003`——一词两译术语注记。
 - 影响面：单规则修改；本规则是票 09 影响分析（docs/impact/01）的变更落点，再改须复核影响报告——交接给走 MR 的人。
+
+## 裁决进展记录（Owner，2026-09-21，未裁——status 维持 open）
+
+**缺公式，不可代裁**：开井日历折算支公式设定书未给全，补公式=发明业务算法（提案草案已明示「以 Owner 原文为准，不猜」）。剔检支已全译可用（PROP-015 跨月劈分已接入），GLS-BOHAI-003 一词两译的消歧注记维持「剔检支可用/日历支待补」现状。待 Owner 提供日历支公式后 modify 落 (b) 支即关箱。入问题清单。

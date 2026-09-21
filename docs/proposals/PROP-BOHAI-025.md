@@ -28,3 +28,7 @@ rationale: "§3 指标 12「机采系统能效」未建——三级（系统/单
 - B 级：`docs/一期收官报告.md` §6 业务面 9（指标 12 机采能效公式未给）。
 - A 级：`ontology/bohai/m1-object-model.yaml#AGG-BOHAI-007`——load/current 注记「单位待 Owner」。
 - 靶 ID 核对：RULE-BOHAI-035 未占用。
+
+## 裁决进展记录（Owner，2026-09-21，未裁——status 维持 open）
+
+**缺公式，不可代裁**：三级（系统/单元/设备）公式设定书未给，仅优良/合格档名——公式是业务事实不硬译。关联缺口：AGG-BOHAI-007.load/current 单位字典未声明（单位判据随公式一并裁，同待素材）。指标位预留维持（RULE-BOHAI-035 池内登记），不落占位元素。入问题清单。

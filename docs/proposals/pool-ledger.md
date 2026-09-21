@@ -27,10 +27,10 @@
 | A16 | MU 全模型无素材（step2§一/§四） | PROP-BOHAI-022 | **rejected** | 裁维持不建（R5 无 UI 证据+产物形态无界面面；素材到另立提案）；commit `881b041` |
 | A17 | AGG-BOHAI-009 物理落表（step2§三/§四） | PROP-BOHAI-021 | **accepted** | 裁 维持无源虚拟实体（劈分人工台账；新建源表归源系统侧建议；推导缺素材入问题清单）；commit `e3ab3d6` |
 | A18 | 提取件二 8 条规则 §4 规则 13–20（step2§四） | PROP-BOHAI-023 | open（部分裁决） | 占位机制已裁：落池不落仓（号位 026–033 池内登记）；提取件二素材待 Owner（取样频次/插补类优先——031=B′ 前置条件）；入问题清单 |
-| A19 | 指标 8 措施有效率判据（fidelity§二/收官§6.9） | PROP-BOHAI-024 | open | add RULE-BOHAI-034；「有效」判据待 Owner |
-| A20 | 指标 12 机采能效公式（fidelity§二/收官§6.9） | PROP-BOHAI-025 | open | add RULE-BOHAI-035；三级公式待 Owner |
-| A21 | 指标 15 桶油成本投入字段（fidelity§二/收官§6.9） | PROP-BOHAI-026 | open | add RULE-BOHAI-036；ERP 缺源裁决 |
-| A22 | 指标 2 开井日历支公式（fidelity§二/收官§6.9） | PROP-BOHAI-029 | open | modify RULE-BOHAI-019；影响报告落点复核 |
+| A19 | 指标 8 措施有效率判据（fidelity§二/收官§6.9） | PROP-BOHAI-024 | open（缺判据） | 「有效」判据设定书未定义，不可代裁；指标位池内预留不落仓；入问题清单 |
+| A20 | 指标 12 机采能效公式（fidelity§二/收官§6.9） | PROP-BOHAI-025 | open（缺公式） | 三级公式未给不硬译；load/current 单位随公式同待素材；入问题清单 |
+| A21 | 指标 15 桶油成本投入字段（fidelity§二/收官§6.9） | PROP-BOHAI-026 | open（部分裁决） | 方向裁：本期不引入（ERP 扩源归源系统侧决策）；指标位池内预留；入问题清单 |
+| A22 | 指标 2 开井日历支公式（fidelity§二/收官§6.9） | PROP-BOHAI-029 | open（缺公式） | 日历支公式未给全不猜；剔检支已全译可用；入问题清单 |
 | A23 | 指标 3 年化拟合（fidelity§二/收官§6.9） | PROP-BOHAI-030 | open | modify RULE-BOHAI-013；实现层待选 |
 | A24 | 指标 5 Q_w 换算口径（fidelity§二/收官§6.9） | PROP-BOHAI-031 | **accepted** | 裁决 B′ 默认推算+化验校正（>5pp 井月以化验重算）；RULE-BOHAI-010 条件式落定；commit `8e5e334`；A3 联动闭环 |
 | A25 | 指标 10 基线拟合参数（fidelity§二/收官§6.9） | PROP-BOHAI-018 | open（部分裁决） | (a) 拟合参数缺素材待 Owner，入问题清单（同靶 A13 已部分裁决） |
