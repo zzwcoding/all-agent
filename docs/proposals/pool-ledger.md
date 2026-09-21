@@ -17,7 +17,7 @@
 | A6 | D6 归一表全集+归一位置（step2§二） | PROP-BOHAI-011 | open（部分裁决） | (b) 位置已裁：映射表=语义资产+执行归源侧 ETL（commit `4b0b5e6`）；(a) 全集缺素材待 Owner 提供，入问题清单 |
 | A7 | D7 状态时效责任方（step2§二） | PROP-BOHAI-012 | **accepted** | 裁 责任方=作业区录入+治理稽核检出（SLA 时限值入问题清单）；commit `9e2286d`；剔检口径时效获解释 |
 | A8 | D8 是否提升「油田」对象（step2§二） | PROP-BOHAI-013 | open | 并入无源实体族（同表 A28 行） |
-| A9 | D9 分层格式规范（step2§二） | PROP-BOHAI-014 | open | modify AGG-BOHAI-003；与配注目标同束裁决 |
+| A9 | D9 分层格式规范（step2§二） | PROP-BOHAI-014 | open（部分裁决） | (a) 方向已裁：保持 String 不发明格式（commit `bfbeca0`）；格式规范+配注目标承载缺素材待 Owner，入问题清单 |
 | A10 | D10 跨月归属期规则（step2§二） | PROP-BOHAI-015 | **accepted** | 裁 按日历天数劈分（当月只承担当月天数）；RULE-024 落地、016/019 注记升级引用；commit `cea7095` |
 | A11 | D11 补录窗口阈值（step2§二） | PROP-BOHAI-016 | open | add RULE-BOHAI-025；阈值待 Owner |
 | A12 | D12 缺失行计入分母（step2§二） | PROP-BOHAI-017 | open | modify RULE-BOHAI-015；分母口径 |
