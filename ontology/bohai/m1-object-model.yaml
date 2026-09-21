@@ -162,7 +162,7 @@ aggregates:
   - id: AGG-BOHAI-009
     name: 受效关系
     alias: EffectuationRelation
-    description: "R5·§5 Ontology 域草案实体：「受效关系（注水井→受效油井，多对多，属性=劈分系数 Σ=1、响应起始日——由王飞系数劈分强制要求，业务规则驱动建模的实证）」。8 表无源表，物理落表待 Owner 确认；不建它则 §5 Join 白名单「oil_production_daily ⋈ water_injection_daily 直连 ✗（须经受效关系实体）」无承载。§3 指标 10 递减增油的劈分承载。"
+    description: "R5·§5 Ontology 域草案实体：「受效关系（注水井→受效油井，多对多，属性=劈分系数 Σ=1、响应起始日——由王飞系数劈分强制要求，业务规则驱动建模的实证）」。8 表无源表。物理落表裁决（Owner 2026-09-21，PROP-BOHAI-021）：**维持无源虚拟实体**——语义层概念位（Join 白名单「oil ⋈ water_injection 直连 ✗ 须经本实体」与 §3 指标 10 劈分的承载），劈分系数暂由人工台账维护；新建源表属源系统工程决策（超语义平台裁决面，登记为源系统侧建议），由现有表推导缺推导规则素材（待定义）。不建它则 Join 白名单与递减增油劈分无承载——本体位不可删。"
     aggregateType: AGGREGATE_ROOT
     attributes:
       - name: injectorWellRef    # [R5·§5「注水井→受效油井」注水方]

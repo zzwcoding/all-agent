@@ -160,7 +160,7 @@ status: 待Owner人审（生成物禁手改，可再生；审记旁档exports/re
 ### AGG-BOHAI-009 受效关系（EffectuationRelation）
 
 - 注源: R5·§5 业务实体，无源表
-- AGGREGATE_ROOT；描述: R5·§5 Ontology 域草案实体：「受效关系（注水井→受效油井，多对多，属性=劈分系数 Σ=1、响应起始日——由王飞系数劈分强制要求，业务规则驱动建模的实证）」。8 表无源表，物理落表待 Owner 确认；不建它则 §5 Join 白名单「oil_production_daily ⋈ water_injection_daily 直连 ✗（须经受效关系实体）」无承载。§3 指标 10 递减增油的劈分承载。
+- AGGREGATE_ROOT；描述: R5·§5 Ontology 域草案实体：「受效关系（注水井→受效油井，多对多，属性=劈分系数 Σ=1、响应起始日——由王飞系数劈分强制要求，业务规则驱动建模的实证）」。8 表无源表。物理落表裁决（Owner 2026-09-21，PROP-BOHAI-021）：**维持无源虚拟实体**——语义层概念位（Join 白名单「oil ⋈ water_injection 直连 ✗ 须经本实体」与 §3 指标 10 劈分的承载），劈分系数暂由人工台账维护；新建源表属源系统工程决策（超语义平台裁决面，登记为源系统侧建议），由现有表推导缺推导规则素材（待定义）。不建它则 Join 白名单与递减增油劈分无承载——本体位不可删。
 
 | 属性 | 标签 | 类型 | 约束与字典 |
 |---|---|---|---|
@@ -311,14 +311,13 @@ status: 待Owner人审（生成物禁手改，可再生；审记旁档exports/re
 
 ## 四、开放疑点（docs/proposals 扫描）
 
-指向本域的 open 提案 15 条（裁决与详情看提案原文）:
+指向本域的 open 提案 14 条（裁决与详情看提案原文）:
 
 - PROP-BOHAI-011 补齐井号归一化映射表全集与归一位置裁决（RULE-BOHAI-005）［modify → M3/RULE-BOHAI-005］（docs/proposals/PROP-BOHAI-011.md）
 - PROP-BOHAI-014 为注水日计量 layerSplit 补格式规范与配注目标承载裁决（AGG-BOHAI-003）［modify → M1/AGG-BOHAI-003］（docs/proposals/PROP-BOHAI-014.md）
 - PROP-BOHAI-016 新增补录窗口阈值校验规则（RULE-BOHAI-025）［modify → M3/RULE-BOHAI-025］（docs/proposals/PROP-BOHAI-016.md）
 - PROP-BOHAI-018 补齐递减增油基线拟合参数与统一前使用边界（RULE-BOHAI-018）［modify → M3/RULE-BOHAI-018］（docs/proposals/PROP-BOHAI-018.md）
 - PROP-BOHAI-019 补齐停机原因码新旧映射表全集（RULE-BOHAI-006）［modify → M3/RULE-BOHAI-006］（docs/proposals/PROP-BOHAI-019.md）
-- PROP-BOHAI-021 裁决受效关系实体物理落表方案（AGG-BOHAI-009）［modify → M1/AGG-BOHAI-009］（docs/proposals/PROP-BOHAI-021.md）
 - PROP-BOHAI-022 裁决 MU 模型补建或维持不建（SCR-BOHAI-001 维形位）［add → MU/SCR-BOHAI-001］（docs/proposals/PROP-BOHAI-022.md）
 - PROP-BOHAI-023 批次受理提取件二规则 13–20 判据（RULE-BOHAI-026 占位）［add → M3/RULE-BOHAI-026］（docs/proposals/PROP-BOHAI-023.md）
 - PROP-BOHAI-024 新增措施有效率指标位待判据（RULE-BOHAI-034）［add → M3/RULE-BOHAI-034］（docs/proposals/PROP-BOHAI-024.md）
