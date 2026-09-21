@@ -35,7 +35,7 @@
 | A24 | 指标 5 Q_w 换算口径（fidelity§二/收官§6.9） | PROP-BOHAI-031 | **accepted** | 裁决 B′ 默认推算+化验校正（>5pp 井月以化验重算）；RULE-BOHAI-010 条件式落定；commit `8e5e334`；A3 联动闭环 |
 | A25 | 指标 10 基线拟合参数（fidelity§二/收官§6.9） | PROP-BOHAI-018 | open（部分裁决） | (a) 拟合参数缺素材待 Owner，入问题清单（同靶 A13 已部分裁决） |
 | A26 | §4 规则 6 完井不在 8 表（step2§三/收官§6.10） | PROP-BOHAI-027 | **rejected** | 裁挂起（扩源=域面变更须 Owner 主动引入另立提案）；RULE-037 号位回收；commit 见本行翻转批次 |
-| A27 | §4 规则 11 实时域（m3 头注/收官§6.10） | PROP-BOHAI-028 | open | add RULE-BOHAI-038 占位；实时面归属 |
+| A27 | §4 规则 11 实时域（m3 头注/收官§6.10） | PROP-BOHAI-028 | **accepted** | 裁 批面近似（当日批内 current 全零即告警；实时面另案）；RULE-038 落地；commit `f930be8` |
 | A28 | 区块/油田/平台/井筒/配注层未建（fidelity§一/收官§6.12） | PROP-BOHAI-013 | **accepted** | 区块建维形 AGG-BOHAI-010（族首）；油田/平台/井筒/配注层裁不建（无素材建即空壳，素材到另立提案）；commit `9d0b0c4` |
 | A29 | 术语 水淹层 未建（fidelity§三） | PROP-BOHAI-001 | **accepted** | 票 10 落 GLS-BOHAI-006；commit `0474bc8`；残留扩域不随本提案闭合 |
 | A30 | 术语 配注合格率 未建（fidelity§三） | PROP-BOHAI-002 | **accepted** | 票 10 落 GLS-BOHAI-009；commit `0474bc8`；指标化残留→PROP-BOHAI-014 |
