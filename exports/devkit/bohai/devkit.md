@@ -311,7 +311,7 @@ status: 待Owner人审（生成物禁手改，可再生；审记旁档exports/re
 
 ## 四、开放疑点（docs/proposals 扫描）
 
-指向本域的 open 提案 13 条（裁决与详情看提案原文）:
+指向本域的 open 提案 12 条（裁决与详情看提案原文）:
 
 - PROP-BOHAI-011 补齐井号归一化映射表全集与归一位置裁决（RULE-BOHAI-005）［modify → M3/RULE-BOHAI-005］（docs/proposals/PROP-BOHAI-011.md）
 - PROP-BOHAI-014 为注水日计量 layerSplit 补格式规范与配注目标承载裁决（AGG-BOHAI-003）［modify → M1/AGG-BOHAI-003］（docs/proposals/PROP-BOHAI-014.md）
@@ -322,7 +322,6 @@ status: 待Owner人审（生成物禁手改，可再生；审记旁档exports/re
 - PROP-BOHAI-024 新增措施有效率指标位待判据（RULE-BOHAI-034）［add → M3/RULE-BOHAI-034］（docs/proposals/PROP-BOHAI-024.md）
 - PROP-BOHAI-025 新增机采系统能效指标位待公式（RULE-BOHAI-035）［add → M3/RULE-BOHAI-035］（docs/proposals/PROP-BOHAI-025.md）
 - PROP-BOHAI-026 新增桶油增产成本指标位待投入字段（RULE-BOHAI-036）［add → M3/RULE-BOHAI-036］（docs/proposals/PROP-BOHAI-026.md）
-- PROP-BOHAI-027 受理 §4 规则 6 完井衔接校验待扩源（RULE-BOHAI-037）［add → M3/RULE-BOHAI-037］（docs/proposals/PROP-BOHAI-027.md）
 - PROP-BOHAI-028 受理 §4 规则 11 实时零值告警待实时面（RULE-BOHAI-038）［add → M3/RULE-BOHAI-038］（docs/proposals/PROP-BOHAI-028.md）
 - PROP-BOHAI-029 补全有效产量开井日历折算支公式（RULE-BOHAI-019）［modify → M3/RULE-BOHAI-019］（docs/proposals/PROP-BOHAI-029.md）
 - PROP-BOHAI-030 补全自然递减率年化指数拟合实现（RULE-BOHAI-013）［modify → M3/RULE-BOHAI-013］（docs/proposals/PROP-BOHAI-030.md）

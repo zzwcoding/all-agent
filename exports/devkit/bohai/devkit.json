@@ -1814,16 +1814,6 @@
         "path": "docs/proposals/PROP-BOHAI-026.md"
       },
       {
-        "id": "PROP-BOHAI-027",
-        "title": "受理 §4 规则 6 完井衔接校验待扩源（RULE-BOHAI-037）",
-        "change": "add",
-        "targetModel": "M3",
-        "targetElement": "RULE-BOHAI-037",
-        "signalKind": "对账缺口",
-        "signalRef": "docs/walkthrough/step2-mr-adjudication.md#三-M3未建清单-规则6",
-        "path": "docs/proposals/PROP-BOHAI-027.md"
-      },
-      {
         "id": "PROP-BOHAI-028",
         "title": "受理 §4 规则 11 实时零值告警待实时面（RULE-BOHAI-038）",
         "change": "add",

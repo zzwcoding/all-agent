@@ -1,7 +1,7 @@
 ---
 id: PROP-BOHAI-027
 title: 受理 §4 规则 6 完井衔接校验待扩源（RULE-BOHAI-037）
-status: open
+status: rejected
 source-signal:
   kind: 对账缺口
   ref: docs/walkthrough/step2-mr-adjudication.md#三-M3未建清单-规则6
@@ -27,3 +27,7 @@ rationale: "R5·§4 规则 6 的判据挂在完井记录（well_completion）上
 - B 级：`docs/一期收官报告.md` §6 业务面 10（§4 规则 6 未建及原因）；`ontology/bohai/m3-rule-model.yaml` 头注（未建清单同源）。
 - 靶 ID 核对：RULE-BOHAI-037 未占用。
 - 影响面：占位不改既有元素；扩源若发生，属域面变更（新表→新对象），另走 onto-modeler 工序与 MR。
+
+## 裁决记录（Owner，2026-09-21）
+
+**裁决：挂起，rejected 归档**——判据源表（well_completion 完井记录）不在渤海域 8 表，扩源属域面变更须 Owner 主动引入（带源表与判据素材另立新提案）；本期不扩源。RULE-BOHAI-037 号位回收可用。同信号再现先查池（本提案即档案）。无本体改动。
