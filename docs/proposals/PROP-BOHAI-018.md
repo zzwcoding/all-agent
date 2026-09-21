@@ -29,3 +29,9 @@ rationale: "同靶两残留合一案：(a) 保真度对账指标 10 部分译—
 - B 级：`docs/walkthrough/step2-mr-adjudication.md` §二 D13 行——「RULE-BOHAI-018（递减增油）描述保留事故 7 注记；仍待 Owner：统一口径前的使用边界」；`docs/walkthrough/step1-db-reverse-draft/dirty-signs.md` D13（两作业区算法不一致）。
 - A 级：`ontology/bohai/m3-rule-model.yaml#RULE-BOHAI-018`——description「基线 q_0(1−d_a)^t 的拟合参数与 d_a 取值待 Owner」；`ontology/bohai/glossary-model.yaml#GLS-BOHAI-007`（术语注记同源）。
 - 影响面：单规则修改；劈分承载 AGG-BOHAI-009.splitCoefficient 不变（其落表裁决另见 PROP-BOHAI-021）。
+
+## 裁决进展记录（Owner，2026-09-21，部分裁决——status 维持 open）
+
+**(b) D13 使用边界已裁**：两作业区算法不一致未消前，递减增油限井组·年尺度内部评估使用，不入对外报表口径；对外发布须先完成联席口径统一（采油工艺所+开发室）。已落 RULE-BOHAI-018 description。
+
+**(a) 基线拟合参数（q_0/d_a/拟合窗口/基期）缺素材待 Owner**——参数是工程事实不猜数（入问题清单）。素材到后 baselineOil 由占位落成可算式，本提案关箱。

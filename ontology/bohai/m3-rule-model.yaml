@@ -326,7 +326,7 @@ rules:
   - id: RULE-BOHAI-018
     name: 递减增油
     ruleType: CALCULATION
-    description: "R5·§3 指标 10（一数多源争议之最，事故 7；Owner=采油工艺所，开发室联席）。基线 q_0(1−d_a)^t 的拟合参数与 d_a 取值待 Owner；多措施叠加以主要措施为主；劈分系数承载 AGG-BOHAI-009.splitCoefficient（§5「Σ=1」invariant）。术语注记（R5·§6）：含口径争议、待联席裁决。换算系数 6.29 桶/m³（R5·§2.2，指标 15 桶油成本用）随本口径注记。"
+    description: "R5·§3 指标 10（一数多源争议之最，事故 7；Owner=采油工艺所，开发室联席）。基线 q_0(1−d_a)^t 的拟合参数与 d_a 取值待 Owner 素材（缺素材不猜数，入问题清单）；多措施叠加以主要措施为主；劈分系数承载 AGG-BOHAI-009.splitCoefficient（§5「Σ=1」invariant）。使用边界已裁（Owner 2026-09-21，PROP-BOHAI-018(b)，D13）：两作业区算法不一致未消前，**本指标限井组·年尺度内部评估使用，不入对外报表口径**——对外发布须先完成联席口径统一（采油工艺所+开发室）。术语注记（R5·§6）：含口径争议、待联席裁决。换算系数 6.29 桶/m³（R5·§2.2，指标 15 桶油成本用）随本口径注记。"
     inputParams:
       - name: actualOil
         type: Decimal
