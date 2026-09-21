@@ -29,6 +29,20 @@
       "notes": "PROP-BOHAI-008采纳后再生；变更仅两处：C口径描述+open清单26→25，增量审通过",
       "reviewedBy": "divh",
       "date": "2026-09-21"
+    },
+    {
+      "target": "exports/devkit/bohai/devkit.md",
+      "reviewedCommit": "6a96d4a16752c9405ea7aded734a4ea42b1d7d61",
+      "reviewedSha256": "bd3c20882ebfd4219fa03e1cb59f60476b49b49347153a7fbe252635913a3be6",
+      "verdict": "已审",
+      "checkpoints": [
+        "装配完整性",
+        "提案内容落位(PROP-031 B′条件式三处)",
+        "约束节原样"
+      ],
+      "notes": "PROP-031采纳后再生；变更=RULE-010条件式+open清单25→24，增量审通过",
+      "reviewedBy": "divh",
+      "date": "2026-09-21"
     }
   ]
 }

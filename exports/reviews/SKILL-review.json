@@ -15,6 +15,20 @@
       "notes": "首审基线（票 46）：--check 再制一致绿；三件套+frontmatter 齐；口径卡与 CORE 同源（出厂集 AC1 探针机核）；引用纪律与拒答边界节在场；档位=首审+变更审（SKILL.md 变更=审全文，skillpack.json 变更=审口径卡节）",
       "reviewedBy": "divh",
       "date": "2026-09-20"
+    },
+    {
+      "target": "exports/skillpkg/bohai/SKILL.md",
+      "reviewedCommit": "6a96d4a16752c9405ea7aded734a4ea42b1d7d61",
+      "reviewedSha256": "074dab40eb3055580faa9d545e656b1e42313b88bf985ffb98f1254880b4fa87",
+      "verdict": "已审",
+      "checkpoints": [
+        "装配完整性",
+        "提案内容落位(PROP-031 B′条件式三处)",
+        "切片声明原样"
+      ],
+      "notes": "PROP-031采纳后再生；RULE-010在M3切片故同步再生，增量审通过",
+      "reviewedBy": "divh",
+      "date": "2026-09-21"
     }
   ]
 }
