@@ -1,7 +1,7 @@
 ---
 id: PROP-BOHAI-011
 title: 补齐井号归一化映射表全集与归一位置裁决（RULE-BOHAI-005）
-status: open
+status: accepted
 source-signal:
   kind: 疑点
   ref: docs/walkthrough/step1-db-reverse-draft/dirty-signs.md#D6-井号旧写法
@@ -34,4 +34,4 @@ rationale: "井号归一化规则已建（TRANSFORMATION，N2/N-2→N-02 形态�
 
 **(b) 归一化位置已裁**：映射表=语义资产（RULE-BOHAI-005 承载唯一真源）+ 执行归源侧 ETL + 语义层保留旧写法残留检出告警。已落 RULE-005 description。
 
-**(a) 归一表全集：未裁——缺素材**。全集是业务事实（哪些井号有旧写法、各映射到什么新写法），字典只给一对形态示例，不可代裁不可发明。**待 Owner 提供归一表全集素材**后 expression 落显式映射集，本提案方可关箱。已记入问题清单。
+**(a) 归一表全集：已到齐关箱（2026-09-21）**——Owner 素材（docs/proposals/evidence/owner-materials-2026-09-21.md §PROP-011，Owner 确认）：四类变体形态+幂等规范化算法+6 条代表性映射示例；匹配失败不猜测落问题单。已落 RULE-BOHAI-005 expression/description。本提案关箱。
