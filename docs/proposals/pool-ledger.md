@@ -32,7 +32,7 @@
 | A21 | 指标 15 桶油成本投入字段（fidelity§二/收官§6.9） | PROP-BOHAI-026 | open | add RULE-BOHAI-036；ERP 缺源裁决 |
 | A22 | 指标 2 开井日历支公式（fidelity§二/收官§6.9） | PROP-BOHAI-029 | open | modify RULE-BOHAI-019；影响报告落点复核 |
 | A23 | 指标 3 年化拟合（fidelity§二/收官§6.9） | PROP-BOHAI-030 | open | modify RULE-BOHAI-013；实现层待选 |
-| A24 | 指标 5 Q_w 换算口径（fidelity§二/收官§6.9） | PROP-BOHAI-031 | open | modify RULE-BOHAI-010；与 A3 联动 |
+| A24 | 指标 5 Q_w 换算口径（fidelity§二/收官§6.9） | PROP-BOHAI-031 | **accepted** | 裁决 B′ 默认推算+化验校正（>5pp 井月以化验重算）；RULE-BOHAI-010 条件式落定；commit `8e5e334`；A3 联动闭环 |
 | A25 | 指标 10 基线拟合参数（fidelity§二/收官§6.9） | PROP-BOHAI-018 | open | 与 A13 同靶合并（modify RULE-BOHAI-018） |
 | A26 | §4 规则 6 完井不在 8 表（step2§三/收官§6.10） | PROP-BOHAI-027 | open | add RULE-BOHAI-037 占位；扩源 or 挂起 |
 | A27 | §4 规则 11 实时域（m3 头注/收官§6.10） | PROP-BOHAI-028 | open | add RULE-BOHAI-038 占位；实时面归属 |
