@@ -21,7 +21,7 @@
 | A10 | D10 跨月归属期规则（step2§二） | PROP-BOHAI-015 | **accepted** | 裁 按日历天数劈分（当月只承担当月天数）；RULE-024 落地、016/019 注记升级引用；commit `cea7095` |
 | A11 | D11 补录窗口阈值（step2§二） | PROP-BOHAI-016 | open（部分裁决） | 方向已裁：超窗不拒收+收单转问题单闭环；RULE-025 骨架入仓（change 转 modify，commit `03827ba`）；阈值 T-? 缺素材入问题清单 |
 | A12 | D12 缺失行计入分母（step2§二） | PROP-BOHAI-017 | **accepted** | 裁 缺失行不入分母+缺失率单列+入清单核实性质；RULE-015 定案；commit `fc21fb8` |
-| A13 | D13 统一前使用边界（step2§二） | PROP-BOHAI-018 | open | 与 A25 同靶合并（RULE-BOHAI-018） |
+| A13 | D13 统一前使用边界（step2§二） | PROP-BOHAI-018 | open（部分裁决） | (b) 使用边界已裁：统一前限井组年尺度内部评估不入对外报表（commit `69ce96c`） |
 | A14 | D14 停机码映射表全集（step2§二） | PROP-BOHAI-019 | open（纯缺素材） | 方向已定无需再裁（承载位 RULE-006/不建枚举/reusedBy 二期）；映射全集缺素材待 Owner，与 PROP-011 同族入问题清单 |
 | A15 | D15 商品量 vs 井口仲裁（step2§二） | PROP-BOHAI-020 | **accepted** | 裁决 ①+②+③（并存披露+使用边界+输差率折算关系，阈值挂后续提案）；AGG-008+QR-003 同步落定；commit `048aa32`；事故 7/13 同源问题有标准答案 |
 | A16 | MU 全模型无素材（step2§一/§四） | PROP-BOHAI-022 | **rejected** | 裁维持不建（R5 无 UI 证据+产物形态无界面面；素材到另立提案）；commit `881b041` |
@@ -33,7 +33,7 @@
 | A22 | 指标 2 开井日历支公式（fidelity§二/收官§6.9） | PROP-BOHAI-029 | open | modify RULE-BOHAI-019；影响报告落点复核 |
 | A23 | 指标 3 年化拟合（fidelity§二/收官§6.9） | PROP-BOHAI-030 | open | modify RULE-BOHAI-013；实现层待选 |
 | A24 | 指标 5 Q_w 换算口径（fidelity§二/收官§6.9） | PROP-BOHAI-031 | **accepted** | 裁决 B′ 默认推算+化验校正（>5pp 井月以化验重算）；RULE-BOHAI-010 条件式落定；commit `8e5e334`；A3 联动闭环 |
-| A25 | 指标 10 基线拟合参数（fidelity§二/收官§6.9） | PROP-BOHAI-018 | open | 与 A13 同靶合并（modify RULE-BOHAI-018） |
+| A25 | 指标 10 基线拟合参数（fidelity§二/收官§6.9） | PROP-BOHAI-018 | open（部分裁决） | (a) 拟合参数缺素材待 Owner，入问题清单（同靶 A13 已部分裁决） |
 | A26 | §4 规则 6 完井不在 8 表（step2§三/收官§6.10） | PROP-BOHAI-027 | open | add RULE-BOHAI-037 占位；扩源 or 挂起 |
 | A27 | §4 规则 11 实时域（m3 头注/收官§6.10） | PROP-BOHAI-028 | open | add RULE-BOHAI-038 占位；实时面归属 |
 | A28 | 区块/油田/平台/井筒/配注层未建（fidelity§一/收官§6.12） | PROP-BOHAI-013 | **accepted** | 区块建维形 AGG-BOHAI-010（族首）；油田/平台/井筒/配注层裁不建（无素材建即空壳，素材到另立提案）；commit `9d0b0c4` |
