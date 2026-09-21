@@ -16,7 +16,7 @@
 | A5 | D5 openDays 矛盾行清洗（step2§二） | PROP-BOHAI-010 | **accepted** | 裁 标注出清单交业务核实（不归零——归属未定，联动 D7）；RULE-023 落地；commit `4f793e1` |
 | A6 | D6 归一表全集+归一位置（step2§二） | PROP-BOHAI-011 | open（部分裁决） | (b) 位置已裁：映射表=语义资产+执行归源侧 ETL（commit `4b0b5e6`）；(a) 全集缺素材待 Owner 提供，入问题清单 |
 | A7 | D7 状态时效责任方（step2§二） | PROP-BOHAI-012 | **accepted** | 裁 责任方=作业区录入+治理稽核检出（SLA 时限值入问题清单）；commit `9e2286d`；剔检口径时效获解释 |
-| A8 | D8 是否提升「油田」对象（step2§二） | PROP-BOHAI-013 | open | 并入无源实体族（同表 A28 行） |
+| A8 | D8 是否提升「油田」对象（step2§二） | PROP-BOHAI-013 | **accepted** | 裁不提升（无业务驱动，fieldName 保持行内冗余）；随 A28 族一并关（commit `9d0b0c4`） |
 | A9 | D9 分层格式规范（step2§二） | PROP-BOHAI-014 | open（部分裁决） | (a) 方向已裁：保持 String 不发明格式（commit `bfbeca0`）；格式规范+配注目标承载缺素材待 Owner，入问题清单 |
 | A10 | D10 跨月归属期规则（step2§二） | PROP-BOHAI-015 | **accepted** | 裁 按日历天数劈分（当月只承担当月天数）；RULE-024 落地、016/019 注记升级引用；commit `cea7095` |
 | A11 | D11 补录窗口阈值（step2§二） | PROP-BOHAI-016 | open（部分裁决） | 方向已裁：超窗不拒收+收单转问题单闭环；RULE-025 骨架入仓（change 转 modify，commit `03827ba`）；阈值 T-? 缺素材入问题清单 |
@@ -36,7 +36,7 @@
 | A25 | 指标 10 基线拟合参数（fidelity§二/收官§6.9） | PROP-BOHAI-018 | open | 与 A13 同靶合并（modify RULE-BOHAI-018） |
 | A26 | §4 规则 6 完井不在 8 表（step2§三/收官§6.10） | PROP-BOHAI-027 | open | add RULE-BOHAI-037 占位；扩源 or 挂起 |
 | A27 | §4 规则 11 实时域（m3 头注/收官§6.10） | PROP-BOHAI-028 | open | add RULE-BOHAI-038 占位；实时面归属 |
-| A28 | 区块/油田/平台/井筒/配注层未建（fidelity§一/收官§6.12） | PROP-BOHAI-013 | open | add AGG-BOHAI-010 族首（区块）；余四实体随裁决顺延/关停（含 A8 油田） |
+| A28 | 区块/油田/平台/井筒/配注层未建（fidelity§一/收官§6.12） | PROP-BOHAI-013 | **accepted** | 区块建维形 AGG-BOHAI-010（族首）；油田/平台/井筒/配注层裁不建（无素材建即空壳，素材到另立提案）；commit `9d0b0c4` |
 | A29 | 术语 水淹层 未建（fidelity§三） | PROP-BOHAI-001 | **accepted** | 票 10 落 GLS-BOHAI-006；commit `0474bc8`；残留扩域不随本提案闭合 |
 | A30 | 术语 配注合格率 未建（fidelity§三） | PROP-BOHAI-002 | **accepted** | 票 10 落 GLS-BOHAI-009；commit `0474bc8`；指标化残留→PROP-BOHAI-014 |
 | A31 | 术语 三多四难 未建（fidelity§三） | PROP-BOHAI-003 | **accepted** | 票 10 落 GLS-BOHAI-010；commit `0474bc8`；无残留 |
