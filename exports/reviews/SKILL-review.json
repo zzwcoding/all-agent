@@ -141,6 +141,20 @@
       "notes": "同上",
       "reviewedBy": "divh",
       "date": "2026-09-21"
+    },
+    {
+      "target": "exports/skillpkg/bohai/SKILL.md",
+      "reviewedCommit": "e0c267b32f81ada91565ab9708551eecb6a0e8c2",
+      "reviewedSha256": "6626425e579a09104d7c71755fd2f1ba693f1259c79d33bd3282be12cfa3a4b4",
+      "verdict": "已审",
+      "checkpoints": [
+        "装配完整性",
+        "提案内容落位(RULE-025在M3切片)",
+        "切片声明原样"
+      ],
+      "notes": "同上",
+      "reviewedBy": "divh",
+      "date": "2026-09-21"
     }
   ]
 }
