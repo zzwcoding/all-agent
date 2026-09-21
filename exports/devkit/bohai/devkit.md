@@ -311,14 +311,13 @@ status: 待Owner人审（生成物禁手改，可再生；审记旁档exports/re
 
 ## 四、开放疑点（docs/proposals 扫描）
 
-指向本域的 open 提案 14 条（裁决与详情看提案原文）:
+指向本域的 open 提案 13 条（裁决与详情看提案原文）:
 
 - PROP-BOHAI-011 补齐井号归一化映射表全集与归一位置裁决（RULE-BOHAI-005）［modify → M3/RULE-BOHAI-005］（docs/proposals/PROP-BOHAI-011.md）
 - PROP-BOHAI-014 为注水日计量 layerSplit 补格式规范与配注目标承载裁决（AGG-BOHAI-003）［modify → M1/AGG-BOHAI-003］（docs/proposals/PROP-BOHAI-014.md）
 - PROP-BOHAI-016 新增补录窗口阈值校验规则（RULE-BOHAI-025）［modify → M3/RULE-BOHAI-025］（docs/proposals/PROP-BOHAI-016.md）
 - PROP-BOHAI-018 补齐递减增油基线拟合参数与统一前使用边界（RULE-BOHAI-018）［modify → M3/RULE-BOHAI-018］（docs/proposals/PROP-BOHAI-018.md）
 - PROP-BOHAI-019 补齐停机原因码新旧映射表全集（RULE-BOHAI-006）［modify → M3/RULE-BOHAI-006］（docs/proposals/PROP-BOHAI-019.md）
-- PROP-BOHAI-022 裁决 MU 模型补建或维持不建（SCR-BOHAI-001 维形位）［add → MU/SCR-BOHAI-001］（docs/proposals/PROP-BOHAI-022.md）
 - PROP-BOHAI-023 批次受理提取件二规则 13–20 判据（RULE-BOHAI-026 占位）［add → M3/RULE-BOHAI-026］（docs/proposals/PROP-BOHAI-023.md）
 - PROP-BOHAI-024 新增措施有效率指标位待判据（RULE-BOHAI-034）［add → M3/RULE-BOHAI-034］（docs/proposals/PROP-BOHAI-024.md）
 - PROP-BOHAI-025 新增机采系统能效指标位待公式（RULE-BOHAI-035）［add → M3/RULE-BOHAI-035］（docs/proposals/PROP-BOHAI-025.md）

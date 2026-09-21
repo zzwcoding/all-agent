@@ -1,7 +1,7 @@
 ---
 id: PROP-BOHAI-022
 title: 裁决 MU 模型补建或维持不建（SCR-BOHAI-001 维形位）
-status: open
+status: rejected
 source-signal:
   kind: 疑点
   ref: docs/walkthrough/step2-mr-adjudication.md#一-MU-不建文件
@@ -26,3 +26,7 @@ rationale: "MU 全模型无素材：R5 全文无界面/屏幕/菜单/控件证�
 - B 级：`docs/一期收官报告.md` §6 业务面 13（MU 全模型无素材）。
 - 靶 ID 核对：SCR- 前缀已在 ontology/schema/model-deps.json idPrefixes 登记（SCR-→MU）；SCR-BOHAI-001 未占用（MU 无文件，grep 核实）。
 - 影响面：若补建，mu-ui-model.yaml 为新文件（AC6 反向「启用却缺文件」已由票 13 落闸，omittedModels 机制可承接过渡态）。
+
+## 裁决记录（Owner，2026-09-21）
+
+**裁决：维持不建，rejected 归档**——R5 全文无界面/屏幕/控件证据，平台产物形态（devkit/skillpkg/MCP 服务）也不含界面面；建占位维形=为占位而占位（无素材空壳，PROP-013 同族判据）。将来出现 UI 素材（如被建项目出界面）时另立提案补建 mu-ui-model.yaml，SCR-BOHAI-001 ID 保留可用。无本体改动。

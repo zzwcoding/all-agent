@@ -1774,16 +1774,6 @@
         "path": "docs/proposals/PROP-BOHAI-019.md"
       },
       {
-        "id": "PROP-BOHAI-022",
-        "title": "裁决 MU 模型补建或维持不建（SCR-BOHAI-001 维形位）",
-        "change": "add",
-        "targetModel": "MU",
-        "targetElement": "SCR-BOHAI-001",
-        "signalKind": "疑点",
-        "signalRef": "docs/walkthrough/step2-mr-adjudication.md#一-MU-不建文件",
-        "path": "docs/proposals/PROP-BOHAI-022.md"
-      },
-      {
         "id": "PROP-BOHAI-023",
         "title": "批次受理提取件二规则 13–20 判据（RULE-BOHAI-026 占位）",
         "change": "add",
