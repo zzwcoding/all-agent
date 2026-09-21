@@ -171,6 +171,16 @@ status: 待Owner人审（生成物禁手改，可再生；审记旁档exports/re
 
 - 不变量 同一注水井劈分系数合计为 1: 对同一 injectorWellRef 的全部受效关系，splitCoefficient 之和 = 1（enforcedAt=ALWAYS）
 
+### AGG-BOHAI-010 区块（Block）
+
+- 注源: R5·§5 业务实体，维形位
+- AGGREGATE_ROOT；描述: R5·§5 实体草案「井—隶属→区块」。无源表（8 表之外）维形位（Owner 2026-09-21，PROP-BOHAI-013）：blockName 现值渤南/渤中/渤西（AGG-BOHAI-001.blockName 属性与 AGG-BOHAI-008 复合主键成分两处承载），区块密度基准 0.86/0.89/0.91（R5·§2.2）的自然归属。同族四实体裁不建：油田（D8 不提升——fieldName 保持行内冗余属性，无业务驱动拆对象）/平台（井的 String 属性已够用）/井筒/配注层——均无源表无属性素材，建即空壳，素材到时另立 add 提案。井/结算的 blockName 是否改引用 blockRef 暂不动（引用改造走影响分析另提案）。
+
+| 属性 | 标签 | 类型 | 约束与字典 |
+|---|---|---|---|
+| blockName | 区块名 | String |  |
+| densityBenchmark | 密度基准（t/m³） | Decimal |  |
+
 聚合关联（aggregate_associations）:
 
 | 关联 | 源 → 靶 | 类型 | 基数 | 引用字段 | 角色 |
@@ -301,10 +311,9 @@ status: 待Owner人审（生成物禁手改，可再生；审记旁档exports/re
 
 ## 四、开放疑点（docs/proposals 扫描）
 
-指向本域的 open 提案 16 条（裁决与详情看提案原文）:
+指向本域的 open 提案 15 条（裁决与详情看提案原文）:
 
 - PROP-BOHAI-011 补齐井号归一化映射表全集与归一位置裁决（RULE-BOHAI-005）［modify → M3/RULE-BOHAI-005］（docs/proposals/PROP-BOHAI-011.md）
-- PROP-BOHAI-013 新增区块维形对象承载无源业务实体族裁决（AGG-BOHAI-010）［add → M1/AGG-BOHAI-010］（docs/proposals/PROP-BOHAI-013.md）
 - PROP-BOHAI-014 为注水日计量 layerSplit 补格式规范与配注目标承载裁决（AGG-BOHAI-003）［modify → M1/AGG-BOHAI-003］（docs/proposals/PROP-BOHAI-014.md）
 - PROP-BOHAI-016 新增补录窗口阈值校验规则（RULE-BOHAI-025）［modify → M3/RULE-BOHAI-025］（docs/proposals/PROP-BOHAI-016.md）
 - PROP-BOHAI-018 补齐递减增油基线拟合参数与统一前使用边界（RULE-BOHAI-018）［modify → M3/RULE-BOHAI-018］（docs/proposals/PROP-BOHAI-018.md）

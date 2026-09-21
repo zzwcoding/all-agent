@@ -536,6 +536,26 @@
             "enforcedAt": "ALWAYS"
           }
         ]
+      },
+      {
+        "id": "AGG-BOHAI-010",
+        "name": "区块",
+        "alias": "Block",
+        "aggregateType": "AGGREGATE_ROOT",
+        "description": "R5·§5 实体草案「井—隶属→区块」。无源表（8 表之外）维形位（Owner 2026-09-21，PROP-BOHAI-013）：blockName 现值渤南/渤中/渤西（AGG-BOHAI-001.blockName 属性与 AGG-BOHAI-008 复合主键成分两处承载），区块密度基准 0.86/0.89/0.91（R5·§2.2）的自然归属。同族四实体裁不建：油田（D8 不提升——fieldName 保持行内冗余属性，无业务驱动拆对象）/平台（井的 String 属性已够用）/井筒/配注层——均无源表无属性素材，建即空壳，素材到时另立 add 提案。井/结算的 blockName 是否改引用 blockRef 暂不动（引用改造走影响分析另提案）。",
+        "sourceNote": "R5·§5 业务实体，维形位",
+        "attributes": [
+          {
+            "name": "blockName",
+            "label": "区块名",
+            "type": "String"
+          },
+          {
+            "name": "densityBenchmark",
+            "label": "密度基准（t/m³）",
+            "type": "Decimal"
+          }
+        ]
       }
     ],
     "associations": [
@@ -1712,16 +1732,6 @@
         "signalKind": "疑点",
         "signalRef": "docs/walkthrough/step1-db-reverse-draft/dirty-signs.md#D6-井号旧写法",
         "path": "docs/proposals/PROP-BOHAI-011.md"
-      },
-      {
-        "id": "PROP-BOHAI-013",
-        "title": "新增区块维形对象承载无源业务实体族裁决（AGG-BOHAI-010）",
-        "change": "add",
-        "targetModel": "M1",
-        "targetElement": "AGG-BOHAI-010",
-        "signalKind": "对账缺口",
-        "signalRef": "docs/walkthrough/step5-fidelity.md#一-对象-无源表实体未建",
-        "path": "docs/proposals/PROP-BOHAI-013.md"
       },
       {
         "id": "PROP-BOHAI-014",

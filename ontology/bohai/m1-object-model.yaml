@@ -187,6 +187,15 @@ aggregates:
         expression: 对同一 injectorWellRef 的全部受效关系，splitCoefficient 之和 = 1
         violationMessage: 劈分系数合计须为 1（R5·§5「Σ=1」）
         enforcedAt: ALWAYS
+  # [R5·§5 业务实体，维形位] 区块（Owner 2026-09-21，PROP-BOHAI-013 采纳：族首维形补建）
+  - id: AGG-BOHAI-010
+    name: 区块
+    alias: Block
+    description: "R5·§5 实体草案「井—隶属→区块」。无源表（8 表之外）维形位（Owner 2026-09-21，PROP-BOHAI-013）：blockName 现值渤南/渤中/渤西（AGG-BOHAI-001.blockName 属性与 AGG-BOHAI-008 复合主键成分两处承载），区块密度基准 0.86/0.89/0.91（R5·§2.2）的自然归属。同族四实体裁不建：油田（D8 不提升——fieldName 保持行内冗余属性，无业务驱动拆对象）/平台（井的 String 属性已够用）/井筒/配注层——均无源表无属性素材，建即空壳，素材到时另立 add 提案。井/结算的 blockName 是否改引用 blockRef 暂不动（引用改造走影响分析另提案）。"
+    aggregateType: AGGREGATE_ROOT
+    attributes:
+      - { name: blockName, label: 区块名, type: String }                 # [R5·§2.2/§5] 现值域：渤南/渤中/渤西；本对象身份键
+      - { name: densityBenchmark, label: 密度基准（t/m³）, type: Decimal } # [R5·§2.2] 渤南 0.86/渤中 0.89/渤西 0.91
 # 无 data_dictionaries：字典无字典表声明（注释值集≠字典表，reverse-guide §6），
 #   完整值集以 enumValues 承载（current_status / well_type / measure_type /
 #   report_shift / equip_type）；stop_reason_code / overhaul_type 值集不全保持 String。

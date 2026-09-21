@@ -1,7 +1,7 @@
 ---
 id: PROP-BOHAI-013
 title: 新增区块维形对象承载无源业务实体族裁决（AGG-BOHAI-010）
-status: open
+status: accepted
 source-signal:
   kind: 对账缺口
   ref: docs/walkthrough/step5-fidelity.md#一-对象-无源表实体未建
@@ -30,3 +30,7 @@ rationale: "保真度对账：区块/油田/平台/井筒/配注层五业务实�
 - B 级：`docs/walkthrough/step2-mr-adjudication.md` §二 D8 行（油田提升裁决）+ §三「无源表」；`docs/一期收官报告.md` §6 业务面 12。
 - A 级：`ontology/bohai/m1-object-model.yaml#AGG-BOHAI-001`——blockName/platform 属性注记「未建对象（无源表，待 Owner）」；`#AGG-BOHAI-008`——blockName 复合主键成分。
 - 靶 ID 核对：AGG-BOHAI-010 未占用（m1 现有 001–009，grep 核实）。
+
+## 裁决记录（Owner，2026-09-21）
+
+**裁决：区块建维形（族首），同族四实体裁不建**。区块有实质承载（blockName 两处现值+密度基准按区块分区），建维形对象 AGG-BOHAI-010（属性仅 blockName+densityBenchmark，全注源不发明）。油田（D8 不提升——无业务驱动拆对象，fieldName 保持行内冗余属性）/平台/井筒/配注层**不建**（无源表无属性素材，建即空壳；素材到时另立 add 提案，非永久关停）。井/结算的 blockName 改引用 blockRef 暂不动（引用改造走影响分析另提案）。落点：m1 新增 AGG-BOHAI-010。
