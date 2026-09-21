@@ -20,7 +20,7 @@
 | A9 | D9 分层格式规范（step2§二） | PROP-BOHAI-014 | open（部分裁决） | (a) 方向已裁：保持 String 不发明格式（commit `bfbeca0`）；格式规范+配注目标承载缺素材待 Owner，入问题清单 |
 | A10 | D10 跨月归属期规则（step2§二） | PROP-BOHAI-015 | **accepted** | 裁 按日历天数劈分（当月只承担当月天数）；RULE-024 落地、016/019 注记升级引用；commit `cea7095` |
 | A11 | D11 补录窗口阈值（step2§二） | PROP-BOHAI-016 | open（部分裁决） | 方向已裁：超窗不拒收+收单转问题单闭环；RULE-025 骨架入仓（change 转 modify，commit `03827ba`）；阈值 T-? 缺素材入问题清单 |
-| A12 | D12 缺失行计入分母（step2§二） | PROP-BOHAI-017 | open | modify RULE-BOHAI-015；分母口径 |
+| A12 | D12 缺失行计入分母（step2§二） | PROP-BOHAI-017 | **accepted** | 裁 缺失行不入分母+缺失率单列+入清单核实性质；RULE-015 定案；commit `fc21fb8` |
 | A13 | D13 统一前使用边界（step2§二） | PROP-BOHAI-018 | open | 与 A25 同靶合并（RULE-BOHAI-018） |
 | A14 | D14 停机码映射表全集（step2§二） | PROP-BOHAI-019 | open | modify RULE-BOHAI-006；全集后落表挂行为 |
 | A15 | D15 商品量 vs 井口仲裁（step2§二） | PROP-BOHAI-020 | **accepted** | 裁决 ①+②+③（并存披露+使用边界+输差率折算关系，阈值挂后续提案）；AGG-008+QR-003 同步落定；commit `048aa32`；事故 7/13 同源问题有标准答案 |
