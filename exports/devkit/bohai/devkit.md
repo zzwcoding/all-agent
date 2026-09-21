@@ -58,7 +58,7 @@ status: 待Owner人审（生成物禁手改，可再生；审记旁档exports/re
 ### AGG-BOHAI-002 日产计量（OilProductionDaily）
 
 - 注源: R5·A.2 日产计量（★核心事实源）+ §5 Join 白名单 oil ⋈ well ✓
-- AGGREGATE_ROOT；描述: 源表 oil_production_daily（R5·设定书附录 A.2，字典标注核心事实源），一井一日，复合主键（wellId, prodDate）。§3 指标 1/3/4/5/7/10/14 的承载事实源。疑点残留：吨方混写（D1，校验 RULE-BOHAI-001）；A/B 班重复行与主键声明冲突（D2）；化验/折算打架（D3，RULE-BOHAI-002）；配产双值行（D4）；openDays 停井日>0（D5，值域已下沉 refRules）——均待 Owner 确认。
+- AGGREGATE_ROOT；描述: 源表 oil_production_daily（R5·设定书附录 A.2，字典标注核心事实源），**行粒度=班次**（Owner 2026-09-21，PROP-BOHAI-007 裁决=A：A/B 班各行各含当班真实产量，非重复录入），复合主键（wellId, prodDate, reportShift）；**日口径=同井同日各班合计**（SUM 天然兼容，下游按日聚合规则不受影响）。§3 指标 1/3/4/5/7/10/14 的承载事实源。疑点残留：吨方混写（D1→RULE-BOHAI-020 检出位已建）；配产双值行（D4）；openDays 停井日>0（D5，值域已下沉 refRules）——均待 Owner 确认。
 
 | 属性 | 标签 | 类型 | 约束与字典 |
 |---|---|---|---|
@@ -296,9 +296,8 @@ status: 待Owner人审（生成物禁手改，可再生；审记旁档exports/re
 
 ## 四、开放疑点（docs/proposals 扫描）
 
-指向本域的 open 提案 22 条（裁决与详情看提案原文）:
+指向本域的 open 提案 21 条（裁决与详情看提案原文）:
 
-- PROP-BOHAI-007 新增同井同日班次重复行校验规则（RULE-BOHAI-021）［add → M3/RULE-BOHAI-021］（docs/proposals/PROP-BOHAI-007.md）
 - PROP-BOHAI-009 新增配产单值校验规则承载双值行版本语义裁决（RULE-BOHAI-022）［add → M3/RULE-BOHAI-022］（docs/proposals/PROP-BOHAI-009.md）
 - PROP-BOHAI-010 新增停井日 openDays 与井状态联动校验规则（RULE-BOHAI-023）［add → M3/RULE-BOHAI-023］（docs/proposals/PROP-BOHAI-010.md）
 - PROP-BOHAI-011 补齐井号归一化映射表全集与归一位置裁决（RULE-BOHAI-005）［modify → M3/RULE-BOHAI-005］（docs/proposals/PROP-BOHAI-011.md）

@@ -1,7 +1,7 @@
 ---
 id: PROP-BOHAI-007
 title: 新增同井同日班次重复行校验规则（RULE-BOHAI-021）
-status: open
+status: rejected
 source-signal:
   kind: 疑点
   ref: docs/walkthrough/step1-db-reverse-draft/dirty-signs.md#D2-班次重复行
@@ -28,3 +28,7 @@ rationale: "D2 同井同日 A/B 班重复行与复合主键 (wellId, prodDate) �
 - B 级：`docs/walkthrough/step2-mr-adjudication.md` §二 D2 行——「仍待 Owner：去重规则与键约束是否强化」。
 - A 级：`ontology/bohai/m1-object-model.yaml#AGG-BOHAI-002`——description「A/B 班重复行与主键声明冲突（D2）」+ reportShift 注记「D2 班次手抄汇总」。
 - 靶 ID 核对：RULE-BOHAI-021 未占用。
+
+## 裁决记录（Owner，2026-09-21）
+
+**裁决：A 班次行是业务事实 → 本提案 rejected 归档**（提案预设路径：裁「班次行=业务事实」则不建唯一性校验）。A/B 班各行各含当班真实产量，非重复录入；冲突方是主键声明而非数据——已修正 AGG-BOHAI-002：行粒度=班次（复合主键 wellId+prodDate+reportShift），日口径=各班合计（SUM 天然兼容，下游按日聚合规则不受影响）。RULE-BOHAI-021 不建（ID 回收可用）。

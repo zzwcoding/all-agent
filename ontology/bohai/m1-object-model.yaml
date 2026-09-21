@@ -38,7 +38,7 @@ aggregates:
   - id: AGG-BOHAI-002
     name: 日产计量
     alias: OilProductionDaily
-    description: "源表 oil_production_daily（R5·设定书附录 A.2，字典标注核心事实源），一井一日，复合主键（wellId, prodDate）。§3 指标 1/3/4/5/7/10/14 的承载事实源。疑点残留：吨方混写（D1，校验 RULE-BOHAI-001）；A/B 班重复行与主键声明冲突（D2）；化验/折算打架（D3，RULE-BOHAI-002）；配产双值行（D4）；openDays 停井日>0（D5，值域已下沉 refRules）——均待 Owner 确认。"
+    description: "源表 oil_production_daily（R5·设定书附录 A.2，字典标注核心事实源），**行粒度=班次**（Owner 2026-09-21，PROP-BOHAI-007 裁决=A：A/B 班各行各含当班真实产量，非重复录入），复合主键（wellId, prodDate, reportShift）；**日口径=同井同日各班合计**（SUM 天然兼容，下游按日聚合规则不受影响）。§3 指标 1/3/4/5/7/10/14 的承载事实源。疑点残留：吨方混写（D1→RULE-BOHAI-020 检出位已建）；配产双值行（D4）；openDays 停井日>0（D5，值域已下沉 refRules）——均待 Owner 确认。"
     aggregateType: AGGREGATE_ROOT
     attributes:
       - name: wellRef            # [R5·§5「oil_production_daily ⋈ well_info（井号）✓」+ A.2 键列] 引用 vs 依赖待 Owner
@@ -67,7 +67,7 @@ aggregates:
             violationMessage: 开井时长须在 [0,24]（R5·§4 规则 5）
             enforcedAt: ALWAYS
       - { name: oilPressure, label: 油压（MPa）, type: Decimal }     # [R5·A.2]
-      - { name: reportShift, label: 报表班次, type: Enum, enumValues: [A, B, C] }   # [R5·A.2] D2 班次手抄汇总；§2.1 手工录入环节是脏数据主要来源
+      - { name: reportShift, label: 报表班次, type: Enum, enumValues: [A, B, C] }   # [R5·A.2] 主键成分（PROP-BOHAI-007=A，2026-09-21：行粒度=班次，日口径=各班合计）；§2.1 手工录入环节是脏数据主要来源
   # [R5·A.3 + §5] 注水侧事实源；§3 指标 6/7/12 承载
   - id: AGG-BOHAI-003
     name: 注水日计量
