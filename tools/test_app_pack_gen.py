@@ -187,13 +187,17 @@ def make_inputs(tmp: Path) -> Path:
 
 
 def make_domain(tmp: Path, *, with_models=("M1", "M2", "M3", "M7"),
-                domain="demo", label="演示域", model_type_override=None) -> Path:
+                domain="demo", label="演示域", model_type_override=None,
+                omitted_models=None) -> Path:
     """搭合成域目录：manifest + 指定声明模型文件（with_models 之外不落盘）。"""
     dom = tmp / "onto" / domain
     dom.mkdir(parents=True)
+    manifest = {"domain": domain, "label": label, "profile": "v9-core"}
+    if omitted_models:
+        manifest["omittedModels"] = [{"model": m, "reason": r}
+                                     for m, r in omitted_models.items()]
     (dom / "manifest.json").write_text(
-        json.dumps({"domain": domain, "label": label, "profile": "v9-core"},
-                   ensure_ascii=False), encoding="utf-8")
+        json.dumps(manifest, ensure_ascii=False), encoding="utf-8")
     for mid in with_models:
         fname, text = MODEL_FILES[mid]
         if model_type_override and mid in model_type_override:
@@ -438,6 +442,69 @@ class DeclaredModelsTest(unittest.TestCase):
             [str(dom), "--inputs-dir", str(self.tmp / "void")])
         self.assertEqual(rc, 2)
         self.assertIn("固定输入", err)
+
+
+class OmittedModelsTest(unittest.TestCase):
+    """manifest omittedModels 豁免（票 59）：带理由豁免 M2/M3/M7 → exit 0 出包
+    +「豁免未建」注记（MD+JSON）；M1 不可豁免照 exit 2；文件在场以文件为准。"""
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.tmp = Path(self._tmp.name)
+        self.inputs = make_inputs(self.tmp)
+
+    def tearDown(self):
+        self._tmp.cleanup()
+
+    def test_omitted_m3_m7_exit_0_with_exempt_notes(self):
+        dom = make_domain(self.tmp / "a", with_models=("M1", "M2"),
+                          omitted_models={"M3": "零规则素材（票 59）",
+                                          "M7": "无报表素材（票 59）"})
+        # M2 模板行为挂 M3 规则引用——豁免 M3 后引用会悬空（引用闸照执法），
+        # 本测试域只留无规则引用的行为
+        m2 = dom / "m2-behavior-model.yaml"
+        m2.write_text(
+            m2.read_text(encoding="utf-8")
+            .replace("    appliedRules:\n      - RULE-DEMO-002\n      - RULE-DEMO-003\n",
+                     "    appliedRules: []\n"),
+            encoding="utf-8")
+        outdir = self.tmp / "pkg"
+        rc, _out, err = run_main([str(dom), "--inputs-dir", str(self.inputs),
+                                  "--out", str(outdir)])
+        self.assertEqual(rc, 0, err)
+        md = (outdir / "devkit.md").read_text(encoding="utf-8")
+        self.assertIn("M3 规则模型（豁免未建）", md)
+        self.assertIn("M7 查询统计与报表模型（豁免未建）", md)
+        self.assertIn("（M7 豁免未建：无报表素材（票 59）——口径节空）", md)
+        self.assertIn("（M3 豁免未建：零规则素材（票 59）——规则清单空）", md)
+        self.assertIn("（M2 · 2 条）", md)
+        data = json.loads((outdir / "devkit.json").read_text(encoding="utf-8"))
+        om = {m["model"]: m.get("omittedReason") for m in data["declaredModels"]
+              if m.get("omitted")}
+        self.assertEqual(om, {"M3": "零规则素材（票 59）",
+                              "M7": "无报表素材（票 59）"})
+        self.assertEqual(data["calibers"], [])
+        self.assertEqual(data["behaviorRuleInventory"]["rules"], [])
+
+    def test_omitted_m1_still_exit_2(self):
+        dom = make_domain(self.tmp / "b", with_models=("M2", "M3", "M7"),
+                          omitted_models={"M1": "M1 不可豁免仍应报错"})
+        rc, _out, err = run_main([str(dom), "--inputs-dir", str(self.inputs)])
+        self.assertEqual(rc, 2)
+        self.assertIn("缺声明模型", err)
+        self.assertIn("M1", err)
+
+    def test_omitted_entry_ignored_when_file_present(self):
+        dom = make_domain(self.tmp / "c",
+                          omitted_models={"M3": "文件在场豁免无效"})
+        outdir = self.tmp / "pkg-c"
+        rc, _out, err = run_main([str(dom), "--inputs-dir", str(self.inputs),
+                                  "--out", str(outdir)])
+        self.assertEqual(rc, 0, err)
+        data = json.loads((outdir / "devkit.json").read_text(encoding="utf-8"))
+        self.assertFalse(any(m.get("omitted") for m in data["declaredModels"]),
+                         "文件在场的声明模型不受豁免条目影响")
+        self.assertTrue(data["behaviorRuleInventory"]["rules"])
 
 
 class CliModesTest(unittest.TestCase):

@@ -332,7 +332,24 @@ def cmd_verify(target: Path, rpath: Path, as_json: bool = False) -> int:
         return emit(EXIT_CONFIG, "invalid", "审记非法（记录缺必备字段或 verdict "
                     "非法值）—— 配置错，详见 stderr；不重建审记")
 
-    record = trail["records"][-1]
+    # 本目标的最新裁决（票 59）：审记旁档按 target.stem 命名（bohai 与 pkb 的
+    # devkit 同落 devkit-review.json），记录内 target 字段是唯一甄别键——
+    # 不过滤会错拿别的生成物最新锚来比对，跨件误判「失效」。
+    # 同件判定（票 59 夹具回归）：approve 时写相对串（如夹具 'targets/x.md'）、
+    # verify 传绝对串是同一件——构件边界后缀匹配（任一方完整后缀于另一方）。
+    def _same_target(rec_target: str, tgt: str) -> bool:
+        return rec_target == tgt or tgt.endswith("/" + rec_target) \
+            or rec_target.endswith("/" + tgt)
+
+    mine = [r for r in trail["records"]
+            if isinstance(r.get("target"), str)
+            and _same_target(r["target"], str(target))]
+    if not mine:
+        return emit(EXIT_RED, "pending",
+                    f"无本目标审记（旁档 {rpath} 现有其他生成物记录 "
+                    f"{len(trail['records'])} 条，无 {target} 的记录）"
+                    f"—— 按待人审处理（宁多审一次，design §3.4 #2）")
+    record = mine[-1]
     if record["verdict"] == VERDICT_REJECTED:
         return emit(EXIT_RED, "rejected",
                     f"最新裁决为打回（routing: {record.get('routing', '')}）"

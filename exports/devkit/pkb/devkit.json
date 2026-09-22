@@ -1,0 +1,212 @@
+{
+  "status": "待Owner人审（生成物禁手改，可再生；审记旁档exports/reviews/，review_gate.py-verify判失效）",
+  "domain": {
+    "name": "pkb",
+    "label": "个人知识库域（个人版本体 WeKnora）",
+    "profile": "headless",
+    "sourcePath": "ontology/pkb"
+  },
+  "declaredModels": [
+    {
+      "model": "M1",
+      "file": "m1-object-model.yaml",
+      "modelType": "OBJECT",
+      "name": "对象模型",
+      "version": "1.0.0"
+    },
+    {
+      "model": "M2",
+      "file": "m2-behavior-model.yaml",
+      "modelType": "BEHAVIOR",
+      "name": "行为模型",
+      "version": "1.0.0"
+    },
+    {
+      "model": "M3",
+      "file": "m3-rule-model.yaml",
+      "modelType": "RULE",
+      "name": "规则模型",
+      "version": "",
+      "omitted": true,
+      "omittedReason": "Q5 已裁（2026-09-22）：图谱通用清单起步+三接入点结构预留（开关就位不开），规则闸未启用且 Owner 输入零约束条款——切本体对号表档时再立规则候选。"
+    },
+    {
+      "model": "M7",
+      "file": "m7-report-model.yaml",
+      "modelType": "REPORT",
+      "name": "查询统计与报表模型",
+      "version": "",
+      "omitted": true,
+      "omittedReason": "无查询/报表/统计口径素材证据——「以后可能会要」不算证据（profile-selection §1）。"
+    }
+  ],
+  "fixedInputs": {
+    "techConstraints": {
+      "file": "tech-constraints.md",
+      "name": "技术架构约束",
+      "path": "fixtures/app-pack-gen/inputs/tech-constraints.md",
+      "text": "出厂集固定输入（合成）——中性示例文本，非任何真实项目规约；生成器按原样装配进开发包头部约束节，文件内容不参与判定。\n\n## 技术架构约束\n\n- 服务端形态：Python 服务端 + 关系库，三层架构（接入 / 领域 / 数据）。\n- 数据访问：一切业务数据经语义层数据字典取数，禁直连物理表名。\n- 集成边界：对外只暴露查询出口与行为接口，不出裸表。\n\n（以上为合成中性约束，仅作开发包装配通路的固定输入。）\n"
+    },
+    "devGuide": {
+      "file": "dev-guide.md",
+      "name": "开发指导书",
+      "path": "fixtures/app-pack-gen/inputs/dev-guide.md",
+      "text": "出厂集固定输入（合成）——中性示例文本，非任何真实项目规约；生成器按原样装配进开发包头部约束节，文件内容不参与判定。\n\n## 开发指导书\n\n- 装配顺序：先数据字典后接口——数据字典是接口签名的唯一依据。\n- 口径实现：统计口径以规则清单（M3）的 expression/narrative 为准，查询出口（M7）只是实现形态，两处不一致时以规则为准并回提案流程。\n- 疑点处置：开发包第④节开放疑点逐条过目，命中疑点的实现先挂起待 Owner 裁决，不自行拍板。\n\n（以上为合成中性指导，仅作开发包装配通路的固定输入。）\n"
+    }
+  },
+  "dataDictionary": {
+    "aggregates": [
+      {
+        "id": "AGG-PKB-001",
+        "name": "知识条目",
+        "alias": "KnowledgeItem",
+        "aggregateType": "AGGREGATE_ROOT",
+        "description": "个人知识库的被管理单元（Owner 原话「管理我日常的开发资料、想法、文档、书籍、 技术感悟、工作业务等等」）。粒度已裁=单一聚合+sourceType 区分来源（Q2 签收 2026-09-22；某类内容长出独立属性面时走提案拆分）。载体形态参照 Owner 既有 资产：书籍全文 txt/书摘 txt/思维导图 png/概念 wiki 页（调研 §一#11）。",
+        "sourceNote": "",
+        "attributes": [
+          {
+            "name": "title",
+            "label": "标题",
+            "type": "String"
+          },
+          {
+            "name": "sourceType",
+            "label": "来源类型",
+            "type": "String"
+          },
+          {
+            "name": "contentRef",
+            "label": "内容载体引用",
+            "type": "String"
+          },
+          {
+            "name": "status",
+            "label": "状态",
+            "type": "Enum",
+            "constraints": {
+              "enumValues": [
+                "暂存",
+                "入册"
+              ]
+            }
+          },
+          {
+            "name": "collectedAt",
+            "label": "采集时间",
+            "type": "DateTime"
+          }
+        ],
+        "lifecycle": [
+          "暂存",
+          "入册"
+        ]
+      }
+    ],
+    "associations": []
+  },
+  "calibers": [],
+  "behaviorRuleInventory": {
+    "behaviors": [
+      {
+        "id": "BH-PKB-CaptureItem",
+        "name": "捕获条目",
+        "behaviorType": "COMMAND",
+        "triggerType": "USER_ACTION",
+        "ownerEntity": "AGG-PKB-001",
+        "preconditions": [],
+        "postconditions": [
+          {
+            "field": "status",
+            "setValue": "暂存"
+          }
+        ],
+        "appliedRules": [],
+        "requiredPermissions": [
+          "PERM-PKB-CaptureItem"
+        ],
+        "sourceNote": ""
+      },
+      {
+        "id": "BH-PKB-PromoteItem",
+        "name": "整理入册",
+        "behaviorType": "COMMAND",
+        "triggerType": "USER_ACTION",
+        "ownerEntity": "AGG-PKB-001",
+        "preconditions": [
+          "status=暂存（Q10：仅暂存条目可入册）"
+        ],
+        "postconditions": [
+          {
+            "field": "status",
+            "setValue": "入册"
+          }
+        ],
+        "appliedRules": [],
+        "requiredPermissions": [
+          "PERM-PKB-PromoteItem"
+        ],
+        "sourceNote": ""
+      },
+      {
+        "id": "BH-PKB-AskKnowledge",
+        "name": "检索问答",
+        "behaviorType": "QUERY",
+        "triggerType": "",
+        "ownerEntity": "AGG-PKB-001",
+        "preconditions": [],
+        "postconditions": [],
+        "appliedRules": [],
+        "requiredPermissions": [
+          "PERM-PKB-AskKnowledge"
+        ],
+        "sourceNote": ""
+      },
+      {
+        "id": "BH-PKB-QueryGraph",
+        "name": "图谱查询",
+        "behaviorType": "QUERY",
+        "triggerType": "",
+        "ownerEntity": "AGG-PKB-001",
+        "preconditions": [],
+        "postconditions": [],
+        "appliedRules": [],
+        "requiredPermissions": [
+          "PERM-PKB-QueryGraph"
+        ],
+        "sourceNote": ""
+      },
+      {
+        "id": "BH-PKB-RegenWiki",
+        "name": "再生Wiki页",
+        "behaviorType": "COMMAND",
+        "triggerType": "USER_ACTION",
+        "ownerEntity": "AGG-PKB-001",
+        "preconditions": [
+          "status=入册（仅入册条目进 wiki 管线）"
+        ],
+        "postconditions": [
+          {
+            "field": "status",
+            "setValue": "入册"
+          }
+        ],
+        "appliedRules": [],
+        "requiredPermissions": [
+          "PERM-PKB-RegenWiki"
+        ],
+        "sourceNote": ""
+      }
+    ],
+    "rules": []
+  },
+  "openProposals": {
+    "enabled": true,
+    "scannedDir": "docs/proposals",
+    "items": []
+  },
+  "generatedFrom": {
+    "generator": "tools/app_pack_gen.py",
+    "source": "ontology/pkb",
+    "note": "确定性派生物：确定性装配零 LLM 零时间戳，同域重生成字节一致；生成物禁手改，防陈旧断言=--check 再制一致（票 35）"
+  }
+}

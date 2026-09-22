@@ -65,6 +65,55 @@ class ReviewGateTest(unittest.TestCase):
         import shutil
         shutil.rmtree(self.tmp, ignore_errors=True)
 
+    def test_verify_filters_records_by_target_shared_review_file(self):
+        """票 59：旁档按 target.stem 共享（两个 devkit 同名 devkit-review.json），
+        verify 只认记录内 target==本目标——不得错拿他件锚判「失效」。"""
+        dir_a = self.tmp / "pkb"
+        dir_a.mkdir()
+        target_a = dir_a / "devkit.md"
+        target_a.write_text("A 生成物\n", encoding="utf-8")
+        # self.target = tmp/artifact.md，与 target_a 不同 stem → 各自旁档；
+        # 这里直接手工构造共享旁档：同 stem 的两件共享一个 review 文件
+        shared = self.rdir / "devkit-review.json"
+        other = self.tmp / "bohai-devkit.md"
+        other.write_text("bohai 生成物\n", encoding="utf-8")
+        # 先对 bohai 件 approve（生成其锚记录），再把旁档挪成共享名
+        rc, _, _ = run_main(["approve", str(other), "--review-dir",
+                             str(self.rdir)])
+        self.assertEqual(rc, 0)
+        (self.rdir / "bohai-devkit-review.json").rename(shared)
+        # pkb 件 verify：旁档在、记录在，但没有 pkb 件的记录 → pending 而非 stale
+        rc, out, _ = run_main(["verify", str(target_a), "--review-dir",
+                               str(self.rdir)])
+        self.assertEqual(rc, 1)
+        self.assertIn("无本目标审记", out)
+        self.assertIn("按待人审", out)
+
+    def test_verify_matches_relative_record_target_against_absolute_verify(self):
+        """票 59 夹具回归：approve 写相对串 target（夹具 'targets/x.md'）、
+        verify 传绝对路径——构件边界后缀匹配判同件，stale 照常判失效。"""
+        fg = self.tmp / "fg"
+        targets = fg / "targets"
+        targets.mkdir(parents=True)
+        art = targets / "x.md"
+        art.write_text("夹具靶件\n", encoding="utf-8")
+        rdir = fg / "records"
+        rdir.mkdir()
+        import hashlib
+        sha = hashlib.sha256(art.read_bytes()).hexdigest()
+        (rdir / "x-review.json").write_text(json.dumps({
+            "target": "targets/x.md", "created": "2026-09-20",
+            "records": [{"target": "targets/x.md", "reviewedCommit": "0" * 40,
+                         "reviewedSha256": "0" * 64, "verdict": "已审",
+                         "checkpoints": [], "notes": "预置失效样例",
+                         "reviewedBy": "fixture-author",
+                         "date": "2026-09-20"}]},
+            ensure_ascii=False), encoding="utf-8")
+        rc, out, _ = run_main(["verify", str(art), "--review-dir", str(rdir)])
+        self.assertEqual(rc, 1)
+        self.assertIn("审记失效", out)
+        self.assertIn("回落待人审", out)
+
     # ---------- init ----------
 
     def test_init_creates_skeleton(self):

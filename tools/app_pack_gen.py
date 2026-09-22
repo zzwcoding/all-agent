@@ -191,14 +191,29 @@ def load_domain(target: Path) -> dict:
                           f"本生成器按单域出包，请传域目录")
     manifest = load_json(manifest_path)
     domain = manifest.get("domain") or target.name
+    # manifest omittedModels 豁免（票 59）：带非空理由的豁免可覆盖声明模型缺件
+    # （限 M2/M3/M7——对应节渲染「豁免未建」注记）；M1 不可豁免（无对象=残包，
+    # schema profiles 组合恒含 M1）。文件在场的声明模型以文件为准（豁免条目对
+    # 已建模型无效果）；未豁免缺件照旧报错不硬编（边界规则 5 保持）。
+    omitted = {o.get("model"): (o.get("reason") or "").strip()
+               for o in manifest.get("omittedModels") or []
+               if isinstance(o, dict) and o.get("model")}
     models, declared = {}, []
     for model_id, filename, model_type, cname in DECLARED_MODELS:
         path = target / filename
         if not path.is_file():
+            if model_id != "M1" and omitted.get(model_id):
+                declared.append({"model": model_id, "file": filename,
+                                 "modelType": model_type, "name": cname,
+                                 "version": "", "omitted": True,
+                                 "omittedReason": omitted[model_id]})
+                models[model_id] = None
+                continue
             raise ConfigError(
                 f"缺声明模型 {model_id}: {path} 不存在"
                 f"（生成器声明集 {'/'.join(m for m, _f, _t, _c in DECLARED_MODELS)}"
-                f"；边界规则 5：缺了报错不硬编，拒绝产出残包）")
+                f"；边界规则 5：缺了报错不硬编，拒绝产出残包；带理由的 manifest "
+                f"omittedModels 豁免可覆盖 M2/M3/M7（票 59））")
         doc = load_yaml_doc(path)
         if doc.get("model_type") != model_type:
             raise ConfigError(
@@ -218,10 +233,14 @@ def load_domain(target: Path) -> dict:
         "aggregates": _req_list(m1, "aggregates", "M1", target / DECLARED_MODELS[0][1]),
         "associations": _req_list(m1, "aggregate_associations", "M1",
                                   target / DECLARED_MODELS[0][1]),
-        "behaviors": _req_list(m2, "behaviors", "M2", target / DECLARED_MODELS[1][1]),
-        "rules": _req_list(m3, "rules", "M3", target / DECLARED_MODELS[2][1]),
-        "queryReports": _req_list(m7, "query_reports", "M7", target / DECLARED_MODELS[3][1]),
-        "notes": {mid: extract_source_notes((target / f).read_text(encoding="utf-8"))
+        "behaviors": (_req_list(m2, "behaviors", "M2", target / DECLARED_MODELS[1][1])
+                      if m2 is not None else []),
+        "rules": (_req_list(m3, "rules", "M3", target / DECLARED_MODELS[2][1])
+                  if m3 is not None else []),
+        "queryReports": (_req_list(m7, "query_reports", "M7", target / DECLARED_MODELS[3][1])
+                         if m7 is not None else []),
+        "notes": {mid: (extract_source_notes((target / f).read_text(encoding="utf-8"))
+                        if models[mid] is not None else {})
                   for mid, f, _t, _c in DECLARED_MODELS},
         "declared": declared,
     }
@@ -562,7 +581,8 @@ def render_md(pkg: dict) -> str:
        f"零 LLM 零时间戳）")
     ap(f"- 本体来源: {dom['sourcePath']}（profile={dom['profile']}）")
     ap("- 声明模型: " + " / ".join(
-        f"{m['model']} {m['name']}" for m in pkg["declaredModels"]))
+        f"{m['model']} {m['name']}" + ("（豁免未建）" if m.get("omitted") else "")
+        for m in pkg["declaredModels"]))
     ap("- 固定输入: " + "、".join(
         f"{i['path']}（出厂集固定输入（合成））"
         for i in pkg["fixedInputs"].values()))
@@ -636,10 +656,17 @@ def render_md(pkg: dict) -> str:
                f"| {_md_cell(x['sourceRole'])}→{_md_cell(x['targetRole'])} |")
         ap("")
 
+    # 豁免注记（票 59）：manifest omittedModels 带理由豁免的模型，对应节渲染注记
+    om = {m["model"]: m.get("omittedReason", "")
+          for m in pkg["declaredModels"] if m.get("omitted")}
+
     # ②口径四件套
     ap(SECTION_HEADS[1] + "（M7 查询出口 × M2 行为 × M3 规则 × M1 承载）")
     ap("")
-    if not pkg["calibers"]:
+    if "M7" in om:
+        ap(f"（M7 豁免未建：{_md_cell(om['M7'])}——口径节空）")
+        ap("")
+    elif not pkg["calibers"]:
         ap("（本域 M7 无查询出口）")
         ap("")
     for c in pkg["calibers"]:
@@ -683,22 +710,30 @@ def render_md(pkg: dict) -> str:
     ap(SECTION_HEADS[2] + "（M2/M3 全量，注源=模型文件 [R<n>·…] 注释标签）")
     ap("")
     inv = pkg["behaviorRuleInventory"]
-    ap(f"### 行为（M2 · {len(inv['behaviors'])} 条）")
-    ap("")
-    for b in inv["behaviors"]:
-        rules_ref = ",".join(b["appliedRules"]) or "—"
-        note = f"— 注源: {b['sourceNote']}" if b["sourceNote"] else ""
-        ap(f"- {b['id']} {b['name']} [{b['behaviorType']}/{b['triggerType']}] "
-           f"ownerEntity={b['ownerEntity']} appliedRules={rules_ref} {note}".rstrip())
-    ap("")
-    ap(f"### 规则（M3 · {len(inv['rules'])} 条）")
-    ap("")
-    for r in inv["rules"]:
-        note = f"— 注源: {r['sourceNote']}" if r["sourceNote"] else ""
-        point = r.get("expression") or r.get("narrative")
-        tail = f"— {_md_cell(point)}" if point else ""
-        ap(f"- {r['id']} {r['name']} [{r['ruleType']}] {note} {tail}".rstrip())
-    ap("")
+    if "M2" in om:
+        ap(f"（M2 豁免未建：{_md_cell(om['M2'])}——行为清单空）")
+        ap("")
+    else:
+        ap(f"### 行为（M2 · {len(inv['behaviors'])} 条）")
+        ap("")
+        for b in inv["behaviors"]:
+            rules_ref = ",".join(b["appliedRules"]) or "—"
+            note = f"— 注源: {b['sourceNote']}" if b["sourceNote"] else ""
+            ap(f"- {b['id']} {b['name']} [{b['behaviorType']}/{b['triggerType']}] "
+               f"ownerEntity={b['ownerEntity']} appliedRules={rules_ref} {note}".rstrip())
+        ap("")
+    if "M3" in om:
+        ap(f"（M3 豁免未建：{_md_cell(om['M3'])}——规则清单空）")
+        ap("")
+    else:
+        ap(f"### 规则（M3 · {len(inv['rules'])} 条）")
+        ap("")
+        for r in inv["rules"]:
+            note = f"— 注源: {r['sourceNote']}" if r["sourceNote"] else ""
+            point = r.get("expression") or r.get("narrative")
+            tail = f"— {_md_cell(point)}" if point else ""
+            ap(f"- {r['id']} {r['name']} [{r['ruleType']}] {note} {tail}".rstrip())
+        ap("")
 
     # ④开放疑点
     ap(SECTION_HEADS[1].replace("二、口径四件套", "四、开放疑点")
