@@ -1,10 +1,12 @@
-# GLS 术语模型草案 · 个人知识库域（pkb）——onto-modeler 草案，未进仓（进仓走 MR）。
+# =====================================================================
+# 个人知识库域（pkb）· GLS 术语模型（票 58 定稿版，Owner Q2–Q10 签收 2026-09-22）
+# ────────────────────────────────────────────────────────────────
 # 口径真源：R11·all-agent-ex TERMS.md（:127–134 RAG/知识库/Wiki 节、:159–165 GraphRAG vs
 # 向量 RAG 节、:136–140 断言观节）+ references/weknora-personal-kb-digest.md §三；
 # 六词全部「口径可复述」，定义逐条注源，不发明新义。
 # relatedObjectRefs 只挂真实存在的 M1 聚合根（GLS→M1 单向，model-deps.json），可空留空不硬挂。
 model_type: GLOSSARY
-version: "0.1.0"
+version: "1.0.0"
 domain: pkb
 terms:
   - id: GLS-PKB-001
@@ -13,10 +15,10 @@ terms:
     termType: 术语
     definition: 个人知识库的被管理单元——一条开发资料/想法/文档/书籍/技术感悟/工作业务素材的登记行；知识库=仓库（原文+切块+元数据）那格，本体条目只登记身份与引用，不存原文。
     relatedObjectRefs: [AGG-PKB-001]
-    status: 有效（待 Owner 确认）
+    status: 有效
     owner: Owner
     source: Owner 口述粗需求（细稿）+ R11·TERMS.md :129（知识库=仓库）
-    notes: 草案新增词（六词中唯一来自 Owner 原话的业务对象词，其余五词为平台能力词）。
+    notes: 六词中唯一来自 Owner 原话的业务对象词，其余五词为平台能力词（票 58 定稿）。
   - id: GLS-PKB-002
     term: RAG
     aliases: [检索增强生成]
@@ -33,10 +35,11 @@ terms:
     termType: 术语
     definition: LLM 蒸馏出的人读页面层（有版本历史、无语义治理）；与本体（口径登记层）分属两层——个人版主从关系待细稿 Q6 裁决。
     relatedObjectRefs: []
-    status: 有效（Q6 待裁决）
+    status: 有效
     owner: Owner
     source: R11·TERMS.md :129（Wiki=人读页面层）
-    notes: Owner 关键词原词；治理权问题（页面改动是否回流本体走提案池）挂细稿 Q6。
+    notes: Q6 已裁（2026-09-22）：Wiki=本体下游派生页，口径/定义类人工编辑走提案池
+      回流本体（ought 单真源），手迹版本历史保留（票 58 定稿）。
   - id: GLS-PKB-004
     term: 知识图谱
     aliases: []

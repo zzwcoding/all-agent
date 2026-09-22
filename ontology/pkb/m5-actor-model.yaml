@@ -1,0 +1,49 @@
+# =====================================================================
+# 个人知识库域（pkb）· M5 主体模型（票 58 定稿版，Owner Q2–Q10 签收 2026-09-22）
+# ────────────────────────────────────────────────────────────────
+# 素材边界：Q9 已裁单 Owner（「我的知识库」），无多角色/多主体；权限面=
+#   五行为各一 PERM（targetType BEHAVIOR），单人多库 dataScope=ALL；
+#   agent 消费（Q7 MCP）是通道不是主体，不建 SYSTEM actor——消费鉴权
+#   随票 60 新仓技术选型落，不在本体预建。
+# =====================================================================
+model_type: ACTOR
+version: "1.0.0"
+domain: pkb
+actors:
+  # [Owner 原话「我的知识库」+ Q9 签收] 单人域唯一主体
+  - actorId: ACTOR-PKB-001
+    name: Owner（个人知识库唯一主体）
+    actorType: HUMAN
+    roles:
+      - ROLE-PKB-001
+roles:
+  - roleId: ROLE-PKB-001
+    name: 知识库管理员（Owner 兼）
+    inheritsFrom: []
+    permissions:
+      - PERM-PKB-CaptureItem
+      - PERM-PKB-PromoteItem
+      - PERM-PKB-AskKnowledge
+      - PERM-PKB-QueryGraph
+      - PERM-PKB-RegenWiki
+permissions:
+  - permissionId: PERM-PKB-CaptureItem
+    targetType: BEHAVIOR
+    targetRef: BH-PKB-CaptureItem
+    dataScope: ALL
+  - permissionId: PERM-PKB-PromoteItem
+    targetType: BEHAVIOR
+    targetRef: BH-PKB-PromoteItem
+    dataScope: ALL
+  - permissionId: PERM-PKB-AskKnowledge
+    targetType: BEHAVIOR
+    targetRef: BH-PKB-AskKnowledge
+    dataScope: ALL
+  - permissionId: PERM-PKB-QueryGraph
+    targetType: BEHAVIOR
+    targetRef: BH-PKB-QueryGraph
+    dataScope: ALL
+  - permissionId: PERM-PKB-RegenWiki
+    targetType: BEHAVIOR
+    targetRef: BH-PKB-RegenWiki
+    dataScope: ALL

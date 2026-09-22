@@ -1,6 +1,6 @@
 # 票 58：pkb 域定稿（Q2–Q10 落定 + M2/M5 补全）
 
-Status: todo
+Status: done
 
 Belongs to: docs/第五期端到端实弹拆票方案.md §4；docs/requirements/pkb-拍板清单-Q2-Q10.md（签收记录载体）
 Touches: ontology/pkb/（m1/m2/m5/glossary/manifest）、exports/mcp/capability-manifest.json（再制）、docs/requirements/pkb-拍板清单-Q2-Q10.md（签收表）
@@ -18,10 +18,10 @@ Owner 已签收 Q2–Q10 全按推荐档（2026-09-22 会话「都按你推荐�
 
 ## 验收（注源）
 
-- [ ] AC1 `python3 tools/schema_check.py ontology/` 全仓绿（含 pkb 4 文件）（源：CI 语义闸）
-- [ ] AC2 capability-manifest 再制一致（--check exit 0）（源：mcp-publisher 出厂集）
-- [ ] AC3 签收记录九问齐（拍板清单签收表 Q2–Q10 全有结论+日期+方式）（源：docs/requirements/pkb-拍板清单-Q2-Q10.md）
-- [ ] AC4 `bash tools/ci.sh` 四闸全绿（源：CI）
+- [x] AC1 `python3 tools/schema_check.py ontology/` 全仓绿（含 pkb 4 文件）（源：CI 语义闸）
+- [x] AC2 capability-manifest 再制一致（--check exit 0）（源：mcp-publisher 出厂集）
+- [x] AC3 签收记录九问齐（拍板清单签收表 Q2–Q10 全有结论+日期+方式）（源：docs/requirements/pkb-拍板清单-Q2-Q10.md）
+- [x] AC4 `bash tools/ci.sh` 四闸全绿（源：CI）
 
 ## 交接包
 

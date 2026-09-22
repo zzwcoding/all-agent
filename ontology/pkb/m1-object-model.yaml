@@ -1,12 +1,15 @@
-# M1 对象模型草案 · 个人知识库域（pkb）——onto-modeler 草案，未进仓（进仓走 MR）。
-# 素材：Owner 口述粗需求（docs/requirements/personal-weknora-细稿.md）+ 调研
-# references/weknora-personal-kb-digest.md（R10–R12）。
-# **AI 只做格式转换，业务必须人确认**——对象粒度（细稿 Q2）、来源类型值集（Q3）、
-# 状态生命周期（Q10）均为推荐档候选，逐条待 Owner 复核。
-# 口径对齐：本体只登记 ought/means（身份与引用），不存原文——「库存原始事实、本体存定义」
-#（R11·TERMS.md 四层归属定版），故条目正文以 contentRef 指针外挂，不进本体仓。
+# =====================================================================
+# 个人知识库域（pkb）· M1 对象模型（票 58 定稿版，Owner Q2–Q10 签收 2026-09-22）
+# ────────────────────────────────────────────────────────────────
+# 素材：Owner 口述粗需求（docs/requirements/personal-weknora-细稿.md）+
+#   拍板清单签收记录（docs/requirements/pkb-拍板清单-Q2-Q10.md）。
+# 口径：本体只登记 ought/means（身份与引用），不存原文——条目正文以
+#   contentRef 指针外挂（R11·TERMS 四层归属：「库存原始事实、本体存定义」）。
+# 已裁口径：Q2 单聚合+sourceType / Q3 六值起步新增走提案 / Q8 书摘优先全文
+#   可选 / Q10 双链（暂存→入册）。AI 只做格式转换，业务已由 Owner 签收。
+# =====================================================================
 model_type: OBJECT
-version: "0.1.0"
+version: "1.0.0"
 domain: pkb
 aggregates:
   - id: AGG-PKB-001
@@ -14,38 +17,44 @@ aggregates:
     alias: KnowledgeItem
     aggregateType: AGGREGATE_ROOT
     description: >-
-      个人知识库的被管理单元（Owner 原话「管理我日常的开发资料、想法、文档、书籍、技术感悟、
-      工作业务等等」）。粒度推荐档=单一聚合+sourceType 区分来源（细稿 Q2 待 Owner 裁决；
-      备选=文档/书籍/想法各自立对象）。载体形态参照 Owner 既有资产真实形态：书籍全文 txt/
-      书摘 txt/思维导图 png/概念 wiki 页（调研 §一#11）。AI 只做格式转换，业务必须人确认。
+      个人知识库的被管理单元（Owner 原话「管理我日常的开发资料、想法、文档、书籍、
+      技术感悟、工作业务等等」）。粒度已裁=单一聚合+sourceType 区分来源（Q2 签收
+      2026-09-22；某类内容长出独立属性面时走提案拆分）。载体形态参照 Owner 既有
+      资产：书籍全文 txt/书摘 txt/思维导图 png/概念 wiki 页（调研 §一#11）。
+    lifecycle:
+      - 暂存
+      - 入册
     attributes:
       - name: title
         label: 标题
         type: String
         required: true
-        description: 条目标题（身份性元数据，推荐档，待 Owner 确认）。
+        description: 条目标题（身份性元数据，票 58 定稿）。
       - name: sourceType
         label: 来源类型
         type: String
         required: true
         description: >-
-          来源类型占位（值集未完不建枚举）：已知六值=开发资料/想法/文档/书籍/技术感悟/工作业务，
-          Owner 原话以「等等」收尾（细稿 Q3 待补全集后转 DictionaryRef 或 Enum）。
+          来源类型（Q3 已裁 2026-09-22）：六值起步=开发资料/想法/文档/书籍/技术感悟/
+          工作业务；保持 String 占位（值集未闭不建枚举），新增类型走提案池转 DICT 字典
+          （字典项停用不删除）。
       - name: contentRef
         label: 内容载体引用
         type: String
         description: >-
-          内容的文件路径或 URI 引用（证据=既有资产为 txt/png 文件形态，调研 §一#11）；
-          条目正文不进本体仓（本体登记引用不存原文），内联短内容条目可空——
-          内容承载形态（外挂文件 vs 内联正文）待 Owner 确认。
+          内容的文件路径或 URI 引用（条目正文不进本体仓，本体只登记引用）；
+          Q8 已裁（2026-09-22）：书摘条目优先，全文挂载可选（contentRef 指向全文
+          文件不强制）；内联短内容条目可空。
       - name: status
         label: 状态
-        type: String
+        type: Enum
+        required: true
+        enumValues: [暂存, 入册]
         description: >-
-          生命周期占位（推荐档=暂存→入册双链，细稿 Q10）：Owner 裁决后转枚举或聚合 lifecycle
-          字段，不预建枚举。
+          生命周期（Q10 已裁 2026-09-22 双链）：捕获链随手记直进「暂存」（低摩擦，
+          不进检索/图谱/wiki 三管线）；整理入册后翻「入册」（进三管线消费）。
       - name: collectedAt
         label: 采集时间
         type: DateTime
         required: true
-        description: 入库采集时间戳（身份性元数据，推荐档，待 Owner 确认）。
+        description: 入库采集时间戳（身份性元数据，票 58 定稿）。

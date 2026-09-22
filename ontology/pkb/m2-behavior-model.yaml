@@ -1,0 +1,69 @@
+# =====================================================================
+# 个人知识库域（pkb）· M2 行为模型（票 58 定稿版，Owner Q2–Q10 签收 2026-09-22）
+# ────────────────────────────────────────────────────────────────
+# 素材边界：行为按 Q10 双链（捕获→整理入册）+ Q7 消费面（检索问答/图谱查询）
+#   + Q6 wiki 派生页口径立最小集；COMMAND 侧两态迁移、QUERY 侧两出口，
+#   规则素材为零（Q5 已裁通用清单起步+三接入点预留）故 appliedRules 全空。
+# =====================================================================
+model_type: BEHAVIOR
+version: "1.0.0"
+domain: pkb
+behaviors:
+  # [Q10 双链·捕获侧] 随手记低摩擦入捕获区，不触发三管线
+  - id: BH-PKB-CaptureItem
+    name: 捕获条目
+    ownerEntity: AGG-PKB-001
+    behaviorType: COMMAND
+    triggerType: USER_ACTION
+    preconditions: []
+    postconditions:
+      - field: status
+        setValue: 暂存
+    appliedRules: []
+    requiredPermissions:
+      - PERM-PKB-CaptureItem
+  # [Q10 双链·整理侧] 暂存条目整理（补标题/来源类型/内容载体）后入册，进检索/图谱/wiki 三管线
+  - id: BH-PKB-PromoteItem
+    name: 整理入册
+    ownerEntity: AGG-PKB-001
+    behaviorType: COMMAND
+    triggerType: USER_ACTION
+    preconditions:
+      - status=暂存（Q10：仅暂存条目可入册）
+    postconditions:
+      - field: status
+        setValue: 入册
+    appliedRules: []
+    requiredPermissions:
+      - PERM-PKB-PromoteItem
+  # [Q7 消费面] RAG 检索问答：相似度检索→塞上下文→LLM 带引用生成（GLS-PKB-002）
+  - id: BH-PKB-AskKnowledge
+    name: 检索问答
+    ownerEntity: AGG-PKB-001
+    behaviorType: QUERY
+    appliedRules: []
+    requiredPermissions:
+      - PERM-PKB-AskKnowledge
+  # [Q7/Q5 消费面] 图谱查询：通用清单档起步，三接入点切换开关预留（GLS-PKB-004/005）
+  - id: BH-PKB-QueryGraph
+    name: 图谱查询
+    ownerEntity: AGG-PKB-001
+    behaviorType: QUERY
+    appliedRules: []
+    requiredPermissions:
+      - PERM-PKB-QueryGraph
+  # [Q6 治理口径] wiki 页=本体下游派生页：再生自入册条目现内容；口径/定义类
+  #   人工编辑走提案池回流本体（ought 单真源），手迹版本历史保留
+  - id: BH-PKB-RegenWiki
+    name: 再生Wiki页
+    ownerEntity: AGG-PKB-001
+    behaviorType: COMMAND
+    triggerType: USER_ACTION
+    preconditions:
+      - status=入册（仅入册条目进 wiki 管线）
+    postconditions:
+      - field: status
+        setValue: 入册
+    appliedRules: []
+    requiredPermissions:
+      - PERM-PKB-RegenWiki

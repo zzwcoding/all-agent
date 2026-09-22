@@ -78,6 +78,18 @@
           "camp": "business-core"
         },
         {
+          "model": "M2",
+          "name": "行为模型",
+          "modelType": "BEHAVIOR",
+          "camp": "business-core"
+        },
+        {
+          "model": "M5",
+          "name": "主体模型",
+          "modelType": "ACTOR",
+          "camp": "business-core"
+        },
+        {
           "model": "GLS",
           "name": "术语模型",
           "modelType": "GLOSSARY",
@@ -87,16 +99,8 @@
       "schemaVersion": "1.2.0",
       "omittedModels": [
         {
-          "model": "M2",
-          "reason": "行为素材只有「管理/检索问答/wiki 生成」短语级证据，无触发/前置/状态变更语义（细稿 Q10 捕获链未裁）——行为候选挂起不产文件，Owner 裁决后补。"
-        },
-        {
           "model": "M3",
-          "reason": "Owner 输入零约束/校验/计算条款（细稿：规则候选挂起）；图谱抽取过闸类规则待 Q5 模式层路线裁决后另立候选。"
-        },
-        {
-          "model": "M5",
-          "reason": "单 Owner 自述（「我的知识库」）无角色/权限/数据范围素材（细稿 Q9 隐私边界未裁）——主体粒度裁决后再立，不预建空壳。"
+          "reason": "Q5 已裁（2026-09-22）：图谱通用清单起步+三接入点结构预留（开关就位不开），规则闸未启用且 Owner 输入零约束条款——切本体对号表档时再立规则候选。"
         },
         {
           "model": "M7",

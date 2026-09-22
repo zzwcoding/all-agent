@@ -3,19 +3,11 @@
   "label": "个人知识库域（个人版本体 WeKnora）",
   "profile": "headless",
   "schemaVersion": "1.2.0",
-  "description": "onto-modeler 草案（2026-09-22，未进仓，进仓走 MR）。素材=Owner 口述粗需求（docs/requirements/personal-weknora-细稿.md，Q1 已裁 (b) 第五期端到端实弹）+ 调研 references/weknora-personal-kb-digest.md（R10–R12）。profile=headless：证据只支撑 M1（知识条目）+GLS（六术语），headless 为覆盖 {M1,GLS} 的最小注册表组合；M2/M3/M5/M7 依 omittedModels 带理由豁免。Q2–Q10 按推荐档出稿，逐条待 Owner 复核（见细稿裁决记录）。",
+  "description": "票 58 定稿（2026-09-22，Owner Q2–Q10 签收 docs/requirements/pkb-拍板清单-Q2-Q10.md）。素材=Owner 口述粗需求（docs/requirements/personal-weknora-细稿.md）+ 调研 references/weknora-personal-kb-digest.md（R10–R12）。profile=headless：M1/M2/M5/GLS 已建文件（Q10 五行为/单 Owner 三件套），M3/M7 依 omittedModels 带理由豁免。建造线=第五期端到端实弹（本体→devkit→sdd-flow 建真系统，票 58–62）。",
   "omittedModels": [
     {
-      "model": "M2",
-      "reason": "行为素材只有「管理/检索问答/wiki 生成」短语级证据，无触发/前置/状态变更语义（细稿 Q10 捕获链未裁）——行为候选挂起不产文件，Owner 裁决后补。"
-    },
-    {
       "model": "M3",
-      "reason": "Owner 输入零约束/校验/计算条款（细稿：规则候选挂起）；图谱抽取过闸类规则待 Q5 模式层路线裁决后另立候选。"
-    },
-    {
-      "model": "M5",
-      "reason": "单 Owner 自述（「我的知识库」）无角色/权限/数据范围素材（细稿 Q9 隐私边界未裁）——主体粒度裁决后再立，不预建空壳。"
+      "reason": "Q5 已裁（2026-09-22）：图谱通用清单起步+三接入点结构预留（开关就位不开），规则闸未启用且 Owner 输入零约束条款——切本体对号表档时再立规则候选。"
     },
     {
       "model": "M7",
