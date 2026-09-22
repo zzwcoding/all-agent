@@ -1,0 +1,51 @@
+# M1 对象模型草案 · 个人知识库域（pkb）——onto-modeler 草案，未进仓（进仓走 MR）。
+# 素材：Owner 口述粗需求（docs/requirements/personal-weknora-细稿.md）+ 调研
+# references/weknora-personal-kb-digest.md（R10–R12）。
+# **AI 只做格式转换，业务必须人确认**——对象粒度（细稿 Q2）、来源类型值集（Q3）、
+# 状态生命周期（Q10）均为推荐档候选，逐条待 Owner 复核。
+# 口径对齐：本体只登记 ought/means（身份与引用），不存原文——「库存原始事实、本体存定义」
+#（R11·TERMS.md 四层归属定版），故条目正文以 contentRef 指针外挂，不进本体仓。
+model_type: OBJECT
+version: "0.1.0"
+domain: pkb
+aggregates:
+  - id: AGG-PKB-001
+    name: 知识条目
+    alias: KnowledgeItem
+    aggregateType: AGGREGATE_ROOT
+    description: >-
+      个人知识库的被管理单元（Owner 原话「管理我日常的开发资料、想法、文档、书籍、技术感悟、
+      工作业务等等」）。粒度推荐档=单一聚合+sourceType 区分来源（细稿 Q2 待 Owner 裁决；
+      备选=文档/书籍/想法各自立对象）。载体形态参照 Owner 既有资产真实形态：书籍全文 txt/
+      书摘 txt/思维导图 png/概念 wiki 页（调研 §一#11）。AI 只做格式转换，业务必须人确认。
+    attributes:
+      - name: title
+        label: 标题
+        type: String
+        required: true
+        description: 条目标题（身份性元数据，推荐档，待 Owner 确认）。
+      - name: sourceType
+        label: 来源类型
+        type: String
+        required: true
+        description: >-
+          来源类型占位（值集未完不建枚举）：已知六值=开发资料/想法/文档/书籍/技术感悟/工作业务，
+          Owner 原话以「等等」收尾（细稿 Q3 待补全集后转 DictionaryRef 或 Enum）。
+      - name: contentRef
+        label: 内容载体引用
+        type: String
+        description: >-
+          内容的文件路径或 URI 引用（证据=既有资产为 txt/png 文件形态，调研 §一#11）；
+          条目正文不进本体仓（本体登记引用不存原文），内联短内容条目可空——
+          内容承载形态（外挂文件 vs 内联正文）待 Owner 确认。
+      - name: status
+        label: 状态
+        type: String
+        description: >-
+          生命周期占位（推荐档=暂存→入册双链，细稿 Q10）：Owner 裁决后转枚举或聚合 lifecycle
+          字段，不预建枚举。
+      - name: collectedAt
+        label: 采集时间
+        type: DateTime
+        required: true
+        description: 入库采集时间戳（身份性元数据，推荐档，待 Owner 确认）。

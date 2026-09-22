@@ -65,6 +65,44 @@
           "reason": "R5 全文无界面/屏幕/菜单素材证据，MU 不建文件——裁决记录 docs/walkthrough/step2-mr-adjudication.md，理由记 lessons/09（票 13 AC6 反向豁免登记）。"
         }
       ]
+    },
+    {
+      "domain": "pkb",
+      "label": "个人知识库域（个人版本体 WeKnora）",
+      "profile": "headless",
+      "models": [
+        {
+          "model": "M1",
+          "name": "对象模型",
+          "modelType": "OBJECT",
+          "camp": "business-core"
+        },
+        {
+          "model": "GLS",
+          "name": "术语模型",
+          "modelType": "GLOSSARY",
+          "camp": "business-core"
+        }
+      ],
+      "schemaVersion": "1.2.0",
+      "omittedModels": [
+        {
+          "model": "M2",
+          "reason": "行为素材只有「管理/检索问答/wiki 生成」短语级证据，无触发/前置/状态变更语义（细稿 Q10 捕获链未裁）——行为候选挂起不产文件，Owner 裁决后补。"
+        },
+        {
+          "model": "M3",
+          "reason": "Owner 输入零约束/校验/计算条款（细稿：规则候选挂起）；图谱抽取过闸类规则待 Q5 模式层路线裁决后另立候选。"
+        },
+        {
+          "model": "M5",
+          "reason": "单 Owner 自述（「我的知识库」）无角色/权限/数据范围素材（细稿 Q9 隐私边界未裁）——主体粒度裁决后再立，不预建空壳。"
+        },
+        {
+          "model": "M7",
+          "reason": "无查询/报表/统计口径素材证据——「以后可能会要」不算证据（profile-selection §1）。"
+        }
+      ]
     }
   ],
   "tools": [

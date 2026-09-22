@@ -1,0 +1,69 @@
+# GLS 术语模型草案 · 个人知识库域（pkb）——onto-modeler 草案，未进仓（进仓走 MR）。
+# 口径真源：R11·all-agent-ex TERMS.md（:127–134 RAG/知识库/Wiki 节、:159–165 GraphRAG vs
+# 向量 RAG 节、:136–140 断言观节）+ references/weknora-personal-kb-digest.md §三；
+# 六词全部「口径可复述」，定义逐条注源，不发明新义。
+# relatedObjectRefs 只挂真实存在的 M1 聚合根（GLS→M1 单向，model-deps.json），可空留空不硬挂。
+model_type: GLOSSARY
+version: "0.1.0"
+domain: pkb
+terms:
+  - id: GLS-PKB-001
+    term: 知识条目
+    aliases: []
+    termType: 术语
+    definition: 个人知识库的被管理单元——一条开发资料/想法/文档/书籍/技术感悟/工作业务素材的登记行；知识库=仓库（原文+切块+元数据）那格，本体条目只登记身份与引用，不存原文。
+    relatedObjectRefs: [AGG-PKB-001]
+    status: 有效（待 Owner 确认）
+    owner: Owner
+    source: Owner 口述粗需求（细稿）+ R11·TERMS.md :129（知识库=仓库）
+    notes: 草案新增词（六词中唯一来自 Owner 原话的业务对象词，其余五词为平台能力词）。
+  - id: GLS-PKB-002
+    term: RAG
+    aliases: [检索增强生成]
+    termType: 术语
+    definition: 消费技术不是存储物——相似度检索→塞上下文→LLM 生成带引用答案。
+    relatedObjectRefs: []
+    status: 有效
+    owner: Owner
+    source: R11·TERMS.md :129（RAG=消费技术）
+    notes: Owner 关键词原词；平台能力词，不挂业务对象。
+  - id: GLS-PKB-003
+    term: Wiki
+    aliases: [维客]
+    termType: 术语
+    definition: LLM 蒸馏出的人读页面层（有版本历史、无语义治理）；与本体（口径登记层）分属两层——个人版主从关系待细稿 Q6 裁决。
+    relatedObjectRefs: []
+    status: 有效（Q6 待裁决）
+    owner: Owner
+    source: R11·TERMS.md :129（Wiki=人读页面层）
+    notes: Owner 关键词原词；治理权问题（页面改动是否回流本体走提案池）挂细稿 Q6。
+  - id: GLS-PKB-004
+    term: 知识图谱
+    aliases: []
+    termType: 术语
+    definition: LLM 从文档抽的实体关系网（广义 KG——无模式层，类型靠临场发挥会漂移）；库存原始事实的连线形态那格，本体的边的实例登记簿。
+    relatedObjectRefs: [AGG-PKB-001]
+    status: 有效
+    owner: Owner
+    source: R11·TERMS.md :129/:125（图谱=实体关系网/学员公式）
+    notes: Owner 关键词原词；relatedObjectRefs 挂知识条目=图谱节点由条目内容抽取而来的描述注记（待 Owner 确认）。
+  - id: GLS-PKB-005
+    term: GraphRAG
+    aliases: []
+    termType: 术语
+    definition: 微软 2024 提出的方法（抽实体建图→社区摘要→答全局性问题，补向量 RAG 的全局盲区）；答「答案散布在所有文档之间」的问题——普通 RAG 答「答案在某一段里」。
+    relatedObjectRefs: []
+    status: 有效
+    owner: Owner
+    source: R11·TERMS.md :132/:161 + R12（微软官方文档/IBM 定义）
+    notes: Owner 关键词原词；个人版 Local/Global 分档取舍挂细稿 Q5。
+  - id: GLS-PKB-006
+    term: 本体
+    aliases: []
+    termType: 术语
+    definition: ought/means 的登记（「什么算什么」：定义+规矩，零事实）；图谱的边的模子（类），图谱是模子压出来的边（实例）——「本体 WeKnora」差异化所在：把通用清单弱模式层换成登记+闸。
+    relatedObjectRefs: []
+    status: 有效
+    owner: Owner
+    source: R11·TERMS.md :125/:130/:139 + R10（WeKnora 通用 11 类弱模式）
+    notes: Owner 关键词原词；三接入点（对号表/过闸/前哨）设计现成（R11·teach-petro-agent 底稿 69），启用面挂细稿 Q5。
