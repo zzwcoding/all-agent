@@ -111,4 +111,4 @@
 
 ## 决策追认（2026-09-22 · 第五期端到端实弹/第二域接入）
 
-- **第二域 pkb（个人知识库 WeKnora）批准入账**（方案 docs/第五期端到端实弹拆票方案.md 7b6591b，票 58–62）：本体 profile=headless（M1/M2/M5/GLS 已建，M3/M7 带理由豁免）；Owner Q2–Q10 全签收（docs/requirements/pkb-拍板清单-Q2-Q10.md）；DDD 路由裁决=不路由（工具/CRUD/MCP 型、规则薄、单人单域）；新仓 personal-weknora 走 sdd-flow 治理。需求真源=docs/requirements/personal-weknora-细稿.md（域素材归 requirements 层，PRD 只登记域级决策）。
+- **第二域 pkb（个人知识库 WeKnora）批准入账**（方案 docs/第五期端到端实弹拆票方案.md 7b6591b，票 58–62）：本体 profile=headless（M1/M2/M5/GLS 已建，M3/M7 带理由豁免）；Owner Q2–Q10 全签收（docs/requirements/pkb-拍板清单-Q2-Q10.md）；DDD 路由裁决=不路由（工具/CRUD/MCP 型、规则薄、单人单域）；新仓 personal-weknora 走 sdd-flow 治理。需求真源=docs/requirements/personal-weknora-细稿.md（域素材归 requirements 层，PRD 只登记域级决策）。skillpkg 对 pkb 域=豁免（Owner 2026-09-23 裁）：headless 单人域消费面=ontology YAML+devkit+MCP manifest 已足，不出 skillpkg；真需时走提案补导出。
