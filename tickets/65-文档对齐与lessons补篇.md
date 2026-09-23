@@ -1,6 +1,6 @@
 # 票 65：文档对齐（AGENTS.md 锚点+目录地图）+ lessons 58/59 补篇
 
-Status: todo
+Status: done
 
 > 来源：第九轮后第二域专项审查 P2-2/P3-5 与观察项 2（docs/reviews/2026-09-23-phase9-review-pkb-domain.md）。AGENTS.md 是「新窗口入口协议」第一站，锚点停在票 57 会让下一个窗口对第五期/pkb 域零感知；lessons 每票一篇惯例自票 03 起，58/59 缺篇。
 Belongs to: 第九轮后 pkb 域审查整改（票 63–65）
@@ -15,11 +15,11 @@ Touches: AGENTS.md、lessons/、（观察项 2 定夺）docs/prd.md
 
 ## 验收（注源）
 
-- [ ] AC1 AGENTS.md 锚点含第五期六提交（短哈希逐个 grep 在位）且尾注下一张=票 60；字符串替换带断言复核（协议第 6 条：替换后 grep 复核）
-- [ ] AC2 目录地图 ontology/ 行同时出现 bohai 与 pkb，「首个业务域」措辞未误删
-- [ ] AC3 lessons/59、lessons/60 在位且三结构齐（做了什么/实弹发现/教训）
-- [ ] AC4 PRD 定夺成文（补行或不补的理由，落 lessons/60 或票面）
-- [ ] AC5 `bash tools/ci.sh` 四闸全绿（最终树原样跑，协议⑩）
+- [x] AC1 AGENTS.md 锚点含第五期六提交（短哈希逐个 grep 在位）且尾注下一张=票 60；字符串替换带断言复核（协议第 6 条：替换后 grep 复核）
+- [x] AC2 目录地图 ontology/ 行同时出现 bohai 与 pkb，「首个业务域」措辞未误删
+- [x] AC3 lessons/59、lessons/60 在位且三结构齐（做了什么/实弹发现/教训）
+- [x] AC4 PRD 定夺成文（补行或不补的理由，落 lessons/60 或票面）
+- [x] AC5 `bash tools/ci.sh` 四闸全绿（最终树原样跑，协议⑩）
 
 ## 交接包（L0 自执行）
 

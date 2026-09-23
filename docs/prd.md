@@ -108,3 +108,7 @@
 
 - **F15 DDD 建模线批准入账**（方案 docs/第四期DDD线拆票方案.md，票 50–53）；交接包 §7 七个开放问题全按方案推荐裁决：闸设计卡 YAML 五查 / Saga 与事件运行时不入一期 / 词条 ID 机检复用 schema_check 解析族 / 设计件落 `design/ddd/<域>/` / 第一期不改 F9 / DDD 线先于 A 线 / 闸与出厂集同票。
 - L5 首跑实弹发现的 Q8 参照答案内部矛盾（lessons/48 挂账）并入票 53 清偿。
+
+## 决策追认（2026-09-22 · 第五期端到端实弹/第二域接入）
+
+- **第二域 pkb（个人知识库 WeKnora）批准入账**（方案 docs/第五期端到端实弹拆票方案.md 7b6591b，票 58–62）：本体 profile=headless（M1/M2/M5/GLS 已建，M3/M7 带理由豁免）；Owner Q2–Q10 全签收（docs/requirements/pkb-拍板清单-Q2-Q10.md）；DDD 路由裁决=不路由（工具/CRUD/MCP 型、规则薄、单人单域）；新仓 personal-weknora 走 sdd-flow 治理。需求真源=docs/requirements/personal-weknora-细稿.md（域素材归 requirements 层，PRD 只登记域级决策）。
