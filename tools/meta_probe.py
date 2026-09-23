@@ -11,7 +11,8 @@
   3.（信息）CORE 分布：八问逐条 semantic_service_core --json，status 分布+期望对照。
      八问常量表与 fixtures/semantic-service/assertions.json CORE-01–08 同步维护
      （断言 fixture 是真源，此处是探针内置副本）——改问/改期望两处一起改。
-     问题集按渤海域冻结：换域跑探针时本项期望对照自然漂移（信息红，不判死）。
+     问题集按域登记（CORE_QUESTION_SETS，票 64）：bohai 八问为冻结集；无冻结集
+     的域=豁免注记判 GREEN，不跑他域问句（跑了必全拒答假红，P2-1 实弹）。
   4.（信息）边界闸豁免：.skill-deps-allow 逐条列出+人工复核栏（值留空，批收官填；
      复核结论由 --review 或缺省 docs/meta/exemption-reviews.json 并入留痕，票 29）
   5.（信息）归档豁免：.archive-allow 同上（文件缺席=0 条，不是错）
@@ -21,7 +22,8 @@
   8.（信息）提案池：docs/proposals/PROP-*.md status 计数 + proposal_check 子进程
      （报其退出码；rc=1 有冲突/违规 → 信息红）
   9.（信息）图基线：graph_index <target> --query <ID> --json 的节点/边快照
-     （对照漂移用；快照值随报告走，ID 缺 --graph-query 传）
+     （对照漂移用；快照值随报告走。ID 缺省按目标域解析 GRAPH_BASELINE_ANCHORS
+     票 64，显式 --graph-query 优先）
  10.〔硬闸〕信号路由表（票 29）：policies/signal-routing.json 自检——合法 JSON、
      routes 恰三类（kind 覆盖 业务错/工程错/元模型错）、每类 instances ≥2 条且
      指针逐个核实（commit 在 git log、PROP 文件在 docs/proposals/）；任一不满足
@@ -96,6 +98,27 @@ CORE_STATUSES = ("answered", "refused_missing", "refused_banned",
                  "refused_out_of_surface")
 
 DEFAULT_GRAPH_QUERY = "AGG-BOHAI-001"  # 渤海域真实聚合对象（票 25 CORE-02 锚点）
+
+# ── 票 64 多域适配：golden 基线按域登记 ──────────────────────────────
+# CORE 问答集与图基线锚都是域专属冻结资产（八问/锚点字面量含域业务 ID），
+# 对无冻结集的域跑 bohai 问句只会全拒答假红（第九轮后 pkb 审查 P2-1 实弹）。
+# 新域要启用这两项：先冻结该域自己的基线，再在下两表登记；不登记=豁免注记。
+CORE_QUESTION_SETS = {"bohai": CORE_QUESTIONS}
+GRAPH_BASELINE_ANCHORS = {"bohai": DEFAULT_GRAPH_QUERY,
+                          "pkb": "AGG-PKB-001"}
+
+
+def _target_domain(target: Path) -> str:
+    """目标域域名：manifest.json 的 domain 优先，缺 manifest 退目录名。"""
+    m = target / "manifest.json"
+    if m.is_file():
+        try:
+            d = json.loads(m.read_text(encoding="utf-8")).get("domain")
+            if isinstance(d, str) and d:
+                return d
+        except (json.JSONDecodeError, UnicodeDecodeError):
+            pass
+    return target.name
 
 Runner = Callable[[Sequence[str]], "tuple[int, str, str]"]
 
@@ -360,9 +383,21 @@ def probe_schema(root: Path, target: Path, runner: Runner) -> dict:
 
 
 def probe_core(root: Path, target: Path, runner: Runner) -> dict:
-    """3. CORE 分布：八问逐条跑核心，status 分布 + 期望对照（信息项）。"""
+    """3. CORE 分布：八问逐条跑核心，status 分布 + 期望对照（信息项）。
+
+    票 64：问答集按域登记（CORE_QUESTION_SETS）——无冻结集域渲染豁免注记
+    判 GREEN，不跑 bohai 问句（跑了必全拒答假红，P2-1 实弹）。
+    """
+    domain = _target_domain(target)
+    questions = CORE_QUESTION_SETS.get(domain)
+    if questions is None:
+        return _info_item(
+            "3", "green",
+            f"域 {domain} 无冻结 CORE 基线=豁免（问答集按域登记，票 64；"
+            f"启用本项先冻结该域问答集入 CORE_QUESTION_SETS）",
+            {"domain": domain, "exempt": True})
     rows = []
-    for q in CORE_QUESTIONS:
+    for q in questions:
         rc, out, err = runner([sys.executable, "tools/semantic_service_core.py",
                                str(target), "--ask", q["ask"], "--json"])
         if rc in (RC_SPAWN_FAIL, RC_TIMEOUT):
@@ -636,7 +671,14 @@ def probe_signal_routing(root: Path, runner: Runner) -> dict:
 
 def collect_all(root: Path, target: Path, runner: Runner,
                 graph_query: str = DEFAULT_GRAPH_QUERY) -> list[dict]:
-    """跑十项探针。单项采集异常 → 该项 SKIPPED 降级，不崩（票面 AC4）。"""
+    """跑十项探针。单项采集异常 → 该项 SKIPPED 降级，不崩（票面 AC4）。
+
+    票 64：图基线锚按目标域解析（GRAPH_BASELINE_ANCHORS）——未显式传
+    --graph-query 时按域取锚，未登记的域退回 DEFAULT_GRAPH_QUERY。
+    """
+    if graph_query == DEFAULT_GRAPH_QUERY:
+        graph_query = GRAPH_BASELINE_ANCHORS.get(_target_domain(target),
+                                                 graph_query)
     specs = [
         ("1", lambda: probe_fixtures(root, runner)),
         ("2", lambda: probe_schema(root, target, runner)),

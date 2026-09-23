@@ -861,5 +861,79 @@ class MetaProbeRealRepoSmoke(unittest.TestCase):
         self.assertEqual(rt["data"]["errors"], [])
 
 
+class MetaProbeMultiDomain(unittest.TestCase):
+    """票 64 多域适配：CORE/图基线按域登记——无冻结集域=豁免注记不假红；
+    图锚按目标域解析，显式 graph_query 优先。"""
+
+    def setUp(self):
+        self.repo = FakeRepo()
+        self.root = self.repo.root
+        self.repo.add_cards(["a-skill", "b-skill"])
+        self.repo.add_skill("a-skill")
+        self.repo.add_skill("b-skill")
+        # pkb 域目录（无 manifest 时目录名即域名；pkb 无冻结 CORE 集）
+        (self.root / "ontology" / "pkb").mkdir()
+
+    def tearDown(self):
+        self.repo.cleanup()
+
+    def test_core_exempt_for_domain_without_frozen_set(self):
+        asks = []
+
+        def spy_core(cmd):
+            asks.append(cmd[cmd.index("--ask") + 1])
+            return 0, json.dumps({"status": "answered"}), ""
+
+        items = run_probe(self.root, make_runner(green_routes(), spy_core),
+                          target="ontology/pkb")
+        core = next(i for i in items if i["id"] == "3")
+        self.assertEqual(core["status"], "green")
+        self.assertTrue(core["data"]["exempt"])
+        self.assertEqual(core["data"]["domain"], "pkb")
+        self.assertEqual(asks, [])  # 豁免域不跑他域问句（跑了必假红，P2-1）
+
+    def test_core_bohai_still_runs_frozen_eight(self):
+        asks = []
+
+        def spy_core(cmd):
+            asks.append(cmd[cmd.index("--ask") + 1])
+            return 0, json.dumps({"status": "answered"}), ""
+
+        run_probe(self.root, make_runner(green_routes(), spy_core),
+                  target="ontology/bohai")
+        self.assertEqual(len(asks), len(mp.CORE_QUESTIONS))
+
+    def test_graph_anchor_resolved_per_domain(self):
+        seen = []
+
+        def spy_graph(cmd):
+            seen.append(cmd[cmd.index("--query") + 1])
+            return 0, GI_FOUND, ""
+
+        routes = green_routes(extra={"graph_index": spy_graph})
+        run_probe(self.root,
+                  make_runner(routes, core_status_runner(ALL_EXPECT)),
+                  target="ontology/pkb")
+        self.assertEqual(seen, ["AGG-PKB-001"])
+        seen.clear()
+        run_probe(self.root,
+                  make_runner(routes, core_status_runner(ALL_EXPECT)),
+                  target="ontology/bohai")
+        self.assertEqual(seen, ["AGG-BOHAI-001"])
+
+    def test_graph_explicit_query_overrides_domain_anchor(self):
+        seen = []
+
+        def spy_graph(cmd):
+            seen.append(cmd[cmd.index("--query") + 1])
+            return 0, GI_FOUND, ""
+
+        mp.collect_all(Path(self.root), Path("ontology/pkb"),
+                       make_runner(green_routes(extra={"graph_index": spy_graph}),
+                                   core_status_runner(ALL_EXPECT)),
+                       graph_query="CUSTOM-1")
+        self.assertEqual(seen, ["CUSTOM-1"])
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -1,6 +1,6 @@
 # 票 64：meta_probe 多域适配（信息项按域选基线，域无基线=豁免注记）
 
-Status: todo
+Status: done
 
 > 来源：第九轮后第二域专项审查 P2-1（docs/reviews/2026-09-23-phase9-review-pkb-domain.md）。实弹：`meta_probe ontology/pkb` 硬闸 5/5 绿但第 3 项 CORE 分布 golden 集硬编码 bohai（pkb 跑 8/8 拒答信息红）、第 9 项图基线硬编码查 AGG-BOHAI-001（基线与域错配）——批收官协议第①条体检留痕对第二域失真，随域数放大。
 Belongs to: 第九轮后 pkb 域审查整改（票 63–65）
@@ -15,10 +15,10 @@ Touches: tools/meta_probe.py、（如结构需要）fixtures/ 或 docs/meta/ 基
 
 ## 验收（注源）
 
-- [ ] AC1 `python3 tools/meta_probe.py ontology/pkb --out docs/meta/体检-<日期>-pkb.md` 结论 PASS 且信息项无 RED（CORE 分布/图基线均 GREEN 或豁免注记）
-- [ ] AC2 `python3 tools/meta_probe.py ontology/bohai --out <对照件>` 与整改前 bohai 结果逐项一致（第 3/9 项摘要零差）
-- [ ] AC3 单测/出厂断言在位并全过（新增豁免例数实跑记录）
-- [ ] AC4 `bash tools/ci.sh` 四闸全绿（最终树原样跑，协议⑩）
+- [x] AC1 `python3 tools/meta_probe.py ontology/pkb --out docs/meta/体检-<日期>-pkb.md` 结论 PASS 且信息项无 RED（CORE 分布/图基线均 GREEN 或豁免注记）
+- [x] AC2 `python3 tools/meta_probe.py ontology/bohai --out <对照件>` 与整改前 bohai 结果逐项一致（第 3/9 项摘要零差）
+- [x] AC3 单测/出厂断言在位并全过（新增豁免例数实跑记录）
+- [x] AC4 `bash tools/ci.sh` 四闸全绿（最终树原样跑，协议⑩）
 
 ## 交接包（L0 自执行）
 
