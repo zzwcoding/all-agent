@@ -1,6 +1,6 @@
 # 票 63：pkb 本体定稿残留修复（GLS 三处 + M5 引用错位）
 
-Status: todo
+Status: done
 
 > 来源：第九轮后第二域专项审查 P3-1/2/3/4（docs/reviews/2026-09-23-phase9-review-pkb-domain.md）。票 58 Owner 全签收后定稿文件内的待裁/待确认残留与引用错位——语义闸不查内容语气，属审查面实锤。
 Belongs to: 第九轮后 pkb 域审查整改（票 63–65，无批方案，三票并列小整改）
@@ -16,10 +16,10 @@ Touches: ontology/pkb/glossary-model.yaml、ontology/pkb/m5-actor-model.yaml
 
 ## 验收（注源）
 
-- [ ] AC1 四处残留/错位全修，grep 复核：`grep -n "待 Owner 确认\|待细稿 Q6\|挂细稿 Q5" ontology/pkb/` 零命中（「待」类待裁语气清零；允许保留「待 Owner 确认」于草案位 docs/，定稿位 ontology/ 不允许）
-- [ ] AC2 语义闸：`python3 tools/schema_check.py ontology`（仓根）与 `python3 tools/schema_check.py ontology/pkb` 全绿，L1–L4 零（修后跑）
-- [ ] AC3 拍板清单一致性复核：修后 GLS/M5 表述与 docs/requirements/pkb-拍板清单-Q2-Q10.md 已裁九问零矛盾
-- [ ] AC4 `bash tools/ci.sh` 四闸全绿（最终树原样跑，协议⑩）
+- [x] AC1 四处残留/错位全修，grep 复核：`grep -n "待 Owner 确认\|待细稿 Q6\|挂细稿 Q5" ontology/pkb/` 零命中（「待」类待裁语气清零；允许保留「待 Owner 确认」于草案位 docs/，定稿位 ontology/ 不允许）
+- [x] AC2 语义闸：`python3 tools/schema_check.py ontology`（仓根）与 `python3 tools/schema_check.py ontology/pkb` 全绿，L1–L4 零（修后跑）
+- [x] AC3 拍板清单一致性复核：修后 GLS/M5 表述与 docs/requirements/pkb-拍板清单-Q2-Q10.md 已裁九问零矛盾
+- [x] AC4 `bash tools/ci.sh` 四闸全绿（最终树原样跑，协议⑩）
 
 ## 交接包（L0 自执行）
 

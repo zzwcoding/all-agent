@@ -33,7 +33,7 @@ terms:
     term: Wiki
     aliases: [维客]
     termType: 术语
-    definition: LLM 蒸馏出的人读页面层（有版本历史、无语义治理）；与本体（口径登记层）分属两层——个人版主从关系待细稿 Q6 裁决。
+    definition: LLM 蒸馏出的人读页面层（有版本历史、无语义治理）；与本体（口径登记层）分属两层——Q6 已裁（2026-09-22）：Wiki=本体下游派生页，主从关系落定。
     relatedObjectRefs: []
     status: 有效
     owner: Owner
@@ -49,7 +49,7 @@ terms:
     status: 有效
     owner: Owner
     source: R11·TERMS.md :129/:125（图谱=实体关系网/学员公式）
-    notes: Owner 关键词原词；relatedObjectRefs 挂知识条目=图谱节点由条目内容抽取而来的描述注记（待 Owner 确认）。
+    notes: Owner 关键词原词；relatedObjectRefs 挂知识条目=图谱节点由条目内容抽取而来的描述注记（票 58 定稿，Owner 已签收）。
   - id: GLS-PKB-005
     term: GraphRAG
     aliases: []
@@ -59,7 +59,7 @@ terms:
     status: 有效
     owner: Owner
     source: R11·TERMS.md :132/:161 + R12（微软官方文档/IBM 定义）
-    notes: Owner 关键词原词；个人版 Local/Global 分档取舍挂细稿 Q5。
+    notes: Owner 关键词原词；Q5 已裁（2026-09-22）：通用清单起步+三接入点预留（开关就位不开），Local/Global 分档取舍随开关启用再裁。
   - id: GLS-PKB-006
     term: 本体
     aliases: []
@@ -69,4 +69,4 @@ terms:
     status: 有效
     owner: Owner
     source: R11·TERMS.md :125/:130/:139 + R10（WeKnora 通用 11 类弱模式）
-    notes: Owner 关键词原词；三接入点（对号表/过闸/前哨）设计现成（R11·teach-petro-agent 底稿 69），启用面挂细稿 Q5。
+    notes: Owner 关键词原词；三接入点（对号表/过闸/前哨）设计现成（R11·teach-petro-agent 底稿 69），Q5 已裁=开关就位不开，启用随建造面推进再裁。
