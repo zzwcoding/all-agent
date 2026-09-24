@@ -418,6 +418,46 @@
       "ac": "票44 CORE-15（L5 评分集机判先绿：Q14 写意图面外=refused_out_of_surface hits/citations/装配指令零泄漏，camp=build-contract）",
       "type": "cmd-succeeds",
       "cmd": "python3 -c \"import json,subprocess,sys; p=subprocess.run(['python3','tools/semantic_service_core.py','ontology/bohai','--ask','把 @SCR-BOHAI-01 的提交按钮改成必填校验要怎么改？','--json'],capture_output=True,text=True); v=json.loads(p.stdout); g=sorted(h['id'] for h in v['hits']); print('hits实际',g); sys.exit(0 if p.returncode==1 and v['status']=='refused_out_of_surface' and g==[] and v['citations']==[] and v['scaffold_commands']==[] and 'build-contract' in p.stdout else 1)\""
+    },
+    {
+      "ac": "票69 CORE-15（his 域 Golden 冻结：退号率口径是什么？ status=answered hits 期望集精确相等）",
+      "type": "cmd-succeeds",
+      "cmd": "python3 -c \"import json,subprocess,sys; p=subprocess.run(['python3','tools/semantic_service_core.py','ontology/his','--ask','退号率口径是什么？','--json'],capture_output=True,text=True); v=json.loads(p.stdout); g=sorted(h['id'] for h in v['hits']); e=['BH-HIS-CancelRegister', 'GLS-HIS-003', 'RULE-HIS-001', 'RULE-HIS-003']; ok = (v['status']=='answered' and g==e); print('CORE-15','status期望','answered','实际',v['status'],'hits相等',g==e); sys.exit(0 if ok else 1)\""
+    },
+    {
+      "ac": "票69 CORE-16（his 域 Golden 冻结：@AGG-HIS-001 有哪些行为？ status=answered hits 期望集精确相等）",
+      "type": "cmd-succeeds",
+      "cmd": "python3 -c \"import json,subprocess,sys; p=subprocess.run(['python3','tools/semantic_service_core.py','ontology/his','--ask','@AGG-HIS-001 有哪些行为？','--json'],capture_output=True,text=True); v=json.loads(p.stdout); g=sorted(h['id'] for h in v['hits']); e=['AGG-HIS-001', 'BH-HIS-CancelRegister', 'BH-HIS-Diagnose', 'BH-HIS-Prescribe', 'BH-HIS-QueryDashboard', 'BH-HIS-QueryDisease', 'BH-HIS-QueryDrug', 'BH-HIS-QueryFinance', 'BH-HIS-QueryOutpatient', 'BH-HIS-QueryPatient', 'BH-HIS-RefundPrescription', 'BH-HIS-Register', 'BH-HIS-RequestInspection', 'BH-HIS-Settle', 'BH-HIS-WriteMedicalRecord']; ok = (v['status']=='answered' and g==e); print('CORE-16','status期望','answered','实际',v['status'],'hits相等',g==e); sys.exit(0 if ok else 1)\""
+    },
+    {
+      "ac": "票69 CORE-17（his 域 Golden 冻结：@SCR-HIS-001 的界面细节 status=refused_out_of_surface hits 期望集精确相等）",
+      "type": "cmd-succeeds",
+      "cmd": "python3 -c \"import json,subprocess,sys; p=subprocess.run(['python3','tools/semantic_service_core.py','ontology/his','--ask','@SCR-HIS-001 的界面细节','--json'],capture_output=True,text=True); v=json.loads(p.stdout); g=sorted(h['id'] for h in v['hits']); e=[]; ok = (v['status']=='refused_out_of_surface' and g==e); print('CORE-17','status期望','refused_out_of_surface','实际',v['status'],'hits相等',g==e); sys.exit(0 if ok else 1)\""
+    },
+    {
+      "ac": "票69 CORE-18（his 域 Golden 冻结：医保报销比例口径是什么？ status=refused_missing hits 期望集精确相等）",
+      "type": "cmd-succeeds",
+      "cmd": "python3 -c \"import json,subprocess,sys; p=subprocess.run(['python3','tools/semantic_service_core.py','ontology/his','--ask','医保报销比例口径是什么？','--json'],capture_output=True,text=True); v=json.loads(p.stdout); g=sorted(h['id'] for h in v['hits']); e=[]; ok = (v['status']=='refused_missing' and g==e); print('CORE-18','status期望','refused_missing','实际',v['status'],'hits相等',g==e); sys.exit(0 if ok else 1)\""
+    },
+    {
+      "ac": "票69 CORE-19（his 域 Golden 冻结：均次费用怎么算？ status=answered hits 期望集精确相等）",
+      "type": "cmd-succeeds",
+      "cmd": "python3 -c \"import json,subprocess,sys; p=subprocess.run(['python3','tools/semantic_service_core.py','ontology/his','--ask','均次费用怎么算？','--json'],capture_output=True,text=True); v=json.loads(p.stdout); g=sorted(h['id'] for h in v['hits']); e=['AGG-HIS-005', 'GLS-HIS-004', 'RULE-HIS-004']; ok = (v['status']=='answered' and g==e); print('CORE-19','status期望','answered','实际',v['status'],'hits相等',g==e); sys.exit(0 if ok else 1)\""
+    },
+    {
+      "ac": "票69 CORE-20（his 域 Golden 冻结：退号率告警阈值是多少？ status=answered hits 期望集精确相等）",
+      "type": "cmd-succeeds",
+      "cmd": "python3 -c \"import json,subprocess,sys; p=subprocess.run(['python3','tools/semantic_service_core.py','ontology/his','--ask','退号率告警阈值是多少？','--json'],capture_output=True,text=True); v=json.loads(p.stdout); g=sorted(h['id'] for h in v['hits']); e=['BH-HIS-CancelRegister', 'GLS-HIS-003', 'RULE-HIS-001', 'RULE-HIS-003']; ok = (v['status']=='answered' and g==e); print('CORE-20','status期望','answered','实际',v['status'],'hits相等',g==e); sys.exit(0 if ok else 1)\""
+    },
+    {
+      "ac": "票69 CORE-21（his 域 Golden 冻结：复诊率怎么算？ status=answered hits 期望集精确相等）",
+      "type": "cmd-succeeds",
+      "cmd": "python3 -c \"import json,subprocess,sys; p=subprocess.run(['python3','tools/semantic_service_core.py','ontology/his','--ask','复诊率怎么算？','--json'],capture_output=True,text=True); v=json.loads(p.stdout); g=sorted(h['id'] for h in v['hits']); e=['GLS-HIS-005', 'RULE-HIS-007']; ok = (v['status']=='answered' and g==e); print('CORE-21','status期望','answered','实际',v['status'],'hits相等',g==e); sys.exit(0 if ok else 1)\""
+    },
+    {
+      "ac": "票69 CORE-22（his 域 Golden 冻结：把 @SCR-HIS-001 的查询按钮改成实时刷新要怎么改？ status=refused_out_of_surface hits 期望集精确相等）",
+      "type": "cmd-succeeds",
+      "cmd": "python3 -c \"import json,subprocess,sys; p=subprocess.run(['python3','tools/semantic_service_core.py','ontology/his','--ask','把 @SCR-HIS-001 的查询按钮改成实时刷新要怎么改？','--json'],capture_output=True,text=True); v=json.loads(p.stdout); g=sorted(h['id'] for h in v['hits']); e=[]; ok = (v['status']=='refused_out_of_surface' and g==e); print('CORE-22','status期望','refused_out_of_surface','实际',v['status'],'hits相等',g==e); sys.exit(0 if ok else 1)\""
     }
   ]
 }

@@ -103,9 +103,30 @@ DEFAULT_GRAPH_QUERY = "AGG-BOHAI-001"  # 渤海域真实聚合对象（票 25 CO
 # CORE 问答集与图基线锚都是域专属冻结资产（八问/锚点字面量含域业务 ID），
 # 对无冻结集的域跑 bohai 问句只会全拒答假红（第九轮后 pkb 审查 P2-1 实弹）。
 # 新域要启用这两项：先冻结该域自己的基线，再在下两表登记；不登记=豁免注记。
-CORE_QUESTION_SETS = {"bohai": CORE_QUESTIONS}
+CORE_QUESTION_SETS = {"bohai": CORE_QUESTIONS,
+                      # 票 69 冻结（his 八问，fixtures/semantic-service CORE-15–22 断言同款）：
+                      # 口径×4/显式锚定/越面(MU)/缺件/写意图越面——answered 5 + refused 3。
+                      "his": [
+    {"core": "CORE-15", "q": "Q1", "ask": "退号率口径是什么？",
+     "expect": "answered"},
+    {"core": "CORE-16", "q": "Q3", "ask": "@AGG-HIS-001 有哪些行为？",
+     "expect": "answered"},
+    {"core": "CORE-17", "q": "Q5", "ask": "@SCR-HIS-001 的界面细节",
+     "expect": "refused_out_of_surface"},
+    {"core": "CORE-18", "q": "Q4", "ask": "医保报销比例口径是什么？",
+     "expect": "refused_missing"},
+    {"core": "CORE-19", "q": "Q2", "ask": "均次费用怎么算？",
+     "expect": "answered"},
+    {"core": "CORE-20", "q": "Q8", "ask": "退号率告警阈值是多少？",
+     "expect": "answered"},
+    {"core": "CORE-21", "q": "Q6", "ask": "复诊率怎么算？",
+     "expect": "answered"},
+    {"core": "CORE-22", "q": "Q7", "ask": "把 @SCR-HIS-001 的查询按钮改成实时刷新要怎么改？",
+     "expect": "refused_out_of_surface"},
+]}
 GRAPH_BASELINE_ANCHORS = {"bohai": DEFAULT_GRAPH_QUERY,
-                          "pkb": "AGG-PKB-001"}
+                          "pkb": "AGG-PKB-001",
+                          "his": "AGG-HIS-001"}
 
 
 def _target_domain(target: Path) -> str:
