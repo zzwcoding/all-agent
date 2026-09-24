@@ -1,6 +1,6 @@
 # 票 67：his 全八模型本体建模（M1/M2/M3/M5/M6/M7/MU/GLS+manifest）
 
-Status: todo
+Status: done
 
 > 本批核心票：八模型 schema 每条跑道第一个真实域内容（MU 为全仓首个真实文件）。素材=references/his-source/ 五件 + 票 66 细稿。定稿性质=**素材定稿**（非 Owner 签收定稿）——开放问题标「待 Owner 确认」。
 Belongs to: docs/第六批第三域拆票方案.md；前置=票 66 done
@@ -21,12 +21,12 @@ Touches: ontology/his/（8 模型文件+manifest.json）
 
 ## 验收（注源）
 
-- [ ] AC1 ontology/his/ 九件齐（8 模型+manifest），ID 前缀 AGG/BH/RULE/ACTOR/ROLE/PERM/FLOW/QR/SCR/GLS-HIS 合规（schema_check L1 零）
-- [ ] AC2 `python3 tools/schema_check.py ontology` 仓根 + `ontology/his` 单域双跑全绿 L1–L4 零
-- [ ] AC3 引用完整性：M2 requiredPermissions→M5 PERM、M2/M7 appliedRules→M3、M7 objectRef→M1、M6 步骤引用行为/对象——grep 抽查零悬空（schema_check L2 在面）
-- [ ] AC4 开放问题清单随定稿（本体头注或细稿节），每条「待 Owner 确认」零硬裁
-- [ ] AC5 bohai/pkb 两域零扰动（语义闸全仓跑含旧域仍绿）
-- [ ] AC6 `bash tools/ci.sh` 四闸全绿（最终树原样跑，协议⑩）
+- [x] AC1 ontology/his/ 九件齐（8 模型+manifest），ID 前缀 AGG/BH/RULE/ACTOR/ROLE/PERM/FLOW/QR/SCR/GLS-HIS 合规（schema_check L1 零）
+- [x] AC2 `python3 tools/schema_check.py ontology` 仓根 + `ontology/his` 单域双跑全绿 L1–L4 零
+- [x] AC3 引用完整性：M2 requiredPermissions→M5 PERM、M2/M7 appliedRules→M3、M7 objectRef→M1、M6 步骤引用行为/对象——grep 抽查零悬空（schema_check L2 在面）
+- [x] AC4 开放问题清单随定稿（本体头注或细稿节），每条「待 Owner 确认」零硬裁
+- [x] AC5 bohai/pkb 两域零扰动（语义闸全仓跑含旧域仍绿）
+- [x] AC6 `bash tools/ci.sh` 四闸全绿（最终树原样跑，协议⑩）
 
 ## 交接包（L0 自执行）
 

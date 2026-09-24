@@ -1,0 +1,140 @@
+# =====================================================================
+# HIS 医院数据报表域（his）· M5 主体模型（票 67 素材定稿版）
+# ────────────────────────────────────────────────────────────────
+# 素材：R13——PRD §1.3 就诊流程角色（患者/医生）+ §6.1 报表消费者
+#   （院长/管理者）+ 收费结算环节（收费员）。权限矩阵素材未给（细稿 Q5
+#   挂账）：报表平台全角色只读、源系统操作行为按角色最小集预建，细分
+#   待 Owner。字典岗位分类与角色同名是巧合，不互引。
+# =====================================================================
+model_type: ACTOR
+version: "1.0.0"
+domain: his
+actors:
+  # [PRD §1.3 流程图「患者到院」] 就诊流程发起方
+  - actorId: ACTOR-HIS-001
+    name: 患者
+    actorType: HUMAN
+    roles:
+      - ROLE-HIS-001
+  # [PRD §1.3「医生接诊：问诊/诊断/开药/检查」] 就诊链路操作主体
+  - actorId: ACTOR-HIS-002
+    name: 医生
+    actorType: HUMAN
+    roles:
+      - ROLE-HIS-002
+  # [PRD §1.3「收费结算」环节] 收费操作主体（DICT-HIS-005 岗位同名巧合不互引）
+  - actorId: ACTOR-HIS-003
+    name: 收费员
+    actorType: HUMAN
+    roles:
+      - ROLE-HIS-003
+  # [PRD §6.1 模块一「院长驾驶舱」] 报表消费者（管理决策方）
+  - actorId: ACTOR-HIS-004
+    name: 院长
+    actorType: HUMAN
+    roles:
+      - ROLE-HIS-004
+  # [PRD §6.2 全局布局/平台运维面] 平台管理主体
+  - actorId: ACTOR-HIS-005
+    name: 系统管理员
+    actorType: HUMAN
+    roles:
+      - ROLE-HIS-005
+roles:
+  - roleId: ROLE-HIS-001
+    name: 就诊患者
+    inheritsFrom: []
+    permissions:
+      - PERM-HIS-Register
+  - roleId: ROLE-HIS-002
+    name: 接诊医生
+    inheritsFrom: []
+    permissions:
+      - PERM-HIS-WriteMedicalRecord
+      - PERM-HIS-Diagnose
+      - PERM-HIS-Prescribe
+      - PERM-HIS-RequestInspection
+  - roleId: ROLE-HIS-003
+    name: 收费员
+    inheritsFrom: []
+    permissions:
+      - PERM-HIS-Settle
+      - PERM-HIS-CancelRegister
+      - PERM-HIS-RefundPrescription
+  - roleId: ROLE-HIS-004
+    name: 报表消费者（院长）
+    inheritsFrom: []
+    permissions:
+      - PERM-HIS-QueryDashboard
+      - PERM-HIS-QueryOutpatient
+      - PERM-HIS-QueryFinance
+      - PERM-HIS-QueryDrug
+      - PERM-HIS-QueryDisease
+      - PERM-HIS-QueryPatient
+  - roleId: ROLE-HIS-005
+    name: 平台管理员
+    inheritsFrom: []
+    permissions:
+      - PERM-HIS-QueryDashboard
+      - PERM-HIS-QueryOutpatient
+      - PERM-HIS-QueryFinance
+      - PERM-HIS-QueryDrug
+      - PERM-HIS-QueryDisease
+      - PERM-HIS-QueryPatient
+permissions:
+  - permissionId: PERM-HIS-Register
+    targetType: BEHAVIOR
+    targetRef: BH-HIS-Register
+    dataScope: ALL
+  - permissionId: PERM-HIS-WriteMedicalRecord
+    targetType: BEHAVIOR
+    targetRef: BH-HIS-WriteMedicalRecord
+    dataScope: ALL
+  - permissionId: PERM-HIS-Diagnose
+    targetType: BEHAVIOR
+    targetRef: BH-HIS-Diagnose
+    dataScope: ALL
+  - permissionId: PERM-HIS-Prescribe
+    targetType: BEHAVIOR
+    targetRef: BH-HIS-Prescribe
+    dataScope: ALL
+  - permissionId: PERM-HIS-RequestInspection
+    targetType: BEHAVIOR
+    targetRef: BH-HIS-RequestInspection
+    dataScope: ALL
+  - permissionId: PERM-HIS-Settle
+    targetType: BEHAVIOR
+    targetRef: BH-HIS-Settle
+    dataScope: ALL
+  - permissionId: PERM-HIS-CancelRegister
+    targetType: BEHAVIOR
+    targetRef: BH-HIS-CancelRegister
+    dataScope: ALL
+  - permissionId: PERM-HIS-RefundPrescription
+    targetType: BEHAVIOR
+    targetRef: BH-HIS-RefundPrescription
+    dataScope: ALL
+  - permissionId: PERM-HIS-QueryDashboard
+    targetType: BEHAVIOR
+    targetRef: BH-HIS-QueryDashboard
+    dataScope: ALL
+  - permissionId: PERM-HIS-QueryOutpatient
+    targetType: BEHAVIOR
+    targetRef: BH-HIS-QueryOutpatient
+    dataScope: ALL
+  - permissionId: PERM-HIS-QueryFinance
+    targetType: BEHAVIOR
+    targetRef: BH-HIS-QueryFinance
+    dataScope: ALL
+  - permissionId: PERM-HIS-QueryDrug
+    targetType: BEHAVIOR
+    targetRef: BH-HIS-QueryDrug
+    dataScope: ALL
+  - permissionId: PERM-HIS-QueryDisease
+    targetType: BEHAVIOR
+    targetRef: BH-HIS-QueryDisease
+    dataScope: ALL
+  - permissionId: PERM-HIS-QueryPatient
+    targetType: BEHAVIOR
+    targetRef: BH-HIS-QueryPatient
+    dataScope: ALL

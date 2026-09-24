@@ -1,0 +1,308 @@
+# =====================================================================
+# HIS 医院数据报表域（his）· M7 查询统计与报表模型（票 67 素材定稿版）
+# ────────────────────────────────────────────────────────────────
+# 素材：R13——PRD §6.1 六模块逐层展示结构 + 详细设计 §5.2 ADS 7 表字段级
+#   schema + §8 API 接口设计。与 M2 QUERY 行为严格一对一（M7→M2 单向）。
+# ADS 物理表（ads_*）=本模型口径的预聚合实现形态（建造面），M7 只登记
+# 统计 ought：sourceObjects 挂 M1 业务对象，resultColumns.sourceExpression
+# 是出口形态，口径真源在 M3（RULE-HIS-* 逐列注记）。
+# 缺口如实：患者地域分布素材无源字段（§5.3 register 无地域列），QR-HIS-006
+# 不建地域列，挂细稿开放问题待 Owner。
+# =====================================================================
+model_type: REPORT
+version: "1.0.0"
+domain: his
+query_reports:
+  # [PRD §6.1 模块一 + §5.2.1 ads_dashboard_kpi] 院长驾驶舱日度 KPI（5 卡+趋势+占比+TOP5+预警）
+  - id: QR-HIS-001
+    name: 院长驾驶舱 KPI 查询
+    alias: dashboardKpiQuery
+    description: "日粒度院长驾驶舱出口（R13·§5.2.1 七字段对应五 KPI 卡）；异常预警面=退号率 RULE-HIS-001 阈值。ADS 实现=ads_dashboard_kpi。"
+    objectType: STATISTICAL_QUERY
+    behaviorRef: BH-HIS-QueryDashboard
+    sourceObjects:
+      - objectRef: AGG-HIS-001
+        alias: r
+        primary: true
+      - objectRef: AGG-HIS-004
+        alias: p
+        primary: false
+      - objectRef: AGG-HIS-003
+        alias: d
+        primary: false
+    parameters:
+      - name: startDay
+        label: 开始日期
+        dataType: Date
+        required: true
+      - name: endDay
+        label: 结束日期
+        dataType: Date
+        required: true
+    conditions:
+      - conditionId: COND-HIS-001
+        leftExpression: r.visitDay
+        operator: BETWEEN
+        parameterRef: startDay
+    resultColumns:
+      - name: visitDay
+        label: 统计日期
+        dataType: Date
+        sourceExpression: r.visitDay
+      - name: registerCnt
+        label: 挂号人次
+        dataType: Integer
+        sourceExpression: COUNT(r.caseNumber)
+      - name: registerRevenue
+        label: 挂号收入（元）
+        dataType: Decimal
+        sourceExpression: SUM(r.registerFee)   # 收入口径=Q1 待 Owner（先按挂号费）
+      - name: refundCnt
+        label: 退号数
+        dataType: Integer
+        sourceExpression: COUNT(CASE WHEN r.visitStatus = '已退号' THEN 1 END)   # 口径 RULE-HIS-003
+      - name: prescriptionCnt
+        label: 处方数
+        dataType: Integer
+        sourceExpression: COUNT(p.prescribeDay)
+      - name: diseaseTypes
+        label: 疾病种数
+        dataType: Integer
+        sourceExpression: COUNT(DISTINCT d.diseaseCode)
+      - name: refundRate
+        label: 退号率（%）
+        dataType: Decimal
+        sourceExpression: refundCnt / registerCnt * 100   # 口径真源 RULE-HIS-003；告警 RULE-HIS-001
+  # [PRD §6.1 模块二 + §5.2.2 ads_dept_visit_rank] 科室接诊排行
+  - id: QR-HIS-002
+    name: 科室接诊排行查询
+    alias: deptVisitRankQuery
+    description: "天+科室粒度接诊排行（R13·§5.2.2 八字段全对应）：接诊量/退号量/退号率/总收入/均次费用，退号率>10% 红色标注（RULE-HIS-001）。ADS 实现=ads_dept_visit_rank。"
+    objectType: STATISTICAL_QUERY
+    behaviorRef: BH-HIS-QueryOutpatient
+    sourceObjects:
+      - objectRef: AGG-HIS-001
+        alias: r
+        primary: true
+    parameters:
+      - name: startDay
+        label: 开始日期
+        dataType: Date
+        required: true
+      - name: endDay
+        label: 结束日期
+        dataType: Date
+        required: true
+    conditions:
+      - conditionId: COND-HIS-002
+        leftExpression: r.visitDay
+        operator: BETWEEN
+        parameterRef: startDay
+    resultColumns:
+      - name: deptName
+        label: 科室名称
+        dataType: String
+        sourceExpression: r.deptName
+      - name: totalVisits
+        label: 接诊量
+        dataType: Integer
+        sourceExpression: COUNT(r.caseNumber)
+      - name: refundCount
+        label: 退号量
+        dataType: Integer
+        sourceExpression: COUNT(CASE WHEN r.visitStatus = '已退号' THEN 1 END)   # 口径 RULE-HIS-003
+      - name: refundRate
+        label: 退号率（%）
+        dataType: Decimal
+        sourceExpression: refundCount / totalVisits * 100   # 口径真源 RULE-HIS-003
+      - name: totalRevenue
+        label: 总收入（元）
+        dataType: Decimal
+        sourceExpression: SUM(r.registerFee)   # 收入口径=Q1 待 Owner
+      - name: avgFee
+        label: 均次费用（元）
+        dataType: Decimal
+        sourceExpression: totalRevenue / totalVisits   # 口径真源 RULE-HIS-004
+  # [PRD §6.1 模块三 + §5.2.4 ads_revenue_payment] 支付方式收入构成
+  - id: QR-HIS-003
+    name: 支付方式收入查询
+    alias: revenuePaymentQuery
+    description: "天+支付方式粒度收入构成（R13·§5.2.4 六字段全对应）：五方式占比合计=100% 校验（RULE-HIS-002）。ADS 实现=ads_revenue_payment。"
+    objectType: STATISTICAL_QUERY
+    behaviorRef: BH-HIS-QueryFinance
+    sourceObjects:
+      - objectRef: AGG-HIS-001
+        alias: r
+        primary: true
+    parameters:
+      - name: startDay
+        label: 开始日期
+        dataType: Date
+        required: true
+      - name: endDay
+        label: 结束日期
+        dataType: Date
+        required: true
+    conditions:
+      - conditionId: COND-HIS-003
+        leftExpression: r.visitDay
+        operator: BETWEEN
+        parameterRef: startDay
+    resultColumns:
+      - name: visitDay
+        label: 就诊日期
+        dataType: Date
+        sourceExpression: r.visitDay
+      - name: registMethod
+        label: 支付方式
+        dataType: String
+        sourceExpression: r.registMethod
+      - name: visitCount
+        label: 挂号笔数
+        dataType: Integer
+        sourceExpression: COUNT(r.caseNumber)
+      - name: revenue
+        label: 该方式收入（元）
+        dataType: Decimal
+        sourceExpression: SUM(r.registerFee)   # 收入口径=Q1 待 Owner
+      - name: revenuePct
+        label: 收入占比（%）
+        dataType: Decimal
+        sourceExpression: revenue / SUM(revenue) OVER (visitDay) * 100   # 合计校验 RULE-HIS-002
+  # [PRD §6.1 模块四 + §5.2.5/§5.2.6/§5.2.7] 药品销售与退费
+  - id: QR-HIS-004
+    name: 药品销售排行查询
+    alias: drugSalesQuery
+    description: "药品粒度销售 TOP20+类型占比+退费率趋势三出口合一（R13·§5.2.5/6/7 字段对应）：总额/总量/排名按总销售额降序。ADS 实现=ads_drug_sales_top20 + ads_drug_type_ratio + ads_presc_refund_rate。"
+    objectType: STATISTICAL_QUERY
+    behaviorRef: BH-HIS-QueryDrug
+    sourceObjects:
+      - objectRef: AGG-HIS-004
+        alias: p
+        primary: true
+    parameters:
+      - name: startDay
+        label: 开始日期
+        dataType: Date
+        required: true
+      - name: endDay
+        label: 结束日期
+        dataType: Date
+        required: true
+    conditions:
+      - conditionId: COND-HIS-004
+        leftExpression: p.prescribeDay
+        operator: BETWEEN
+        parameterRef: startDay
+    resultColumns:
+      - name: drugName
+        label: 药品名称
+        dataType: String
+        sourceExpression: p.drugName
+      - name: totalQty
+        label: 销售总量
+        dataType: Integer
+        sourceExpression: SUM(p.quantity)
+      - name: totalSales
+        label: 销售总额（元）
+        dataType: Decimal
+        sourceExpression: SUM(p.quantity * 药品单价)   # 单价字段在 drug_info（DICT-HIS-002 只读），JOIN 取数=建造面
+      - name: overallRank
+        label: 总排名
+        dataType: Integer
+        sourceExpression: RANK() OVER (ORDER BY totalSales DESC)
+      - name: refundRate
+        label: 处方退费率（%）
+        dataType: Decimal
+        sourceExpression: COUNT(CASE WHEN p.refundFlag THEN 1 END) / COUNT(p.prescribeDay) * 100   # 口径真源 RULE-HIS-005
+  # [PRD §6.1 模块五 + §5.2.2 诊断维度] 疾病诊断分布与病历完整率
+  - id: QR-HIS-005
+    name: 疾病诊断分布查询
+    alias: diseaseDistQuery
+    description: "诊断粒度 TOP20+ICD-10 章节分布+病历完整率雷达三出口合一（R13·§6.1 模块五 + §5.3 disease/medical_record）：ICD 章节=DICT-HIS-001 编码段首字母映射（推定，待 Owner）。"
+    objectType: STATISTICAL_QUERY
+    behaviorRef: BH-HIS-QueryDisease
+    sourceObjects:
+      - objectRef: AGG-HIS-003
+        alias: d
+        primary: true
+      - objectRef: AGG-HIS-002
+        alias: m
+        primary: false
+    parameters:
+      - name: startDay
+        label: 开始日期
+        dataType: Date
+        required: true
+      - name: endDay
+        label: 结束日期
+        dataType: Date
+        required: true
+    conditions:
+      - conditionId: COND-HIS-005
+        leftExpression: d.diagnosisDay
+        operator: BETWEEN
+        parameterRef: startDay
+    resultColumns:
+      - name: diseaseCode
+        label: 疾病编码
+        dataType: String
+        sourceExpression: d.diseaseCode
+      - name: diseaseName
+        label: 疾病名称
+        dataType: String
+        sourceExpression: d.diseaseName
+      - name: diagCount
+        label: 诊断次数
+        dataType: Integer
+        sourceExpression: COUNT(d.diseaseCode)
+      - name: icdChapter
+        label: ICD-10 章节
+        dataType: String
+        sourceExpression: SUBSTR(d.diseaseCode, 1, 1)   # 章节映射=DICT-HIS-001 编码段推定
+      - name: recordCompleteRate
+        label: 病历完整率（%）
+        dataType: Decimal
+        sourceExpression: (非空维度计数) / 5 * 100   # 口径真源 RULE-HIS-006；5 维度=m 五属性
+  # [PRD §6.1 模块六] 患者画像（年龄-性别金字塔+复诊率；地域分布=缺口）
+  - id: QR-HIS-006
+    name: 患者画像查询
+    alias: patientProfileQuery
+    description: "就诊粒度患者画像（R13·§6.1 模块六）：年龄-性别金字塔+复诊率详情卡。地域分布 TOP10 素材无源字段（§5.3 register 无地域列）——缺口如实记，不建列；患者主数据未建，同一人判定按 patientName 推定（RULE-HIS-007 注记）。"
+    objectType: STATISTICAL_QUERY
+    behaviorRef: BH-HIS-QueryPatient
+    sourceObjects:
+      - objectRef: AGG-HIS-001
+        alias: r
+        primary: true
+    parameters:
+      - name: startDay
+        label: 开始日期
+        dataType: Date
+        required: true
+      - name: endDay
+        label: 结束日期
+        dataType: Date
+        required: true
+    conditions:
+      - conditionId: COND-HIS-006
+        leftExpression: r.visitDay
+        operator: BETWEEN
+        parameterRef: startDay
+    resultColumns:
+      - name: ageGroup
+        label: 年龄段
+        dataType: String
+        sourceExpression: CASE 分组(r.patientAge)   # 金字塔分组界点素材未给，实现面定
+      - name: patientGender
+        label: 性别
+        dataType: String
+        sourceExpression: r.patientGender
+      - name: patientCnt
+        label: 患者数
+        dataType: Integer
+        sourceExpression: COUNT(DISTINCT r.patientName)   # 同一人判定=Q3/RULE-HIS-007 注记
+      - name: revisitRate
+        label: 复诊率（%）
+        dataType: Decimal
+        sourceExpression: 窗口期内≥2 次挂号患者数 / 总患者数 * 100   # 口径真源 RULE-HIS-007；窗口 30 天=Q3 待 Owner

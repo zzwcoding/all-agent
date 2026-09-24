@@ -1,0 +1,8 @@
+{
+  "domain": "his",
+  "label": "HIS 医院数据报表域",
+  "profile": "v9-full",
+  "schemaVersion": "1.2.0",
+  "description": "票 67 素材定稿（2026-09-25，第六批第三域全模型压测批）。素材=R13·references/his-source/ 五件（GitHub luzai02/his- 公开实训文档，无 License=仅文本素材引用）。profile=v9-full：八模型全建（M1 五聚合+五字典+二关联/M2 八 COMMAND+六 QUERY/M3 七规则/M5 五主体/M6 一就诊全流程/M7 六报表/MU 六页面+应用菜单/GLS 十术语）——MU 为全仓首个真实文件。定稿性质=素材定稿非 Owner 签收：开放问题 Q1–Q8（收入口径/状态集/复诊率窗口/退费冲减/权限矩阵/统计日/基建不入本体/完整率读法）挂 docs/requirements/his-报表平台-细稿.md §四待 Owner 裁决。",
+  "omittedModels": []
+}

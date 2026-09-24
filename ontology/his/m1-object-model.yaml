@@ -1,0 +1,202 @@
+# =====================================================================
+# HIS 医院数据报表域（his）· M1 对象模型（票 67 素材定稿版）
+# ────────────────────────────────────────────────────────────────
+# 素材：R13·references/his-source/——PRD §1.2 业务域表 + 详细设计 §5.3
+#   HIS 源库核心表（字段级真源 §5.2/§5.3）。建模面=报表平台消费面：
+#   业务对象（就诊链路五件）+ 五张只读字典（ICD-10/药品/医技/科室/员工）。
+# 口径：ADS 7 指标表归 M7（细稿 Q6 已裁），大数据基建/前后端实现不入本体
+#   （细稿 §五明示不建模）。聚合归并非一表一聚合：medical_record_disease
+#   归「诊断记录」聚合（病历-疾病关联表的语义=一次诊断）。
+# 待 Owner 确认：visitStatus 状态集（Q2 推荐档推断）/支付方式值集枚举化
+#   （Q1 关联收入口径）。AI 只做格式转换，业务必须人确认。
+# =====================================================================
+model_type: OBJECT
+version: "1.0.0"
+domain: his
+aggregates:
+  # [详细设计 §5.3 register 114 行·枢纽表] 连接患者/科室/医生的就诊登记行
+  - id: AGG-HIS-001
+    name: 挂号记录
+    alias: RegisterRecord
+    aggregateType: AGGREGATE_ROOT
+    description: >-
+      患者就诊的登记枢纽行（R13·详细设计 §5.3 register：关联患者/科室/医生，
+      用于就诊状态流/年龄金字塔/地域分布/复诊率）。行粒度=一次挂号（case_number
+      就诊号唯一，PRD §1.3）。visitStatus 状态集按 §1.3 流程图推定（Q2 待
+      Owner 确认）；支付方式五值取自 §5.2.4 regist_method 字段示例。
+    lifecycle:
+      - 挂号
+      - 候诊
+      - 接诊中
+      - 已诊断
+      - 已开方
+      - 已收费
+      - 已完成
+      - 已退号
+    attributes:
+      - { name: caseNumber, label: 就诊号, type: String, required: true, unique: true }   # [PRD §1.3 流程图] 挂号生成 case_number
+      - { name: patientName, label: 患者姓名, type: String, required: true }
+      - { name: patientAge, label: 患者年龄, type: Integer }                             # [PRD §6.1 患者画像] 年龄-性别金字塔用
+      - { name: patientGender, label: 患者性别, type: Enum, enumValues: [男, 女] }
+      - { name: deptName, label: 就诊科室, type: String, required: true }                 # [§5.3] 冗余科室名（字典 DICT-HIS-004 只读引用，退化字段）
+      - { name: doctorName, label: 接诊医生, type: String }                              # [§5.3 employee 145 行] 字典只读引用，退化字段
+      - name: visitStatus
+        label: 就诊状态
+        type: Enum
+        required: true
+        enumValues: [挂号, 候诊, 接诊中, 已诊断, 已开方, 已收费, 已完成, 已退号]   # [§1.3 推定=Q2 待 Owner] 漏斗图阶段承载
+        refRules:
+          - RULE-HIS-003    # 退号率分母口径（就诊状态判定退号）
+      - { name: registMethod, label: 支付方式, type: Enum, required: true,
+          enumValues: [现金, 银行卡, 微信, 支付宝, 医保卡] }                              # [§5.2.4 regist_method] 收入占比维度
+      - { name: registerFee, label: 挂号费, type: Decimal, required: true }               # [§5.2.1 register_revenue] 收入口径载体（Q1 待 Owner）
+      - { name: visitDay, label: 就诊日期, type: Date, required: true }                   # [§5.2.1 visit_day] 统计日口径载体（Q8 待 Owner）
+  # [详细设计 §5.3 medical_record 104 行] 门诊病历（5 维度完整率载体）
+  - id: AGG-HIS-002
+    name: 门诊病历
+    alias: OutpatientMedicalRecord
+    aggregateType: AGGREGATE_ROOT
+    description: >-
+      医生接诊书写的门诊病历（R13·§5.3 medical_record：主诉/现病史/既往史/
+      过敏史/体格检查）。5 维度完整率雷达图（PRD §6.1 模块五）的判定载体——
+      每维度非空即完整（RULE-HIS-006 口径）。
+    attributes:
+      - { name: caseRef, label: 所属就诊, type: AggregateRootRef, targetAggregate: AGG-HIS-001, required: true }
+      - name: chiefComplaint
+        label: 主诉
+        type: String                              # [§5.3] 完整率维度 1
+        refRules:
+          - RULE-HIS-006
+      - name: presentHistory
+        label: 现病史
+        type: String                              # [§5.3] 完整率维度 2
+        refRules:
+          - RULE-HIS-006
+      - name: pastHistory
+        label: 既往史
+        type: String                              # [§5.3] 完整率维度 3
+        refRules:
+          - RULE-HIS-006
+      - name: allergyHistory
+        label: 过敏史
+        type: String                              # [§5.3] 完整率维度 4
+        refRules:
+          - RULE-HIS-006
+      - name: physicalExam
+        label: 体格检查
+        type: String                              # [§5.3] 完整率维度 5
+        refRules:
+          - RULE-HIS-006
+  # [详细设计 §5.3 medical_record_disease 106 行] 一次诊断（病历×疾病字典关联行）
+  - id: AGG-HIS-003
+    name: 诊断记录
+    alias: DiagnosisRecord
+    aggregateType: AGGREGATE_ROOT
+    description: >-
+      医生对一次就诊给出的诊断（R13·§5.3 medical_record_disease：病历-疾病
+      关联表，关联 disease 表取 ICD-10 中文病名）。行粒度=一次就诊×一个诊断。
+    attributes:
+      - { name: caseRef, label: 所属就诊, type: AggregateRootRef, targetAggregate: AGG-HIS-001, required: true }
+      - { name: diseaseCode, label: 疾病编码, type: String, required: true }             # [§5.3 disease 表] ICD-10 编码（DICT-HIS-001 只读引用）
+      - { name: diseaseName, label: 疾病名称, type: String, required: true }             # [§5.3] 冗余中文病名（字典退化字段）
+      - { name: diagnosisDay, label: 诊断日期, type: Date, required: true }               # [§5.3] 诊断 TOP20/ICD 分布维度
+  # [详细设计 §5.3 prescription 116 行] 药品处方
+  - id: AGG-HIS-004
+    name: 处方
+    alias: Prescription
+    aggregateType: AGGREGATE_ROOT
+    description: >-
+      医生开具的药品处方（R13·§5.3 prescription：关联 drug_info）。行粒度=
+      一张处方；退药退费以 refundFlag 承载（§5.2.7 refund_presc 的判定字段，
+      退费冲减规则 Q4 待 Owner）。
+    attributes:
+      - { name: caseRef, label: 所属就诊, type: AggregateRootRef, targetAggregate: AGG-HIS-001, required: true }
+      - { name: drugId, label: 药品 ID, type: Integer, required: true }                  # [§5.2.5 drug_id] 药品字典只读引用
+      - { name: drugName, label: 药品名称, type: String, required: true }                # [§5.3] 冗余药名（字典退化字段）
+      - { name: quantity, label: 数量, type: Integer, required: true }
+      - { name: usage, label: 用法, type: String }                                       # [§5.3] 用法说明
+      - { name: prescribeDay, label: 开立日期, type: Date, required: true }               # [§5.2.7 presc_day] 退费率趋势维度
+      - name: refundFlag
+        label: 退药退费标记
+        type: Boolean
+        required: true                             # [§5.2.7 refund_presc] 处方退费率分子判定
+        refRules:
+          - RULE-HIS-005
+  # [详细设计 §5.3 inspection_request 101 行] 检验/检查申请单
+  - id: AGG-HIS-005
+    name: 检验申请
+    alias: InspectionRequest
+    aggregateType: AGGREGATE_ROOT
+    description: >-
+      医生开具的检验/检查申请单（R13·§5.3 inspection_request：关联
+      medical_technology 项目字典）。完成率及平均耗时的载体（PRD §4.3 指标 6）。
+    attributes:
+      - { name: caseRef, label: 所属就诊, type: AggregateRootRef, targetAggregate: AGG-HIS-001, required: true }
+      - { name: itemName, label: 医技项目, type: String, required: true }                # [§5.3 medical_technology] 项目字典只读引用
+      - { name: requestStatus, label: 申请状态, type: Enum, enumValues: [已申请, 已完成] } # [§5.3] 完成率判定字段
+      - { name: fee, label: 费用, type: Decimal }                                        # [§5.3] 检验费用
+      - { name: requestDay, label: 申请日期, type: Date, required: true }
+data_dictionaries:
+  # [详细设计 §5.3 disease 29,496 行] ICD-10 国际疾病分类字典（只读引用）
+  - id: DICT-HIS-001
+    name: 疾病字典
+    alias: DiseaseDictionary
+    description: "ICD-10 国际疾病分类标准字典（R13·§5.3 disease 29,496 行）：编码/中文病名/章节，诊断记录（AGG-HIS-003）只读引用。"
+    types:
+      - name: ICD-10 编码
+        items: [A00-B99, C00-D48, D50-D89, E00-E90, F00-F99, G00-G99, H00-H59, H60-H95, I00-I99, J00-J99, K00-K93, L00-L99, M00-M99, N00-N99, O00-O99, P00-P96, Q00-Q99, R00-R99, S00-T98, U00-U99, V01-Y98, Z00-Z99]
+      - name: 章节名
+        items: [传染病, 肿瘤, 血液病, 内分泌, 精神, 神经, 眼耳, 循环, 呼吸, 消化, 皮肤, 肌骨, 泌尿生殖, 妊娠分娩, 围生期, 畸形, 症状体征, 外伤, 特殊, 死因, 影响健康]
+  # [详细设计 §5.3 drug_info 3,066 行] 药品字典（只读引用）
+  - id: DICT-HIS-002
+    name: 药品字典
+    alias: DrugDictionary
+    description: "药品字典（R13·§5.3 drug_info 3,066 行）：名称/类型/剂型/厂家/价格，处方（AGG-HIS-004）只读引用。"
+    types:
+      - name: 药品类型
+        items: [西药, 中成药, 中草药]                                                     # [§5.2.5 drug_type] 类型占比/分色维度
+      - name: 剂型
+        items: [片剂, 胶囊, 注射剂, 颗粒, 口服液, 外用]                                    # [§5.2.5 drug_dosage] 剂型字段
+  # [详细设计 §5.3 medical_technology 3,521 行] 医技项目字典（只读引用）
+  - id: DICT-HIS-003
+    name: 医技项目字典
+    alias: MedicalTechnologyDictionary
+    description: "医技服务项目字典与定价（R13·§5.3 medical_technology 3,521 行），检验申请（AGG-HIS-005）只读引用。"
+    types:
+      - name: 项目类别
+        items: [检验, 影像, 超声, 内镜, 心电, 病理]                                      # [§5.3] 项目分类
+  # [详细设计 §5.3 department 240 行] 科室字典
+  - id: DICT-HIS-004
+    name: 科室字典
+    alias: DepartmentDictionary
+    description: "科室基础信息字典（R13·§5.3 department 240 行）：挂号记录科室维度与科室接诊排行的退化引用源。"
+    types:
+      - name: 科室类别
+        items: [门诊科室, 医技科室, 职能科室]                                            # [§5.3] 分类推定，待 Owner
+  # [详细设计 §5.3 employee 145 行] 员工/医生字典
+  - id: DICT-HIS-005
+    name: 员工字典
+    alias: EmployeeDictionary
+    description: "医生/员工基础信息字典（R13·§5.3 employee 145 行）：医生接诊排行的退化引用源。"
+    types:
+      - name: 岗位
+        items: [医生, 护士, 收费员, 管理员]                                              # [§5.3] 岗位分类推定，待 Owner
+aggregate_associations:
+  # [PRD §1.3 就诊全流程 + §5.3 Join 说明] 一次就诊 1..* 处方
+  - id: ASSOC-HIS-001
+    sourceAggregate: AGG-HIS-001
+    targetAggregate: AGG-HIS-004
+    associationType: REFERENCE
+    sourceRole: 就诊
+    targetRole: 处方
+    cardinality: ONE_TO_MANY
+    referenceField: caseRef
+  # [PRD §1.3 + §5.3] 一次就诊 1..* 诊断记录
+  - id: ASSOC-HIS-002
+    sourceAggregate: AGG-HIS-001
+    targetAggregate: AGG-HIS-003
+    associationType: REFERENCE
+    sourceRole: 就诊
+    targetRole: 诊断记录
+    cardinality: ONE_TO_MANY
+    referenceField: caseRef

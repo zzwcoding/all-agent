@@ -1,0 +1,111 @@
+# =====================================================================
+# HIS 医院数据报表域（his）· GLS 术语模型（票 67 素材定稿版）
+# ────────────────────────────────────────────────────────────────
+# 口径真源：R13·references/his-source/（PRD 正文 + 详细设计 §5.2 字段语义）。
+# 十词全部注源可溯；平台能力词与业务词分列注记。relatedObjectRefs 只挂
+# 真实存在的 M1 聚合根（GLS→M1 单向），可空留空不硬挂。
+# =====================================================================
+model_type: GLOSSARY
+version: "1.0.0"
+domain: his
+terms:
+  - id: GLS-HIS-001
+    term: HIS
+    aliases: [医院信息系统, Hospital Information System]
+    termType: 缩写
+    definition: 医院信息系统——挂号/就诊/处方/收费/药品管理等核心业务数字化的业务系统（OLTP）；本域是它的下游报表消费平台（OLAP），源系统业务细则不在本域建模。
+    relatedObjectRefs: []
+    status: 有效
+    owner: Owner
+    source: R13·PRD §1.1（HIS 定义与 OLTP/OLAP 分工）
+    notes: 域名的词根；平台词非业务对象词，不挂对象。
+  - id: GLS-HIS-002
+    term: ICD-10
+    aliases: [国际疾病分类]
+    termType: 缩写
+    definition: 国际疾病分类第十次修订本——诊断记录的标准疾病编码体系（编码+中文病名+章节），疾病字典（DICT-HIS-001）的码表来源。
+    relatedObjectRefs: []
+    status: 有效
+    owner: Owner
+    source: R13·PRD §1.2（疾病诊断业务域 ICD-10 说明）
+    notes: 外部标准，本体只登记引用不复制码表内容。
+  - id: GLS-HIS-003
+    term: 退号率
+    aliases: []
+    termType: 术语
+    definition: 退号数 ÷ 挂号人次 × 100%（口径真源 RULE-HIS-003）；>10% 触发红色告警（RULE-HIS-001 阈值，PRD 两处素材互证）。
+    relatedObjectRefs: [AGG-HIS-001]
+    status: 有效
+    owner: Owner
+    source: R13·详细设计 §5.2.1 refund_cnt/register_cnt 字段对 + PRD §6.1 异常预警
+    notes: 全域唯一带硬阈值的指标；统计日归属（Q8）与状态集（Q2）待 Owner。
+  - id: GLS-HIS-004
+    term: 均次费用
+    aliases: [次均费用]
+    termType: 术语
+    definition: 总收入 ÷ 接诊量（口径真源 RULE-HIS-004）；收入口径暂按挂号费（Q1 待 Owner：药品/医技费是否计入未裁）。
+    relatedObjectRefs: [AGG-HIS-001]
+    status: 有效
+    owner: Owner
+    source: R13·详细设计 §5.2.2 avg_fee 字段 + PRD §6.1 模块三「科室均次费用（均值线）」
+    notes: 「均次」与「次均」两种写法素材并存（§6.1 vs 行业习惯），别名如实登记。
+  - id: GLS-HIS-005
+    term: 复诊率
+    aliases: []
+    termType: 术语
+    definition: 复诊患者数 ÷ 就诊患者总数 × 100%（口径真源 RULE-HIS-007）；复诊=同一患者窗口期内≥2 次挂号，窗口推荐档 30 天（Q3 待 Owner）。
+    relatedObjectRefs: [AGG-HIS-001]
+    status: 有效
+    owner: Owner
+    source: R13·PRD §6.1 模块六「复诊率详情卡片」
+    notes: 患者主数据未建，同一人判定按 patientName 推定——缺口如实记。
+  - id: GLS-HIS-006
+    term: 病历完整率
+    aliases: []
+    termType: 术语
+    definition: 病历 5 维度（主诉/现病史/既往史/过敏史/体格检查）非空维度数 ÷ 5 × 100%（口径真源 RULE-HIS-006）；行级读法与数据集级读法素材未指明（Q8 挂账）。
+    relatedObjectRefs: [AGG-HIS-002]
+    status: 有效
+    owner: Owner
+    source: R13·PRD §6.1 模块五（雷达图 5 维度枚举）+ §5.3 medical_record 字段
+    notes: 五维度名与 M1 五属性一一对应，无发明。
+  - id: GLS-HIS-007
+    term: 处方退费率
+    aliases: [退药退费率]
+    termType: 术语
+    definition: 退药退费处方数 ÷ 处方总数 × 100%（口径真源 RULE-HIS-005）；按笔数计不按金额计，退费是否冲减收入（Q4）与本口径无关。
+    relatedObjectRefs: [AGG-HIS-004]
+    status: 有效
+    owner: Owner
+    source: R13·详细设计 §5.2.7 refund_presc/total_presc 字段对 + PRD §6.1 模块四
+    notes: 别名「退药退费率」取素材 §4.3 指标 5 原名。
+  - id: GLS-HIS-008
+    term: KPI 卡
+    aliases: [指标卡片, KpiCard]
+    termType: 术语
+    definition: 指标卡片组件——标题/数值（等宽字体）/图标/趋势百分比（绿涨红跌）/副文本（PRD §6.2 公共组件表）；六页面通用的展示 ought。
+    relatedObjectRefs: []
+    status: 有效
+    owner: Owner
+    source: R13·PRD §6.2 KpiCard 组件行
+    notes: 平台组件词，挂在 MU 元素承载，不挂 M1 对象。
+  - id: GLS-HIS-009
+    term: ADS 层
+    aliases: [应用数据层]
+    termType: 术语
+    definition: 数据分层的最上层——面向报表的预聚合 MySQL 表（7 张 ads_*），直接供报表 API 查询（响应 <100ms）；其口径真源=M7 查询定义+M3 规则，物理表=建造面不入本体。
+    relatedObjectRefs: []
+    status: 有效
+    owner: Owner
+    source: R13·PRD §7.2 数据分层设计（ADS 层说明）
+    notes: 与 ODS/DWD/DWS 同族，该族只收此代表词（细稿 §五：基建不入模型）。
+  - id: GLS-HIS-010
+    term: 院长驾驶舱
+    aliases: [Dashboard]
+    termType: 术语
+    definition: 院长决策视图——日度 KPI 五卡+近 7 日接诊趋势+支付方式占比+科室接诊 TOP5+异常预警（退号率>10%）五层展示（PRD §6.1 模块一逐层对应）。
+    relatedObjectRefs: []
+    status: 有效
+    owner: Owner
+    source: R13·PRD §6.1 模块一（五层结构逐项）
+    notes: 报表模块词，承载=M7 QR-HIS-001 + MU SCR-HIS-001，词面与对象分离登记。

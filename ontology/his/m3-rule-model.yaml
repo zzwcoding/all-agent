@@ -1,0 +1,157 @@
+# =====================================================================
+# HIS 医院数据报表域（his）· M3 规则模型（票 67 素材定稿版）
+# ────────────────────────────────────────────────────────────────
+# 素材：R13——PRD §6.1 告警阈值/§4.3 六指标 + 详细设计 §5.2 ADS 口径字段。
+# 规则素材薄但硬：占比合计校验/退号率阈值两条平台规则 + 六条指标口径
+# （退号率/均次费用/病历完整率/处方退费率/收入占比/复诊率）。不凑数：
+# 六条口径对应 §4.3 六指标，Q1/Q3/Q4/Q8 未裁处如实标注。
+# 四层下沉：行级 required 在 M1（如 refundFlag 必填），本文件只收数据集级
+# 口径与阈值（rule-placement 判定）。
+# =====================================================================
+model_type: RULE
+version: "1.0.0"
+domain: his
+rules:
+  # [PRD §6.1 模块一「异常预警（退号率 >10% 告警）」] 全仓唯一的硬阈值
+  - id: RULE-HIS-001
+    name: 退号率告警阈值
+    ruleType: VALIDATION
+    description: >-
+      退号率 >10% 红色告警（R13·PRD §6.1 模块一异常预警 + §6.3 异常高亮
+      「退号率 >10% 红色标注」两处素材互证）。阈值 10% 为素材明示值；
+      正常区间绿色标注。
+    inputParams:
+      - name: refundRate
+        type: Decimal
+        sourceField: register.visitStatus
+        required: true
+    outputType: Boolean
+    expression: refundRate <= 10
+    reusedBy:
+      - BH-HIS-QueryDashboard
+      - BH-HIS-QueryOutpatient
+  # [PRD §6.1 模块三「支付方式收入占比（环形图）」+ §5.2.4 revenue_pct] 合计校验
+  - id: RULE-HIS-002
+    name: 支付方式收入占比合计校验
+    ruleType: VALIDATION
+    description: >-
+      五支付方式（现金/银行卡/微信/支付宝/医保卡）收入占比合计=100%
+      （R13·详细设计 §5.2.4 revenue_pct 字段语义 + 环形图完整性推导）。
+      校验面=按日汇总粒度（Q8 统计日口径待 Owner）。
+    inputParams:
+      - name: pctSum
+        type: Decimal
+        sourceField: register.registerFee
+        required: true
+    outputType: Boolean
+    expression: pctSum == 100
+    reusedBy:
+      - BH-HIS-QueryFinance
+  # [详细设计 §5.2.1 refund_cnt/register_cnt + §4.3 指标 1] 退号率口径
+  - id: RULE-HIS-003
+    name: 退号率口径
+    ruleType: CALCULATION
+    description: >-
+      退号率 = 退号数 ÷ 挂号人次 × 100（R13·§5.2.1 refund_cnt/register_cnt
+      字段对 + §4.3 指标 1「科室接诊量及退号率」）。分母=挂号人次（就诊状态
+      非「已退号」的挂号记录数，Q2 状态集待 Owner）；退号归原就诊日（Q8 待
+      Owner）。
+    inputParams:
+      - name: refundCount
+        type: Integer
+        sourceField: register.visitStatus
+        required: true
+      - name: registerCount
+        type: Integer
+        sourceField: register.caseNumber
+        required: true
+    outputType: Decimal
+    expression: refundCount / registerCount * 100
+    reusedBy:
+      - BH-HIS-QueryDashboard
+      - BH-HIS-QueryOutpatient
+  # [详细设计 §5.2.2 avg_fee = total_revenue/total_visits] 均次费用口径
+  - id: RULE-HIS-004
+    name: 均次费用口径
+    ruleType: CALCULATION
+    description: >-
+      均次费用 = 总收入 ÷ 接诊量（R13·§5.2.2 avg_fee 字段语义 + PRD §6.1
+      模块三「科室均次费用（横向柱状图 + 均值线）」）。收入口径=挂号收入
+      （Q1 待 Owner：药品/医技费是否计入未裁，本口径先按挂号费）。
+    inputParams:
+      - name: totalRevenue
+        type: Decimal
+        sourceField: register.registerFee
+        required: true
+      - name: totalVisits
+        type: Integer
+        sourceField: register.caseNumber
+        required: true
+    outputType: Decimal
+    expression: totalRevenue / totalVisits
+    reusedBy:
+      - BH-HIS-QueryFinance
+      - BH-HIS-QueryOutpatient
+  # [详细设计 §5.2.7 refund_presc/total_presc + §4.3 指标 5] 处方退费率口径
+  - id: RULE-HIS-005
+    name: 处方退费率口径
+    ruleType: CALCULATION
+    description: >-
+      处方退费率 = 退药退费处方数 ÷ 处方总数 × 100（R13·§5.2.7
+      refund_presc/total_presc 字段对 + §4.3 指标 5「处方退药/退费率」）。
+      分子判定字段=处方 refundFlag（AGG-HIS-004）。退费冲减收入与否（Q4）
+      与本口径无关（只计笔数不计金额），如实注记。
+    inputParams:
+      - name: refundPresc
+        type: Integer
+        sourceField: prescription.refundFlag
+        required: true
+      - name: totalPresc
+        type: Integer
+        sourceField: prescription.prescribeDay   # 行计数载体（处方无独立单号属性，复合粒度=就诊×药品×开立日）
+        required: true
+    outputType: Decimal
+    expression: refundPresc / totalPresc * 100
+    reusedBy:
+      - BH-HIS-QueryDrug
+      - BH-HIS-QueryDashboard
+  # [PRD §6.1 模块五「病历完整率（雷达图：5 维度）」] 病历完整率口径
+  - id: RULE-HIS-006
+    name: 病历完整率口径
+    ruleType: CALCULATION
+    description: >-
+      病历完整率 = 5 维度（主诉/现病史/既往史/过敏史/体格检查）非空维度数
+      ÷ 5 × 100（R13·PRD §6.1 模块五雷达图 + §5.3 medical_record 五字段
+      一一对应）。行级判定字段=AGG-HIS-002 五属性；数据集级汇总（完整病历
+      行数÷病历总行数）为另一读法，素材未指明，如实挂 Q8 待 Owner。
+    inputParams:
+      - name: filledDims
+        type: Integer
+        sourceField: medicalRecord.chiefComplaint
+        required: true
+    outputType: Decimal
+    expression: filledDims / 5 * 100
+    reusedBy:
+      - BH-HIS-QueryDisease
+  # [PRD §6.1 模块六「复诊率详情卡片」] 复诊率口径（Q3 窗口值待 Owner）
+  - id: RULE-HIS-007
+    name: 复诊率口径
+    ruleType: CALCULATION
+    description: >-
+      复诊率 = 复诊患者数 ÷ 就诊患者总数 × 100；复诊 = 同一患者（patientName
+      推定同一人，患者主数据未建=缺口如实记）在窗口期内≥2 次挂号（R13·PRD
+      §6.1 模块六）。窗口期素材未给，推荐档 30 天（Q3 待 Owner，本规则按
+      30 天标注推断）。
+    inputParams:
+      - name: revisitPatients
+        type: Integer
+        sourceField: register.patientName
+        required: true
+      - name: totalPatients
+        type: Integer
+        sourceField: register.caseNumber
+        required: true
+    outputType: Decimal
+    expression: revisitPatients / totalPatients * 100
+    reusedBy:
+      - BH-HIS-QueryPatient

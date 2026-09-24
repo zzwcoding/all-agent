@@ -1,0 +1,184 @@
+# =====================================================================
+# HIS 医院数据报表域（his）· MU UI 模型（票 67 素材定稿版 · 全仓首个真实 MU）
+# ────────────────────────────────────────────────────────────────
+# 素材：R13——PRD §6.1 六模块页面结构 + §6.2 公共组件 + §6.3 页面交互 +
+#   前端设计文档 §7.3 路由/§7.4 布局。六页面全是只读查询面（QUERY_LIST），
+#   无审批流（双按钮规则不适用）；登录/权限管理页面素材未给（Q5 挂账）不建。
+# 控件映射：日期→DATEPICKER、明细表→GRID、操作→BUTTON、图表区为 ECharts
+#   画布（非表单控件，以 LABEL 注记承载，不硬套 10 类外控件）。
+# =====================================================================
+model_type: UI
+version: "1.0.0"
+domain: his
+application:
+  name: HIS 数据报表平台
+  menus:
+    - menuId: MENU-HIS-001
+      name: 运营报表
+      children:
+        - menuId: MENU-HIS-001-1
+          name: 院长驾驶舱
+          screenRef: SCR-HIS-001
+        - menuId: MENU-HIS-001-2
+          name: 门诊运营分析
+          screenRef: SCR-HIS-002
+        - menuId: MENU-HIS-001-3
+          name: 收费与结算分析
+          screenRef: SCR-HIS-003
+    - menuId: MENU-HIS-002
+      name: 专题分析
+      children:
+        - menuId: MENU-HIS-002-1
+          name: 药品处方分析
+          screenRef: SCR-HIS-004
+        - menuId: MENU-HIS-002-2
+          name: 疾病诊断分析
+          screenRef: SCR-HIS-005
+        - menuId: MENU-HIS-002-3
+          name: 患者画像分析
+          screenRef: SCR-HIS-006
+screens:
+  # [PRD §6.1 模块一 + §6.2 KpiCard/FilterBar] 院长驾驶舱：5 KPI 卡+趋势+占比+TOP5+预警
+  - screenId: SCR-HIS-001
+    name: 院长驾驶舱
+    screenType: QUERY_LIST
+    layout: |
+      +----------+----------+----------+----------+----------+
+      | KPI卡×5（挂号人次/收入/处方数/退号数/疾病种数）           |
+      +---------------------------+---------------------------+
+      | 近7日接诊趋势（折线）       | 支付方式占比（环形）        |
+      +---------------------------+---------------------------+
+      | 科室接诊TOP5（柱状）        | 异常预警（退号率>10%红标）  |
+      +---------------------------+---------------------------+
+    elements:
+      - { id: EL-HIS-101, type: DATEPICKER, label: 开始日期, io: input, required: true, dataBinding: register.visitDay }
+      - { id: EL-HIS-102, type: DATEPICKER, label: 结束日期, io: input, required: true, dataBinding: register.visitDay }
+      - { id: EL-HIS-103, type: LABEL, label: 近7日接诊趋势/支付方式占比/科室TOP5（ECharts 画布，PRD §6.1 模块一）, io: output }
+      - { id: EL-HIS-104, type: GRID, label: KPI 指标卡数值区, io: output, dataSource: QR-HIS-001,
+          refRules: [RULE-HIS-001] }
+    actions:
+      - actionId: ACT-UI-HIS-001
+        name: 查询
+        behaviorRef: BH-HIS-QueryDashboard
+        actionType: BUTTON
+        permissionRef: [PERM-HIS-QueryDashboard]
+      - actionId: ACT-UI-HIS-002
+        name: 重置
+        behaviorRef: BH-HIS-QueryDashboard
+        actionType: RETURN
+        permissionRef: [PERM-HIS-QueryDashboard]
+  # [PRD §6.1 模块二] 门诊运营：运营 KPI+科室/医生排行+状态漏斗+明细表
+  - screenId: SCR-HIS-002
+    name: 门诊运营分析
+    screenType: QUERY_LIST
+    layout: |
+      +----------+----------+----------+
+      | 运营KPI卡×N                        |
+      +----------------+------------------+
+      | 科室接诊排行（柱状+退号率标注）| 医生接诊TOP15（柱状）|
+      +----------------+------------------+
+      | 就诊状态流转（漏斗）          | 科室明细表（可排序GRID）|
+      +----------------+------------------+
+    elements:
+      - { id: EL-HIS-201, type: DATEPICKER, label: 开始日期, io: input, required: true, dataBinding: register.visitDay }
+      - { id: EL-HIS-202, type: DATEPICKER, label: 结束日期, io: input, required: true, dataBinding: register.visitDay }
+      - { id: EL-HIS-203, type: GRID, label: 科室明细表, io: output, dataSource: QR-HIS-002,
+          refRules: [RULE-HIS-001, RULE-HIS-003, RULE-HIS-004] }
+    actions:
+      - actionId: ACT-UI-HIS-003
+        name: 查询
+        behaviorRef: BH-HIS-QueryOutpatient
+        actionType: BUTTON
+        permissionRef: [PERM-HIS-QueryOutpatient]
+  # [PRD §6.1 模块三] 收费与结算：收入 KPI+趋势+支付占比+均次费用+明细
+  - screenId: SCR-HIS-003
+    name: 收费与结算分析
+    screenType: QUERY_LIST
+    layout: |
+      +----------+----------+----------+
+      | 收入KPI卡×N                        |
+      +----------------+------------------+
+      | 每日收入趋势（面积图）        | 支付方式占比（环形）   |
+      +----------------+------------------+
+      | 科室均次费用（柱状+均值线）   | 收入明细表（GRID）     |
+      +----------------+------------------+
+    elements:
+      - { id: EL-HIS-301, type: DATEPICKER, label: 开始日期, io: input, required: true, dataBinding: register.visitDay }
+      - { id: EL-HIS-302, type: DATEPICKER, label: 结束日期, io: input, required: true, dataBinding: register.visitDay }
+      - { id: EL-HIS-303, type: GRID, label: 收入明细表, io: output, dataSource: QR-HIS-003,
+          refRules: [RULE-HIS-002, RULE-HIS-004] }
+    actions:
+      - actionId: ACT-UI-HIS-004
+        name: 查询
+        behaviorRef: BH-HIS-QueryFinance
+        actionType: BUTTON
+        permissionRef: [PERM-HIS-QueryFinance]
+  # [PRD §6.1 模块四] 药品处方：药品 KPI+销售 TOP20+类型占比+退费率趋势
+  - screenId: SCR-HIS-004
+    name: 药品处方分析
+    screenType: QUERY_LIST
+    layout: |
+      +----------+----------+----------+
+      | 药品KPI卡×N                        |
+      +----------------+------------------+
+      | 药品销售额TOP20（按类型分色） | 药品类型占比（矩形树图）|
+      +----------------+------------------+
+      | 退药退费率趋势（折线+均值线） | 药品销售明细表（GRID）  |
+      +----------------+------------------+
+    elements:
+      - { id: EL-HIS-401, type: DATEPICKER, label: 开始日期, io: input, required: true, dataBinding: prescription.prescribeDay }
+      - { id: EL-HIS-402, type: DATEPICKER, label: 结束日期, io: input, required: true, dataBinding: prescription.prescribeDay }
+      - { id: EL-HIS-403, type: GRID, label: 药品销售明细表, io: output, dataSource: QR-HIS-004,
+          refRules: [RULE-HIS-005] }
+    actions:
+      - actionId: ACT-UI-HIS-005
+        name: 查询
+        behaviorRef: BH-HIS-QueryDrug
+        actionType: BUTTON
+        permissionRef: [PERM-HIS-QueryDrug]
+  # [PRD §6.1 模块五] 疾病诊断：疾病 KPI+TOP20+ICD 分布+病历完整率雷达+明细
+  - screenId: SCR-HIS-005
+    name: 疾病诊断分析
+    screenType: QUERY_LIST
+    layout: |
+      +----------+----------+----------+
+      | 疾病KPI卡×N                        |
+      +----------------+------------------+
+      | 诊断疾病TOP20（柱状）         | ICD-10章节分布（矩形树图）|
+      +----------------+------------------+
+      | 病历完整率（雷达5维）         | 诊断明细表（含进度条GRID）|
+      +----------------+------------------+
+    elements:
+      - { id: EL-HIS-501, type: DATEPICKER, label: 开始日期, io: input, required: true, dataBinding: diagnosisRecord.diagnosisDay }
+      - { id: EL-HIS-502, type: DATEPICKER, label: 结束日期, io: input, required: true, dataBinding: diagnosisRecord.diagnosisDay }
+      - { id: EL-HIS-503, type: GRID, label: 诊断明细表, io: output, dataSource: QR-HIS-005,
+          refRules: [RULE-HIS-006] }
+    actions:
+      - actionId: ACT-UI-HIS-006
+        name: 查询
+        behaviorRef: BH-HIS-QueryDisease
+        actionType: BUTTON
+        permissionRef: [PERM-HIS-QueryDisease]
+  # [PRD §6.1 模块六] 患者画像：患者 KPI+年龄性别金字塔+复诊率（地域分布=缺口）
+  - screenId: SCR-HIS-006
+    name: 患者画像分析
+    screenType: QUERY_LIST
+    layout: |
+      +----------+----------+----------+
+      | 患者KPI卡×N                        |
+      +----------------+------------------+
+      | 年龄-性别金字塔（双向柱状）   | 复诊率详情卡片          |
+      +----------------+------------------+
+      | （地域分布TOP10=缺口：素材无源字段，不建面板）                  |
+      +----------------+------------------+
+    elements:
+      - { id: EL-HIS-601, type: DATEPICKER, label: 开始日期, io: input, required: true, dataBinding: register.visitDay }
+      - { id: EL-HIS-602, type: DATEPICKER, label: 结束日期, io: input, required: true, dataBinding: register.visitDay }
+      - { id: EL-HIS-603, type: GRID, label: 患者画像明细, io: output, dataSource: QR-HIS-006,
+          refRules: [RULE-HIS-007] }
+    actions:
+      - actionId: ACT-UI-HIS-007
+        name: 查询
+        behaviorRef: BH-HIS-QueryPatient
+        actionType: BUTTON
+        permissionRef: [PERM-HIS-QueryPatient]
