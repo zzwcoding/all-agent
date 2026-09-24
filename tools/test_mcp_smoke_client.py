@@ -90,6 +90,21 @@ class CaseTableTest(unittest.TestCase):
         u2 = next(c for c in self.cases if c["id"] == "U2")
         self.assertFalse(u2["expect_id_token"])
 
+    def test_u8_impact_asserts_shape_not_count(self):
+        """U8 断形态不断量级快照（票 66）：影响集规模随本体演进是活数
+        （票 24 基线 56 → 2026-09-24 demo 实点 64，钉快照必陈旧）——
+        形态 token 与非空守卫必须在位，量级快照 token 不得入期望。"""
+        u8 = next(c for c in self.cases if c["id"] == "U8")
+        contains = "；".join(u8["expect_contains"])
+        self.assertIn("【影响 --impact】", contains)
+        self.assertIn("个受影响节点（依赖方）", contains)
+        self.assertIn("BH-BOHAI-QueryWellDailyOutput", contains)
+        self.assertIn("0 个受影响节点", "；".join(u8["expect_not_contains"]))
+        for token in u8["expect_contains"]:
+            self.assertNotRegex(
+                token, r"\d+ 个受影响节点",
+                f"U8 期望钉了量级快照（随本体演进必陈旧）: {token}")
+
     def test_u9_is_handover_closure_call(self):
         """U9=票 24 交接包指定：closure(AGG-BOHAI-001, hops=2)，钉空闭包诚实报告。"""
         u9 = next(c for c in self.cases if c["id"] == "U9")

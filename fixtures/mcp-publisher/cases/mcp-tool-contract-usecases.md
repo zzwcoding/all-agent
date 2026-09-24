@@ -13,4 +13,4 @@
 | U5 | semantic_query | `{"element_id": "AGG-BOHAI-001"}` | 节点简报：ID、model=M1、域=bohai、文件位置；未找到不猜的镜像见 U6 |
 | U6 | semantic_query | `{"element_id": "AGG-BOHAI-999"}` | 未找到明确报错（不做名称猜测、不给近似拼写建议） |
 | U7 | semantic_closure | `{"element_id": "GLS-BOHAI-002", "hops": 1}` | 闭包含 AGG-BOHAI-001 / AGG-BOHAI-002（relatedObjectRefs 正向，hops=1） |
-| U8 | semantic_impact | `{"element_id": "AGG-BOHAI-001"}` | 影响集（56 节点）含 BH-BOHAI-* 名下行为（--impact 反向）；hops≤2 区分直挂/经子对象 |
+| U8 | semantic_impact | `{"element_id": "AGG-BOHAI-001"}` | 影响集非空且含 BH-BOHAI-* 名下行为（--impact 反向）；hops≤2 区分直挂/经子对象。量级随本体演进是活数不钉快照值（票 66：票 24 时点基线 56 已演进至 64） |

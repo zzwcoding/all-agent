@@ -143,12 +143,13 @@ def _cases():
             "id": "U8",
             "tool": "semantic_impact",
             "args": {"element_id": "AGG-BOHAI-001"},
-            "expect_contains": ["【影响 --impact】56 个受影响节点",
+            "expect_contains": ["【影响 --impact】", "个受影响节点（依赖方）",
                                 "BH-BOHAI-QueryWellDailyOutput", "hops=1"],
-            "expect_not_contains": [],
+            "expect_not_contains": ["0 个受影响节点"],
             "expect_citation_header": False,
             "expect_id_token": True,
-            "note": "影响集（56 节点）含 BH-BOHAI-* 名下行为（反向依赖）；真源=cases U8",
+            "note": "影响集非空且含 BH-BOHAI-* 名下行为（反向依赖）；量级随本体演进是"
+                    "活数不钉快照（票 66：票 24 基线 56 已陈旧至 64）——契约断形态不断数",
         },
         {
             "id": "U9",
