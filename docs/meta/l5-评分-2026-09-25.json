@@ -1,0 +1,616 @@
+{
+  "tool": "l5_score",
+  "ticket": "42",
+  "inputFingerprint": "9dd4d74e3c48f241",
+  "verdict": "FAIL",
+  "exitCode": 1,
+  "conditions": {
+    "perQuestionNormalized": {
+      "pass": false,
+      "below": [
+        {
+          "question_id": "Q2",
+          "normalized": 0.0,
+          "rawTotal": 0
+        }
+      ],
+      "threshold": 3
+    },
+    "setMedian": {
+      "pass": true,
+      "value": 5.0,
+      "threshold": 4.0
+    },
+    "noZeroScore": {
+      "pass": false,
+      "zeroed": [
+        {
+          "question_id": "Q2",
+          "reasons": [
+            "一票否决（disqualifier_triggered：3 采样中 3 票为 true，按 0 分计）"
+          ]
+        }
+      ]
+    }
+  },
+  "questions": [
+    {
+      "question_id": "Q1",
+      "rubric_file": "q1-sample-rubric.yaml",
+      "normalized": 3.0,
+      "rawTotal": 15,
+      "stable": true,
+      "disqualified": false,
+      "disq_votes": 0,
+      "zeroed": false,
+      "zero_reasons": [],
+      "unstable_dims": [],
+      "dimensions": [
+        {
+          "id": "semantic_fidelity",
+          "weight": 2,
+          "samples": [
+            2,
+            2,
+            2
+          ],
+          "median": 2,
+          "spread": 0
+        },
+        {
+          "id": "caliber_quality",
+          "weight": 2,
+          "samples": [
+            3,
+            3,
+            3
+          ],
+          "median": 3,
+          "spread": 0
+        },
+        {
+          "id": "organization",
+          "weight": 1,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        }
+      ]
+    },
+    {
+      "question_id": "Q10",
+      "rubric_file": "q10-closure-narrative-rubric.yaml",
+      "normalized": 5.0,
+      "rawTotal": 25,
+      "stable": true,
+      "disqualified": false,
+      "disq_votes": 0,
+      "zeroed": false,
+      "zero_reasons": [],
+      "unstable_dims": [],
+      "dimensions": [
+        {
+          "id": "semantic_fidelity",
+          "weight": 2,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        },
+        {
+          "id": "neighbor_distinction",
+          "weight": 2,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        },
+        {
+          "id": "dispute_notes",
+          "weight": 1,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        }
+      ]
+    },
+    {
+      "question_id": "Q11",
+      "rubric_file": "q11-missing-rule-rubric.yaml",
+      "normalized": 5.0,
+      "rawTotal": 25,
+      "stable": true,
+      "disqualified": false,
+      "disq_votes": 0,
+      "zeroed": false,
+      "zero_reasons": [],
+      "unstable_dims": [],
+      "dimensions": [
+        {
+          "id": "refusal_structure",
+          "weight": 2,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        },
+        {
+          "id": "layer_accuracy",
+          "weight": 2,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        },
+        {
+          "id": "nearby_discipline",
+          "weight": 1,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        }
+      ]
+    },
+    {
+      "question_id": "Q12",
+      "rubric_file": "q12-nearby-guidance-rubric.yaml",
+      "normalized": 4.0,
+      "rawTotal": 20,
+      "stable": true,
+      "disqualified": false,
+      "disq_votes": 0,
+      "zeroed": false,
+      "zero_reasons": [],
+      "unstable_dims": [],
+      "dimensions": [
+        {
+          "id": "guidance_actionability",
+          "weight": 2,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        },
+        {
+          "id": "neighbor_distinction",
+          "weight": 2,
+          "samples": [
+            3,
+            3,
+            3
+          ],
+          "median": 3,
+          "spread": 0
+        },
+        {
+          "id": "refusal_structure",
+          "weight": 1,
+          "samples": [
+            4,
+            4,
+            4
+          ],
+          "median": 4,
+          "spread": 0
+        }
+      ]
+    },
+    {
+      "question_id": "Q13",
+      "rubric_file": "q13-banned-algorithm-rubric.yaml",
+      "normalized": 5.0,
+      "rawTotal": 25,
+      "stable": true,
+      "disqualified": false,
+      "disq_votes": 0,
+      "zeroed": false,
+      "zero_reasons": [],
+      "unstable_dims": [],
+      "dimensions": [
+        {
+          "id": "banned_conclusion",
+          "weight": 2,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        },
+        {
+          "id": "guidance_coherence",
+          "weight": 2,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        },
+        {
+          "id": "no_fabrication",
+          "weight": 1,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        }
+      ]
+    },
+    {
+      "question_id": "Q14",
+      "rubric_file": "q14-write-intent-rubric.yaml",
+      "normalized": 5.0,
+      "rawTotal": 25,
+      "stable": true,
+      "disqualified": false,
+      "disq_votes": 0,
+      "zeroed": false,
+      "zero_reasons": [],
+      "unstable_dims": [],
+      "dimensions": [
+        {
+          "id": "out_of_surface_reason",
+          "weight": 2,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        },
+        {
+          "id": "routing_split",
+          "weight": 2,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        },
+        {
+          "id": "no_speculation",
+          "weight": 1,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        }
+      ]
+    },
+    {
+      "question_id": "Q2",
+      "rubric_file": "q2-explicit-anchor-rubric.yaml",
+      "normalized": 0.0,
+      "rawTotal": 0,
+      "stable": true,
+      "disqualified": true,
+      "disq_votes": 3,
+      "zeroed": true,
+      "zero_reasons": [
+        "一票否决（disqualifier_triggered：3 采样中 3 票为 true，按 0 分计）"
+      ],
+      "unstable_dims": [],
+      "dimensions": [
+        {
+          "id": "anchor_discipline",
+          "weight": 2,
+          "samples": [
+            1,
+            1,
+            1
+          ],
+          "median": 1,
+          "spread": 0
+        },
+        {
+          "id": "boundary_distinction",
+          "weight": 2,
+          "samples": [
+            1,
+            1,
+            1
+          ],
+          "median": 1,
+          "spread": 0
+        },
+        {
+          "id": "organization",
+          "weight": 1,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        }
+      ]
+    },
+    {
+      "question_id": "Q3",
+      "rubric_file": "q3-refusal-missing-concept-rubric.yaml",
+      "normalized": 4.0,
+      "rawTotal": 20,
+      "stable": false,
+      "disqualified": false,
+      "disq_votes": 0,
+      "zeroed": false,
+      "zero_reasons": [],
+      "unstable_dims": [
+        {
+          "id": "zero_fabrication",
+          "weight": 1,
+          "samples": [
+            1,
+            2,
+            3
+          ],
+          "median": 2,
+          "spread": 2
+        }
+      ],
+      "dimensions": [
+        {
+          "id": "refusal_structure",
+          "weight": 2,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        },
+        {
+          "id": "layer_accuracy",
+          "weight": 2,
+          "samples": [
+            3,
+            4,
+            4
+          ],
+          "median": 4,
+          "spread": 1
+        },
+        {
+          "id": "zero_fabrication",
+          "weight": 1,
+          "samples": [
+            1,
+            2,
+            3
+          ],
+          "median": 2,
+          "spread": 2
+        }
+      ]
+    },
+    {
+      "question_id": "Q4",
+      "rubric_file": "q4-out-of-surface-rubric.yaml",
+      "normalized": 5.0,
+      "rawTotal": 25,
+      "stable": true,
+      "disqualified": false,
+      "disq_votes": 0,
+      "zeroed": false,
+      "zero_reasons": [],
+      "unstable_dims": [],
+      "dimensions": [
+        {
+          "id": "out_of_surface_reason",
+          "weight": 2,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        },
+        {
+          "id": "routing_clarity",
+          "weight": 2,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        },
+        {
+          "id": "no_speculation",
+          "weight": 1,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        }
+      ]
+    },
+    {
+      "question_id": "Q7",
+      "rubric_file": "q7-term-caliber-rubric.yaml",
+      "normalized": 5.0,
+      "rawTotal": 25,
+      "stable": true,
+      "disqualified": false,
+      "disq_votes": 0,
+      "zeroed": false,
+      "zero_reasons": [],
+      "unstable_dims": [],
+      "dimensions": [
+        {
+          "id": "term_as_answer",
+          "weight": 2,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        },
+        {
+          "id": "closure_narrative",
+          "weight": 2,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        },
+        {
+          "id": "dispute_notes",
+          "weight": 1,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        }
+      ]
+    },
+    {
+      "question_id": "Q8",
+      "rubric_file": "q8-banned-disposal-rubric.yaml",
+      "normalized": 5.0,
+      "rawTotal": 25,
+      "stable": true,
+      "disqualified": false,
+      "disq_votes": 0,
+      "zeroed": false,
+      "zero_reasons": [],
+      "unstable_dims": [],
+      "dimensions": [
+        {
+          "id": "banned_conclusion",
+          "weight": 2,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        },
+        {
+          "id": "replacement_quality",
+          "weight": 2,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        },
+        {
+          "id": "no_softening",
+          "weight": 1,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        }
+      ]
+    },
+    {
+      "question_id": "Q9",
+      "rubric_file": "q9-multi-sense-rubric.yaml",
+      "normalized": 4.6,
+      "rawTotal": 23,
+      "stable": true,
+      "disqualified": false,
+      "disq_votes": 0,
+      "zeroed": false,
+      "zero_reasons": [],
+      "unstable_dims": [],
+      "dimensions": [
+        {
+          "id": "candidate_coverage",
+          "weight": 2,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        },
+        {
+          "id": "anchoring_request",
+          "weight": 2,
+          "samples": [
+            5,
+            5,
+            5
+          ],
+          "median": 5,
+          "spread": 0
+        },
+        {
+          "id": "no_overreach",
+          "weight": 1,
+          "samples": [
+            3,
+            3,
+            3
+          ],
+          "median": 3,
+          "spread": 0
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "question_id": "Q13",
+  "dimensions": [
+    {
+      "id": "banned_conclusion",
+      "score": 5,
+      "reason": "结论先行明确「老完成率」为禁用词、本服务不把它当可用口径作答、没有现行答案也不复现旧算法，与参照答案锚5结论同构且无含糊。"
+    },
+    {
+      "id": "guidance_coherence",
+      "score": 5,
+      "reason": "禁用说明（GLS-BOHAI-001 条目转写）→替代口径（产量完成率）→真实 ID 指路（RULE-BOHAI-009 公式 / BH-BOHAI-QueryBlockMonthlyCompletion / QR-BOHAI-002 completionPct 列）三步齐全衔接连贯，另附闭包轨迹每跳可复核，与参照同构。"
+    },
+    {
+      "id": "no_fabrication",
+      "score": 5,
+      "reason": "明示 v1 具体计算公式在仓内无承载、规则模型只有替代口径条目，按「未找到不猜」纪律不反推不复现、任何补猜表述一律不给，与参照锚5一致且全文无公式形状的补猜。"
+    }
+  ],
+  "disqualifier_triggered": false
+}

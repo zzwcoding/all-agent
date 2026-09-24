@@ -1,0 +1,21 @@
+{
+  "question_id": "Q3",
+  "dimensions": [
+    {
+      "id": "refusal_structure",
+      "score": 5,
+      "reason": "四件齐备且与参照逐件对应：拒答结论先行、检索轨迹交代全量检索穷尽未命中且不猜不推想、查询/对象/行为三层缺件说明、提案流程下一步俱全，话术与参照同构。"
+    },
+    {
+      "id": "layer_accuracy",
+      "score": 3,
+      "reason": "三层逐层核对且只声明真缺的层、AGG-BOHAI-002 明细载体正确标注「近邻指路，非所问」，但查询层近邻出口 QR-BOHAI-001 未点名（仅述「有 3 个字面近邻」）、近邻集合以对象层 AGG-BOHAI-004 代之，未达锚 5 的「与参照一致」，分层纪律无错位故不落锚 1。"
+    },
+    {
+      "id": "zero_fabrication",
+      "score": 1,
+      "reason": "叙述中出现参照白名单（QR-BOHAI-001/AGG-BOHAI-002）之外的 ID AGG-BOHAI-004，按锚 1 记 1 分——该 ID 经实核为仓内真实元素（m1-object-model.yaml 井检修记录）且未编造声明在位，故不触发编造类 disqualifier。"
+    }
+  ],
+  "disqualifier_triggered": false
+}

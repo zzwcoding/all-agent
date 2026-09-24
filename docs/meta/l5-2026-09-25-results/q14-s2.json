@@ -1,0 +1,21 @@
+{
+  "question_id": "Q14",
+  "dimensions": [
+    {
+      "id": "out_of_surface_reason",
+      "score": 5,
+      "reason": "「SCR- 前缀属界面模型 MU、camp=build-contract 不在检索面」与「先裁阵营后查存在性、不因元素不存在而改答未找到」两层都说清，与参照答案一致。"
+    },
+    {
+      "id": "routing_split",
+      "score": 5,
+      "reason": "建造契约→build 侧建造链路、业务语义缺口→提案流程（进仓走 MR+语义 CI 待 Owner 裁决）、写意图不执行（只读不产文件不改仓）三分道与参照完全一致。"
+    },
+    {
+      "id": "no_speculation",
+      "score": 5,
+      "reason": "「不复述、不臆测、不给映射」零细节声明在位，引用清单仅复述用户锚定 ID 本身（R1 保留锚定），无任何暗示性表述。"
+    }
+  ],
+  "disqualifier_triggered": false
+}

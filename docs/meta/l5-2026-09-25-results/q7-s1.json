@@ -1,0 +1,5 @@
+{"question_id": "Q7",
+ "dimensions": [{"id": "term_as_answer", "score": 5, "reason": "GLS-BOHAI-002 术语条目逐要素照登（term/别名净产量/termType=别名/status=有效/Owner 开发室/注源 R5·§6）与定义「剔除检修井口径的产量（即净产量）」均与参照答案逐点等价。"},
+  {"id": "closure_narrative", "score": 5, "reason": "沿 relatedObjectRefs 指路 AGG-BOHAI-001/002 → 承载规则 RULE-BOHAI-019（剔检支 expression 原文照登）→ 行为 BH-BOHAI-QueryBlockMonthlyCompletion → 出口 QR-BOHAI-002 effectiveOutputSum 列逐层点名，与参照分层一致且链路闭合。"},
+  {"id": "dispute_notes", "score": 5, "reason": "双口径并列（开井日历折算支公式 Σ(oilOutput × openDays/24) 已到、差异>3% 口径页并列注明来源）与跨月检修按日历天数劈分已裁均如实转达，未把已裁口径说成待 Owner。"}],
+ "disqualifier_triggered": false}

@@ -1,0 +1,7 @@
+{"question_id": "Q11",
+ "dimensions": [
+  {"id": "refusal_structure", "score": 5, "reason": "拒答结论先行、检索轨迹（全量零命中未猜）、缺件分层、提案流程下一步四件齐且表述明确，与参照答案逐件对应。"},
+  {"id": "layer_accuracy", "score": 5, "reason": "三层如实：查询层有出口近邻但不承载封账判据、对象层与行为/规则层未建且点明缺口在规则层，与参照「出口存在≠规则存在」一致。"},
+  {"id": "nearby_discipline", "score": 5, "reason": "QR-BOHAI-002/QR-BOHAI-004 逐条标「近邻指路，非所问」并附零编造 ID 声明，与参照一致。"}
+ ],
+ "disqualifier_triggered": false}

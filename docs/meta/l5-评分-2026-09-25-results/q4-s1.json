@@ -1,0 +1,21 @@
+{
+  "question_id": "Q4",
+  "dimensions": [
+    {
+      "id": "out_of_surface_reason",
+      "score": 5,
+      "reason": "拒答结论先行（检索面检查不通过，不返回任何页面/按钮细节），SCR-前缀→MU camp=build-contract 阵营归属与检索面=camp=business-core 定义与参照答案逐点等价，且补充域内无元素实例佐证无越界。"
+    },
+    {
+      "id": "routing_clarity",
+      "score": 5,
+      "reason": "建造链路与提案流程分道清楚，BH-BOHAI-RecordDailyOutput/QR-BOHAI-001 等价概念均注明「业务面近邻指路/非所问、不是该页面的映射关系」，与参照「非映射关系」口径一致。"
+    },
+    {
+      "id": "no_speculation",
+      "score": 5,
+      "reason": "仅复述锚定 ID 本身并说明阵营归属与拒答理由，对页面内容零臆测零映射暗示，明确「映射本身属面外模型，不代答」，与参照一致。"
+    }
+  ],
+  "disqualifier_triggered": false
+}

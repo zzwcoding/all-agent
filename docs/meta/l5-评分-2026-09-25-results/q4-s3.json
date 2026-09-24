@@ -1,0 +1,7 @@
+{"question_id": "Q4",
+ "dimensions": [
+  {"id": "out_of_surface_reason", "score": 5, "reason": "结论先行拒答不返回页面/按钮细节，SCR-→MU camp=build-contract 阵营归属说清且检索面=camp=business-core 定义到位，与参照答案逐点等价。"},
+  {"id": "routing_clarity", "score": 5, "reason": "建造链路与提案流程分道清楚，且对 BH-BOHAI-RecordDailyOutput/QR-BOHAI-001 等价概念明确注明「不是该页面的映射关系、映射属面外模型不代答」。"},
+  {"id": "no_speculation", "score": 5, "reason": "对 SCR-BOHAI-01 仅复述锚定 ID 本身并说明拒答理由，对页面内容零臆测、零映射暗示，与参照「映射本身属面外模型，不代答」一致。"}
+ ],
+ "disqualifier_triggered": false}

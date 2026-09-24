@@ -1,0 +1,21 @@
+{
+  "question_id": "Q9",
+  "dimensions": [
+    {
+      "id": "candidate_coverage",
+      "score": 5,
+      "reason": "五候选分组呈现齐备——计量字段（AGG-BOHAI-002 的 waterCut）/化验字段（AGG-BOHAI-006 的 waterCutLab）/指标链（RULE-BOHAI-010→BH-BOHAI-QueryBlockWaterCut→QR-BOHAI-004），「两义字段带一条月度区块指标链的多义词」定性与参照答案一致，权威源裁决注记（并存分场景）同步到位，无候选增漏。"
+    },
+    {
+      "id": "anchoring_request",
+      "score": 5,
+      "reason": "「请锚定：你要问的『含水率』是哪一支……补上修饰词」明确请提问者补修饰词，并给出两义不可互换的实质理由（并存分场景下日度与月度各归其源），且点明 RULE-BOHAI-002「检出偏差不是口径仲裁」，与参照一致。"
+    },
+    {
+      "id": "no_overreach",
+      "score": 3,
+      "reason": "无越权——口径归属仅引用仓内已裁注记（并存分场景）而不自行表态，但全文缺「裁决权在 Owner——本服务只列证据与承载，不表态」的边界声明，边界表述缺失。"
+    }
+  ],
+  "disqualifier_triggered": false
+}

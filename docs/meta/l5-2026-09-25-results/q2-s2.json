@@ -1,0 +1,21 @@
+{
+  "question_id": "Q2",
+  "dimensions": [
+    {
+      "id": "anchor_discipline",
+      "score": 1,
+      "reason": "虽点明显式锚定直达，但名下行为集与参照错位：漏报参照名下的 BH-BOHAI-UpdateWellStatus，又把 5 条经子对象挂靠行为计入名下共 7 条，属锚 1 的「行为集合与参照错位（漏报/增报）」。"
+    },
+    {
+      "id": "boundary_distinction",
+      "score": 1,
+      "reason": "把参照答案明示「非本对象名下，单列防误答」的 BH-BOHAI-RecordDailyOutput 连同其他子对象挂靠行为一并计入「名下行为共 7 条」，未按参照单列关联说明并交代间接触达路径边界，命中锚 1「把关联行为混入名下行为集」。"
+    },
+    {
+      "id": "organization",
+      "score": 5,
+      "reason": "结论先行（名下行为共 7 条及机判复现命令）+ 逐行为条目带类型与挂靠链 + 「本回答引用的元素 ID」清单收尾，与参照同构。"
+    }
+  ],
+  "disqualifier_triggered": true
+}

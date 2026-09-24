@@ -1,0 +1,7 @@
+{"question_id": "Q1",
+ "dimensions": [
+  {"id": "semantic_fidelity", "score": 2, "reason": "载体 AGG-BOHAI-002 与查询出口 QR-BOHAI-001 命中参照，但承载字段（参照为 dailyOutput/outputVolume，答为 oilOutput/liquidOutput）与校验规则（参照 RULE-BOHAI-001 非负 ≥0 双层登记整段缺失）两处核心口径失准且装配链大幅增项，超出锚 3「一处表述失准」而未达全偏的锚 1；失准根源是候按现行 bohai 全域作答而参照锚定票 04 最小域（要素在现行本体可查证，非凭空编造）。"},
+  {"id": "caliber_quality", "score": 3, "reason": "口径表述自洽且禁用词处置正确（GLS-BOHAI-001 明示废弃不作可用口径），但未按参照交代 dailyOutput 的 dictionaryRef→DICT-BOHAI-01 字典下钻链，参照核心的 RULE-BOHAI-001 非负校验口径未覆盖——非「把禁用口径说成可用」级错误，也未达可直接作范例档。"},
+  {"id": "organization", "score": 5, "reason": "结论先行（四件套装配作答）+ 分节闭包装配展开 + 「本回答引用的元素 ID」清单收尾，与参照答案同构。"}
+ ],
+ "disqualifier_triggered": false}

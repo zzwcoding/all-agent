@@ -1,0 +1,6 @@
+{"question_id": "Q1",
+ "dimensions": [
+   {"id": "semantic_fidelity", "score": 2, "reason": "载体 AGG-BOHAI-002 与查询出口 QR-BOHAI-001 命中参照，但口径四件套中承载字段（oilOutput/liquidOutput 而非 dailyOutput）与校验规则集（RULE-BOHAI-003/004/027/030 而非 RULE-BOHAI-001 非负校验）与参照答案要点错位，且未含井属性 dailyOutput 落点。"},
+   {"id": "caliber_quality", "score": 3, "reason": "口径表述规矩、禁用词（老完成率）处置正确且双口径边界交代清楚，但核心校验口径与参照不一致且未交代 dailyOutput 非负校验与字典下钻链，未达范例级。"},
+   {"id": "organization", "score": 5, "reason": "结论先行+四件套闭包装配展开+「本回答引用的元素 ID」清单收尾，与参照答案结构同构。"}],
+ "disqualifier_triggered": false}

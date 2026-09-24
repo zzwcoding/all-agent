@@ -1,0 +1,21 @@
+{
+  "question_id": "Q1",
+  "dimensions": [
+    {
+      "id": "semantic_fidelity",
+      "score": 2,
+      "reason": "四件套框架仅命中 AGG-BOHAI-002 与 QR-BOHAI-001 两件，参照口径核心的 dailyOutput 属性与 RULE-BOHAI-001 非负校验完全缺席、规则面整体替换为 RULE-BOHAI-003/004/027/030，装配链失准超出锚 3 的「一处」但主题未偏仍答日产量口径。"
+    },
+    {
+      "id": "caliber_quality",
+      "score": 3,
+      "reason": "口径表述精确、禁用词 GLS-BOHAI-001 处置正确且双口径边界清晰无口径级错误，但未交代参照所含的 dictionaryRef→DICT-BOHAI-01 下钻链，且引用参照面外的 PROP-BOHAI-007/020 裁决性表述无法对锚核实。"
+    },
+    {
+      "id": "organization",
+      "score": 5,
+      "reason": "结论先行点明多义与四件套框架，四件套闭包装配逐段展开并附闭包轨迹，以「本回答引用的元素 ID」清单收尾，与参照答案完全同构。"
+    }
+  ],
+  "disqualifier_triggered": false
+}
