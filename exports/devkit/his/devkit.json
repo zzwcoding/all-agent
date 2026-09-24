@@ -1,0 +1,1563 @@
+{
+  "status": "待Owner人审（生成物禁手改，可再生；审记旁档exports/reviews/，review_gate.py-verify判失效）",
+  "domain": {
+    "name": "his",
+    "label": "HIS 医院数据报表域",
+    "profile": "v9-full",
+    "sourcePath": "ontology/his"
+  },
+  "declaredModels": [
+    {
+      "model": "M1",
+      "file": "m1-object-model.yaml",
+      "modelType": "OBJECT",
+      "name": "对象模型",
+      "version": "1.0.0"
+    },
+    {
+      "model": "M2",
+      "file": "m2-behavior-model.yaml",
+      "modelType": "BEHAVIOR",
+      "name": "行为模型",
+      "version": "1.0.0"
+    },
+    {
+      "model": "M3",
+      "file": "m3-rule-model.yaml",
+      "modelType": "RULE",
+      "name": "规则模型",
+      "version": "1.0.0"
+    },
+    {
+      "model": "M7",
+      "file": "m7-report-model.yaml",
+      "modelType": "REPORT",
+      "name": "查询统计与报表模型",
+      "version": "1.0.0"
+    }
+  ],
+  "fixedInputs": {
+    "techConstraints": {
+      "file": "tech-constraints.md",
+      "name": "技术架构约束",
+      "path": "fixtures/app-pack-gen/inputs/tech-constraints.md",
+      "text": "出厂集固定输入（合成）——中性示例文本，非任何真实项目规约；生成器按原样装配进开发包头部约束节，文件内容不参与判定。\n\n## 技术架构约束\n\n- 服务端形态：Python 服务端 + 关系库，三层架构（接入 / 领域 / 数据）。\n- 数据访问：一切业务数据经语义层数据字典取数，禁直连物理表名。\n- 集成边界：对外只暴露查询出口与行为接口，不出裸表。\n\n（以上为合成中性约束，仅作开发包装配通路的固定输入。）\n"
+    },
+    "devGuide": {
+      "file": "dev-guide.md",
+      "name": "开发指导书",
+      "path": "fixtures/app-pack-gen/inputs/dev-guide.md",
+      "text": "出厂集固定输入（合成）——中性示例文本，非任何真实项目规约；生成器按原样装配进开发包头部约束节，文件内容不参与判定。\n\n## 开发指导书\n\n- 装配顺序：先数据字典后接口——数据字典是接口签名的唯一依据。\n- 口径实现：统计口径以规则清单（M3）的 expression/narrative 为准，查询出口（M7）只是实现形态，两处不一致时以规则为准并回提案流程。\n- 疑点处置：开发包第④节开放疑点逐条过目，命中疑点的实现先挂起待 Owner 裁决，不自行拍板。\n\n（以上为合成中性指导，仅作开发包装配通路的固定输入。）\n"
+    }
+  },
+  "dataDictionary": {
+    "aggregates": [
+      {
+        "id": "AGG-HIS-001",
+        "name": "挂号记录",
+        "alias": "RegisterRecord",
+        "aggregateType": "AGGREGATE_ROOT",
+        "description": "患者就诊的登记枢纽行（R13·详细设计 §5.3 register：关联患者/科室/医生， 用于就诊状态流/年龄金字塔/地域分布/复诊率）。行粒度=一次挂号（case_number 就诊号唯一，PRD §1.3）。visitStatus 状态集按 §1.3 流程图推定（Q2 待 Owner 确认）；支付方式五值取自 §5.2.4 regist_method 字段示例。",
+        "sourceNote": "",
+        "attributes": [
+          {
+            "name": "caseNumber",
+            "label": "就诊号",
+            "type": "String",
+            "constraints": {
+              "unique": true
+            }
+          },
+          {
+            "name": "patientName",
+            "label": "患者姓名",
+            "type": "String"
+          },
+          {
+            "name": "patientAge",
+            "label": "患者年龄",
+            "type": "Integer"
+          },
+          {
+            "name": "patientGender",
+            "label": "患者性别",
+            "type": "Enum",
+            "constraints": {
+              "enumValues": [
+                "男",
+                "女"
+              ]
+            }
+          },
+          {
+            "name": "deptName",
+            "label": "就诊科室",
+            "type": "String"
+          },
+          {
+            "name": "doctorName",
+            "label": "接诊医生",
+            "type": "String"
+          },
+          {
+            "name": "visitStatus",
+            "label": "就诊状态",
+            "type": "Enum",
+            "constraints": {
+              "enumValues": [
+                "挂号",
+                "候诊",
+                "接诊中",
+                "已诊断",
+                "已开方",
+                "已收费",
+                "已完成",
+                "已退号"
+              ],
+              "refRules": []
+            }
+          },
+          {
+            "name": "registMethod",
+            "label": "支付方式",
+            "type": "Enum",
+            "constraints": {
+              "enumValues": [
+                "现金",
+                "银行卡",
+                "微信",
+                "支付宝",
+                "医保卡"
+              ]
+            }
+          },
+          {
+            "name": "registerFee",
+            "label": "挂号费",
+            "type": "Decimal"
+          },
+          {
+            "name": "visitDay",
+            "label": "就诊日期",
+            "type": "Date"
+          }
+        ],
+        "lifecycle": [
+          "挂号",
+          "候诊",
+          "接诊中",
+          "已诊断",
+          "已开方",
+          "已收费",
+          "已完成",
+          "已退号"
+        ]
+      },
+      {
+        "id": "AGG-HIS-002",
+        "name": "门诊病历",
+        "alias": "OutpatientMedicalRecord",
+        "aggregateType": "AGGREGATE_ROOT",
+        "description": "医生接诊书写的门诊病历（R13·§5.3 medical_record：主诉/现病史/既往史/ 过敏史/体格检查）。5 维度完整率雷达图（PRD §6.1 模块五）的判定载体—— 每维度非空即完整（RULE-HIS-006 口径）。",
+        "sourceNote": "",
+        "attributes": [
+          {
+            "name": "caseRef",
+            "label": "所属就诊",
+            "type": "AggregateRootRef",
+            "constraints": {
+              "targetAggregate": "AGG-HIS-001"
+            }
+          },
+          {
+            "name": "chiefComplaint",
+            "label": "主诉",
+            "type": "String",
+            "constraints": {
+              "refRules": []
+            }
+          },
+          {
+            "name": "presentHistory",
+            "label": "现病史",
+            "type": "String",
+            "constraints": {
+              "refRules": []
+            }
+          },
+          {
+            "name": "pastHistory",
+            "label": "既往史",
+            "type": "String",
+            "constraints": {
+              "refRules": []
+            }
+          },
+          {
+            "name": "allergyHistory",
+            "label": "过敏史",
+            "type": "String",
+            "constraints": {
+              "refRules": []
+            }
+          },
+          {
+            "name": "physicalExam",
+            "label": "体格检查",
+            "type": "String",
+            "constraints": {
+              "refRules": []
+            }
+          }
+        ]
+      },
+      {
+        "id": "AGG-HIS-003",
+        "name": "诊断记录",
+        "alias": "DiagnosisRecord",
+        "aggregateType": "AGGREGATE_ROOT",
+        "description": "医生对一次就诊给出的诊断（R13·§5.3 medical_record_disease：病历-疾病 关联表，关联 disease 表取 ICD-10 中文病名）。行粒度=一次就诊×一个诊断。",
+        "sourceNote": "",
+        "attributes": [
+          {
+            "name": "caseRef",
+            "label": "所属就诊",
+            "type": "AggregateRootRef",
+            "constraints": {
+              "targetAggregate": "AGG-HIS-001"
+            }
+          },
+          {
+            "name": "diseaseCode",
+            "label": "疾病编码",
+            "type": "String"
+          },
+          {
+            "name": "diseaseName",
+            "label": "疾病名称",
+            "type": "String"
+          },
+          {
+            "name": "diagnosisDay",
+            "label": "诊断日期",
+            "type": "Date"
+          }
+        ]
+      },
+      {
+        "id": "AGG-HIS-004",
+        "name": "处方",
+        "alias": "Prescription",
+        "aggregateType": "AGGREGATE_ROOT",
+        "description": "医生开具的药品处方（R13·§5.3 prescription：关联 drug_info）。行粒度= 一张处方；退药退费以 refundFlag 承载（§5.2.7 refund_presc 的判定字段， 退费冲减规则 Q4 待 Owner）。",
+        "sourceNote": "",
+        "attributes": [
+          {
+            "name": "caseRef",
+            "label": "所属就诊",
+            "type": "AggregateRootRef",
+            "constraints": {
+              "targetAggregate": "AGG-HIS-001"
+            }
+          },
+          {
+            "name": "drugId",
+            "label": "药品 ID",
+            "type": "Integer"
+          },
+          {
+            "name": "drugName",
+            "label": "药品名称",
+            "type": "String"
+          },
+          {
+            "name": "quantity",
+            "label": "数量",
+            "type": "Integer"
+          },
+          {
+            "name": "usage",
+            "label": "用法",
+            "type": "String"
+          },
+          {
+            "name": "prescribeDay",
+            "label": "开立日期",
+            "type": "Date"
+          },
+          {
+            "name": "refundFlag",
+            "label": "退药退费标记",
+            "type": "Boolean",
+            "constraints": {
+              "refRules": []
+            }
+          }
+        ]
+      },
+      {
+        "id": "AGG-HIS-005",
+        "name": "检验申请",
+        "alias": "InspectionRequest",
+        "aggregateType": "AGGREGATE_ROOT",
+        "description": "医生开具的检验/检查申请单（R13·§5.3 inspection_request：关联 medical_technology 项目字典）。完成率及平均耗时的载体（PRD §4.3 指标 6）。",
+        "sourceNote": "",
+        "attributes": [
+          {
+            "name": "caseRef",
+            "label": "所属就诊",
+            "type": "AggregateRootRef",
+            "constraints": {
+              "targetAggregate": "AGG-HIS-001"
+            }
+          },
+          {
+            "name": "itemName",
+            "label": "医技项目",
+            "type": "String"
+          },
+          {
+            "name": "requestStatus",
+            "label": "申请状态",
+            "type": "Enum",
+            "constraints": {
+              "enumValues": [
+                "已申请",
+                "已完成"
+              ]
+            }
+          },
+          {
+            "name": "fee",
+            "label": "费用",
+            "type": "Decimal"
+          },
+          {
+            "name": "requestDay",
+            "label": "申请日期",
+            "type": "Date"
+          }
+        ]
+      }
+    ],
+    "associations": [
+      {
+        "id": "ASSOC-HIS-001",
+        "sourceAggregate": "AGG-HIS-001",
+        "targetAggregate": "AGG-HIS-004",
+        "associationType": "REFERENCE",
+        "sourceRole": "就诊",
+        "targetRole": "处方",
+        "cardinality": "ONE_TO_MANY",
+        "referenceField": "caseRef"
+      },
+      {
+        "id": "ASSOC-HIS-002",
+        "sourceAggregate": "AGG-HIS-001",
+        "targetAggregate": "AGG-HIS-003",
+        "associationType": "REFERENCE",
+        "sourceRole": "就诊",
+        "targetRole": "诊断记录",
+        "cardinality": "ONE_TO_MANY",
+        "referenceField": "caseRef"
+      }
+    ]
+  },
+  "calibers": [
+    {
+      "id": "QR-HIS-001",
+      "name": "院长驾驶舱 KPI 查询",
+      "alias": "dashboardKpiQuery",
+      "objectType": "STATISTICAL_QUERY",
+      "questionSample": "院长驾驶舱 KPI 查询",
+      "sourceNote": "",
+      "description": "日粒度院长驾驶舱出口（R13·§5.2.1 七字段对应五 KPI 卡）；异常预警面=退号率 RULE-HIS-001 阈值。ADS 实现=ads_dashboard_kpi。",
+      "behavior": {
+        "id": "BH-HIS-QueryDashboard",
+        "name": "查询院长驾驶舱",
+        "type": "QUERY",
+        "triggerType": "",
+        "ownerEntity": "AGG-HIS-001",
+        "sourceNote": ""
+      },
+      "sourceObjects": [
+        {
+          "objectRef": "AGG-HIS-001",
+          "alias": "r",
+          "primary": true,
+          "name": "挂号记录"
+        },
+        {
+          "objectRef": "AGG-HIS-004",
+          "alias": "p",
+          "primary": false,
+          "name": "处方"
+        },
+        {
+          "objectRef": "AGG-HIS-003",
+          "alias": "d",
+          "primary": false,
+          "name": "诊断记录"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "startDay",
+          "label": "开始日期",
+          "dataType": "Date",
+          "required": true,
+          "allowedOperators": []
+        },
+        {
+          "name": "endDay",
+          "label": "结束日期",
+          "dataType": "Date",
+          "required": true,
+          "allowedOperators": []
+        }
+      ],
+      "conditions": [
+        {
+          "conditionId": "COND-HIS-001",
+          "leftExpression": "r.visitDay",
+          "operator": "BETWEEN",
+          "parameterRef": "startDay"
+        }
+      ],
+      "resultColumns": [
+        {
+          "name": "visitDay",
+          "label": "统计日期",
+          "dataType": "Date",
+          "sourceExpression": "r.visitDay"
+        },
+        {
+          "name": "registerCnt",
+          "label": "挂号人次",
+          "dataType": "Integer",
+          "sourceExpression": "COUNT(r.caseNumber)"
+        },
+        {
+          "name": "registerRevenue",
+          "label": "挂号收入（元）",
+          "dataType": "Decimal",
+          "sourceExpression": "SUM(r.registerFee)"
+        },
+        {
+          "name": "refundCnt",
+          "label": "退号数",
+          "dataType": "Integer",
+          "sourceExpression": "COUNT(CASE WHEN r.visitStatus = '已退号' THEN 1 END)"
+        },
+        {
+          "name": "prescriptionCnt",
+          "label": "处方数",
+          "dataType": "Integer",
+          "sourceExpression": "COUNT(p.prescribeDay)"
+        },
+        {
+          "name": "diseaseTypes",
+          "label": "疾病种数",
+          "dataType": "Integer",
+          "sourceExpression": "COUNT(DISTINCT d.diseaseCode)"
+        },
+        {
+          "name": "refundRate",
+          "label": "退号率（%）",
+          "dataType": "Decimal",
+          "sourceExpression": "refundCnt / registerCnt * 100"
+        }
+      ],
+      "rules": [
+        {
+          "id": "RULE-HIS-001",
+          "name": "退号率告警阈值",
+          "type": "VALIDATION",
+          "point": {
+            "expression": "refundRate <= 10"
+          },
+          "via": "behavior.appliedRules(BH-HIS-QueryDashboard)"
+        },
+        {
+          "id": "RULE-HIS-003",
+          "name": "退号率口径",
+          "type": "CALCULATION",
+          "point": {
+            "expression": "refundCount / registerCount * 100"
+          },
+          "via": "behavior.appliedRules(BH-HIS-QueryDashboard)"
+        },
+        {
+          "id": "RULE-HIS-005",
+          "name": "处方退费率口径",
+          "type": "CALCULATION",
+          "point": {
+            "expression": "refundPresc / totalPresc * 100"
+          },
+          "via": "behavior.appliedRules(BH-HIS-QueryDashboard)"
+        },
+        {
+          "id": "RULE-HIS-002",
+          "name": "支付方式收入占比合计校验",
+          "type": "VALIDATION",
+          "point": {
+            "expression": "pctSum == 100"
+          },
+          "via": "ownerObjectBehaviors(AGG-HIS-001)"
+        },
+        {
+          "id": "RULE-HIS-004",
+          "name": "均次费用口径",
+          "type": "CALCULATION",
+          "point": {
+            "expression": "totalRevenue / totalVisits"
+          },
+          "via": "ownerObjectBehaviors(AGG-HIS-001)"
+        },
+        {
+          "id": "RULE-HIS-007",
+          "name": "复诊率口径",
+          "type": "CALCULATION",
+          "point": {
+            "expression": "revisitPatients / totalPatients * 100"
+          },
+          "via": "ownerObjectBehaviors(AGG-HIS-001)"
+        },
+        {
+          "id": "RULE-HIS-006",
+          "name": "病历完整率口径",
+          "type": "CALCULATION",
+          "point": {
+            "expression": "filledDims / 5 * 100"
+          },
+          "via": "ownerObjectBehaviors(AGG-HIS-003)"
+        }
+      ],
+      "hitIds": [
+        "QR-HIS-001",
+        "BH-HIS-QueryDashboard",
+        "AGG-HIS-001",
+        "AGG-HIS-004",
+        "AGG-HIS-003",
+        "RULE-HIS-001",
+        "RULE-HIS-003",
+        "RULE-HIS-005",
+        "RULE-HIS-002",
+        "RULE-HIS-004",
+        "RULE-HIS-007",
+        "RULE-HIS-006"
+      ]
+    },
+    {
+      "id": "QR-HIS-002",
+      "name": "科室接诊排行查询",
+      "alias": "deptVisitRankQuery",
+      "objectType": "STATISTICAL_QUERY",
+      "questionSample": "科室接诊排行查询",
+      "sourceNote": "",
+      "description": "天+科室粒度接诊排行（R13·§5.2.2 八字段全对应）：接诊量/退号量/退号率/总收入/均次费用，退号率>10% 红色标注（RULE-HIS-001）。ADS 实现=ads_dept_visit_rank。",
+      "behavior": {
+        "id": "BH-HIS-QueryOutpatient",
+        "name": "查询门诊运营",
+        "type": "QUERY",
+        "triggerType": "",
+        "ownerEntity": "AGG-HIS-001",
+        "sourceNote": ""
+      },
+      "sourceObjects": [
+        {
+          "objectRef": "AGG-HIS-001",
+          "alias": "r",
+          "primary": true,
+          "name": "挂号记录"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "startDay",
+          "label": "开始日期",
+          "dataType": "Date",
+          "required": true,
+          "allowedOperators": []
+        },
+        {
+          "name": "endDay",
+          "label": "结束日期",
+          "dataType": "Date",
+          "required": true,
+          "allowedOperators": []
+        }
+      ],
+      "conditions": [
+        {
+          "conditionId": "COND-HIS-002",
+          "leftExpression": "r.visitDay",
+          "operator": "BETWEEN",
+          "parameterRef": "startDay"
+        }
+      ],
+      "resultColumns": [
+        {
+          "name": "deptName",
+          "label": "科室名称",
+          "dataType": "String",
+          "sourceExpression": "r.deptName"
+        },
+        {
+          "name": "totalVisits",
+          "label": "接诊量",
+          "dataType": "Integer",
+          "sourceExpression": "COUNT(r.caseNumber)"
+        },
+        {
+          "name": "refundCount",
+          "label": "退号量",
+          "dataType": "Integer",
+          "sourceExpression": "COUNT(CASE WHEN r.visitStatus = '已退号' THEN 1 END)"
+        },
+        {
+          "name": "refundRate",
+          "label": "退号率（%）",
+          "dataType": "Decimal",
+          "sourceExpression": "refundCount / totalVisits * 100"
+        },
+        {
+          "name": "totalRevenue",
+          "label": "总收入（元）",
+          "dataType": "Decimal",
+          "sourceExpression": "SUM(r.registerFee)"
+        },
+        {
+          "name": "avgFee",
+          "label": "均次费用（元）",
+          "dataType": "Decimal",
+          "sourceExpression": "totalRevenue / totalVisits"
+        }
+      ],
+      "rules": [
+        {
+          "id": "RULE-HIS-001",
+          "name": "退号率告警阈值",
+          "type": "VALIDATION",
+          "point": {
+            "expression": "refundRate <= 10"
+          },
+          "via": "behavior.appliedRules(BH-HIS-QueryOutpatient)"
+        },
+        {
+          "id": "RULE-HIS-003",
+          "name": "退号率口径",
+          "type": "CALCULATION",
+          "point": {
+            "expression": "refundCount / registerCount * 100"
+          },
+          "via": "behavior.appliedRules(BH-HIS-QueryOutpatient)"
+        },
+        {
+          "id": "RULE-HIS-004",
+          "name": "均次费用口径",
+          "type": "CALCULATION",
+          "point": {
+            "expression": "totalRevenue / totalVisits"
+          },
+          "via": "behavior.appliedRules(BH-HIS-QueryOutpatient)"
+        },
+        {
+          "id": "RULE-HIS-002",
+          "name": "支付方式收入占比合计校验",
+          "type": "VALIDATION",
+          "point": {
+            "expression": "pctSum == 100"
+          },
+          "via": "ownerObjectBehaviors(AGG-HIS-001)"
+        },
+        {
+          "id": "RULE-HIS-005",
+          "name": "处方退费率口径",
+          "type": "CALCULATION",
+          "point": {
+            "expression": "refundPresc / totalPresc * 100"
+          },
+          "via": "ownerObjectBehaviors(AGG-HIS-001)"
+        },
+        {
+          "id": "RULE-HIS-007",
+          "name": "复诊率口径",
+          "type": "CALCULATION",
+          "point": {
+            "expression": "revisitPatients / totalPatients * 100"
+          },
+          "via": "ownerObjectBehaviors(AGG-HIS-001)"
+        }
+      ],
+      "hitIds": [
+        "QR-HIS-002",
+        "BH-HIS-QueryOutpatient",
+        "AGG-HIS-001",
+        "RULE-HIS-001",
+        "RULE-HIS-003",
+        "RULE-HIS-004",
+        "RULE-HIS-002",
+        "RULE-HIS-005",
+        "RULE-HIS-007"
+      ]
+    },
+    {
+      "id": "QR-HIS-003",
+      "name": "支付方式收入查询",
+      "alias": "revenuePaymentQuery",
+      "objectType": "STATISTICAL_QUERY",
+      "questionSample": "支付方式收入查询",
+      "sourceNote": "",
+      "description": "天+支付方式粒度收入构成（R13·§5.2.4 六字段全对应）：五方式占比合计=100% 校验（RULE-HIS-002）。ADS 实现=ads_revenue_payment。",
+      "behavior": {
+        "id": "BH-HIS-QueryFinance",
+        "name": "查询收费结算",
+        "type": "QUERY",
+        "triggerType": "",
+        "ownerEntity": "AGG-HIS-001",
+        "sourceNote": ""
+      },
+      "sourceObjects": [
+        {
+          "objectRef": "AGG-HIS-001",
+          "alias": "r",
+          "primary": true,
+          "name": "挂号记录"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "startDay",
+          "label": "开始日期",
+          "dataType": "Date",
+          "required": true,
+          "allowedOperators": []
+        },
+        {
+          "name": "endDay",
+          "label": "结束日期",
+          "dataType": "Date",
+          "required": true,
+          "allowedOperators": []
+        }
+      ],
+      "conditions": [
+        {
+          "conditionId": "COND-HIS-003",
+          "leftExpression": "r.visitDay",
+          "operator": "BETWEEN",
+          "parameterRef": "startDay"
+        }
+      ],
+      "resultColumns": [
+        {
+          "name": "visitDay",
+          "label": "就诊日期",
+          "dataType": "Date",
+          "sourceExpression": "r.visitDay"
+        },
+        {
+          "name": "registMethod",
+          "label": "支付方式",
+          "dataType": "String",
+          "sourceExpression": "r.registMethod"
+        },
+        {
+          "name": "visitCount",
+          "label": "挂号笔数",
+          "dataType": "Integer",
+          "sourceExpression": "COUNT(r.caseNumber)"
+        },
+        {
+          "name": "revenue",
+          "label": "该方式收入（元）",
+          "dataType": "Decimal",
+          "sourceExpression": "SUM(r.registerFee)"
+        },
+        {
+          "name": "revenuePct",
+          "label": "收入占比（%）",
+          "dataType": "Decimal",
+          "sourceExpression": "revenue / SUM(revenue) OVER (visitDay) * 100"
+        }
+      ],
+      "rules": [
+        {
+          "id": "RULE-HIS-002",
+          "name": "支付方式收入占比合计校验",
+          "type": "VALIDATION",
+          "point": {
+            "expression": "pctSum == 100"
+          },
+          "via": "behavior.appliedRules(BH-HIS-QueryFinance)"
+        },
+        {
+          "id": "RULE-HIS-004",
+          "name": "均次费用口径",
+          "type": "CALCULATION",
+          "point": {
+            "expression": "totalRevenue / totalVisits"
+          },
+          "via": "behavior.appliedRules(BH-HIS-QueryFinance)"
+        },
+        {
+          "id": "RULE-HIS-003",
+          "name": "退号率口径",
+          "type": "CALCULATION",
+          "point": {
+            "expression": "refundCount / registerCount * 100"
+          },
+          "via": "ownerObjectBehaviors(AGG-HIS-001)"
+        },
+        {
+          "id": "RULE-HIS-001",
+          "name": "退号率告警阈值",
+          "type": "VALIDATION",
+          "point": {
+            "expression": "refundRate <= 10"
+          },
+          "via": "ownerObjectBehaviors(AGG-HIS-001)"
+        },
+        {
+          "id": "RULE-HIS-005",
+          "name": "处方退费率口径",
+          "type": "CALCULATION",
+          "point": {
+            "expression": "refundPresc / totalPresc * 100"
+          },
+          "via": "ownerObjectBehaviors(AGG-HIS-001)"
+        },
+        {
+          "id": "RULE-HIS-007",
+          "name": "复诊率口径",
+          "type": "CALCULATION",
+          "point": {
+            "expression": "revisitPatients / totalPatients * 100"
+          },
+          "via": "ownerObjectBehaviors(AGG-HIS-001)"
+        }
+      ],
+      "hitIds": [
+        "QR-HIS-003",
+        "BH-HIS-QueryFinance",
+        "AGG-HIS-001",
+        "RULE-HIS-002",
+        "RULE-HIS-004",
+        "RULE-HIS-003",
+        "RULE-HIS-001",
+        "RULE-HIS-005",
+        "RULE-HIS-007"
+      ]
+    },
+    {
+      "id": "QR-HIS-004",
+      "name": "药品销售排行查询",
+      "alias": "drugSalesQuery",
+      "objectType": "STATISTICAL_QUERY",
+      "questionSample": "药品销售排行查询",
+      "sourceNote": "",
+      "description": "药品粒度销售 TOP20+类型占比+退费率趋势三出口合一（R13·§5.2.5/6/7 字段对应）：总额/总量/排名按总销售额降序。ADS 实现=ads_drug_sales_top20 + ads_drug_type_ratio + ads_presc_refund_rate。",
+      "behavior": {
+        "id": "BH-HIS-QueryDrug",
+        "name": "查询药品处方",
+        "type": "QUERY",
+        "triggerType": "",
+        "ownerEntity": "AGG-HIS-004",
+        "sourceNote": ""
+      },
+      "sourceObjects": [
+        {
+          "objectRef": "AGG-HIS-004",
+          "alias": "p",
+          "primary": true,
+          "name": "处方"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "startDay",
+          "label": "开始日期",
+          "dataType": "Date",
+          "required": true,
+          "allowedOperators": []
+        },
+        {
+          "name": "endDay",
+          "label": "结束日期",
+          "dataType": "Date",
+          "required": true,
+          "allowedOperators": []
+        }
+      ],
+      "conditions": [
+        {
+          "conditionId": "COND-HIS-004",
+          "leftExpression": "p.prescribeDay",
+          "operator": "BETWEEN",
+          "parameterRef": "startDay"
+        }
+      ],
+      "resultColumns": [
+        {
+          "name": "drugName",
+          "label": "药品名称",
+          "dataType": "String",
+          "sourceExpression": "p.drugName"
+        },
+        {
+          "name": "totalQty",
+          "label": "销售总量",
+          "dataType": "Integer",
+          "sourceExpression": "SUM(p.quantity)"
+        },
+        {
+          "name": "totalSales",
+          "label": "销售总额（元）",
+          "dataType": "Decimal",
+          "sourceExpression": "SUM(p.quantity * 药品单价)"
+        },
+        {
+          "name": "overallRank",
+          "label": "总排名",
+          "dataType": "Integer",
+          "sourceExpression": "RANK() OVER (ORDER BY totalSales DESC)"
+        },
+        {
+          "name": "refundRate",
+          "label": "处方退费率（%）",
+          "dataType": "Decimal",
+          "sourceExpression": "COUNT(CASE WHEN p.refundFlag THEN 1 END) / COUNT(p.prescribeDay) * 100"
+        }
+      ],
+      "rules": [
+        {
+          "id": "RULE-HIS-005",
+          "name": "处方退费率口径",
+          "type": "CALCULATION",
+          "point": {
+            "expression": "refundPresc / totalPresc * 100"
+          },
+          "via": "behavior.appliedRules(BH-HIS-QueryDrug)"
+        }
+      ],
+      "hitIds": [
+        "QR-HIS-004",
+        "BH-HIS-QueryDrug",
+        "AGG-HIS-004",
+        "RULE-HIS-005"
+      ]
+    },
+    {
+      "id": "QR-HIS-005",
+      "name": "疾病诊断分布查询",
+      "alias": "diseaseDistQuery",
+      "objectType": "STATISTICAL_QUERY",
+      "questionSample": "疾病诊断分布查询",
+      "sourceNote": "",
+      "description": "诊断粒度 TOP20+ICD-10 章节分布+病历完整率雷达三出口合一（R13·§6.1 模块五 + §5.3 disease/medical_record）：ICD 章节=DICT-HIS-001 编码段首字母映射（推定，待 Owner）。",
+      "behavior": {
+        "id": "BH-HIS-QueryDisease",
+        "name": "查询疾病诊断",
+        "type": "QUERY",
+        "triggerType": "",
+        "ownerEntity": "AGG-HIS-003",
+        "sourceNote": ""
+      },
+      "sourceObjects": [
+        {
+          "objectRef": "AGG-HIS-003",
+          "alias": "d",
+          "primary": true,
+          "name": "诊断记录"
+        },
+        {
+          "objectRef": "AGG-HIS-002",
+          "alias": "m",
+          "primary": false,
+          "name": "门诊病历"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "startDay",
+          "label": "开始日期",
+          "dataType": "Date",
+          "required": true,
+          "allowedOperators": []
+        },
+        {
+          "name": "endDay",
+          "label": "结束日期",
+          "dataType": "Date",
+          "required": true,
+          "allowedOperators": []
+        }
+      ],
+      "conditions": [
+        {
+          "conditionId": "COND-HIS-005",
+          "leftExpression": "d.diagnosisDay",
+          "operator": "BETWEEN",
+          "parameterRef": "startDay"
+        }
+      ],
+      "resultColumns": [
+        {
+          "name": "diseaseCode",
+          "label": "疾病编码",
+          "dataType": "String",
+          "sourceExpression": "d.diseaseCode"
+        },
+        {
+          "name": "diseaseName",
+          "label": "疾病名称",
+          "dataType": "String",
+          "sourceExpression": "d.diseaseName"
+        },
+        {
+          "name": "diagCount",
+          "label": "诊断次数",
+          "dataType": "Integer",
+          "sourceExpression": "COUNT(d.diseaseCode)"
+        },
+        {
+          "name": "icdChapter",
+          "label": "ICD-10 章节",
+          "dataType": "String",
+          "sourceExpression": "SUBSTR(d.diseaseCode, 1, 1)"
+        },
+        {
+          "name": "recordCompleteRate",
+          "label": "病历完整率（%）",
+          "dataType": "Decimal",
+          "sourceExpression": "(非空维度计数) / 5 * 100"
+        }
+      ],
+      "rules": [
+        {
+          "id": "RULE-HIS-006",
+          "name": "病历完整率口径",
+          "type": "CALCULATION",
+          "point": {
+            "expression": "filledDims / 5 * 100"
+          },
+          "via": "behavior.appliedRules(BH-HIS-QueryDisease)"
+        }
+      ],
+      "hitIds": [
+        "QR-HIS-005",
+        "BH-HIS-QueryDisease",
+        "AGG-HIS-003",
+        "AGG-HIS-002",
+        "RULE-HIS-006"
+      ]
+    },
+    {
+      "id": "QR-HIS-006",
+      "name": "患者画像查询",
+      "alias": "patientProfileQuery",
+      "objectType": "STATISTICAL_QUERY",
+      "questionSample": "患者画像查询",
+      "sourceNote": "",
+      "description": "就诊粒度患者画像（R13·§6.1 模块六）：年龄-性别金字塔+复诊率详情卡。地域分布 TOP10 素材无源字段（§5.3 register 无地域列）——缺口如实记，不建列；患者主数据未建，同一人判定按 patientName 推定（RULE-HIS-007 注记）。",
+      "behavior": {
+        "id": "BH-HIS-QueryPatient",
+        "name": "查询患者画像",
+        "type": "QUERY",
+        "triggerType": "",
+        "ownerEntity": "AGG-HIS-001",
+        "sourceNote": ""
+      },
+      "sourceObjects": [
+        {
+          "objectRef": "AGG-HIS-001",
+          "alias": "r",
+          "primary": true,
+          "name": "挂号记录"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "startDay",
+          "label": "开始日期",
+          "dataType": "Date",
+          "required": true,
+          "allowedOperators": []
+        },
+        {
+          "name": "endDay",
+          "label": "结束日期",
+          "dataType": "Date",
+          "required": true,
+          "allowedOperators": []
+        }
+      ],
+      "conditions": [
+        {
+          "conditionId": "COND-HIS-006",
+          "leftExpression": "r.visitDay",
+          "operator": "BETWEEN",
+          "parameterRef": "startDay"
+        }
+      ],
+      "resultColumns": [
+        {
+          "name": "ageGroup",
+          "label": "年龄段",
+          "dataType": "String",
+          "sourceExpression": "CASE 分组(r.patientAge)"
+        },
+        {
+          "name": "patientGender",
+          "label": "性别",
+          "dataType": "String",
+          "sourceExpression": "r.patientGender"
+        },
+        {
+          "name": "patientCnt",
+          "label": "患者数",
+          "dataType": "Integer",
+          "sourceExpression": "COUNT(DISTINCT r.patientName)"
+        },
+        {
+          "name": "revisitRate",
+          "label": "复诊率（%）",
+          "dataType": "Decimal",
+          "sourceExpression": "窗口期内≥2 次挂号患者数 / 总患者数 * 100"
+        }
+      ],
+      "rules": [
+        {
+          "id": "RULE-HIS-007",
+          "name": "复诊率口径",
+          "type": "CALCULATION",
+          "point": {
+            "expression": "revisitPatients / totalPatients * 100"
+          },
+          "via": "behavior.appliedRules(BH-HIS-QueryPatient)"
+        },
+        {
+          "id": "RULE-HIS-002",
+          "name": "支付方式收入占比合计校验",
+          "type": "VALIDATION",
+          "point": {
+            "expression": "pctSum == 100"
+          },
+          "via": "ownerObjectBehaviors(AGG-HIS-001)"
+        },
+        {
+          "id": "RULE-HIS-003",
+          "name": "退号率口径",
+          "type": "CALCULATION",
+          "point": {
+            "expression": "refundCount / registerCount * 100"
+          },
+          "via": "ownerObjectBehaviors(AGG-HIS-001)"
+        },
+        {
+          "id": "RULE-HIS-001",
+          "name": "退号率告警阈值",
+          "type": "VALIDATION",
+          "point": {
+            "expression": "refundRate <= 10"
+          },
+          "via": "ownerObjectBehaviors(AGG-HIS-001)"
+        },
+        {
+          "id": "RULE-HIS-005",
+          "name": "处方退费率口径",
+          "type": "CALCULATION",
+          "point": {
+            "expression": "refundPresc / totalPresc * 100"
+          },
+          "via": "ownerObjectBehaviors(AGG-HIS-001)"
+        },
+        {
+          "id": "RULE-HIS-004",
+          "name": "均次费用口径",
+          "type": "CALCULATION",
+          "point": {
+            "expression": "totalRevenue / totalVisits"
+          },
+          "via": "ownerObjectBehaviors(AGG-HIS-001)"
+        }
+      ],
+      "hitIds": [
+        "QR-HIS-006",
+        "BH-HIS-QueryPatient",
+        "AGG-HIS-001",
+        "RULE-HIS-007",
+        "RULE-HIS-002",
+        "RULE-HIS-003",
+        "RULE-HIS-001",
+        "RULE-HIS-005",
+        "RULE-HIS-004"
+      ]
+    }
+  ],
+  "behaviorRuleInventory": {
+    "behaviors": [
+      {
+        "id": "BH-HIS-Register",
+        "name": "挂号登记",
+        "behaviorType": "COMMAND",
+        "triggerType": "USER_ACTION",
+        "ownerEntity": "AGG-HIS-001",
+        "preconditions": [],
+        "postconditions": [
+          {
+            "field": "visitStatus",
+            "setValue": "挂号"
+          }
+        ],
+        "appliedRules": [],
+        "requiredPermissions": [
+          "PERM-HIS-Register"
+        ],
+        "sourceNote": ""
+      },
+      {
+        "id": "BH-HIS-WriteMedicalRecord",
+        "name": "书写病历",
+        "behaviorType": "COMMAND",
+        "triggerType": "USER_ACTION",
+        "ownerEntity": "AGG-HIS-002",
+        "preconditions": [
+          "visitStatus=接诊中（Q2 状态集推定，待 Owner）"
+        ],
+        "postconditions": [],
+        "appliedRules": [
+          "RULE-HIS-006"
+        ],
+        "requiredPermissions": [
+          "PERM-HIS-WriteMedicalRecord"
+        ],
+        "sourceNote": ""
+      },
+      {
+        "id": "BH-HIS-Diagnose",
+        "name": "开具诊断",
+        "behaviorType": "COMMAND",
+        "triggerType": "USER_ACTION",
+        "ownerEntity": "AGG-HIS-003",
+        "preconditions": [
+          "caseRef 存在病历（§1.3 先问诊后诊断）"
+        ],
+        "postconditions": [],
+        "appliedRules": [],
+        "requiredPermissions": [
+          "PERM-HIS-Diagnose"
+        ],
+        "sourceNote": ""
+      },
+      {
+        "id": "BH-HIS-Prescribe",
+        "name": "开具处方",
+        "behaviorType": "COMMAND",
+        "triggerType": "USER_ACTION",
+        "ownerEntity": "AGG-HIS-004",
+        "preconditions": [
+          "caseRef 就诊状态=已诊断（Q2 推定）"
+        ],
+        "postconditions": [
+          {
+            "field": "refundFlag",
+            "setValue": "false"
+          }
+        ],
+        "appliedRules": [],
+        "requiredPermissions": [
+          "PERM-HIS-Prescribe"
+        ],
+        "sourceNote": ""
+      },
+      {
+        "id": "BH-HIS-RequestInspection",
+        "name": "开具检验申请",
+        "behaviorType": "COMMAND",
+        "triggerType": "USER_ACTION",
+        "ownerEntity": "AGG-HIS-005",
+        "preconditions": [
+          "caseRef 就诊状态=已诊断（Q2 推定）"
+        ],
+        "postconditions": [],
+        "appliedRules": [],
+        "requiredPermissions": [
+          "PERM-HIS-RequestInspection"
+        ],
+        "sourceNote": ""
+      },
+      {
+        "id": "BH-HIS-Settle",
+        "name": "收费结算",
+        "behaviorType": "COMMAND",
+        "triggerType": "USER_ACTION",
+        "ownerEntity": "AGG-HIS-001",
+        "preconditions": [
+          "visitStatus=已开方 或 已诊断（无方直接结算，Q2 推定）"
+        ],
+        "postconditions": [
+          {
+            "field": "visitStatus",
+            "setValue": "已收费"
+          }
+        ],
+        "appliedRules": [
+          "RULE-HIS-002"
+        ],
+        "requiredPermissions": [
+          "PERM-HIS-Settle"
+        ],
+        "sourceNote": ""
+      },
+      {
+        "id": "BH-HIS-CancelRegister",
+        "name": "退号",
+        "behaviorType": "COMMAND",
+        "triggerType": "USER_ACTION",
+        "ownerEntity": "AGG-HIS-001",
+        "preconditions": [
+          "visitStatus≠已完成（退号窗口素材未给，如实挂 Q4）"
+        ],
+        "postconditions": [
+          {
+            "field": "visitStatus",
+            "setValue": "已退号"
+          }
+        ],
+        "appliedRules": [
+          "RULE-HIS-003"
+        ],
+        "requiredPermissions": [
+          "PERM-HIS-CancelRegister"
+        ],
+        "sourceNote": ""
+      },
+      {
+        "id": "BH-HIS-RefundPrescription",
+        "name": "退药退费",
+        "behaviorType": "COMMAND",
+        "triggerType": "USER_ACTION",
+        "ownerEntity": "AGG-HIS-004",
+        "preconditions": [
+          "refundFlag=false（未退过）"
+        ],
+        "postconditions": [
+          {
+            "field": "refundFlag",
+            "setValue": "true"
+          }
+        ],
+        "appliedRules": [
+          "RULE-HIS-005"
+        ],
+        "requiredPermissions": [
+          "PERM-HIS-RefundPrescription"
+        ],
+        "sourceNote": ""
+      },
+      {
+        "id": "BH-HIS-QueryDashboard",
+        "name": "查询院长驾驶舱",
+        "behaviorType": "QUERY",
+        "triggerType": "",
+        "ownerEntity": "AGG-HIS-001",
+        "preconditions": [],
+        "postconditions": [],
+        "appliedRules": [
+          "RULE-HIS-001",
+          "RULE-HIS-003",
+          "RULE-HIS-005"
+        ],
+        "requiredPermissions": [
+          "PERM-HIS-QueryDashboard"
+        ],
+        "sourceNote": ""
+      },
+      {
+        "id": "BH-HIS-QueryOutpatient",
+        "name": "查询门诊运营",
+        "behaviorType": "QUERY",
+        "triggerType": "",
+        "ownerEntity": "AGG-HIS-001",
+        "preconditions": [],
+        "postconditions": [],
+        "appliedRules": [
+          "RULE-HIS-001",
+          "RULE-HIS-003",
+          "RULE-HIS-004"
+        ],
+        "requiredPermissions": [
+          "PERM-HIS-QueryOutpatient"
+        ],
+        "sourceNote": ""
+      },
+      {
+        "id": "BH-HIS-QueryFinance",
+        "name": "查询收费结算",
+        "behaviorType": "QUERY",
+        "triggerType": "",
+        "ownerEntity": "AGG-HIS-001",
+        "preconditions": [],
+        "postconditions": [],
+        "appliedRules": [
+          "RULE-HIS-002",
+          "RULE-HIS-004"
+        ],
+        "requiredPermissions": [
+          "PERM-HIS-QueryFinance"
+        ],
+        "sourceNote": ""
+      },
+      {
+        "id": "BH-HIS-QueryDrug",
+        "name": "查询药品处方",
+        "behaviorType": "QUERY",
+        "triggerType": "",
+        "ownerEntity": "AGG-HIS-004",
+        "preconditions": [],
+        "postconditions": [],
+        "appliedRules": [
+          "RULE-HIS-005"
+        ],
+        "requiredPermissions": [
+          "PERM-HIS-QueryDrug"
+        ],
+        "sourceNote": ""
+      },
+      {
+        "id": "BH-HIS-QueryDisease",
+        "name": "查询疾病诊断",
+        "behaviorType": "QUERY",
+        "triggerType": "",
+        "ownerEntity": "AGG-HIS-003",
+        "preconditions": [],
+        "postconditions": [],
+        "appliedRules": [
+          "RULE-HIS-006"
+        ],
+        "requiredPermissions": [
+          "PERM-HIS-QueryDisease"
+        ],
+        "sourceNote": ""
+      },
+      {
+        "id": "BH-HIS-QueryPatient",
+        "name": "查询患者画像",
+        "behaviorType": "QUERY",
+        "triggerType": "",
+        "ownerEntity": "AGG-HIS-001",
+        "preconditions": [],
+        "postconditions": [],
+        "appliedRules": [
+          "RULE-HIS-007"
+        ],
+        "requiredPermissions": [
+          "PERM-HIS-QueryPatient"
+        ],
+        "sourceNote": ""
+      }
+    ],
+    "rules": [
+      {
+        "id": "RULE-HIS-001",
+        "name": "退号率告警阈值",
+        "ruleType": "VALIDATION",
+        "description": "退号率 >10% 红色告警（R13·PRD §6.1 模块一异常预警 + §6.3 异常高亮 「退号率 >10% 红色标注」两处素材互证）。阈值 10% 为素材明示值； 正常区间绿色标注。",
+        "expression": "refundRate <= 10",
+        "narrative": "",
+        "reusedBy": [
+          "BH-HIS-QueryDashboard",
+          "BH-HIS-QueryOutpatient"
+        ],
+        "sourceNote": ""
+      },
+      {
+        "id": "RULE-HIS-002",
+        "name": "支付方式收入占比合计校验",
+        "ruleType": "VALIDATION",
+        "description": "五支付方式（现金/银行卡/微信/支付宝/医保卡）收入占比合计=100% （R13·详细设计 §5.2.4 revenue_pct 字段语义 + 环形图完整性推导）。 校验面=按日汇总粒度（Q8 统计日口径待 Owner）。",
+        "expression": "pctSum == 100",
+        "narrative": "",
+        "reusedBy": [
+          "BH-HIS-QueryFinance"
+        ],
+        "sourceNote": ""
+      },
+      {
+        "id": "RULE-HIS-003",
+        "name": "退号率口径",
+        "ruleType": "CALCULATION",
+        "description": "退号率 = 退号数 ÷ 挂号人次 × 100（R13·§5.2.1 refund_cnt/register_cnt 字段对 + §4.3 指标 1「科室接诊量及退号率」）。分母=挂号人次（就诊状态 非「已退号」的挂号记录数，Q2 状态集待 Owner）；退号归原就诊日（Q8 待 Owner）。",
+        "expression": "refundCount / registerCount * 100",
+        "narrative": "",
+        "reusedBy": [
+          "BH-HIS-QueryDashboard",
+          "BH-HIS-QueryOutpatient"
+        ],
+        "sourceNote": ""
+      },
+      {
+        "id": "RULE-HIS-004",
+        "name": "均次费用口径",
+        "ruleType": "CALCULATION",
+        "description": "均次费用 = 总收入 ÷ 接诊量（R13·§5.2.2 avg_fee 字段语义 + PRD §6.1 模块三「科室均次费用（横向柱状图 + 均值线）」）。收入口径=挂号收入 （Q1 待 Owner：药品/医技费是否计入未裁，本口径先按挂号费）。",
+        "expression": "totalRevenue / totalVisits",
+        "narrative": "",
+        "reusedBy": [
+          "BH-HIS-QueryFinance",
+          "BH-HIS-QueryOutpatient"
+        ],
+        "sourceNote": ""
+      },
+      {
+        "id": "RULE-HIS-005",
+        "name": "处方退费率口径",
+        "ruleType": "CALCULATION",
+        "description": "处方退费率 = 退药退费处方数 ÷ 处方总数 × 100（R13·§5.2.7 refund_presc/total_presc 字段对 + §4.3 指标 5「处方退药/退费率」）。 分子判定字段=处方 refundFlag（AGG-HIS-004）。退费冲减收入与否（Q4） 与本口径无关（只计笔数不计金额），如实注记。",
+        "expression": "refundPresc / totalPresc * 100",
+        "narrative": "",
+        "reusedBy": [
+          "BH-HIS-QueryDrug",
+          "BH-HIS-QueryDashboard"
+        ],
+        "sourceNote": ""
+      },
+      {
+        "id": "RULE-HIS-006",
+        "name": "病历完整率口径",
+        "ruleType": "CALCULATION",
+        "description": "病历完整率 = 5 维度（主诉/现病史/既往史/过敏史/体格检查）非空维度数 ÷ 5 × 100（R13·PRD §6.1 模块五雷达图 + §5.3 medical_record 五字段 一一对应）。行级判定字段=AGG-HIS-002 五属性；数据集级汇总（完整病历 行数÷病历总行数）为另一读法，素材未指明，如实挂 Q8 待 Owner。",
+        "expression": "filledDims / 5 * 100",
+        "narrative": "",
+        "reusedBy": [
+          "BH-HIS-QueryDisease"
+        ],
+        "sourceNote": ""
+      },
+      {
+        "id": "RULE-HIS-007",
+        "name": "复诊率口径",
+        "ruleType": "CALCULATION",
+        "description": "复诊率 = 复诊患者数 ÷ 就诊患者总数 × 100；复诊 = 同一患者（patientName 推定同一人，患者主数据未建=缺口如实记）在窗口期内≥2 次挂号（R13·PRD §6.1 模块六）。窗口期素材未给，推荐档 30 天（Q3 待 Owner，本规则按 30 天标注推断）。",
+        "expression": "revisitPatients / totalPatients * 100",
+        "narrative": "",
+        "reusedBy": [
+          "BH-HIS-QueryPatient"
+        ],
+        "sourceNote": ""
+      }
+    ]
+  },
+  "openProposals": {
+    "enabled": true,
+    "scannedDir": "docs/proposals",
+    "items": []
+  },
+  "generatedFrom": {
+    "generator": "tools/app_pack_gen.py",
+    "source": "ontology/his",
+    "note": "确定性派生物：确定性装配零 LLM 零时间戳，同域重生成字节一致；生成物禁手改，防陈旧断言=--check 再制一致（票 35）"
+  }
+}

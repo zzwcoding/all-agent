@@ -67,6 +67,14 @@
       "outputContains": [
         "缺 []"
       ]
+    },
+    {
+      "ac": "票68 AC1（his devkit --check 防陈旧：全模型域出包零豁免注记+入库副本再制一致）",
+      "type": "cmd-succeeds",
+      "cmd": "python3 tools/app_pack_gen.py ontology/his --check exports/devkit/his/devkit.md",
+      "outputContains": [
+        "再制一致"
+      ]
     }
   ]
 }

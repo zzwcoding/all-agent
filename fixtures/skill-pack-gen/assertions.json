@@ -53,6 +53,14 @@
         "非 business-core 阵营",
         "MU"
       ]
+    },
+    {
+      "ac": "票68 AC2（his skillpkg --check 防陈旧：豁免裁决后首域出包+入库副本再制一致）",
+      "type": "cmd-succeeds",
+      "cmd": "python3 tools/skill_pack_gen.py ontology/his --models M1,M2,M3,M7,GLS --check exports/skillpkg/his/SKILL.md",
+      "outputContains": [
+        "再制一致"
+      ]
     }
   ]
 }

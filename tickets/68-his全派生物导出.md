@@ -1,6 +1,6 @@
 # 票 68：his 全派生物导出（devkit+skillpkg+mcp manifest+审记 init）
 
-Status: todo
+Status: done
 
 > 反向验证：票 59 的豁免感知修复在本域**不应触发**（M1/M2/M3/M7/GLS 全齐，声明集天然满足）——全模型域出包路径首跑。
 Belongs to: docs/第六批第三域拆票方案.md；前置=票 67 done
@@ -16,11 +16,11 @@ Touches: exports/devkit/his/、exports/skillpkg/his/、exports/mcp/capability-ma
 
 ## 验收（注源）
 
-- [ ] AC1 devkit 四节齐可指认（AGG-HIS-*/RULE-HIS-*/QR-HIS-*）；豁免修复零触发实证（生成器无豁免注记渲染，输出无「豁免未建」）
-- [ ] AC2 skillpkg 出包+--check 一致；calibers 与 QR-HIS-* 对齐
-- [ ] AC3 manifest --check 双跑一致（bohai/pkb 块字节零扰动实证）
-- [ ] AC4 审记 verify=pending（bohai 已审/pkb pending 回归不变）
-- [ ] AC5 出厂断言全过（含新增 2 条）+ `bash tools/ci.sh` 四闸全绿（最终树原样跑，协议⑩）
+- [x] AC1 devkit 四节齐可指认（AGG-HIS-*/RULE-HIS-*/QR-HIS-*）；豁免修复零触发实证（生成器无豁免注记渲染，输出无「豁免未建」）
+- [x] AC2 skillpkg 出包+--check 一致；calibers 与 QR-HIS-* 对齐
+- [x] AC3 manifest --check 双跑一致（bohai/pkb 块字节零扰动实证）
+- [x] AC4 审记 verify=pending（bohai 已审/pkb pending 回归不变）
+- [x] AC5 出厂断言全过（含新增 2 条）+ `bash tools/ci.sh` 四闸全绿（最终树原样跑，协议⑩）
 
 ## 交接包（L0 自执行）
 
