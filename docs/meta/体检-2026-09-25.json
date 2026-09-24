@@ -1,7 +1,7 @@
 {
   "tool": "meta_probe",
   "ticket": "28/29",
-  "generatedAt": "2026-09-25 00:42:39",
+  "generatedAt": "2026-09-25 01:30:29",
   "root": "/Users/divh/Downloads/All-agent",
   "ontologyTarget": "ontology/bohai",
   "graphQuery": "AGG-BOHAI-001",
@@ -239,7 +239,7 @@
       "title": "边界闸豁免",
       "kind": "info",
       "status": "green",
-      "summary": "10 条豁免（复核结论已并入 10 条，复核人 L0，复核日期 2026-09-20）",
+      "summary": "10 条豁免（复核结论已并入 10 条，复核人 L0，复核日期 2026-09-25）",
       "data": {
         "file": ".skill-deps-allow",
         "entries": [
@@ -290,67 +290,67 @@
           "source": "docs/meta/exemption-reviews.json",
           "loaded": true,
           "reviewedBy": "L0",
-          "reviewedAt": "2026-09-20",
+          "reviewedAt": "2026-09-25",
           "byPattern": {
             "fixtures/onto-modeler/**": {
               "verdict": "保留",
               "reason": "出厂集 Seam 声明面（卡「Seam 与出厂集」字段，票 05）闸不解析，豁免=机制性登记非欠账，保留",
               "reviewedBy": "L0",
-              "reviewedAt": "2026-09-20"
+              "reviewedAt": "2026-09-25"
             },
             "fixtures/db-reverse/**": {
               "verdict": "保留",
               "reason": "出厂集 Seam 声明面（卡字段，票 06 同票 05 手法）闸不解析，机制性豁免，保留",
               "reviewedBy": "L0",
-              "reviewedAt": "2026-09-20"
+              "reviewedAt": "2026-09-25"
             },
             "fixtures/semantic-service/**": {
               "verdict": "保留",
               "reason": "出厂集 Seam 声明面（卡字段，票 07 同票 05/06 手法）闸不解析，机制性豁免，保留",
               "reviewedBy": "L0",
-              "reviewedAt": "2026-09-20"
+              "reviewedAt": "2026-09-25"
             },
             "fixtures/impact-analyzer/**": {
               "verdict": "保留",
               "reason": "出厂集 Seam 声明面（卡字段，票 08 同票 05/06/07 手法）闸不解析，机制性豁免，保留",
               "reviewedBy": "L0",
-              "reviewedAt": "2026-09-20"
+              "reviewedAt": "2026-09-25"
             },
             "fixtures/proposal-pool/**": {
               "verdict": "保留",
               "reason": "出厂集 Seam 声明面（卡字段，票 18 二期同手法）闸不解析，机制性豁免，保留",
               "reviewedBy": "L0",
-              "reviewedAt": "2026-09-20"
+              "reviewedAt": "2026-09-25"
             },
             "fixtures/requirement-explorer/**": {
               "verdict": "保留",
               "reason": "出厂集 Seam 声明面（卡「Seam 与出厂集」字段，闸不解析该行）——机制性豁免，保留（票 30）",
               "reviewedBy": "L0",
-              "reviewedAt": "2026-09-20"
+              "reviewedAt": "2026-09-25"
             },
             "fixtures/code-reverse/**": {
               "verdict": "保留",
               "reason": "出厂集 Seam 声明面（卡「Seam 与出厂集」字段，闸不解析该行）——机制性豁免，保留（票 31）",
               "reviewedBy": "L0",
-              "reviewedAt": "2026-09-20"
+              "reviewedAt": "2026-09-25"
             },
             "fixtures/doc-extractor/**": {
               "verdict": "保留",
               "reason": "出厂集 Seam 声明面（卡「Seam 与出厂集」字段，闸不解析该行）——机制性豁免，保留（票 32）",
               "reviewedBy": "L0",
-              "reviewedAt": "2026-09-20"
+              "reviewedAt": "2026-09-25"
             },
             "fixtures/pattern-library/**": {
               "verdict": "保留",
               "reason": "出厂集 Seam 声明面（卡「Seam 与出厂集」字段，闸不解析该行）——机制性豁免，保留（票 33（模式件库出厂集 Seam，同手法））",
               "reviewedBy": "L0",
-              "reviewedAt": "2026-09-20"
+              "reviewedAt": "2026-09-25"
             },
             "fixtures/ddd-modeler/**": {
               "verdict": "保留",
               "reason": "出厂集 Seam 声明面（卡「Seam 与出厂集」字段，票 50 开卡/票 51 闸轨/票 52 skill 轨，闸不解析该行）——机制性豁免，保留（票 54 补复核）",
               "reviewedBy": "L0",
-              "reviewedAt": "2026-09-20"
+              "reviewedAt": "2026-09-25"
             }
           },
           "unmatched": [],
@@ -376,7 +376,7 @@
           "source": "docs/meta/exemption-reviews.json",
           "loaded": true,
           "reviewedBy": "L0",
-          "reviewedAt": "2026-09-20",
+          "reviewedAt": "2026-09-25",
           "byPattern": {},
           "unmatched": [
             "fixtures/code-reverse/**",
