@@ -1,0 +1,247 @@
+{
+  "status": "待Owner人审（生成物禁手改，可再生；审记旁档exports/reviews/，review_gate.py-verify判失效）",
+  "domain": {
+    "name": "hr",
+    "label": "hr 人力资本域（MySQL employees 示例库）",
+    "profile": "v9-full",
+    "sourcePath": "ontology/hr"
+  },
+  "slice": {
+    "declared": [
+      "M1",
+      "M3",
+      "GLS"
+    ],
+    "models": [
+      {
+        "model": "M1",
+        "name": "对象模型",
+        "camp": "business-core",
+        "modelType": "OBJECT",
+        "yamlFile": "m1-object-model.yaml",
+        "version": "1.0.0"
+      },
+      {
+        "model": "M3",
+        "name": "规则模型",
+        "camp": "business-core",
+        "modelType": "RULE",
+        "yamlFile": "m3-rule-model.yaml",
+        "version": "1.0.0"
+      },
+      {
+        "model": "GLS",
+        "name": "术语模型",
+        "camp": "business-core",
+        "modelType": "GLOSSARY",
+        "yamlFile": "glossary-model.yaml",
+        "version": "1.0.0"
+      }
+    ],
+    "citationPrefixes": [
+      "AGG-",
+      "ASSOC-",
+      "DICT-",
+      "RULE-",
+      "GLS-"
+    ]
+  },
+  "routing": {
+    "note": "问答纪律的静态化表述：检索瀑布运行时真源见语义服务（skills/semantic-service）；成稿润色归人审后的使用方，本包只供确定性骨架。",
+    "steps": [
+      {
+        "step": "①",
+        "name": "显式锚定",
+        "discipline": "问句带 @ID 时按前缀定模型定阵营（先阵营后存在性）：面内确认存在并反向收名下行为；面外拒答，不返回该元素任何细节。"
+      },
+      {
+        "step": "②",
+        "name": "名称解析",
+        "discipline": "无锚定/锚定失败降级：候选词对 name/alias/属性标签/术语确定性分层匹配，不猜不模糊；多义列候选请锚定修饰词，不擅自合并。"
+      },
+      {
+        "step": "③",
+        "name": "闭包装配",
+        "discipline": "命中元素沿引用/影响两向装配证据集（承载/行为/规则/查询出口/术语），只引用装配集内 ID，装配指令可复现。"
+      },
+      {
+        "step": "④",
+        "name": "可拒答",
+        "discipline": "面外/仓内没有/禁用词三分支如实拒答：缺件分层说明+近邻指路；禁用词给替代口径真实 ID；写意图走提案流程。"
+      }
+    ]
+  },
+  "calibers": [],
+  "caliberNote": "未声明 M7——无口径问答卡（口径卡命中集须与语义服务 CORE 同源，装配须 M1/M2/M3/M7 齐备）。",
+  "glossary": {
+    "declared": true,
+    "terms": [
+      {
+        "id": "GLS-HR-001",
+        "term": "员工",
+        "aliases": [
+          "雇员",
+          "Employee"
+        ],
+        "status": "有效",
+        "termType": "术语",
+        "definition": "人力库的主档对象——emp_no 唯一标识的一名雇员（R14·employees 表），其任职/管理/职级/薪酬皆以时态区间行挂在员工之下。",
+        "relatedObjectRefs": [
+          "AGG-HR-001"
+        ]
+      },
+      {
+        "id": "GLS-HR-002",
+        "term": "部门",
+        "aliases": [
+          "Department"
+        ],
+        "status": "有效",
+        "termType": "术语",
+        "definition": "编号+名称唯一标识的组织单元（R14·departments 表，dept_name UNIQUE）。",
+        "relatedObjectRefs": [
+          "AGG-HR-002"
+        ]
+      },
+      {
+        "id": "GLS-HR-003",
+        "term": "部门任职",
+        "aliases": [
+          "在职",
+          "DepartmentAssignment"
+        ],
+        "status": "有效",
+        "termType": "术语",
+        "definition": "员工在某时段隶属于某部门的时态分配行（R14·dept_emp 表）；「在职」=存在现行任职行。",
+        "relatedObjectRefs": [
+          "AGG-HR-003"
+        ]
+      },
+      {
+        "id": "GLS-HR-004",
+        "term": "薪酬记录",
+        "aliases": [
+          "薪档",
+          "SalaryRecord"
+        ],
+        "status": "有效",
+        "termType": "术语",
+        "definition": "自 from_date 起生效的期间薪档行（R14·salaries 表；Q1 已裁不标单位——DDL 无单位证据）。",
+        "relatedObjectRefs": [
+          "AGG-HR-006"
+        ]
+      },
+      {
+        "id": "GLS-HR-005",
+        "term": "职级",
+        "aliases": [
+          "职务",
+          "Title"
+        ],
+        "status": "有效",
+        "termType": "术语",
+        "definition": "员工任职名称的时态轨迹行（R14·titles 表）；职级值集为自由文本（Q2 已裁不字典化）。",
+        "relatedObjectRefs": [
+          "AGG-HR-005"
+        ]
+      },
+      {
+        "id": "GLS-HR-006",
+        "term": "现行任职",
+        "aliases": [
+          "current",
+          "在任"
+        ],
+        "status": "有效",
+        "termType": "术语",
+        "definition": "该员工 from_date 最大者的成对任职行（R14·current_dept_emp 视图条件；Q3 已裁以视图语义为准，9999-01-01 哨兵为数据惯例注记非判定依据）。",
+        "relatedObjectRefs": [
+          "AGG-HR-003"
+        ]
+      },
+      {
+        "id": "GLS-HR-007",
+        "term": "时态区间",
+        "aliases": [
+          "from_date/to_date",
+          "任职区间"
+        ],
+        "status": "有效",
+        "termType": "术语",
+        "definition": "六表公共的 from_date/to_date 双列结构——人力库一切轨迹（任职/管理/职级/薪酬）的时段表达（R14·DDL 结构证据）。",
+        "relatedObjectRefs": []
+      },
+      {
+        "id": "GLS-HR-008",
+        "term": "人司年限",
+        "aliases": [
+          "司龄",
+          "Tenure"
+        ],
+        "status": "有效",
+        "termType": "术语",
+        "definition": "统计日与 hire_date 的天差 ÷365.25，一位小数（Q6 已裁口径；RULE-HR-008）。",
+        "relatedObjectRefs": [
+          "AGG-HR-001"
+        ]
+      }
+    ],
+    "bannedTerms": []
+  },
+  "citationDiscipline": {
+    "idCitationFormat": "回答必带元素 ID 引用（前缀形态真实 ID，如 AGG-BOHAI-002），逐条可经 `python3 tools/graph_index.py <域> --query <ID> --json` 复核；成稿须含「本回答引用的元素 ID」清单节，与正文 ID token 双向一致（tools/check_citations.py 检具）。",
+    "outOfSurface": [
+      {
+        "prefixes": [
+          "SCR-"
+        ],
+        "model": "MU",
+        "name": "UI 模型",
+        "camp": "build-contract"
+      }
+    ],
+    "outsideSlice": [
+      {
+        "prefixes": [
+          "BH-"
+        ],
+        "model": "M2",
+        "name": "行为模型",
+        "camp": "business-core"
+      },
+      {
+        "prefixes": [
+          "ACTOR-",
+          "ROLE-",
+          "PERM-"
+        ],
+        "model": "M5",
+        "name": "主体模型",
+        "camp": "business-core"
+      },
+      {
+        "prefixes": [
+          "FLOW-"
+        ],
+        "model": "M6",
+        "name": "流程模型",
+        "camp": "business-core"
+      },
+      {
+        "prefixes": [
+          "QR-",
+          "RPT-"
+        ],
+        "model": "M7",
+        "name": "查询统计与报表模型",
+        "camp": "business-core"
+      }
+    ],
+    "refusal": "可拒答声明：仓内没有就说明缺什么，绝不编造；写意图一律回「走提案流程」（进仓走 MR + 语义 CI）；本包只读——运行面语义消费，不做本体写入。"
+  },
+  "generatedFrom": {
+    "generator": "tools/skill_pack_gen.py",
+    "source": "ontology/hr",
+    "note": "确定性派生物：本体切片装配零 LLM 零时间戳，同域同声明重生成字节一致；生成物禁手改，防陈旧断言=--check 再制一致（票 36）"
+  }
+}

@@ -1,0 +1,1158 @@
+{
+  "status": "待Owner人审（生成物禁手改，可再生；审记旁档exports/reviews/，review_gate.py-verify判失效）",
+  "domain": {
+    "name": "hr",
+    "label": "hr 人力资本域（MySQL employees 示例库）",
+    "profile": "v9-full",
+    "sourcePath": "ontology/hr"
+  },
+  "declaredModels": [
+    {
+      "model": "M1",
+      "file": "m1-object-model.yaml",
+      "modelType": "OBJECT",
+      "name": "对象模型",
+      "version": "1.0.0"
+    },
+    {
+      "model": "M2",
+      "file": "m2-behavior-model.yaml",
+      "modelType": "BEHAVIOR",
+      "name": "行为模型",
+      "version": "1.0.0"
+    },
+    {
+      "model": "M3",
+      "file": "m3-rule-model.yaml",
+      "modelType": "RULE",
+      "name": "规则模型",
+      "version": "1.0.0"
+    },
+    {
+      "model": "M7",
+      "file": "m7-report-model.yaml",
+      "modelType": "REPORT",
+      "name": "查询统计与报表模型",
+      "version": "1.0.0"
+    }
+  ],
+  "fixedInputs": {
+    "techConstraints": {
+      "file": "tech-constraints.md",
+      "name": "技术架构约束",
+      "path": "fixtures/app-pack-gen/inputs/tech-constraints.md",
+      "text": "出厂集固定输入（合成）——中性示例文本，非任何真实项目规约；生成器按原样装配进开发包头部约束节，文件内容不参与判定。\n\n## 技术架构约束\n\n- 服务端形态：Python 服务端 + 关系库，三层架构（接入 / 领域 / 数据）。\n- 数据访问：一切业务数据经语义层数据字典取数，禁直连物理表名。\n- 集成边界：对外只暴露查询出口与行为接口，不出裸表。\n\n（以上为合成中性约束，仅作开发包装配通路的固定输入。）\n"
+    },
+    "devGuide": {
+      "file": "dev-guide.md",
+      "name": "开发指导书",
+      "path": "fixtures/app-pack-gen/inputs/dev-guide.md",
+      "text": "出厂集固定输入（合成）——中性示例文本，非任何真实项目规约；生成器按原样装配进开发包头部约束节，文件内容不参与判定。\n\n## 开发指导书\n\n- 装配顺序：先数据字典后接口——数据字典是接口签名的唯一依据。\n- 口径实现：统计口径以规则清单（M3）的 expression/narrative 为准，查询出口（M7）只是实现形态，两处不一致时以规则为准并回提案流程。\n- 疑点处置：开发包第④节开放疑点逐条过目，命中疑点的实现先挂起待 Owner 裁决，不自行拍板。\n\n（以上为合成中性指导，仅作开发包装配通路的固定输入。）\n"
+    }
+  },
+  "dataDictionary": {
+    "aggregates": [
+      {
+        "id": "AGG-HR-001",
+        "name": "员工",
+        "alias": "Employee",
+        "aggregateType": "AGGREGATE_ROOT",
+        "description": "员工主档（R14·CREATE TABLE employees：emp_no PK，六列全 NOT NULL）。 生命周期自 hireDate 起；「在职/离职」不由本表字段承载，而由四张轨迹 表的时态区间表达（Q3 已裁以视图语义为准）。",
+        "sourceNote": "",
+        "attributes": [
+          {
+            "name": "empNo",
+            "label": "员工编号",
+            "type": "Integer",
+            "constraints": {
+              "unique": true
+            }
+          },
+          {
+            "name": "birthDate",
+            "label": "出生日期",
+            "type": "Date"
+          },
+          {
+            "name": "lastName",
+            "label": "姓",
+            "type": "String"
+          },
+          {
+            "name": "firstName",
+            "label": "名",
+            "type": "String"
+          },
+          {
+            "name": "gender",
+            "label": "性别",
+            "type": "Enum",
+            "constraints": {
+              "enumValues": [
+                "M",
+                "F"
+              ],
+              "refRules": []
+            }
+          },
+          {
+            "name": "hireDate",
+            "label": "入职日期",
+            "type": "Date"
+          }
+        ],
+        "lifecycle": [
+          "在职",
+          "离职"
+        ]
+      },
+      {
+        "id": "AGG-HR-002",
+        "name": "部门",
+        "alias": "Department",
+        "aggregateType": "AGGREGATE_ROOT",
+        "description": "部门主档（R14·CREATE TABLE departments：dept_no CHAR(4) PK + dept_name UNIQUE KEY）。示例库共九行，但量级属数据事实不入本体。",
+        "sourceNote": "",
+        "attributes": [
+          {
+            "name": "deptNo",
+            "label": "部门编号",
+            "type": "String",
+            "constraints": {
+              "unique": true
+            }
+          },
+          {
+            "name": "deptName",
+            "label": "部门名称",
+            "type": "String",
+            "constraints": {
+              "unique": true,
+              "refRules": []
+            }
+          }
+        ],
+        "lifecycle": [
+          "设立",
+          "撤销"
+        ]
+      },
+      {
+        "id": "AGG-HR-003",
+        "name": "部门任职",
+        "alias": "DepartmentAssignment",
+        "aggregateType": "AGGREGATE_ROOT",
+        "description": "员工×部门的时态分配行（R14·CREATE TABLE dept_emp：PK(emp_no,dept_no)， 双 FK ON DELETE CASCADE）。from_date/to_date 区间承载「何时属何部门」； 「现行任职」判定=RULE-HR-003（current_dept_emp 视图条件，Q3 已裁）。",
+        "sourceNote": "",
+        "attributes": [
+          {
+            "name": "empNo",
+            "label": "员工编号",
+            "type": "Integer"
+          },
+          {
+            "name": "deptNo",
+            "label": "部门编号",
+            "type": "String"
+          },
+          {
+            "name": "fromDate",
+            "label": "起始日期",
+            "type": "Date"
+          },
+          {
+            "name": "toDate",
+            "label": "截止日期",
+            "type": "Date"
+          }
+        ],
+        "lifecycle": [
+          "任职中",
+          "已调离"
+        ]
+      },
+      {
+        "id": "AGG-HR-004",
+        "name": "管理任职",
+        "alias": "DepartmentManager",
+        "aggregateType": "AGGREGATE_ROOT",
+        "description": "员工×部门的管理角色时态行（R14·CREATE TABLE dept_manager： PK(emp_no,dept_no)，双 FK ON DELETE CASCADE）。结构上与部门任职同构， 语义=该员工在该时段管理该部门。",
+        "sourceNote": "",
+        "attributes": [
+          {
+            "name": "empNo",
+            "label": "员工编号",
+            "type": "Integer"
+          },
+          {
+            "name": "deptNo",
+            "label": "部门编号",
+            "type": "String"
+          },
+          {
+            "name": "fromDate",
+            "label": "起始日期",
+            "type": "Date"
+          },
+          {
+            "name": "toDate",
+            "label": "截止日期",
+            "type": "Date"
+          }
+        ],
+        "lifecycle": [
+          "任期内",
+          "已卸任"
+        ]
+      },
+      {
+        "id": "AGG-HR-005",
+        "name": "职级记录",
+        "alias": "TitleRecord",
+        "aggregateType": "AGGREGATE_ROOT",
+        "description": "员工职级的时态轨迹行（R14·CREATE TABLE titles：PK(emp_no,title, from_date)，单 FK）。title 为自由文本（Q2 已裁不字典化——DDL 无 枚举证据）；to_date 可空（DDL 唯一可空列，RULE-HR-005 如实注记）。",
+        "sourceNote": "",
+        "attributes": [
+          {
+            "name": "empNo",
+            "label": "员工编号",
+            "type": "Integer"
+          },
+          {
+            "name": "title",
+            "label": "职级名称",
+            "type": "String"
+          },
+          {
+            "name": "fromDate",
+            "label": "起始日期",
+            "type": "Date"
+          },
+          {
+            "name": "toDate",
+            "label": "截止日期",
+            "type": "Date"
+          }
+        ],
+        "lifecycle": [
+          "任职中",
+          "已变更"
+        ]
+      },
+      {
+        "id": "AGG-HR-006",
+        "name": "薪酬记录",
+        "alias": "SalaryRecord",
+        "aggregateType": "AGGREGATE_ROOT",
+        "description": "员工薪酬的时态轨迹行（R14·CREATE TABLE salaries：PK(emp_no,from_date)， 单 FK ON DELETE CASCADE）。salary 语义=期间薪档（Q1 已裁：自 fromDate 起生效的薪档，不标单位——DDL 无单位证据）。",
+        "sourceNote": "",
+        "attributes": [
+          {
+            "name": "empNo",
+            "label": "员工编号",
+            "type": "Integer"
+          },
+          {
+            "name": "salary",
+            "label": "期间薪档",
+            "type": "Integer",
+            "constraints": {
+              "refRules": []
+            }
+          },
+          {
+            "name": "fromDate",
+            "label": "起始日期",
+            "type": "Date"
+          },
+          {
+            "name": "toDate",
+            "label": "截止日期",
+            "type": "Date"
+          }
+        ],
+        "lifecycle": [
+          "生效中",
+          "已调整"
+        ]
+      }
+    ],
+    "associations": [
+      {
+        "id": "ASSOC-HR-001",
+        "sourceAggregate": "AGG-HR-001",
+        "targetAggregate": "AGG-HR-003",
+        "associationType": "REFERENCE",
+        "sourceRole": "员工",
+        "targetRole": "部门任职",
+        "cardinality": "ONE_TO_MANY",
+        "referenceField": "empNo"
+      },
+      {
+        "id": "ASSOC-HR-002",
+        "sourceAggregate": "AGG-HR-002",
+        "targetAggregate": "AGG-HR-003",
+        "associationType": "REFERENCE",
+        "sourceRole": "部门",
+        "targetRole": "部门任职",
+        "cardinality": "ONE_TO_MANY",
+        "referenceField": "deptNo"
+      },
+      {
+        "id": "ASSOC-HR-003",
+        "sourceAggregate": "AGG-HR-001",
+        "targetAggregate": "AGG-HR-004",
+        "associationType": "REFERENCE",
+        "sourceRole": "员工",
+        "targetRole": "管理任职",
+        "cardinality": "ONE_TO_MANY",
+        "referenceField": "empNo"
+      },
+      {
+        "id": "ASSOC-HR-004",
+        "sourceAggregate": "AGG-HR-002",
+        "targetAggregate": "AGG-HR-004",
+        "associationType": "REFERENCE",
+        "sourceRole": "部门",
+        "targetRole": "管理任职",
+        "cardinality": "ONE_TO_MANY",
+        "referenceField": "deptNo"
+      },
+      {
+        "id": "ASSOC-HR-005",
+        "sourceAggregate": "AGG-HR-001",
+        "targetAggregate": "AGG-HR-005",
+        "associationType": "REFERENCE",
+        "sourceRole": "员工",
+        "targetRole": "职级记录",
+        "cardinality": "ONE_TO_MANY",
+        "referenceField": "empNo"
+      },
+      {
+        "id": "ASSOC-HR-006",
+        "sourceAggregate": "AGG-HR-001",
+        "targetAggregate": "AGG-HR-006",
+        "associationType": "REFERENCE",
+        "sourceRole": "员工",
+        "targetRole": "薪酬记录",
+        "cardinality": "ONE_TO_MANY",
+        "referenceField": "empNo"
+      }
+    ]
+  },
+  "calibers": [
+    {
+      "id": "QR-HR-001",
+      "name": "员工薪酬明细查询",
+      "alias": "salaryDetailQuery",
+      "objectType": "STATISTICAL_QUERY",
+      "questionSample": "员工薪酬明细查询",
+      "sourceNote": "",
+      "description": "员工粒度薪酬轨迹出口（R14·salaries 表直读）：期间薪档+起止区间+现行标记（Q3：哨兵注记为数据惯例，判定语义 RULE-HR-003）。",
+      "behavior": {
+        "id": "BH-HR-QuerySalary",
+        "name": "查询员工薪酬",
+        "type": "QUERY",
+        "triggerType": "",
+        "ownerEntity": "AGG-HR-006",
+        "sourceNote": ""
+      },
+      "sourceObjects": [
+        {
+          "objectRef": "AGG-HR-006",
+          "alias": "s",
+          "primary": true,
+          "name": "薪酬记录"
+        },
+        {
+          "objectRef": "AGG-HR-001",
+          "alias": "e",
+          "primary": false,
+          "name": "员工"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "startDay",
+          "label": "生效起始日",
+          "dataType": "Date",
+          "required": true,
+          "allowedOperators": []
+        },
+        {
+          "name": "endDay",
+          "label": "生效截止日",
+          "dataType": "Date",
+          "required": true,
+          "allowedOperators": []
+        }
+      ],
+      "conditions": [
+        {
+          "conditionId": "COND-HR-001",
+          "leftExpression": "s.fromDate",
+          "operator": "BETWEEN",
+          "parameterRef": "startDay"
+        }
+      ],
+      "resultColumns": [
+        {
+          "name": "empNo",
+          "label": "员工编号",
+          "dataType": "Integer",
+          "sourceExpression": "e.empNo"
+        },
+        {
+          "name": "fullName",
+          "label": "姓名",
+          "dataType": "String",
+          "sourceExpression": "CONCAT(e.lastName, ' ', e.firstName)"
+        },
+        {
+          "name": "salary",
+          "label": "期间薪档",
+          "dataType": "Integer",
+          "sourceExpression": "s.salary"
+        },
+        {
+          "name": "fromDate",
+          "label": "生效日期",
+          "dataType": "Date",
+          "sourceExpression": "s.fromDate"
+        },
+        {
+          "name": "toDate",
+          "label": "截止日期",
+          "dataType": "Date",
+          "sourceExpression": "s.toDate"
+        },
+        {
+          "name": "isCurrent",
+          "label": "是否现行",
+          "dataType": "Boolean",
+          "sourceExpression": "s.toDate == DATE '9999-01-01'"
+        }
+      ],
+      "rules": [
+        {
+          "id": "RULE-HR-002",
+          "name": "薪酬一期一条",
+          "type": "VALIDATION",
+          "point": {
+            "expression": "COUNT(*) == COUNT(DISTINCT (empNo, fromDate))"
+          },
+          "via": "behavior.appliedRules(BH-HR-QuerySalary)"
+        },
+        {
+          "id": "RULE-HR-003",
+          "name": "现行任职判定",
+          "type": "CALCULATION",
+          "point": {
+            "expression": "fromDate == MAX(fromDate) OVER (empNo) AND toDate == latestToDate"
+          },
+          "via": "behavior.appliedRules(BH-HR-QuerySalary)"
+        },
+        {
+          "id": "RULE-HR-001",
+          "name": "性别代码值域",
+          "type": "VALIDATION",
+          "point": {
+            "expression": "gender == 'M' or gender == 'F'"
+          },
+          "via": "ownerObjectBehaviors(AGG-HR-001)"
+        },
+        {
+          "id": "RULE-HR-008",
+          "name": "人司年限口径",
+          "type": "CALCULATION",
+          "point": {
+            "expression": "DATEDIFF(asOfDay, hireDate) / 365.25"
+          },
+          "via": "ownerObjectBehaviors(AGG-HR-001)"
+        }
+      ],
+      "hitIds": [
+        "QR-HR-001",
+        "BH-HR-QuerySalary",
+        "AGG-HR-006",
+        "AGG-HR-001",
+        "RULE-HR-002",
+        "RULE-HR-003",
+        "RULE-HR-001",
+        "RULE-HR-008"
+      ]
+    },
+    {
+      "id": "QR-HR-002",
+      "name": "部门在职人数查询",
+      "alias": "deptHeadcountQuery",
+      "objectType": "STATISTICAL_QUERY",
+      "questionSample": "部门在职人数查询",
+      "sourceNote": "",
+      "description": "部门粒度在职人数出口（R14·dept_emp + current_dept_emp 视图直读）：人数=现行任职行计数（口径 RULE-HR-007，现行判定 RULE-HR-003）。",
+      "behavior": {
+        "id": "BH-HR-QueryHeadcount",
+        "name": "查询部门在职人数",
+        "type": "QUERY",
+        "triggerType": "",
+        "ownerEntity": "AGG-HR-003",
+        "sourceNote": ""
+      },
+      "sourceObjects": [
+        {
+          "objectRef": "AGG-HR-003",
+          "alias": "a",
+          "primary": true,
+          "name": "部门任职"
+        },
+        {
+          "objectRef": "AGG-HR-002",
+          "alias": "d",
+          "primary": false,
+          "name": "部门"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "startDay",
+          "label": "起始日",
+          "dataType": "Date",
+          "required": true,
+          "allowedOperators": []
+        },
+        {
+          "name": "endDay",
+          "label": "截止日",
+          "dataType": "Date",
+          "required": true,
+          "allowedOperators": []
+        }
+      ],
+      "conditions": [
+        {
+          "conditionId": "COND-HR-002",
+          "leftExpression": "a.fromDate",
+          "operator": "BETWEEN",
+          "parameterRef": "startDay"
+        }
+      ],
+      "resultColumns": [
+        {
+          "name": "deptNo",
+          "label": "部门编号",
+          "dataType": "String",
+          "sourceExpression": "d.deptNo"
+        },
+        {
+          "name": "deptName",
+          "label": "部门名称",
+          "dataType": "String",
+          "sourceExpression": "d.deptName"
+        },
+        {
+          "name": "headcount",
+          "label": "在职人数",
+          "dataType": "Integer",
+          "sourceExpression": "COUNT(DISTINCT a.empNo)"
+        }
+      ],
+      "rules": [
+        {
+          "id": "RULE-HR-003",
+          "name": "现行任职判定",
+          "type": "CALCULATION",
+          "point": {
+            "expression": "fromDate == MAX(fromDate) OVER (empNo) AND toDate == latestToDate"
+          },
+          "via": "behavior.appliedRules(BH-HR-QueryHeadcount)"
+        },
+        {
+          "id": "RULE-HR-007",
+          "name": "部门在职人数口径",
+          "type": "CALCULATION",
+          "point": {
+            "expression": "COUNT(DISTINCT empNo) WHERE 现行任职（RULE-HR-003 过滤）"
+          },
+          "via": "behavior.appliedRules(BH-HR-QueryHeadcount)"
+        },
+        {
+          "id": "RULE-HR-004",
+          "name": "部门名称唯一",
+          "type": "VALIDATION",
+          "point": {
+            "expression": "COUNT(*) == COUNT(DISTINCT deptName)"
+          },
+          "via": "reusedBy(BH-HR-QueryHeadcount)"
+        }
+      ],
+      "hitIds": [
+        "QR-HR-002",
+        "BH-HR-QueryHeadcount",
+        "AGG-HR-003",
+        "AGG-HR-002",
+        "RULE-HR-003",
+        "RULE-HR-007",
+        "RULE-HR-004"
+      ]
+    },
+    {
+      "id": "QR-HR-003",
+      "name": "员工任职轨迹查询",
+      "alias": "titleHistoryQuery",
+      "objectType": "STATISTICAL_QUERY",
+      "questionSample": "员工任职轨迹查询",
+      "sourceNote": "",
+      "description": "员工粒度职级轨迹出口（R14·titles 表直读）：职级为自由文本（Q2 已裁不字典化），区间有效性 RULE-HR-005。",
+      "behavior": {
+        "id": "BH-HR-QueryTitle",
+        "name": "查询任职轨迹",
+        "type": "QUERY",
+        "triggerType": "",
+        "ownerEntity": "AGG-HR-005",
+        "sourceNote": ""
+      },
+      "sourceObjects": [
+        {
+          "objectRef": "AGG-HR-005",
+          "alias": "t",
+          "primary": true,
+          "name": "职级记录"
+        },
+        {
+          "objectRef": "AGG-HR-001",
+          "alias": "e",
+          "primary": false,
+          "name": "员工"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "startDay",
+          "label": "起始日",
+          "dataType": "Date",
+          "required": true,
+          "allowedOperators": []
+        },
+        {
+          "name": "endDay",
+          "label": "截止日",
+          "dataType": "Date",
+          "required": true,
+          "allowedOperators": []
+        }
+      ],
+      "conditions": [
+        {
+          "conditionId": "COND-HR-003",
+          "leftExpression": "t.fromDate",
+          "operator": "BETWEEN",
+          "parameterRef": "startDay"
+        }
+      ],
+      "resultColumns": [
+        {
+          "name": "empNo",
+          "label": "员工编号",
+          "dataType": "Integer",
+          "sourceExpression": "e.empNo"
+        },
+        {
+          "name": "fullName",
+          "label": "姓名",
+          "dataType": "String",
+          "sourceExpression": "CONCAT(e.lastName, ' ', e.firstName)"
+        },
+        {
+          "name": "title",
+          "label": "职级",
+          "dataType": "String",
+          "sourceExpression": "t.title"
+        },
+        {
+          "name": "fromDate",
+          "label": "起始日期",
+          "dataType": "Date",
+          "sourceExpression": "t.fromDate"
+        },
+        {
+          "name": "toDate",
+          "label": "截止日期",
+          "dataType": "Date",
+          "sourceExpression": "t.toDate"
+        }
+      ],
+      "rules": [
+        {
+          "id": "RULE-HR-005",
+          "name": "轨迹区间有效性",
+          "type": "VALIDATION",
+          "point": {
+            "expression": "toDate IS NULL OR toDate >= fromDate"
+          },
+          "via": "behavior.appliedRules(BH-HR-QueryTitle)"
+        },
+        {
+          "id": "RULE-HR-001",
+          "name": "性别代码值域",
+          "type": "VALIDATION",
+          "point": {
+            "expression": "gender == 'M' or gender == 'F'"
+          },
+          "via": "ownerObjectBehaviors(AGG-HR-001)"
+        },
+        {
+          "id": "RULE-HR-008",
+          "name": "人司年限口径",
+          "type": "CALCULATION",
+          "point": {
+            "expression": "DATEDIFF(asOfDay, hireDate) / 365.25"
+          },
+          "via": "ownerObjectBehaviors(AGG-HR-001)"
+        }
+      ],
+      "hitIds": [
+        "QR-HR-003",
+        "BH-HR-QueryTitle",
+        "AGG-HR-005",
+        "AGG-HR-001",
+        "RULE-HR-005",
+        "RULE-HR-001",
+        "RULE-HR-008"
+      ]
+    },
+    {
+      "id": "QR-HR-004",
+      "name": "部门管理者查询",
+      "alias": "deptManagerQuery",
+      "objectType": "STATISTICAL_QUERY",
+      "questionSample": "部门管理者查询",
+      "sourceNote": "",
+      "description": "部门粒度管理任职出口（R14·dept_manager 表直读）：在任判定同构复用 RULE-HR-003；部门名称唯一性 RULE-HR-004。",
+      "behavior": {
+        "id": "BH-HR-QueryManager",
+        "name": "查询部门管理者",
+        "type": "QUERY",
+        "triggerType": "",
+        "ownerEntity": "AGG-HR-004",
+        "sourceNote": ""
+      },
+      "sourceObjects": [
+        {
+          "objectRef": "AGG-HR-004",
+          "alias": "m",
+          "primary": true,
+          "name": "管理任职"
+        },
+        {
+          "objectRef": "AGG-HR-002",
+          "alias": "d",
+          "primary": false,
+          "name": "部门"
+        },
+        {
+          "objectRef": "AGG-HR-001",
+          "alias": "e",
+          "primary": false,
+          "name": "员工"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "startDay",
+          "label": "起始日",
+          "dataType": "Date",
+          "required": true,
+          "allowedOperators": []
+        },
+        {
+          "name": "endDay",
+          "label": "截止日",
+          "dataType": "Date",
+          "required": true,
+          "allowedOperators": []
+        }
+      ],
+      "conditions": [
+        {
+          "conditionId": "COND-HR-004",
+          "leftExpression": "m.fromDate",
+          "operator": "BETWEEN",
+          "parameterRef": "startDay"
+        }
+      ],
+      "resultColumns": [
+        {
+          "name": "deptNo",
+          "label": "部门编号",
+          "dataType": "String",
+          "sourceExpression": "d.deptNo"
+        },
+        {
+          "name": "deptName",
+          "label": "部门名称",
+          "dataType": "String",
+          "sourceExpression": "d.deptName"
+        },
+        {
+          "name": "empNo",
+          "label": "管理者编号",
+          "dataType": "Integer",
+          "sourceExpression": "m.empNo"
+        },
+        {
+          "name": "managerName",
+          "label": "管理者姓名",
+          "dataType": "String",
+          "sourceExpression": "CONCAT(e.lastName, ' ', e.firstName)"
+        },
+        {
+          "name": "fromDate",
+          "label": "任期起始",
+          "dataType": "Date",
+          "sourceExpression": "m.fromDate"
+        },
+        {
+          "name": "toDate",
+          "label": "任期截止",
+          "dataType": "Date",
+          "sourceExpression": "m.toDate"
+        }
+      ],
+      "rules": [
+        {
+          "id": "RULE-HR-003",
+          "name": "现行任职判定",
+          "type": "CALCULATION",
+          "point": {
+            "expression": "fromDate == MAX(fromDate) OVER (empNo) AND toDate == latestToDate"
+          },
+          "via": "behavior.appliedRules(BH-HR-QueryManager)"
+        },
+        {
+          "id": "RULE-HR-001",
+          "name": "性别代码值域",
+          "type": "VALIDATION",
+          "point": {
+            "expression": "gender == 'M' or gender == 'F'"
+          },
+          "via": "ownerObjectBehaviors(AGG-HR-001)"
+        },
+        {
+          "id": "RULE-HR-008",
+          "name": "人司年限口径",
+          "type": "CALCULATION",
+          "point": {
+            "expression": "DATEDIFF(asOfDay, hireDate) / 365.25"
+          },
+          "via": "ownerObjectBehaviors(AGG-HR-001)"
+        }
+      ],
+      "hitIds": [
+        "QR-HR-004",
+        "BH-HR-QueryManager",
+        "AGG-HR-004",
+        "AGG-HR-002",
+        "AGG-HR-001",
+        "RULE-HR-003",
+        "RULE-HR-001",
+        "RULE-HR-008"
+      ]
+    },
+    {
+      "id": "QR-HR-005",
+      "name": "员工人司年限查询",
+      "alias": "tenureQuery",
+      "objectType": "STATISTICAL_QUERY",
+      "questionSample": "员工人司年限查询",
+      "sourceNote": "",
+      "description": "员工粒度人司年限出口（R14·employees.hire_date 直读）：口径 RULE-HR-008（DATEDIFF/365.25 一位小数，Q6 已裁）；性别为构成分析维度（值域 RULE-HR-001）。",
+      "behavior": {
+        "id": "BH-HR-QueryTenure",
+        "name": "查询人司年限",
+        "type": "QUERY",
+        "triggerType": "",
+        "ownerEntity": "AGG-HR-001",
+        "sourceNote": ""
+      },
+      "sourceObjects": [
+        {
+          "objectRef": "AGG-HR-001",
+          "alias": "e",
+          "primary": true,
+          "name": "员工"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "asOfDay",
+          "label": "统计日",
+          "dataType": "Date",
+          "required": true,
+          "allowedOperators": []
+        }
+      ],
+      "conditions": [
+        {
+          "conditionId": "COND-HR-005",
+          "leftExpression": "e.hireDate",
+          "operator": "LESS_OR_EQUAL",
+          "parameterRef": "asOfDay"
+        }
+      ],
+      "resultColumns": [
+        {
+          "name": "empNo",
+          "label": "员工编号",
+          "dataType": "Integer",
+          "sourceExpression": "e.empNo"
+        },
+        {
+          "name": "fullName",
+          "label": "姓名",
+          "dataType": "String",
+          "sourceExpression": "CONCAT(e.lastName, ' ', e.firstName)"
+        },
+        {
+          "name": "gender",
+          "label": "性别",
+          "dataType": "String",
+          "sourceExpression": "e.gender"
+        },
+        {
+          "name": "hireDate",
+          "label": "入职日期",
+          "dataType": "Date",
+          "sourceExpression": "e.hireDate"
+        },
+        {
+          "name": "tenureYears",
+          "label": "人司年限（年）",
+          "dataType": "Decimal",
+          "sourceExpression": "ROUND(DATEDIFF(asOfDay, e.hireDate) / 365.25, 1)"
+        }
+      ],
+      "rules": [
+        {
+          "id": "RULE-HR-001",
+          "name": "性别代码值域",
+          "type": "VALIDATION",
+          "point": {
+            "expression": "gender == 'M' or gender == 'F'"
+          },
+          "via": "behavior.appliedRules(BH-HR-QueryTenure)"
+        },
+        {
+          "id": "RULE-HR-008",
+          "name": "人司年限口径",
+          "type": "CALCULATION",
+          "point": {
+            "expression": "DATEDIFF(asOfDay, hireDate) / 365.25"
+          },
+          "via": "behavior.appliedRules(BH-HR-QueryTenure)"
+        }
+      ],
+      "hitIds": [
+        "QR-HR-005",
+        "BH-HR-QueryTenure",
+        "AGG-HR-001",
+        "RULE-HR-001",
+        "RULE-HR-008"
+      ]
+    }
+  ],
+  "behaviorRuleInventory": {
+    "behaviors": [
+      {
+        "id": "BH-HR-QuerySalary",
+        "name": "查询员工薪酬",
+        "behaviorType": "QUERY",
+        "triggerType": "",
+        "ownerEntity": "AGG-HR-006",
+        "preconditions": [],
+        "postconditions": [],
+        "appliedRules": [
+          "RULE-HR-002",
+          "RULE-HR-003"
+        ],
+        "requiredPermissions": [
+          "PERM-HR-QuerySalary"
+        ],
+        "sourceNote": ""
+      },
+      {
+        "id": "BH-HR-QueryHeadcount",
+        "name": "查询部门在职人数",
+        "behaviorType": "QUERY",
+        "triggerType": "",
+        "ownerEntity": "AGG-HR-003",
+        "preconditions": [],
+        "postconditions": [],
+        "appliedRules": [
+          "RULE-HR-003",
+          "RULE-HR-007"
+        ],
+        "requiredPermissions": [
+          "PERM-HR-QueryHeadcount"
+        ],
+        "sourceNote": ""
+      },
+      {
+        "id": "BH-HR-QueryTitle",
+        "name": "查询任职轨迹",
+        "behaviorType": "QUERY",
+        "triggerType": "",
+        "ownerEntity": "AGG-HR-005",
+        "preconditions": [],
+        "postconditions": [],
+        "appliedRules": [
+          "RULE-HR-005"
+        ],
+        "requiredPermissions": [
+          "PERM-HR-QueryTitle"
+        ],
+        "sourceNote": ""
+      },
+      {
+        "id": "BH-HR-QueryManager",
+        "name": "查询部门管理者",
+        "behaviorType": "QUERY",
+        "triggerType": "",
+        "ownerEntity": "AGG-HR-004",
+        "preconditions": [],
+        "postconditions": [],
+        "appliedRules": [
+          "RULE-HR-003"
+        ],
+        "requiredPermissions": [
+          "PERM-HR-QueryManager"
+        ],
+        "sourceNote": ""
+      },
+      {
+        "id": "BH-HR-QueryTenure",
+        "name": "查询人司年限",
+        "behaviorType": "QUERY",
+        "triggerType": "",
+        "ownerEntity": "AGG-HR-001",
+        "preconditions": [],
+        "postconditions": [],
+        "appliedRules": [
+          "RULE-HR-001",
+          "RULE-HR-008"
+        ],
+        "requiredPermissions": [
+          "PERM-HR-QueryTenure"
+        ],
+        "sourceNote": ""
+      }
+    ],
+    "rules": [
+      {
+        "id": "RULE-HR-001",
+        "name": "性别代码值域",
+        "ruleType": "VALIDATION",
+        "description": "性别取值限 M/F（R14·employees 表 gender ENUM('M','F')——DDL 内唯一 枚举约束）。中文释义（男/女）为通识注记不入值集。",
+        "expression": "gender == 'M' or gender == 'F'",
+        "narrative": "",
+        "reusedBy": [
+          "BH-HR-QueryTenure"
+        ],
+        "sourceNote": ""
+      },
+      {
+        "id": "RULE-HR-002",
+        "name": "薪酬一期一条",
+        "ruleType": "VALIDATION",
+        "description": "同一员工同一生效日仅一条薪酬记录（R14·salaries 表 PK(emp_no, from_date) 复合主键语义）。区间重叠检测非 PK 所能表达，属建造面 补充校验，如实注记不充规则。",
+        "expression": "COUNT(*) == COUNT(DISTINCT (empNo, fromDate))",
+        "narrative": "",
+        "reusedBy": [
+          "BH-HR-QuerySalary"
+        ],
+        "sourceNote": ""
+      },
+      {
+        "id": "RULE-HR-003",
+        "name": "现行任职判定",
+        "ruleType": "CALCULATION",
+        "description": "现行任职行=该员工 from_date 最大者的成对行（R14·current_dept_emp 视图定义：INNER JOIN dept_emp_latest_date ON emp_no 相等 AND from_date=MAX(from_date) AND to_date=视图 to_date——视图条件是 「现行」唯一 schema 级证据）。9999-01-01 哨兵为数据惯例（Q3 已裁 注记，非本判定依据）。管理任职（同构结构）按同一读法判定在任。",
+        "expression": "fromDate == MAX(fromDate) OVER (empNo) AND toDate == latestToDate",
+        "narrative": "",
+        "reusedBy": [
+          "BH-HR-QueryHeadcount",
+          "BH-HR-QueryManager",
+          "BH-HR-QuerySalary"
+        ],
+        "sourceNote": ""
+      },
+      {
+        "id": "RULE-HR-004",
+        "name": "部门名称唯一",
+        "ruleType": "VALIDATION",
+        "description": "部门名称全表唯一（R14·departments 表 UNIQUE KEY (dept_name)）。 部门维度出口的分组粒度锚点。",
+        "expression": "COUNT(*) == COUNT(DISTINCT deptName)",
+        "narrative": "",
+        "reusedBy": [
+          "BH-HR-QueryHeadcount"
+        ],
+        "sourceNote": ""
+      },
+      {
+        "id": "RULE-HR-005",
+        "name": "轨迹区间有效性",
+        "ruleType": "VALIDATION",
+        "description": "轨迹区间满足 to_date ≥ from_date；titles.to_date 可空（R14·titles 表 to_date DATE 无 NOT NULL——六表唯一可空列）=「现行职级」语义， 空值放行。",
+        "expression": "toDate IS NULL OR toDate >= fromDate",
+        "narrative": "",
+        "reusedBy": [
+          "BH-HR-QueryTitle"
+        ],
+        "sourceNote": ""
+      },
+      {
+        "id": "RULE-HR-006",
+        "name": "源库级联删除语义",
+        "ruleType": "VALIDATION",
+        "description": "删除 employees 行将级联清除 dept_emp/dept_manager/titles/salaries 轨迹（R14·employees.sql 六处 FK 声明 ON DELETE CASCADE）。Q4 已裁： hr 域为只读消费域，业务面禁物理删除，本规则登记源库语义供集成方 知悉；级联为删批量行为，非可执行行级表达式，走 narrative 形态。",
+        "expression": "",
+        "narrative": "DELETE employees WHERE emp_no = :empNo 将级联删除该员工全部 部门任职/管理任职/职级/薪酬行（六处 ON DELETE CASCADE）。 消费域不得触发物理删除。",
+        "reusedBy": [],
+        "sourceNote": ""
+      },
+      {
+        "id": "RULE-HR-007",
+        "name": "部门在职人数口径",
+        "ruleType": "CALCULATION",
+        "description": "部门在职人数 = 该部门现行任职行数（R14·current_dept_emp 视图即 「每员工现行部门」的官方读法；现行判定 RULE-HR-003）。",
+        "expression": "COUNT(DISTINCT empNo) WHERE 现行任职（RULE-HR-003 过滤）",
+        "narrative": "",
+        "reusedBy": [
+          "BH-HR-QueryHeadcount"
+        ],
+        "sourceNote": ""
+      },
+      {
+        "id": "RULE-HR-008",
+        "name": "人司年限口径",
+        "ruleType": "CALCULATION",
+        "description": "人司年限 = DATEDIFF(统计日, hire_date) ÷ 365.25，一位小数（Q6 已 裁：365.25 折年；hire_date 为唯一入职证据 R14·employees 表）。",
+        "expression": "DATEDIFF(asOfDay, hireDate) / 365.25",
+        "narrative": "",
+        "reusedBy": [
+          "BH-HR-QueryTenure"
+        ],
+        "sourceNote": ""
+      }
+    ]
+  },
+  "openProposals": {
+    "enabled": true,
+    "scannedDir": "docs/proposals",
+    "items": []
+  },
+  "generatedFrom": {
+    "generator": "tools/app_pack_gen.py",
+    "source": "ontology/hr",
+    "note": "确定性派生物：确定性装配零 LLM 零时间戳，同域重生成字节一致；生成物禁手改，防陈旧断言=--check 再制一致（票 35）"
+  }
+}

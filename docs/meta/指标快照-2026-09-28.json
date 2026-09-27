@@ -1,0 +1,62 @@
+{
+  "generatedAt": "2026-09-28 01:11:24",
+  "gitHead": "bda7e5a",
+  "unitTests": 667,
+  "domains": [
+    {
+      "domain": "bohai",
+      "profile": "v9-full",
+      "modelFiles": 7,
+      "omitted": 1
+    },
+    {
+      "domain": "his",
+      "profile": "v9-full",
+      "modelFiles": 8,
+      "omitted": 0
+    },
+    {
+      "domain": "hr",
+      "profile": "v9-full",
+      "modelFiles": 7,
+      "omitted": 1
+    },
+    {
+      "domain": "pkb",
+      "profile": "headless",
+      "modelFiles": 4,
+      "omitted": 2
+    }
+  ],
+  "exports": [
+    {
+      "target": "exports/devkit/bohai/devkit.md",
+      "review": "pass"
+    },
+    {
+      "target": "exports/devkit/his/devkit.md",
+      "review": "pending"
+    },
+    {
+      "target": "exports/devkit/hr/devkit.md",
+      "review": "pending"
+    },
+    {
+      "target": "exports/devkit/pkb/devkit.md",
+      "review": "pass"
+    },
+    {
+      "target": "exports/skillpkg/bohai/SKILL.md",
+      "review": "pass"
+    },
+    {
+      "target": "exports/skillpkg/his/SKILL.md",
+      "review": "pending"
+    },
+    {
+      "target": "exports/skillpkg/hr/SKILL.md",
+      "review": "pending"
+    }
+  ],
+  "checkupNotes": 19
+}

@@ -1,0 +1,626 @@
+{
+  "tool": "meta_probe",
+  "ticket": "28/29",
+  "generatedAt": "2026-09-28 01:10:50",
+  "root": "/Users/divh/Downloads/All-agent",
+  "ontologyTarget": "ontology/his",
+  "graphQuery": "AGG-HIS-001",
+  "conclusion": "PASS",
+  "exitCode": 0,
+  "hardProbeIds": [
+    "1",
+    "10",
+    "2",
+    "6",
+    "7"
+  ],
+  "probes": [
+    {
+      "id": "1",
+      "title": "出厂集",
+      "kind": "hard",
+      "status": "green",
+      "summary": "17/17 套全过（pending 0，fail 0）",
+      "data": {
+        "suites": [
+          {
+            "name": "app-pack-gen",
+            "status": "pass"
+          },
+          {
+            "name": "code-reverse",
+            "status": "pass"
+          },
+          {
+            "name": "db-reverse",
+            "status": "pass"
+          },
+          {
+            "name": "ddd-modeler",
+            "status": "pass"
+          },
+          {
+            "name": "doc-extractor",
+            "status": "pass"
+          },
+          {
+            "name": "graph_index",
+            "status": "pass"
+          },
+          {
+            "name": "impact-analyzer",
+            "status": "pass"
+          },
+          {
+            "name": "l5-scoring",
+            "status": "pass"
+          },
+          {
+            "name": "mcp-publisher",
+            "status": "pass"
+          },
+          {
+            "name": "onto-modeler",
+            "status": "pass"
+          },
+          {
+            "name": "pattern-library",
+            "status": "pass"
+          },
+          {
+            "name": "proposal-pool",
+            "status": "pass"
+          },
+          {
+            "name": "requirement-explorer",
+            "status": "pass"
+          },
+          {
+            "name": "review-gate",
+            "status": "pass"
+          },
+          {
+            "name": "schema_check",
+            "status": "pass"
+          },
+          {
+            "name": "semantic-service",
+            "status": "pass"
+          },
+          {
+            "name": "skill-pack-gen",
+            "status": "pass"
+          }
+        ],
+        "counts": {
+          "pass": 17
+        },
+        "runnerExitCode": 0,
+        "reportStatus": "pass"
+      },
+      "error": null
+    },
+    {
+      "id": "2",
+      "title": "语义闸",
+      "kind": "hard",
+      "status": "green",
+      "summary": "L1/L2/L4 全 0（pass，目标域+仓根），检查文件 8",
+      "data": {
+        "status": "pass",
+        "levels": {
+          "L1": 0,
+          "L2": 0,
+          "L4": 0
+        },
+        "violationCount": 0,
+        "fileCount": 8,
+        "runnerExitCode": 0,
+        "ontologyRoot": "ontology",
+        "rootChecked": true,
+        "runs": [
+          {
+            "target": "ontology/his",
+            "role": "目标域",
+            "status": "pass",
+            "levels": {
+              "L1": 0,
+              "L2": 0,
+              "L4": 0
+            },
+            "violationCount": 0,
+            "fileCount": 8,
+            "runnerExitCode": 0
+          },
+          {
+            "target": "ontology",
+            "role": "仓根",
+            "status": "pass",
+            "levels": {
+              "L1": 0,
+              "L2": 0,
+              "L4": 0
+            },
+            "violationCount": 0,
+            "fileCount": 26,
+            "runnerExitCode": 0
+          }
+        ]
+      },
+      "error": null
+    },
+    {
+      "id": "3",
+      "title": "CORE 分布",
+      "kind": "info",
+      "status": "green",
+      "summary": "answered 5/8，拒答 3/8（missing 1 / banned 0 / out_of_surface 2）",
+      "data": {
+        "dist": {
+          "answered": 5,
+          "refused_out_of_surface": 2,
+          "refused_missing": 1
+        },
+        "questions": [
+          {
+            "core": "CORE-15",
+            "q": "Q1",
+            "ask": "退号率口径是什么？",
+            "expect": "answered",
+            "actual": "answered",
+            "match": true
+          },
+          {
+            "core": "CORE-16",
+            "q": "Q3",
+            "ask": "@AGG-HIS-001 有哪些行为？",
+            "expect": "answered",
+            "actual": "answered",
+            "match": true
+          },
+          {
+            "core": "CORE-17",
+            "q": "Q5",
+            "ask": "@SCR-HIS-001 的界面细节",
+            "expect": "refused_out_of_surface",
+            "actual": "refused_out_of_surface",
+            "match": true
+          },
+          {
+            "core": "CORE-18",
+            "q": "Q4",
+            "ask": "医保报销比例口径是什么？",
+            "expect": "refused_missing",
+            "actual": "refused_missing",
+            "match": true
+          },
+          {
+            "core": "CORE-19",
+            "q": "Q2",
+            "ask": "均次费用怎么算？",
+            "expect": "answered",
+            "actual": "answered",
+            "match": true
+          },
+          {
+            "core": "CORE-20",
+            "q": "Q8",
+            "ask": "退号率告警阈值是多少？",
+            "expect": "answered",
+            "actual": "answered",
+            "match": true
+          },
+          {
+            "core": "CORE-21",
+            "q": "Q6",
+            "ask": "复诊率怎么算？",
+            "expect": "answered",
+            "actual": "answered",
+            "match": true
+          },
+          {
+            "core": "CORE-22",
+            "q": "Q7",
+            "ask": "把 @SCR-HIS-001 的查询按钮改成实时刷新要怎么改？",
+            "expect": "refused_out_of_surface",
+            "actual": "refused_out_of_surface",
+            "match": true
+          }
+        ],
+        "answered": 5,
+        "refused": 3,
+        "mismatched": []
+      },
+      "error": null
+    },
+    {
+      "id": "4",
+      "title": "边界闸豁免",
+      "kind": "info",
+      "status": "green",
+      "summary": "10 条豁免（复核结论已并入 10 条，复核人 L0，复核日期 2026-09-25）",
+      "data": {
+        "file": ".skill-deps-allow",
+        "entries": [
+          {
+            "pattern": "fixtures/onto-modeler/**",
+            "reason": "onto-modeler 的出厂集 Seam：已在卡「Seam 与出厂集」字段声明，闸只解析 reads/writes/data 行，故在此显式豁免（票 05）"
+          },
+          {
+            "pattern": "fixtures/db-reverse/**",
+            "reason": "db-reverse 的出厂集 Seam：已在卡「Seam 与出厂集」字段声明，闸只解析 reads/writes/data 行，故在此显式豁免（票 06，同票 05 手法）"
+          },
+          {
+            "pattern": "fixtures/semantic-service/**",
+            "reason": "semantic-service 的出厂集 Seam：已在卡「Seam 与出厂集」字段声明，闸只解析 reads/writes/data 行，故在此显式豁免（票 07，同票 05/06 手法）"
+          },
+          {
+            "pattern": "fixtures/impact-analyzer/**",
+            "reason": "impact-analyzer 的出厂集 Seam：已在卡「Seam 与出厂集」字段声明，闸只解析 reads/writes/data 行，故在此显式豁免（票 08，同票 05/06/07 手法）"
+          },
+          {
+            "pattern": "fixtures/proposal-pool/**",
+            "reason": "proposal-pool 的出厂集 Seam：已在卡「Seam 与出厂集」字段声明，闸只解析 reads/writes/data 行，故在此显式豁免（票 18，同票 05/06/07/08 手法）"
+          },
+          {
+            "pattern": "fixtures/requirement-explorer/**",
+            "reason": "requirement-explorer 的出厂集 Seam：已在卡「Seam 与出厂集」字段声明，闸只解析 reads/writes/data 行，故在此显式豁免（票 30，同票 05/06/07/08/18 手法）"
+          },
+          {
+            "pattern": "fixtures/code-reverse/**",
+            "reason": "code-reverse 的出厂集 Seam：已在卡「Seam 与出厂集」字段声明，闸只解析 reads/writes/data 行，故在此显式豁免（票 31，同票 05/06/07/08/18/30 手法）"
+          },
+          {
+            "pattern": "fixtures/doc-extractor/**",
+            "reason": "doc-extractor 的出厂集 Seam：已在卡「Seam 与出厂集」字段声明，闸只解析 reads/writes/data 行，故在此显式豁免（票 32，同票 05/06/07/08/18/30/31 手法）"
+          },
+          {
+            "pattern": "fixtures/pattern-library/**",
+            "reason": "onto-modeler 模式件库出厂集 Seam：已在卡「Seam 与出厂集」字段声明，闸只解析 reads/writes/data 行，故在此显式豁免（票 33，同票 05–32 手法）"
+          },
+          {
+            "pattern": "fixtures/ddd-modeler/**",
+            "reason": "ddd-modeler 的出厂集 Seam：已在卡「Seam 与出厂集」字段声明，闸只解析 reads/writes/data 行，故在此显式豁免（票 52，同票 05–33 手法）"
+          }
+        ],
+        "badLines": [],
+        "reviewSlots": 10,
+        "reviews": {
+          "source": "docs/meta/exemption-reviews.json",
+          "loaded": true,
+          "reviewedBy": "L0",
+          "reviewedAt": "2026-09-25",
+          "byPattern": {
+            "fixtures/onto-modeler/**": {
+              "verdict": "保留",
+              "reason": "出厂集 Seam 声明面（卡「Seam 与出厂集」字段，票 05）闸不解析，豁免=机制性登记非欠账，保留",
+              "reviewedBy": "L0",
+              "reviewedAt": "2026-09-25"
+            },
+            "fixtures/db-reverse/**": {
+              "verdict": "保留",
+              "reason": "出厂集 Seam 声明面（卡字段，票 06 同票 05 手法）闸不解析，机制性豁免，保留",
+              "reviewedBy": "L0",
+              "reviewedAt": "2026-09-25"
+            },
+            "fixtures/semantic-service/**": {
+              "verdict": "保留",
+              "reason": "出厂集 Seam 声明面（卡字段，票 07 同票 05/06 手法）闸不解析，机制性豁免，保留",
+              "reviewedBy": "L0",
+              "reviewedAt": "2026-09-25"
+            },
+            "fixtures/impact-analyzer/**": {
+              "verdict": "保留",
+              "reason": "出厂集 Seam 声明面（卡字段，票 08 同票 05/06/07 手法）闸不解析，机制性豁免，保留",
+              "reviewedBy": "L0",
+              "reviewedAt": "2026-09-25"
+            },
+            "fixtures/proposal-pool/**": {
+              "verdict": "保留",
+              "reason": "出厂集 Seam 声明面（卡字段，票 18 二期同手法）闸不解析，机制性豁免，保留",
+              "reviewedBy": "L0",
+              "reviewedAt": "2026-09-25"
+            },
+            "fixtures/requirement-explorer/**": {
+              "verdict": "保留",
+              "reason": "出厂集 Seam 声明面（卡「Seam 与出厂集」字段，闸不解析该行）——机制性豁免，保留（票 30）",
+              "reviewedBy": "L0",
+              "reviewedAt": "2026-09-25"
+            },
+            "fixtures/code-reverse/**": {
+              "verdict": "保留",
+              "reason": "出厂集 Seam 声明面（卡「Seam 与出厂集」字段，闸不解析该行）——机制性豁免，保留（票 31）",
+              "reviewedBy": "L0",
+              "reviewedAt": "2026-09-25"
+            },
+            "fixtures/doc-extractor/**": {
+              "verdict": "保留",
+              "reason": "出厂集 Seam 声明面（卡「Seam 与出厂集」字段，闸不解析该行）——机制性豁免，保留（票 32）",
+              "reviewedBy": "L0",
+              "reviewedAt": "2026-09-25"
+            },
+            "fixtures/pattern-library/**": {
+              "verdict": "保留",
+              "reason": "出厂集 Seam 声明面（卡「Seam 与出厂集」字段，闸不解析该行）——机制性豁免，保留（票 33（模式件库出厂集 Seam，同手法））",
+              "reviewedBy": "L0",
+              "reviewedAt": "2026-09-25"
+            },
+            "fixtures/ddd-modeler/**": {
+              "verdict": "保留",
+              "reason": "出厂集 Seam 声明面（卡「Seam 与出厂集」字段，票 50 开卡/票 51 闸轨/票 52 skill 轨，闸不解析该行）——机制性豁免，保留（票 54 补复核）",
+              "reviewedBy": "L0",
+              "reviewedAt": "2026-09-25"
+            }
+          },
+          "unmatched": [],
+          "error": null,
+          "unreviewed": []
+        }
+      },
+      "error": null
+    },
+    {
+      "id": "5",
+      "title": "归档豁免",
+      "kind": "info",
+      "status": "green",
+      "summary": "0 条豁免（豁免文件不存在，0 条——不是错）",
+      "data": {
+        "file": ".archive-allow",
+        "exists": false,
+        "entries": [],
+        "badLines": [],
+        "reviewSlots": 0,
+        "reviews": {
+          "source": "docs/meta/exemption-reviews.json",
+          "loaded": true,
+          "reviewedBy": "L0",
+          "reviewedAt": "2026-09-25",
+          "byPattern": {},
+          "unmatched": [
+            "fixtures/code-reverse/**",
+            "fixtures/db-reverse/**",
+            "fixtures/ddd-modeler/**",
+            "fixtures/doc-extractor/**",
+            "fixtures/impact-analyzer/**",
+            "fixtures/onto-modeler/**",
+            "fixtures/pattern-library/**",
+            "fixtures/proposal-pool/**",
+            "fixtures/requirement-explorer/**",
+            "fixtures/semantic-service/**"
+          ],
+          "error": null,
+          "unreviewed": []
+        }
+      },
+      "error": null
+    },
+    {
+      "id": "6",
+      "title": "安装位",
+      "kind": "hard",
+      "status": "green",
+      "summary": "零漂移零孤儿，9 个 skill 双位置一致（注册表规模 9）",
+      "data": {
+        "registrySize": 9,
+        "consistent": [
+          "code-reverse",
+          "db-reverse",
+          "ddd-modeler",
+          "doc-extractor",
+          "impact-analyzer",
+          "onto-modeler",
+          "proposal-pool",
+          "requirement-explorer",
+          "semantic-service"
+        ],
+        "drift": [],
+        "driftByType": {},
+        "driftCount": 0,
+        "orphans": [],
+        "orphanCount": 0,
+        "runnerExitCode": 0
+      },
+      "error": null
+    },
+    {
+      "id": "7",
+      "title": "skill↔卡同步",
+      "kind": "hard",
+      "status": "green",
+      "summary": "卡 13 : skill 9；有 skill 无卡 0（违规向）；有卡无 skill 4（占位卡待建，不判违规）",
+      "data": {
+        "cards": [
+          "onto-modeler",
+          "db-reverse",
+          "impact-analyzer",
+          "semantic-service",
+          "requirement-explorer",
+          "code-reverse",
+          "doc-extractor",
+          "ddd-modeler",
+          "app-generator",
+          "skill-publisher",
+          "mcp-publisher",
+          "proposal-pool",
+          "meta-doctor"
+        ],
+        "skills": [
+          "code-reverse",
+          "db-reverse",
+          "ddd-modeler",
+          "doc-extractor",
+          "impact-analyzer",
+          "onto-modeler",
+          "proposal-pool",
+          "requirement-explorer",
+          "semantic-service"
+        ],
+        "skillNoCard": [],
+        "cardNoSkill": [
+          "app-generator",
+          "mcp-publisher",
+          "meta-doctor",
+          "skill-publisher"
+        ]
+      },
+      "error": null
+    },
+    {
+      "id": "8",
+      "title": "提案池",
+      "kind": "info",
+      "status": "green",
+      "summary": "31 份提案（status: accepted×27 rejected×4）；proposal_check rc=0（violations 0）",
+      "data": {
+        "files": 31,
+        "statusCounts": {
+          "accepted": 27,
+          "rejected": 4
+        },
+        "unparsed": [],
+        "proposalCheck": {
+          "exitCode": 0,
+          "status": "pass",
+          "violations": 0
+        }
+      },
+      "error": null
+    },
+    {
+      "id": "9",
+      "title": "图基线",
+      "kind": "info",
+      "status": "green",
+      "summary": "查询 AGG-HIS-001（命中）：节点 80 / 边 155",
+      "data": {
+        "query": "AGG-HIS-001",
+        "found": true,
+        "nodes": 80,
+        "edges": 155,
+        "runnerExitCode": 0
+      },
+      "error": null
+    },
+    {
+      "id": "10",
+      "title": "信号路由表",
+      "kind": "hard",
+      "status": "green",
+      "summary": "三类路由齐（业务错/工程错/元模型错），实例指针 10 commit 全在 log + 5 PROP 全在池",
+      "data": {
+        "table": "policies/signal-routing.json",
+        "exists": true,
+        "version": 1,
+        "routes": [
+          {
+            "kind": "业务错",
+            "destination": "本体 MR（人审）",
+            "instanceCount": 3
+          },
+          {
+            "kind": "工程错",
+            "destination": "tickets/ 票",
+            "instanceCount": 4
+          },
+          {
+            "kind": "元模型错",
+            "destination": "schema 演进票",
+            "instanceCount": 3
+          }
+        ],
+        "kindsFound": [
+          "业务错",
+          "工程错",
+          "元模型错"
+        ],
+        "commitChecks": [
+          {
+            "commit": "6f85807",
+            "ticket": "46",
+            "desc": "人审闸信号源首审基线（票 46 首审审记 exports/reviews/devkit-review.json verdict=已审；首个真实打回·本体内容错将沿本道当场起草提案）",
+            "exists": true
+          },
+          {
+            "commit": "1086c2b",
+            "ticket": "19",
+            "desc": "裁决队列实弹落池（票 19；31 提案=5 闭环回填+26 开放待 Owner 裁决）",
+            "exists": true
+          },
+          {
+            "commit": "29f890b",
+            "ticket": "17",
+            "desc": "术语问句入 Golden Q 闭环（票 17 回填 accepted 提案）",
+            "exists": true
+          },
+          {
+            "commit": "6f85807",
+            "ticket": "46",
+            "desc": "人审闸信号源首审基线（票 46 首审审记 exports/reviews/devkit-review.json verdict=已审；首个真实打回·装配/生成器错将沿本道当场开票）",
+            "exists": true
+          },
+          {
+            "commit": "648e6fd",
+            "ticket": "04",
+            "desc": "图索引构建器（纯内存图+闭包/影响链 CLI）",
+            "exists": true
+          },
+          {
+            "commit": "d0be9c2",
+            "ticket": "25",
+            "desc": "core 名称解析 camp 裁剪 P1 修复（复现用例 CORE-09 钉死）",
+            "exists": true
+          },
+          {
+            "commit": "85776bc",
+            "ticket": "56",
+            "desc": "proposal_check 裁决后盲区实弹发现（A 线 PROP-006 采纳流程：accepted add+靶在场被检查②误报红，检查器只被提议期语义验证过、裁决后语义零样本）→ 工程错道开票 56 修复（检查②收窄 draft/open+回归×2+fixture 换锚 RULE-BOHAI-099，lessons/57）",
+            "exists": true
+          },
+          {
+            "commit": "0104735",
+            "ticket": "41",
+            "desc": "L3 首跑真缺陷裁决修域 RULE-BOHAI-003（票 41 L3 确定性闸存量首跑，修域不改闸、原值留档）",
+            "exists": true
+          },
+          {
+            "commit": "0474bc8",
+            "ticket": "10",
+            "desc": "术语模型 GLS 进 schema（版本 1.1.0+CHANGELOG+filename-mismatch 闸）",
+            "exists": true
+          },
+          {
+            "commit": "a4fb938",
+            "ticket": "27",
+            "desc": "schema_check 元素枚举去 id 锚定（缺 id 盲区修复，27 域全量绿灯零扰动）",
+            "exists": true
+          }
+        ],
+        "propChecks": [
+          {
+            "prop": "PROP-BOHAI-006",
+            "exists": true
+          },
+          {
+            "prop": "PROP-BOHAI-018",
+            "exists": true
+          },
+          {
+            "prop": "PROP-BOHAI-031",
+            "exists": true
+          },
+          {
+            "prop": "PROP-BOHAI-005",
+            "exists": true
+          },
+          {
+            "prop": "PROP-BOHAI-006",
+            "exists": true
+          }
+        ],
+        "errors": []
+      },
+      "error": null
+    }
+  ]
+}
