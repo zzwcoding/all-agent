@@ -502,5 +502,65 @@ class ReviewGateTest(unittest.TestCase):
         self.assertEqual(p2, Path("/r/devkit-review.json"))
 
 
+class VerifyAllMode(unittest.TestCase):
+    """票 77：verify --all 枚举面 + verify_record 提炼后的直用面。"""
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self._tmp.name)
+        self.addCleanup(self._tmp.cleanup)
+        self.rdir = self.root / "exports" / "reviews"
+
+    def _make_target(self, rel: str) -> Path:
+        t = self.root / rel
+        t.parent.mkdir(parents=True, exist_ok=True)
+        t.write_text(f"# {rel}\n", encoding="utf-8")
+        return t
+
+    def test_all_one_pass_one_pending_exit_1(self):
+        a = self._make_target("exports/devkit/d1/devkit.md")
+        run_main(["approve", str(a), "--review-dir", str(self.rdir)])
+        self._make_target("exports/devkit/d2/devkit.md")  # 无审记
+        rc, out, _err = run_main(["verify", "--all", "--root", str(self.root)])
+        self.assertEqual(rc, 1)
+        self.assertIn("[pass]", out)
+        self.assertIn("[pending]", out)
+        self.assertIn("2 件", out)
+
+    def test_all_both_approved_exit_0(self):
+        for rel in ("exports/devkit/d1/devkit.md",
+                    "exports/skillpkg/d1/SKILL.md"):
+            t = self._make_target(rel)
+            run_main(["approve", str(t), "--review-dir", str(self.rdir)])
+        rc, out, _err = run_main(["verify", "--all", "--root", str(self.root)])
+        self.assertEqual(rc, 0)
+        self.assertEqual(out.count("[pass]"), 2)
+
+    def test_all_empty_exports_exit_2(self):
+        rc, _out, err = run_main(["verify", "--all", "--root", str(self.root)])
+        self.assertEqual(rc, 2)
+        self.assertIn("无 devkit/skillpkg 生成物可核", err)
+
+    def test_verify_requires_target_or_all(self):
+        rc, _out, _err = run_main(["verify"])
+        self.assertEqual(rc, 2)
+
+    def test_verify_record_returns_tuple_without_printing(self):
+        t = self._make_target("exports/devkit/d1/devkit.md")
+        out, err = io.StringIO(), io.StringIO()
+        with redirect_stdout(out), redirect_stderr(err):
+            code, status, reason, record, n = rg.verify_record(
+                t, self.rdir / "devkit-review.json")
+        self.assertEqual((code, status, record, n), (1, "pending", None, 0))
+        self.assertIn("无审记", reason)
+        self.assertEqual(out.getvalue(), "")  # 核心函数不打印
+
+    def test_verify_record_missing_target_is_config(self):
+        code, status, reason, _r, _n = rg.verify_record(
+            self.root / "nope.md", self.rdir / "nope-review.json")
+        self.assertEqual((code, status), (2, "invalid"))
+        self.assertIn("目标不存在", reason)
+
+
 if __name__ == "__main__":
     unittest.main()

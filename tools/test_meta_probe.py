@@ -13,6 +13,7 @@ docs/meta/exemption-reviews.json 两条路，无结论=留空栏，坏结论文�
 
 import io
 import json
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -933,6 +934,50 @@ class MetaProbeMultiDomain(unittest.TestCase):
                                    core_status_runner(ALL_EXPECT)),
                        graph_query="CUSTOM-1")
         self.assertEqual(seen, ["CUSTOM-1"])
+
+
+class ListDomainsMode(unittest.TestCase):
+    """票 77：--list-domains 域清单枚举（AGENTS 协议①去手抄域名单的承载）。"""
+
+    def _call(self, argv):
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            try:
+                rc = mp.main(argv)
+            except SystemExit as exc:  # argparse 用法错按退出码收
+                rc = exc.code if isinstance(exc.code, int) else 2
+        return rc, buf.getvalue()
+
+    def test_real_repo_lists_three_domains(self):
+        proc = subprocess.run(
+            [sys.executable, str(REAL_ROOT / "tools" / "meta_probe.py"),
+             "--list-domains"],
+            capture_output=True, text=True, timeout=60)
+        self.assertEqual(proc.returncode, 0)
+        self.assertEqual(proc.stdout.splitlines(), ["bohai", "his", "pkb"])
+
+    def test_tmp_root_sorted_enumeration(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            for d in ("a2", "a1"):
+                (root / "ontology" / d).mkdir(parents=True)
+                (root / "ontology" / d / "manifest.json").write_text(
+                    json.dumps({"domain": d}), encoding="utf-8")
+            (root / "ontology" / "notadomain.txt").write_text(
+                "x", encoding="utf-8")  # 非目录项不进清单
+            rc, out = self._call(["--list-domains", "--root", str(root)])
+            self.assertEqual(rc, 0)
+            self.assertEqual(out.splitlines(), ["a1", "a2"])
+
+    def test_tmp_root_without_ontology_is_empty_not_crash(self):
+        with tempfile.TemporaryDirectory() as td:
+            rc, out = self._call(["--list-domains", "--root", td])
+            self.assertEqual(rc, 0)
+            self.assertEqual(out, "")
+
+    def test_target_optional_but_required_without_flag(self):
+        rc, _out = self._call([])
+        self.assertEqual(rc, 2)
 
 
 if __name__ == "__main__":

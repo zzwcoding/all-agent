@@ -293,44 +293,31 @@ def cmd_reject(target: Path, rpath: Path, routing: "str | None",
     return EXIT_OK
 
 
-def cmd_verify(target: Path, rpath: Path, as_json: bool = False) -> int:
-    def emit(code: int, status: str, reason: str, record=None) -> int:
-        if as_json:
-            print(json.dumps({
-                "tool": "review_gate", "ticket": TICKET,
-                "target": str(target), "reviewFile": str(rpath),
-                "status": status, "exitCode": code, "reason": reason,
-                "recordsCount": (len(trail["records"]) if trail else 0),
-                "record": record,
-            }, ensure_ascii=False, indent=2))
-        else:
-            print(reason)
-        return code
-
+def verify_record(target: Path, rpath: Path) -> "tuple[int, str, str, dict | None, int]":
+    """核审记核心（票 77 提炼）：verify --all / onboard_check / report_numbers
+    共用同一状态机，不再各复制一份。返回 (exit_code, status, reason, record,
+    records_count)，不打印。"""
     if not target.is_file():
-        print(f"配置错误: 目标不存在: {target}", file=sys.stderr)
-        return EXIT_CONFIG
+        return EXIT_CONFIG, "invalid", f"配置错误: 目标不存在: {target}", None, 0
 
     trail = None
     if not rpath.exists():
-        return emit(EXIT_RED, "pending",
-                    f"无审记（缺失=无效）: {rpath} —— 按待人审处理，"
-                    f"不重建审记（宁多审一次，design §3.4 #2）")
+        return EXIT_RED, "pending", (
+            f"无审记（缺失=无效）: {rpath} —— 按待人审处理，"
+            f"不重建审记（宁多审一次，design §3.4 #2）"), None, 0
     trail, corrupt = load_trail(rpath)
     if trail is None:
-        return emit(EXIT_RED, "pending",
-                    f"审记损坏（{corrupt}）: {rpath} —— 按待人审处理，"
-                    f"不重建审记")
+        return EXIT_RED, "pending", (
+            f"审记损坏（{corrupt}）: {rpath} —— 按待人审处理，"
+            f"不重建审记"), None, 0
     if not trail["records"]:
-        return emit(EXIT_RED, "pending",
-                    f"审记无任何裁决记录: {rpath} —— 按待人审处理")
+        return EXIT_RED, "pending", (
+            f"审记无任何裁决记录: {rpath} —— 按待人审处理"), None, 0
     problems = trail_problems(trail)
     if problems:
-        print("审记非法（配置错）—— 审记整体不可信，逐条脏点:", file=sys.stderr)
-        for p in problems:
-            print(f"  {p}", file=sys.stderr)
-        return emit(EXIT_CONFIG, "invalid", "审记非法（记录缺必备字段或 verdict "
-                    "非法值）—— 配置错，详见 stderr；不重建审记")
+        return EXIT_CONFIG, "invalid", (
+            "审记非法（记录缺必备字段或 verdict 非法值）—— 配置错，脏点: "
+            + "; ".join(problems) + "；不重建审记"), None, len(trail["records"])
 
     # 本目标的最新裁决（票 59）：审记旁档按 target.stem 命名（bohai 与 pkb 的
     # devkit 同落 devkit-review.json），记录内 target 字段是唯一甄别键——
@@ -345,25 +332,79 @@ def cmd_verify(target: Path, rpath: Path, as_json: bool = False) -> int:
             if isinstance(r.get("target"), str)
             and _same_target(r["target"], str(target))]
     if not mine:
-        return emit(EXIT_RED, "pending",
-                    f"无本目标审记（旁档 {rpath} 现有其他生成物记录 "
-                    f"{len(trail['records'])} 条，无 {target} 的记录）"
-                    f"—— 按待人审处理（宁多审一次，design §3.4 #2）")
+        return EXIT_RED, "pending", (
+            f"无本目标审记（旁档 {rpath} 现有其他生成物记录 "
+            f"{len(trail['records'])} 条，无 {target} 的记录）"
+            f"—— 按待人审处理（宁多审一次，design §3.4 #2）"), None, len(trail["records"])
     record = mine[-1]
     if record["verdict"] == VERDICT_REJECTED:
-        return emit(EXIT_RED, "rejected",
-                    f"最新裁决为打回（routing: {record.get('routing', '')}）"
-                    f"—— 按未通过处理，整改后再审", record)
+        return EXIT_RED, "rejected", (
+            f"最新裁决为打回（routing: {record.get('routing', '')}）"
+            f"—— 按未通过处理，整改后再审"), record, len(trail["records"])
     current = sha256_of(target)
     if current == record["reviewedSha256"]:
-        return emit(EXIT_OK, "pass",
-                    f"已审且哈希一致: {target}\n  审记: {rpath}"
-                    f"\n  锚定 commit={short(record['reviewedCommit'])}"
-                    f" by={record['reviewedBy']} date={record['date']}", record)
-    return emit(EXIT_RED, "stale",
-                f"审记失效: 生成物已再生/被改（现算 {short(current)} ≠ 锚定 "
-                f"{short(record['reviewedSha256'])}）→ 已审结论自动失效，"
-                f"回落待人审（零宽限；旧审记保留可查）", record)
+        return EXIT_OK, "pass", (
+            f"已审且哈希一致: {target}\n  审记: {rpath}"
+            f"\n  锚定 commit={short(record['reviewedCommit'])}"
+            f" by={record['reviewedBy']} date={record['date']}"), record, len(trail["records"])
+    return EXIT_RED, "stale", (
+        f"审记失效: 生成物已再生/被改（现算 {short(current)} ≠ 锚定 "
+        f"{short(record['reviewedSha256'])}）→ 已审结论自动失效，"
+        f"回落待人审（零宽限；旧审记保留可查）"), record, len(trail["records"])
+
+
+def cmd_verify(target: Path, rpath: Path, as_json: bool = False) -> int:
+    code, status, reason, record, n_records = verify_record(target, rpath)
+    if as_json:
+        print(json.dumps({
+            "tool": "review_gate", "ticket": TICKET,
+            "target": str(target), "reviewFile": str(rpath),
+            "status": status, "exitCode": code, "reason": reason,
+            "recordsCount": n_records,
+            "record": record,
+        }, ensure_ascii=False, indent=2))
+    elif code == EXIT_CONFIG:
+        print(reason, file=sys.stderr)  # 配置错走 stderr（票 45 契约保持）
+    else:
+        print(reason)
+    return code
+
+
+# verify --all 的枚举面（票 77）：devkit 与 skillpkg 两类生成物；manifest 免审级不在面内。
+VERIFY_ALL_GLOBS = ("exports/devkit/*/devkit.md", "exports/skillpkg/*/SKILL.md")
+
+
+def cmd_verify_all(root: Path, as_json: bool = False,
+                   review_dir: "Path | None" = None) -> int:
+    """枚举 exports 面逐件核审记（票 77，AGENTS 协议⑥枚举化承载）。
+    逐行报状态；任一非 pass exit 1，任一配置错 exit 2。缺失/失效照旧=
+    收官挂账项，不阻塞四闸（本命令不进 ci.sh）。"""
+    targets = sorted(t for pat in VERIFY_ALL_GLOBS for t in root.glob(pat))
+    if not targets:
+        print(f"配置错误: {root}/exports 下无 devkit/skillpkg 生成物可核",
+              file=sys.stderr)
+        return EXIT_CONFIG
+    rdir = review_dir if review_dir is not None else root / "exports" / "reviews"
+    if not as_json:
+        print(f"verify --all：{len(targets)} 件（{' + '.join(VERIFY_ALL_GLOBS)}）")
+    worst = EXIT_OK
+    for t in targets:
+        code, status, reason, record, n_records = verify_record(
+            t, review_path_for(t, rdir))
+        if as_json:
+            print(json.dumps({
+                "tool": "review_gate", "ticket": TICKET, "mode": "all",
+                "target": str(t), "status": status, "exitCode": code,
+                "reason": reason, "recordsCount": n_records, "record": record,
+            }, ensure_ascii=False))
+        else:
+            stream = sys.stderr if code == EXIT_CONFIG else sys.stdout
+            print(f"[{status}] {reason}", file=stream)
+        worst = max(worst, code)
+    if not as_json:
+        print(f"verify --all 小结: {len(targets)} 件，最差退出码 {worst}"
+              f"（非 0 = 存在待人审/失效/打回件，按收官挂账口径处理）")
+    return worst
 
 
 # ---------- CLI ----------
@@ -391,13 +432,29 @@ def main(argv=None) -> int:
     add_target(sub.add_parser("approve", help="追加 verdict=已审 审记"))
     add_target(sub.add_parser("reject", help="追加 verdict=打回 审记"
                                           "（--routing 必带）"))
-    p_verify = sub.add_parser("verify", help="现算 sha256 与最新审记比对")
-    p_verify.add_argument("target", help="被审生成物路径")
+    p_verify = sub.add_parser("verify", help="现算 sha256 与最新审记比对"
+                                              "（单件传 target；枚举面传 --all）")
+    p_verify.add_argument("target", nargs="?", default=None,
+                          help="被审生成物路径（--all 时可省）")
+    p_verify.add_argument("--all", action="store_true",
+                          help="枚举 exports/devkit/*/devkit.md + "
+                               "exports/skillpkg/*/SKILL.md 逐件核（票 77）")
+    p_verify.add_argument("--root", default=None,
+                          help="--all 的枚举根（缺省=本脚本上级目录；单件模式不适用）")
     p_verify.add_argument("--review-dir", default=None,
-                          help=f"审记旁档目录（缺省 {DEFAULT_REVIEW_DIR}）")
+                          help=f"审记旁档目录（缺省 {DEFAULT_REVIEW_DIR}；"
+                               f"--all 缺省 <root>/exports/reviews）")
     p_verify.add_argument("--json", action="store_true",
                           help="机读 JSON 输出（stdout 只含 JSON）")
     args = ap.parse_args(argv)
+
+    if args.action == "verify" and getattr(args, "all", False):
+        root = Path(args.root) if args.root \
+            else Path(__file__).resolve().parent.parent
+        review_dir = Path(args.review_dir) if args.review_dir else None
+        return cmd_verify_all(root, as_json=args.json, review_dir=review_dir)
+    if args.action == "verify" and not args.target:
+        ap.error("verify 需要单件 target 或 --all 枚举面")
 
     target = Path(args.target)
     rpath = review_path_for(target, Path(args.review_dir) if args.review_dir

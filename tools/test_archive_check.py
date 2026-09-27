@@ -3,6 +3,7 @@
 
 import io
 import json
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -183,6 +184,57 @@ class RepoCase(unittest.TestCase):
     def test_unknown_profile_is_config_error(self):
         with self.assertRaises(ValueError):
             ac.run(self.root, profile="nope")
+
+
+class WarnUntracked(unittest.TestCase):
+    """票 77：归档闸未跟踪文件警告（只警不拦；lessons/0019 误删实证）。"""
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self._tmp.name)
+        self.addCleanup(self._tmp.cleanup)
+
+    def _git(self, *args):
+        proc = subprocess.run(["git", "-C", str(self.root), *args],
+                              capture_output=True, text=True)
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+
+    def test_untracked_listed_tracked_not(self):
+        self._git("init", "-q")
+        (self.root / "a.txt").write_text("tracked", encoding="utf-8")
+        self._git("add", "a.txt")
+        (self.root / "b.txt").write_text("untracked", encoding="utf-8")
+        got = ac.warn_untracked(self.root)
+        self.assertIn("b.txt", got)
+        self.assertNotIn("a.txt", got)
+
+    def test_clean_repo_empty_list(self):
+        self._git("init", "-q")
+        (self.root / "a.txt").write_text("x", encoding="utf-8")
+        self._git("add", "a.txt")
+        self.assertEqual(ac.warn_untracked(self.root), [])
+
+    def test_non_git_dir_silent_empty(self):
+        (self.root / "x.md").write_text("x", encoding="utf-8")
+        self.assertEqual(ac.warn_untracked(self.root), [])
+
+    def test_report_carries_untracked_and_does_not_block_exit(self):
+        # 复用 RepoCase 的最小 skill-repo 夹具（缺布局表 run() 会配置错）
+        write(self.root / "SKILL.md", "---\nname: demo\n---\n")
+        write(self.root / "references" / "repo-layout.json", json.dumps(LAYOUT))
+        write(self.root / "specs" / "archive-registry.json", json.dumps(REGISTRY))
+        write(self.root / "specs" / "modules.md", CARD)
+        write(self.root / "tickets" / "01-x.md", "# 票\nStatus: done\n")
+        write(self.root / "lessons" / "01-x.md",
+              "# 日志\n## 做了什么\n## 取舍\n## 坑\n")
+        self._git("init", "-q")
+        self._git("add", ".")
+        # 入账后再写新日志 → 未跟踪；归档闸照绿，仅警告面带出
+        write(self.root / "lessons" / "02-y.md",
+              "# 日志\n## 做了什么\n## 取舍\n## 坑\n")
+        report = ac.run(self.root)
+        self.assertEqual(report["status"], "pass", report["violations"])
+        self.assertIn("lessons/02-y.md", report["untracked"])
 
 
 if __name__ == "__main__":

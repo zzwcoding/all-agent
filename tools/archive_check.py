@@ -215,6 +215,22 @@ def check_registry(files: list[str], root: Path, artifacts: list[dict]) -> list[
     return violations
 
 
+def warn_untracked(root: Path) -> "list[str]":
+    """未跟踪文件清单（票 77，只警不拦）：git status --porcelain 的 ?? 项。
+    git 缺席/非 git 仓/超时一律静默返回空表——警告不得反过来卡 CI。"""
+    try:
+        proc = subprocess.run(
+            ["git", "-C", str(root), "-c", "core.quotepath=false",
+             "status", "--porcelain"],
+            capture_output=True, text=True, timeout=30)
+    except (OSError, subprocess.TimeoutExpired):
+        return []
+    if proc.returncode != 0:
+        return []
+    return [line[3:] for line in proc.stdout.splitlines()
+            if line.startswith("?? ")]
+
+
 def run(root: Path, profile: str | None = None,
         layout_path: Path | None = None, registry_path: Path | None = None,
         allow_path: Path | None = None) -> dict:
@@ -240,6 +256,7 @@ def run(root: Path, profile: str | None = None,
         "status": "fail" if violations else "pass",
         "profile": profile,
         "filesChecked": len(files),
+        "untracked": warn_untracked(root),
         "exempted": [{"path": f,
                       "reason": next((r for p, r in allowlist
                                       if fnmatch.fnmatch(f, p)), "")}
@@ -252,6 +269,9 @@ def print_human(report: dict) -> None:
     print(f"profile={report['profile']} 受管文件 {report['filesChecked']} 个")
     for e in report["exempted"]:
         print(f"[豁免] {e['path']} — {e['reason']}")
+    for f in report.get("untracked", []):
+        print(f"[⚠ 未跟踪] {f} —— 提交前 git add（防文件只落盘不入账，"
+              f"lessons/0019 误删实证，票 77；不影响本闸退出码）")
     if not report["violations"]:
         print("归档闸: 全部文件对得上布局表+登记表")
         return

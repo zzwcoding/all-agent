@@ -1,0 +1,48 @@
+{
+  "generatedAt": "2026-09-28 00:33:17",
+  "gitHead": "87b676c",
+  "unitTests": 667,
+  "domains": [
+    {
+      "domain": "bohai",
+      "profile": "v9-full",
+      "modelFiles": 7,
+      "omitted": 1
+    },
+    {
+      "domain": "his",
+      "profile": "v9-full",
+      "modelFiles": 8,
+      "omitted": 0
+    },
+    {
+      "domain": "pkb",
+      "profile": "headless",
+      "modelFiles": 4,
+      "omitted": 2
+    }
+  ],
+  "exports": [
+    {
+      "target": "exports/devkit/bohai/devkit.md",
+      "review": "pass"
+    },
+    {
+      "target": "exports/devkit/his/devkit.md",
+      "review": "pending"
+    },
+    {
+      "target": "exports/devkit/pkb/devkit.md",
+      "review": "pass"
+    },
+    {
+      "target": "exports/skillpkg/bohai/SKILL.md",
+      "review": "pass"
+    },
+    {
+      "target": "exports/skillpkg/his/SKILL.md",
+      "review": "pending"
+    }
+  ],
+  "checkupNotes": 15
+}

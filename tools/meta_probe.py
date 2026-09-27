@@ -914,7 +914,11 @@ def main(argv=None, runner: Runner | None = None) -> int:
     ap = argparse.ArgumentParser(
         description="元循环探针（票 28/29）：十项确定性体检，MD+JSON 报告；"
                     "退出码 0 硬闸全绿 / 1 硬闸红 / 2 用法错误")
-    ap.add_argument("target", help="ontology 目录（如 ontology/bohai）")
+    ap.add_argument("target", nargs="?", default=None,
+                    help="ontology 目录（如 ontology/bohai）；--list-domains 时可省")
+    ap.add_argument("--list-domains", action="store_true",
+                    help="枚举 ontology/*/manifest.json 域名清单后退出"
+                         "（票 77：域清单以现跑为准，勿手抄）")
     ap.add_argument("--out", default=None,
                     help="报告落盘路径（.md；同时落同名 .json；缺省只打 stdout）")
     ap.add_argument("--root", default=None,
@@ -929,6 +933,15 @@ def main(argv=None, runner: Runner | None = None) -> int:
 
     root = (Path(args.root).resolve() if args.root
             else Path(__file__).resolve().parent.parent)
+    if args.list_domains:
+        onto = root / "ontology"
+        domains = sorted(d.parent.name for d in onto.glob("*/manifest.json")) \
+            if onto.is_dir() else []
+        for name in domains:
+            print(name)
+        return 0
+    if not args.target:
+        ap.error("需要 ontology 目录（如 ontology/bohai）或 --list-domains")
     target = Path(args.target)
     if not target.is_dir():
         print(f"用法错误: 本体目录不存在: {args.target}", file=sys.stderr)
