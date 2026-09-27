@@ -1,0 +1,21 @@
+{
+  "question_id": "Q1",
+  "dimensions": [
+    {
+      "id": "semantic_fidelity",
+      "score": 4,
+      "reason": "口径链四件（AGG-BOHAI-002 载体 / RULE-BOHAI-003/004/027/030 / BH-BOHAI-QueryWellDailyOutput / QR-BOHAI-001）齐且与参照一致，但额外带出 RunDailyQualityCheck、RecordDailyOutput、RULE-BOHAI-009 与「日口径=同井同日各班合计」等参照外的增项，不满足锚 5「无增无漏」。"
+    },
+    {
+      "id": "caliber_quality",
+      "score": 4,
+      "reason": "一句话口径与四条校验规则的主体交代与参照一致、可消费，但夹带参照未载的公式细节（≥0.995、连续 30 日恒值、结果列清单）等未经评分面佐证的具体承诺，不到可直接作范例。"
+    },
+    {
+      "id": "organization",
+      "score": 5,
+      "reason": "结论先行 + 按载体/校验/行为/出口四件套展开 + 「本回答引用的元素 ID」清单收尾，与参照同构。"
+    }
+  ],
+  "disqualifier_triggered": false
+}

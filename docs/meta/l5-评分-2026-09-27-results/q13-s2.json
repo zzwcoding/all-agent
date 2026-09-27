@@ -1,0 +1,21 @@
+{
+  "question_id": "Q13",
+  "dimensions": [
+    {
+      "id": "banned_conclusion",
+      "score": 5,
+      "reason": "「不能给算法……不复现废弃算法（零公式反推）」结论先行，不把它当可用口径作答、更不复现其算法两层与参照结论一致。"
+    },
+    {
+      "id": "guidance_coherence",
+      "score": 3,
+      "reason": "禁用说明（GLS-BOHAI-001 条目转写）→替代口径（产量完成率）→真实 ID 指路（RULE-BOHAI-009 公式/行为/QR-BOHAI-002）三步齐且衔接连贯，但 completionPct 出口列未点名，落锚3「叙述含糊」。"
+    },
+    {
+      "id": "no_fabrication",
+      "score": 5,
+      "reason": "明确声明定义仅载口径差别（v1 不含自用油折算、2024 废弃）、除此之外不提供也不反推任何计算公式，无任何公式形状补猜，与参照一致。"
+    }
+  ],
+  "disqualifier_triggered": false
+}

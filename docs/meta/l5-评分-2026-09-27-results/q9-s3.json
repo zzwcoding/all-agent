@@ -1,0 +1,21 @@
+{
+  "question_id": "Q9",
+  "dimensions": [
+    {
+      "id": "candidate_coverage",
+      "score": 4,
+      "reason": "计量字段（AGG-BOHAI-002 waterCut）/化验字段（AGG-BOHAI-006 waterCutLab）/指标链（RULE-BOHAI-010→BH-BOHAI-QueryBlockWaterCut→QR-BOHAI-004）三组候选齐且分组呈现、「两义字段带一条指标链」定性一致，但增列参照外的 RULE-BOHAI-029 及 f_w 公式等补猜细节，不满足「无增无漏」。"
+    },
+    {
+      "id": "anchoring_request",
+      "score": 4,
+      "reason": "「请锚定修饰词（计量折算/化验实测/区块综合指标），不擅自合并」明确请提问者补修饰词，且给出并存分场景、语义与用途不同层等不可互换理由，但 RULE-BOHAI-002「容差只是检出，不是口径仲裁」的仲裁边界未点明。"
+    },
+    {
+      "id": "no_overreach",
+      "score": 3,
+      "reason": "全文未代替 Owner 择支表态、只转达已裁并存分场景，无越权，但参照「裁决权在 Owner——本服务只列证据与承载，不表态」的边界声明缺失。"
+    }
+  ],
+  "disqualifier_triggered": false
+}

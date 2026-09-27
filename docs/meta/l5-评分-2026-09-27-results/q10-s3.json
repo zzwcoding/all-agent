@@ -1,0 +1,21 @@
+{
+  "question_id": "Q10",
+  "dimensions": [
+    {
+      "id": "semantic_fidelity",
+      "score": 4,
+      "reason": "公式与粒度→分子分母 sourceField（dailyProduction.oilOutput/planOutput）→BH-BOHAI-QueryBlockMonthlyCompletion 封账前置注记→QR-BOHAI-002 completionPct 列分层齐全且与参照逐点等价，但增引参照外的 RULE-BOHAI-022 并改挂分母取版口径承载、附出口列 sourceExpression 等增项。"
+    },
+    {
+      "id": "neighbor_distinction",
+      "score": 5,
+      "reason": "同出口并列「有效产量·剔检」列（RULE-BOHAI-019）明确标注「那是另一指标，非完成率本身，勿混用」，FLOW-BOHAI-001 以「消费变体/消费本口径」单列定性为流程而非口径，两处非本答定性均成立。"
+    },
+    {
+      "id": "dispute_notes",
+      "score": 5,
+      "reason": "配产双值行已裁注记照登完整（双值=版本事实非脏行、按当日最后班次非空值取版、双值行全量出清单供人复核），且禁用旧称注记（v1 口径 2024 年废弃、替代即本指标）如实转达不洗白。"
+    }
+  ],
+  "disqualifier_triggered": false
+}

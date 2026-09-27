@@ -1,0 +1,21 @@
+{
+  "question_id": "Q8",
+  "dimensions": [
+    {
+      "id": "banned_conclusion",
+      "score": 3,
+      "reason": "结论先行「不能用」与 GLS-BOHAI-001 条目转写（termType=禁用词/status=禁用（替代：产量完成率）/v1 定义）对，但 Owner 缺、禁用注记双承载（RULE-BOHAI-009 description 一侧）未交代，正中锚3。"
+    },
+    {
+      "id": "replacement_quality",
+      "score": 3,
+      "reason": "真源 RULE-BOHAI-009（公式/粒度/单位）→执行行为→QR-BOHAI-002 三件齐且可消费，但 completionPct 出口列名未点名，落锚3「列名叙述含糊」。"
+    },
+    {
+      "id": "no_softening",
+      "score": 4,
+      "reason": "全文无「过渡可用」「换算还能用」式软化暗示且明示不复现废弃算法，唯结尾行动项落在提案流程，未按参照落「报表与问答一律以产量完成率口径为准」。"
+    }
+  ],
+  "disqualifier_triggered": false
+}

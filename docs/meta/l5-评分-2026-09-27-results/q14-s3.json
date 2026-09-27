@@ -1,0 +1,21 @@
+{
+  "question_id": "Q14",
+  "dimensions": [
+    {
+      "id": "out_of_surface_reason",
+      "score": 3,
+      "reason": "SCR- 前缀→MU（UI 模型）、camp=build-contract、不在检索面（检索面=camp=business-core）的阵营归属说清，但「先判阵营、后查存在性——不因元素不存在而改答『未找到』」一层完全缺失。"
+    },
+    {
+      "id": "routing_split",
+      "score": 5,
+      "reason": "三分道齐且清楚：界面建造契约走 build 侧建造链路、业务语义缺口走提案流程（进仓走 MR + 语义 CI，待 Owner 裁决）、写意图一律不执行（只读、不产文件、不直改任何模型），与参照一致。"
+    },
+    {
+      "id": "no_speculation",
+      "score": 5,
+      "reason": "「零细节、零臆测，一概不给」声明在位，仅复述用户锚定 ID SCR-BOHAI-01 本身（未编造任何 ID、不含任何检索产出细节），无映射暗示。"
+    }
+  ],
+  "disqualifier_triggered": false
+}

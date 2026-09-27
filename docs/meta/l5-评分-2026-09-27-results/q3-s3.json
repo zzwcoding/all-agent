@@ -1,0 +1,21 @@
+{
+  "question_id": "Q3",
+  "dimensions": [
+    {
+      "id": "refusal_structure",
+      "score": 5,
+      "reason": "「拒答：仓内没有『月度产量汇总』」结论先行 + 检索轨迹全量核对无命中不猜 + 三层缺件分层 + 提案流程（进仓走 MR + 语义 CI）下一步，R2 四件与参照逐件对应。"
+    },
+    {
+      "id": "layer_accuracy",
+      "score": 3,
+      "reason": "查询/对象/行为三层均如实声明未建且未把近邻说成本答，但参照要求的近邻出口 QR-BOHAI-001 完全未点名、其「明细查询非月度聚合」的近邻定性缺失，仅以「N 个字面近邻」含糊计数带过。"
+    },
+    {
+      "id": "zero_fabrication",
+      "score": 1,
+      "reason": "叙述与引用清单出现白名单（{QR-BOHAI-001, AGG-BOHAI-002}）之外的元素 ID AGG-BOHAI-004 并声称「真实存在」，命中锚 1「叙述中出现白名单外的 ID」。"
+    }
+  ],
+  "disqualifier_triggered": false
+}

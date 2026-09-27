@@ -1,0 +1,21 @@
+{
+  "question_id": "Q2",
+  "dimensions": [
+    {
+      "id": "anchor_discipline",
+      "score": 3,
+      "reason": "「显式锚定命中、直达装配」已点明且七件行为集合与参照一致无增无漏，但逐条仅给类型（QUERY/COMMAND），参照照登的触发（USER_ACTION）、权限（PERM-BOHAI-QueryWellDailyOutput）、出口（QR-BOHAI-001）与 appliedRules 挂靠叙述缺位，正中锚 3「类型/触发/权限叙述小漏」。"
+    },
+    {
+      "id": "boundary_distinction",
+      "score": 5,
+      "reason": "七件行为按触达路径如实分述：直接名下仅 QueryWellDailyOutput（ownerEntity 直挂 hops=1），其余六件经 AGG-BOHAI-002/004/006 三载体分别交代归属与路径（含 ASSOC 关联 ID），与参照逐点等价且明确不把载体名下行为说成井直接名下。"
+    },
+    {
+      "id": "organization",
+      "score": 5,
+      "reason": "结论先行（合计 7 条、两类归属）+ 逐行为条目 + 「本回答引用的元素 ID」清单收尾，与参照同构。"
+    }
+  ],
+  "disqualifier_triggered": false
+}

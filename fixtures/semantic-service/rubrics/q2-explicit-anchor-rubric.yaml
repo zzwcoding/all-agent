@@ -18,9 +18,9 @@ dimensions:
   - id: boundary_distinction
     weight: 2
     anchors:
-      5: "关联行为（BH-BOHAI-RecordDailyOutput）照参照答案单列「非本对象名下，单列防误答」，并交代间接触达路径（ASSOC-BOHAI-001/FLOW-BOHAI-001），与参照逐点等价"
-      3: "有关联说明但间接触达路径交代含糊"
-      1: "把关联行为混入名下行为集（反向收集边界错）"
+      5: "七件行为按触达路径如实分述（直接名下 QueryWellDailyOutput；经 AGG-BOHAI-002/004/006 三载体闭包触达其余五件），每件归属 ownerEntity 交代与参照逐点等价"
+      3: "行为集齐但触达路径/归属交代含糊"
+      1: "归属混淆（把载体名下行为说成井直接名下）或漏报/错报触达载体"
   - id: organization
     weight: 1
     anchors:
@@ -29,5 +29,5 @@ dimensions:
       1: "无组织，一锅粥"
 disqualifiers:
   - "编造名下不存在的行为、权限或出口（机判管正文与清单一致，此处管 ID 真实性的语义承诺）"
-  - "把关联行为答成名下行为（误导性强调）"
+  - "归属张冠李戴（把 AGG-BOHAI-002/004/006 名下行为说成 AGG-BOHAI-001 直接名下，或反之）"
   - "答案内部自相矛盾（同文前后对同一事实给出冲突陈述）"

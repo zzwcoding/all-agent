@@ -1,0 +1,21 @@
+{
+  "question_id": "Q7",
+  "dimensions": [
+    {
+      "id": "term_as_answer",
+      "score": 4,
+      "reason": "「术语条目本身是答案的一部分」成立，GLS-BOHAI-002 的定义/别名（净产量）/termType=别名/status=有效照登，但参照照登的 Owner（开发室）与注源缺漏。"
+    },
+    {
+      "id": "closure_narrative",
+      "score": 4,
+      "reason": "relatedObjectRefs 指路（AGG-BOHAI-001/002）→ RULE-BOHAI-019 剔检支 expression → BH-BOHAI-QueryBlockMonthlyCompletion → QR-BOHAI-002 分层叙述完整，但出口列仅以「有效产量·剔检（吨）」标签指认、未点名 effectiveOutputSum 字段名。"
+    },
+    {
+      "id": "dispute_notes",
+      "score": 5,
+      "reason": "双口径并列注记如实转达：与开井日历折算支两支并列、日历支公式 Σ(oilOutput × openDays/24) 已到、差异 >3% 口径页并列注明来源、跨月检修按日历天数劈分已裁，照登不洗白且明确「不互替」。"
+    }
+  ],
+  "disqualifier_triggered": false
+}

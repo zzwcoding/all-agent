@@ -1,0 +1,21 @@
+{
+  "question_id": "Q4",
+  "dimensions": [
+    {
+      "id": "out_of_surface_reason",
+      "score": 5,
+      "reason": "「不在检索面，不返回任何页面细节」结论先行+SCR- 前缀属 MU、camp=build-contract 阵营归属说清+检索面=camp=business-core 定义到位，与参照逐点等价。"
+    },
+    {
+      "id": "routing_clarity",
+      "score": 3,
+      "reason": "建造契约走建造链路/业务语义缺口走提案流程分道清楚，但参照给出的业务面等价概念（BH-BOHAI-RecordDailyOutput/QR-BOHAI-001）完全未提供，指路第二要素缺位。"
+    },
+    {
+      "id": "no_speculation",
+      "score": 5,
+      "reason": "仅复述用户锚定 ID 本身，明确声明名称/布局/控件/动作/菜单零细节零臆测，无任何映射暗示，与参照「不代答」一致。"
+    }
+  ],
+  "disqualifier_triggered": false
+}

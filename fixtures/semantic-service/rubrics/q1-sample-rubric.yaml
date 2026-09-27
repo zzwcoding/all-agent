@@ -16,13 +16,13 @@ dimensions:
   - id: semantic_fidelity
     weight: 2
     anchors:
-      5: "口径四件套（字段 dailyOutput / 载体 AGG-BOHAI-002 / 规则 RULE-BOHAI-001 / 查询出口 QR-BOHAI-001）与参照答案逐句等价，闭包装配链无增无漏（锚 5 例引参照原文）"
+      5: "口径链四件（载体 AGG-BOHAI-002 / 校验规则 RULE-BOHAI-003/004/027/030 / 行为 BH-BOHAI-QueryWellDailyOutput / 查询出口 QR-BOHAI-001）与参照答案逐句等价，闭包装配链无增无漏（锚 5 例引参照原文）"
       3: "要点齐但表述含糊或冗余，装配链有一处表述失准"
       1: "语义偏离参照（答非所问 / 要点错位 / 口径张冠李戴）"
   - id: caliber_quality
     weight: 2
     anchors:
-      5: "口径表述可直接作范例，字典下钻链（dictionaryRef → DICT-BOHAI-01）交代与参照一致"
+      5: "口径表述可直接作范例，四条校验规则（003 非空率/004 恒值/027 突变告警/030 键完整性）交代与参照一致"
       3: "口径正确但夹杂未定义口语词"
       1: "把禁用口径说成可用等口径级错误"
   - id: organization

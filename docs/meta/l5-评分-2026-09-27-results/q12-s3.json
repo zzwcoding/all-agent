@@ -1,0 +1,21 @@
+{
+  "question_id": "Q12",
+  "dimensions": [
+    {
+      "id": "guidance_actionability",
+      "score": 4,
+      "reason": "AGG-BOHAI-002「日产计量事实源，但井口产量口径词未建、不能径直等同」的数据有承载/命名口径未立项辨析到位、提案流程分支可行动，但参照的下一步两分支只答了一支，缺「若只是要井口日产数据，事实载体在册可查数」的第二分支。"
+    },
+    {
+      "id": "neighbor_distinction",
+      "score": 3,
+      "reason": "AGG-BOHAI-004 标注「检修台账，与井口产量非同一概念」定性正确，但参照点名的字面交集来源（「影响产量（吨）」字段、仅字面相近）完全未交代。"
+    },
+    {
+      "id": "refusal_structure",
+      "score": 5,
+      "reason": "结论先行/检索轨迹/缺件分层/提案流程下一步 R2 四件与参照齐，并附「本回答未编造任何 ID」声明，ID 集合与参照白名单一致。"
+    }
+  ],
+  "disqualifier_triggered": false
+}

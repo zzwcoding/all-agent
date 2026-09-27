@@ -1,0 +1,21 @@
+{
+  "question_id": "Q10",
+  "dimensions": [
+    {
+      "id": "semantic_fidelity",
+      "score": 5,
+      "reason": "公式与粒度（actualOilSum/planOutputSum×100、月/区块）→分子分母 sourceField→执行行为（含封账前置未建待 Owner 注记）→QR-BOHAI-002 completionPct 列，四层分层叙述与参照逐点等价。"
+    },
+    {
+      "id": "neighbor_distinction",
+      "score": 4,
+      "reason": "RULE-BOHAI-019 并列列明写「另一指标，非完成率本身，勿混用」，但 FLOW-BOHAI-001 仅以「消费变体/消费流程」暗示非本答，未明写「不是口径本身」，定性较参照含糊。"
+    },
+    {
+      "id": "dispute_notes",
+      "score": 5,
+      "reason": "分母 planOutput 双值行已裁（双值=版本事实非脏行、当日最后班次非空值取版、双值行全量出清单供人复核）与禁用旧称注记均照登不洗白，与参照一致。"
+    }
+  ],
+  "disqualifier_triggered": false
+}

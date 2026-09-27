@@ -1,0 +1,21 @@
+{
+  "question_id": "Q11",
+  "dimensions": [
+    {
+      "id": "refusal_structure",
+      "score": 5,
+      "reason": "「拒答：仓内没有『统计月封账』」结论先行 + 检索轨迹全量核对无命中不猜 + 三层缺件分层 + 提案流程（进仓走 MR + 语义 CI，待 Owner 裁决）下一步，R2 四件与参照逐件对应。"
+    },
+    {
+      "id": "layer_accuracy",
+      "score": 5,
+      "reason": "查询层如实交代仅有月度统计出口近邻（「月度统计出口，非封账规则本身」即「出口能按月出数不回答封账怎么判」）、对象层与行为/规则层未建且点明缺口在规则层，出口存在≠规则存在的分层与参照一致。"
+    },
+    {
+      "id": "nearby_discipline",
+      "score": 5,
+      "reason": "QR-BOHAI-002/QR-BOHAI-004 逐条标「近邻指路，非所问」并附「本回答未编造任何 ID」声明，全文 ID 集合与参照白名单完全一致。"
+    }
+  ],
+  "disqualifier_triggered": false
+}

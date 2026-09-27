@@ -1,0 +1,21 @@
+{
+  "question_id": "Q7",
+  "dimensions": [
+    {
+      "id": "term_as_answer",
+      "score": 3,
+      "reason": "术语条目即答案一部分且转写齐（别名净产量/termType=别名/status=有效/定义），但 Owner（开发室）与注源缺漏，正中锚3「要素缺漏」。"
+    },
+    {
+      "id": "closure_narrative",
+      "score": 4,
+      "reason": "relatedObjectRefs 指路（AGG-BOHAI-001/002）→RULE-BOHAI-019 剔检支 expression→行为→QR-BOHAI-002 装配链齐且分层清楚，唯出口列以「有效产量·剔检（吨）」标签指认、未点 effectiveOutputSum 字段名。"
+    },
+    {
+      "id": "dispute_notes",
+      "score": 5,
+      "reason": "双口径并列、日历支公式 Σ(oilOutput×openDays/24)、差异>3% 口径页并列注明来源、跨月检修按日历天数劈分已裁，四要素照登不洗白，与参照一致。"
+    }
+  ],
+  "disqualifier_triggered": false
+}

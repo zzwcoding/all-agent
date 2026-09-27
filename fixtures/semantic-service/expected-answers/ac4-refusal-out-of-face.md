@@ -2,7 +2,7 @@
 
 - Golden Question: 「@SCR-BOHAI-01 的页面长什么样？有哪些按钮？」
 - 走到的瀑布级: 一级显式锚定（ID 可解析）→ 检索面裁剪（camp=build-contract）→ 四级可拒答（检索面外）
-- A 线对照复核（2026-09-21，票 57 整改）：复核未涉及——本答断言面=问答本体最小域（A 线未触碰）；SCR- 前缀阵营面 A 线未变（MU 维持不建，A 线裁决在案），机判实跑复验仍 refused_out_of_surface 零泄漏。
+- 再锚定注记（票 71，2026-09-27）：断言面迁至 ontology/bohai 真域（与机判 CORE-04 同源）；SCR- 前缀阵营面未变（bohai MU 维持不建——@SCR-BOHAI-01 在真域亦无登记实体，双重面外），机判实跑复验仍 refused_out_of_surface 零泄漏；校验规则引用过期更正（RecordDailyOutput appliedRules 现行真值=RULE-BOHAI-005 井号归一化）。
 - 断言面: 面外语说明 + 提案流程指路 + 不含任何 MU 元素细节（守卫正则全扫描）
 
 ## 答案（示范格式）
@@ -13,7 +13,7 @@
 
 **你要的如果在业务面**（以下为服务面内等价概念的直接引用，不是该页面的映射关系——映射本身属面外模型，不代答）：
 
-- 单井产量录入的业务行为是 `BH-BOHAI-RecordDailyOutput`（录入单井日产量，COMMAND，需权限 `PERM-BOHAI-RecordDailyOutput`，校验规则 `RULE-BOHAI-001`）；
+- 单井产量录入的业务行为是 `BH-BOHAI-RecordDailyOutput`（录入单井日产量，COMMAND，需权限 `PERM-BOHAI-RecordDailyOutput`，校验规则 `RULE-BOHAI-005`）；
 - 单井日产量的查询口径是 `QR-BOHAI-001`（单井日产量查询）。
 
 **下一步**：若属页面契约问题，请走建造链路；若认为该页面背后缺业务概念（如新行为/新口径），请走提案流程补定义。本服务只读。
@@ -23,5 +23,5 @@
 - SCR-BOHAI-01（用户锚定 ID，仅复述并说明阵营归属与拒答理由，不展开任何细节）
 - BH-BOHAI-RecordDailyOutput（业务面等价概念：录入行为）
 - PERM-BOHAI-RecordDailyOutput（上述行为所需权限）
-- RULE-BOHAI-001（上述行为引用的校验规则）
+- RULE-BOHAI-005（上述行为引用的校验规则——井号归一化）
 - QR-BOHAI-001（业务面等价概念：查询出口）

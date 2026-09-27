@@ -1,0 +1,21 @@
+{
+  "question_id": "Q11",
+  "dimensions": [
+    {
+      "id": "refusal_structure",
+      "score": 5,
+      "reason": "「拒答：仓内没有」结论先行+检索轨迹（全量核对无命中、未找到不猜）+缺件三层+提案流程下一步，四件与参照逐件对应。"
+    },
+    {
+      "id": "layer_accuracy",
+      "score": 5,
+      "reason": "查询层有月度出口近邻、对象层与行为/规则层未建三层如实，近邻标「月度统计出口，非封账规则本身」并点明缺口在对象与规则层，与参照「出口存在≠规则存在」一致。"
+    },
+    {
+      "id": "nearby_discipline",
+      "score": 5,
+      "reason": "QR-BOHAI-002/QR-BOHAI-004 逐条标「近邻指路，非所问」并附「本回答未编造任何 ID」声明，与参照一致。"
+    }
+  ],
+  "disqualifier_triggered": false
+}

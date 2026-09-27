@@ -1,0 +1,21 @@
+{
+  "question_id": "Q8",
+  "dimensions": [
+    {
+      "id": "banned_conclusion",
+      "score": 3,
+      "reason": "「不能用」结论先行且 GLS-BOHAI-001 条目转写（termType=禁用词/status=禁用（替代：产量完成率）/定义）到位，但 Owner 缺登、且「禁用注记双承载（条目与 RULE-BOHAI-009 description）」的说明完全缺失，正中锚 3「注记双承载说明缺」。"
+    },
+    {
+      "id": "replacement_quality",
+      "score": 3,
+      "reason": "替代三件齐（RULE-BOHAI-009 公式与粒度→BH-BOHAI-QueryBlockMonthlyCompletion→QR-BOHAI-002）且指明改以产量完成率作答，但查询出口的 completionPct 结果列未点名，出口可消费性叙述含糊。"
+    },
+    {
+      "id": "no_softening",
+      "score": 5,
+      "reason": "全文无「过渡可用」「换算一下还能用」式软化暗示，明确「不复现废弃算法、不按可用口径展开」，产量完成率口径指向清晰。"
+    }
+  ],
+  "disqualifier_triggered": false
+}

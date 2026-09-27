@@ -1,0 +1,21 @@
+{
+  "question_id": "Q3",
+  "dimensions": [
+    {
+      "id": "refusal_structure",
+      "score": 5,
+      "reason": "「拒答：仓内没有」结论先行+检索轨迹（全量核对无命中不猜）+缺件三层分层+提案流程下一步，四件与参照逐件对应。"
+    },
+    {
+      "id": "layer_accuracy",
+      "score": 4,
+      "reason": "查询/对象/行为三层逐层核对且近邻均标「非所问」，但参照点名的近邻出口 QR-BOHAI-001 未带入、改以 AGG-BOHAI-004 作第二近邻，近邻集与参照不一致。"
+    },
+    {
+      "id": "zero_fabrication",
+      "score": 3,
+      "reason": "全文 ID 仅 AGG-BOHAI-002/004 且均标非所问、附未编造声明，两 ID 皆真实元素，但不符合锚5 白名单集（缺 QR-BOHAI-001、多 AGG-BOHAI-004），且「3/3/7 个字面近邻」计数为参照未载断言。"
+    }
+  ],
+  "disqualifier_triggered": false
+}

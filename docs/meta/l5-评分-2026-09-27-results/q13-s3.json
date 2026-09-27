@@ -1,0 +1,21 @@
+{
+  "question_id": "Q13",
+  "dimensions": [
+    {
+      "id": "banned_conclusion",
+      "score": 5,
+      "reason": "「不能给算法……不复现废弃算法（零公式反推）」结论先行，明确不把禁用口径当可用口径作答、更不复现其算法，与参照「没有『怎么算』的现行答案」结论等价。"
+    },
+    {
+      "id": "guidance_coherence",
+      "score": 4,
+      "reason": "禁用说明（GLS-BOHAI-001 条目转写）→替代口径（产量完成率，RULE-BOHAI-009 公式与粒度）→真实 ID 指路（RULE-BOHAI-009/BH-BOHAI-QueryBlockMonthlyCompletion/QR-BOHAI-002）三步衔接连贯，但出口 completionPct 结果列未点名。"
+    },
+    {
+      "id": "no_fabrication",
+      "score": 4,
+      "reason": "「定义仅载明 v1 口径差别，除此之外不提供、也不反推任何计算公式」的零补猜声明明确，但参照「v1 具体公式在仓内没有承载（未找到不猜）——反推即补猜」的理由交代比参照薄。"
+    }
+  ],
+  "disqualifier_triggered": false
+}

@@ -1,0 +1,21 @@
+{
+  "question_id": "Q2",
+  "dimensions": [
+    {
+      "id": "anchor_discipline",
+      "score": 3,
+      "reason": "显式锚定点明且七件行为集合与参照一致无增无漏，但行为的触发/权限叙述缺失（参照直接名下行为带 USER_ACTION 与 PERM-BOHAI-QueryWellDailyOutput），正中锚3「类型在、触发/权限小漏」。"
+    },
+    {
+      "id": "boundary_distinction",
+      "score": 5,
+      "reason": "七件行为按触达路径如实分述——直接名下（ownerEntity 直挂）1 件、经 AGG-BOHAI-002/004/006 三载体触达 6 件，归属交代与参照逐点等价。"
+    },
+    {
+      "id": "organization",
+      "score": 5,
+      "reason": "结论先行（合计 7 条）+两类归属逐行为条目+「本回答引用的元素 ID」清单收尾，与参照同构。"
+    }
+  ],
+  "disqualifier_triggered": false
+}

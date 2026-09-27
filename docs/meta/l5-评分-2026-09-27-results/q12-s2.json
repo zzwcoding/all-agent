@@ -1,0 +1,21 @@
+{
+  "question_id": "Q12",
+  "dimensions": [
+    {
+      "id": "guidance_actionability",
+      "score": 3,
+      "reason": "「AGG-BOHAI-002 是事实源、但『井口产量』口径词未建、不能径直等同」辨析在位，但下一步只给提案立项一分支，参照的「只查数则事实载体在册」分支缺失，指路可行动性缺一半。"
+    },
+    {
+      "id": "neighbor_distinction",
+      "score": 3,
+      "reason": "AGG-BOHAI-004 标注了「检修台账，与井口产量非同一概念」，但字面交集来源（「影响产量（吨）」字段）完全未交代，落锚3「交集来源交代含糊」的缺位端。"
+    },
+    {
+      "id": "refusal_structure",
+      "score": 5,
+      "reason": "结论先行/检索轨迹/缺件分层/下一步四件齐，并附「本回答未编造任何 ID」声明。"
+    }
+  ],
+  "disqualifier_triggered": false
+}
