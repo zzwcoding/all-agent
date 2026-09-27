@@ -14,86 +14,150 @@
         {
           "path": "",
           "purpose": "仓根：术语表、信源清单与仓级规约",
-          "patterns": ["CONTEXT.md", "AGENTS.md", "RESOURCES.md", "README.md", "LICENSE", ".gitignore", ".archive-allow", ".skill-deps-allow"],
+          "patterns": [
+            "CONTEXT.md",
+            "AGENTS.md",
+            "RESOURCES.md",
+            "README.md",
+            "LICENSE",
+            ".gitignore",
+            ".archive-allow",
+            ".skill-deps-allow"
+          ],
           "producer": "阶段 0/1"
         },
         {
           "path": "docs",
           "purpose": "PRD、设计案、ADR、影响分析报告；requirements/（需求细稿，requirement-explorer 产物，票 30 起）；code-reverse/（调用链素材，code-reverse 产物，票 31 起）；doc-extractor/（文档萃取证据索引，doc-extractor 产物，票 32 起）；meta/（元循环体检留痕，票 28 起，派生物可重建）",
-          "patterns": ["*.md", "adr/*.md", "impact/*.md", "requirements/*.md", "code-reverse/*.md", "doc-extractor/*.md", "meta/*.md", "meta/*.json"],
+          "patterns": [
+            "*.md",
+            "adr/*.md",
+            "impact/*.md",
+            "requirements/*.md",
+            "code-reverse/*.md",
+            "doc-extractor/*.md",
+            "meta/*.md",
+            "meta/*.json"
+          ],
           "producer": "阶段 1（PRD）/ 决策时（ADR）/ impact-analyzer（票 08 起）/ requirement-explorer（票 30 起，细稿实际运行落位）/ code-reverse（票 31 起，调用链素材实际运行落位）/ doc-extractor（票 32 起，证据索引实际运行落位）/ tools/meta_probe.py 首跑与体检留痕（票 28 起）"
         },
         {
           "path": "specs",
           "purpose": "skill 卡集合与功能 spec + 归档登记表",
-          "patterns": ["*.md", "*.json"],
+          "patterns": [
+            "*.md",
+            "*.json"
+          ],
           "producer": "阶段 2/3（specs 与登记表）/ 票 01（登记表）"
         },
         {
           "path": "tickets",
           "purpose": "开发票，NN-标题.md",
-          "patterns": ["*.md"],
+          "patterns": [
+            "*.md"
+          ],
           "nameRegex": "^\\d{2}-.+\\.md$",
           "producer": "阶段 4 拆票"
         },
         {
           "path": "tools",
           "purpose": "确定性脚本（语义闸、三闸、出厂集 runner）及 unittest 单测 + 脚本自维护机读表（install-registry.json，票 15）+ git 钩子（hooks/pre-commit）+ MCP 发布侧依赖钉版文件（requirements-mcp.txt，票 40）",
-          "patterns": ["*.py", "*.sh", "*.json", "hooks/*", "requirements*.txt"],
+          "patterns": [
+            "*.py",
+            "*.sh",
+            "*.json",
+            "hooks/*",
+            "requirements*.txt"
+          ],
           "producer": "各票实现拍（脚本走 TDD）/ 票 40（MCP SDK 钉版）"
         },
         {
           "path": "fixtures",
           "purpose": "出厂集：fixtures/<名>/ 固定输入 + assertions.json 断言集",
-          "patterns": ["*/**"],
+          "patterns": [
+            "*/**"
+          ],
           "producer": "各票出厂集先行（设计案 §3.4）"
         },
         {
           "path": "exports",
           "purpose": "派生物：对外发布物（MCP capability manifest 等，exports/mcp/）、应用开发包（exports/devkit/<域>/，票 35 起）、可对话技能包（exports/skillpkg/<域>/，票 36 起）与人审闸审记旁档（exports/reviews/，票 46 起，design-human-review-gate 裁决点 4），生成物可由确定性生成器再生禁手改；审记旁档追加不覆盖（审记可以缺，不可以编）",
-          "patterns": ["mcp/*.json", "mcp/*.md", "devkit/*.md", "devkit/*.json", "skillpkg/*.md", "skillpkg/*.json", "reviews/*.json"],
+          "patterns": [
+            "mcp/*.json",
+            "mcp/*.md",
+            "devkit/*.md",
+            "devkit/*.json",
+            "skillpkg/*.md",
+            "skillpkg/*.json",
+            "reviews/*.json"
+          ],
           "producer": "票 23 起 tools/mcp_manifest_gen.py（防陈旧断言=fixtures/mcp-publisher AC2 --check 再制一致）/ 票 35 起 tools/app_pack_gen.py（防陈旧断言=fixtures/app-pack-gen AC2 --check 再制一致）/ 票 36 起 tools/skill_pack_gen.py（防陈旧断言=fixtures/skill-pack-gen AC2 --check 再制一致）/ 票 46 起 tools/review_gate.py init/approve/reject（审记旁档追加不覆盖）"
         },
         {
           "path": "skills",
           "purpose": "L0/L1 skill 本体：skills/<名>/SKILL.md + 私件 references/（票 05 起落盘）",
-          "patterns": ["*/**"],
+          "patterns": [
+            "*/**"
+          ],
           "producer": "阶段 2 骨架（卡过审即建）/ 各 skill 票"
         },
         {
           "path": "policies",
           "purpose": "L4 策略数据（门禁规则、豁免清单等机读策略）",
-          "patterns": ["*.md", "*.json", "*.yaml", "*.yml"],
+          "patterns": [
+            "*.md",
+            "*.json",
+            "*.yaml",
+            "*.yml"
+          ],
           "producer": "阶段 2/6"
         },
         {
           "path": "diagrams",
           "purpose": "架构图与流程图产物（archify/mermaid 等）",
-          "patterns": ["*.html", "*.md", "*.json", "*.png", "*.svg"],
+          "patterns": [
+            "*.html",
+            "*.md",
+            "*.json",
+            "*.png",
+            "*.svg"
+          ],
           "producer": "阶段 2 架构图 / 体检刷新"
         },
         {
           "path": "references",
           "purpose": "L2 共享规约与调研落盘 + 机读布局表",
-          "patterns": ["*.md", "*.json", "*.py"],
+          "patterns": [
+            "*.md",
+            "*.json",
+            "*.py",
+            "*.sql"
+          ],
           "producer": "阶段 2 规约沉淀 / 各票调研"
         },
         {
           "path": "ontology",
           "purpose": "L4 本体仓数据：schema/（schema 文档+模型注册表+依赖白名单）、<域>/manifest.json + 模型 YAML",
-          "patterns": ["**"],
+          "patterns": [
+            "**"
+          ],
           "producer": "票 03（schema）/ 本体工序 skill（票 05 起）"
         },
         {
           "path": "design",
           "purpose": "被建域设计产物：ddd/（DDD 设计件——格式真源 README.md + <域>/ 下聚合卡/领域事件表/聚合↔表映射/仓储边界 YAML 草案，ddd-modeler 工序产物，草案进仓走 MR 人审，status 草案/已审，非派生物不走 --check，票 50 起）",
-          "patterns": ["ddd/*.md", "ddd/*.yaml"],
+          "patterns": [
+            "ddd/*.md",
+            "ddd/*.yaml"
+          ],
           "producer": "格式真源 README（票 50）/ ddd-modeler skill 产草案（票 52 起，票 51 起 ddd_check 闸）"
         },
         {
           "path": "lessons",
           "purpose": "施工日志：每票一篇，NN-标题.md",
-          "patterns": ["*.md"],
+          "patterns": [
+            "*.md"
+          ],
           "nameRegex": "^\\d{2}-.+\\.md$",
           "producer": "各票收尾（L2 自主档）"
         }

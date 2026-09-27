@@ -53,8 +53,11 @@ def _file_contains(path: Path, token: str) -> bool:
 def _grep_glob(dirpath: Path, pattern: str, token: str) -> "list[str]":
     if not dirpath.is_dir():
         return []
+    # 只收文件：金集未来出现子目录时 glob('*') 会带出目录，read_text 会炸
+    # （票 77 审查 P3-4）
     return [p.name for p in sorted(dirpath.glob(pattern))
-            if token in p.read_text(encoding="utf-8", errors="ignore")]
+            if p.is_file()
+            and token in p.read_text(encoding="utf-8", errors="ignore")]
 
 
 def _review_item(root: Path, target: Path, label: str) -> dict:

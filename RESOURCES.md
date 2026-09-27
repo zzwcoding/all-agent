@@ -17,5 +17,6 @@
 | R11 | 本体×GraphRAG 教学资产群（weknora复刻仓 + neo4j-graphrag-ex 仓 + teach-petro-agent lessons 53–69 + all-agent-ex TERMS.md） | 四维投影四开关教学实现/Neo4j GraphRAG 全流水线实操/本体×GraphRAG 三接入点定稿（A 对号表/B 过闸/C 前哨）/知识库·Wiki·图谱·RAG×本体概念对号 | 各仓本机路径见 `references/weknora-personal-kb-digest.md` §1 |
 | R12 | 微软 GraphRAG 官方文档 + IBM GraphRAG 定义（2025） | GraphRAG 方法定位：语料→知识图谱→社区摘要→全局查询；与向量 RAG 的分工（段内问题 vs 跨文档问题） | https://microsoft.github.io/graphrag/ ；https://www.ibm.com/think/topics/graphrag |
 | R13 | HIS 医院数据报表平台实训文档群（GitHub `luzai02/his-`，2026-09-25 经 gh API 落盘五件） | 第三域 his 素材真源：PRD 960 行（8 业务域/15 源表/7 ADS 指标表/6 报表模块 18 API/页面交互）+详细设计 1215 行（ADS 表字段级 schema/双数据源/API 设计）+前后端与 Kafka 设计；八模型素材全齐 | `references/his-source/` 五件；上游 github.com/luzai02/his-（公开仓无 License 文件=仅文本素材引用，细稿为本仓改写，第六批方案 §4.3 证据边界） |
+| R14 | MySQL 官方示例库 employees（GitHub `datacharmer/test_db`，2026-09-28 raw 直取） | 第四域 hr 素材真源：6 表 DDL（员工/部门/部门任职/部门管理/职级/薪酬，PK/FK/ENUM/UNIQUE/级联全）+2 视图（现行部门判定语义）；CC BY-SA 3.0（头注署名，数据为伪造样本）；db-reverse 通路首个实战素材 | `references/hr-source/` 两件（employees.sql + README-素材溯源.md）；上游 github.com/datacharmer/test_db（只引 schema 文本，数据 dump 不入仓） |
 
 数字弹药（引用时注 R2/R4）：语义自动覆盖 70~80%；企业可被 AI 理解的数据仅 5~10%；95% 生死线阶梯（语义层 70-75% → +记忆反馈 80-90% → +Loop Engineering 逼近 95%）。

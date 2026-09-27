@@ -445,7 +445,7 @@ def main(argv=None) -> int:
                           help=f"审记旁档目录（缺省 {DEFAULT_REVIEW_DIR}；"
                                f"--all 缺省 <root>/exports/reviews）")
     p_verify.add_argument("--json", action="store_true",
-                          help="机读 JSON 输出（stdout 只含 JSON）")
+                          help="机读输出（单件=单一 JSON；--all=逐件 JSON Lines）")
     args = ap.parse_args(argv)
 
     if args.action == "verify" and getattr(args, "all", False):
