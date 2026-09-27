@@ -930,6 +930,8 @@ def run(target: Path) -> dict:
 
     # 悬空引用统一判定（定义收集完后）
     for domain in domains:
+        mc_dc = load_json(domain / "manifest.json") if (domain / "manifest.json").is_file() else {}
+        dname_dc = mc_dc.get("domain", domain.name) if isinstance(mc_dc, dict) else domain.name
         for path in model_files(domain):
             rel = str(path)
             try:
@@ -946,7 +948,7 @@ def run(target: Path) -> dict:
                     if not (isinstance(key, str) and is_ref_key(key, ref_keys)):
                         continue
                     for ref in iter_ref_strings(value):
-                        if isinstance(ref, str) and id_model_of(ref, prefix2model) and ref not in defs_by_domain.get(dname, set()):
+                        if isinstance(ref, str) and id_model_of(ref, prefix2model) and ref not in defs_by_domain.get(dname_dc, set()):
                             add("L2", "dangling-ref", rel, key_line(mapping, key),
                                 f"悬空引用: ref 字段「{key}」指向的 {ref} "
                                 f"在本域（{dname}）内无 ID 定义"
