@@ -56,3 +56,7 @@
 **图谱汇入问答实证（新能力）**：问「斯特里克兰和谁有什么关系？」→ 真 glm 成答「斯特里克兰与布兰奇·斯特洛夫……情人关系 [n3, n5]」带 chunk 级引用——关系问题从不可答变可答（A 批缺口 1 的完整闭环）。
 
 新仓 B 批提交：票 12=370e7ba / 13 中途=e7c0a47+收官=c99f5d3 / 14 中途=7873e00+收官=6ee7e4e / 15=4fa4e92。weknora 63 测试、CI 四门绿。
+
+## Web UI 批（2026-09-27，weknora 票 16–19 + All-agent 票 75——F7 转正）
+
+ADR 0002 立项 → Owner 拍板改 **React 18 + Vite + TS + antd 5**（ADR 0003，引入前端构建链例外）→ 约定层全套（PRD 页面清单四行/modules 九卡 m9-webui/页面映射实化/F7 spec API 面十一条）→ FastAPI /api/* 十端点薄调公开接口 → React 四页（问答/条目/图谱/wiki）→ 实弹：真档 --real 起服四端点全通（ask 真 LLM 答人物关系带 5 引用/graph stats 10557·11079）。实弹修 4 坑（闭包 Pydantic 模型 body 误判/路由序吃 stats/main 签名漏 argv/DIST_DIR 层级）——均带回归测试或验证。weknora 提交链 199bfa7（票 16）→ 6f3d47b → ce026be（17/18）→ 30de4a7（19），81 测试、CI 五门（含前端构建门）。F7 转正：保持「已完成」，测试承载面=API 契约+构建门；浏览器 E2E 留后续票。
