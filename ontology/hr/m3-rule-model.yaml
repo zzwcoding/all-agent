@@ -1,0 +1,156 @@
+# =====================================================================
+# hr 人力资本域（hr）· M3 规则模型（票 79 建模，db-reverse 首实战）
+# ────────────────────────────────────────────────────────────────
+# 素材：R14——规则全部为 DDL 约束/视图条件的结构语义（PK 唯一、UNIQUE、
+#   ENUM、可空、级联、视图「现行」条件），无 PRD 式业务阈值，不凑数。
+# Q3 已裁：「现行」判定以视图语义为准（9999-01-01 哨兵=数据惯例注记，
+#   非本闸判定依据）；Q4 已裁：级联语义如实登记、业务面禁物理删除。
+# 落地形态：RULE-HR-006 走 narrative（级联语义非可执行表达式），其余
+#   走 expression——两形态并存即 schema.md §6 的机判面。
+# sourceField 一律用聚合 alias 全名（Employee.gender 式）保证 L3-1 唯一
+#   解析（Department/DepartmentAssignment/DepartmentManager 同词根歧义
+#   规避）。
+# =====================================================================
+model_type: RULE
+version: "1.0.0"
+domain: hr
+rules:
+  # [employees.sql gender ENUM('M','F')] DDL 级枚举值域
+  - id: RULE-HR-001
+    name: 性别代码值域
+    ruleType: VALIDATION
+    description: >-
+      性别取值限 M/F（R14·employees 表 gender ENUM('M','F')——DDL 内唯一
+      枚举约束）。中文释义（男/女）为通识注记不入值集。
+    inputParams:
+      - name: gender
+        type: Enum
+        sourceField: Employee.gender
+        required: true
+    outputType: Boolean
+    expression: gender == 'M' or gender == 'F'
+    reusedBy:
+      - BH-HR-QueryTenure
+  # [employees.sql salaries PRIMARY KEY (emp_no, from_date)] 一期一条
+  - id: RULE-HR-002
+    name: 薪酬一期一条
+    ruleType: VALIDATION
+    description: >-
+      同一员工同一生效日仅一条薪酬记录（R14·salaries 表 PK(emp_no,
+      from_date) 复合主键语义）。区间重叠检测非 PK 所能表达，属建造面
+      补充校验，如实注记不充规则。
+    inputParams:
+      - name: salaryRow
+        type: Integer
+        sourceField: SalaryRecord.empNo
+        required: true
+    outputType: Boolean
+    expression: COUNT(*) == COUNT(DISTINCT (empNo, fromDate))
+    reusedBy:
+      - BH-HR-QuerySalary
+  # [employees.sql CREATE OR REPLACE VIEW current_dept_emp] 现行任职判定
+  - id: RULE-HR-003
+    name: 现行任职判定
+    ruleType: CALCULATION
+    description: >-
+      现行任职行=该员工 from_date 最大者的成对行（R14·current_dept_emp
+      视图定义：INNER JOIN dept_emp_latest_date ON emp_no 相等 AND
+      from_date=MAX(from_date) AND to_date=视图 to_date——视图条件是
+      「现行」唯一 schema 级证据）。9999-01-01 哨兵为数据惯例（Q3 已裁
+      注记，非本判定依据）。管理任职（同构结构）按同一读法判定在任。
+    inputParams:
+      - name: assignmentRow
+        type: Integer
+        sourceField: DepartmentAssignment.fromDate
+        required: true
+    outputType: Boolean
+    expression: fromDate == MAX(fromDate) OVER (empNo) AND toDate == latestToDate
+    reusedBy:
+      - BH-HR-QueryHeadcount
+      - BH-HR-QueryManager
+      - BH-HR-QuerySalary
+  # [employees.sql departments UNIQUE KEY (dept_name)] 名称唯一
+  - id: RULE-HR-004
+    name: 部门名称唯一
+    ruleType: VALIDATION
+    description: >-
+      部门名称全表唯一（R14·departments 表 UNIQUE KEY (dept_name)）。
+      部门维度出口的分组粒度锚点。
+    inputParams:
+      - name: deptName
+        type: String
+        sourceField: Department.deptName
+        required: true
+    outputType: Boolean
+    expression: COUNT(*) == COUNT(DISTINCT deptName)
+    reusedBy:
+      - BH-HR-QueryHeadcount
+  # [employees.sql titles.to_date 可空] 区间有效性
+  - id: RULE-HR-005
+    name: 轨迹区间有效性
+    ruleType: VALIDATION
+    description: >-
+      轨迹区间满足 to_date ≥ from_date；titles.to_date 可空（R14·titles
+      表 to_date DATE 无 NOT NULL——六表唯一可空列）=「现行职级」语义，
+      空值放行。
+    inputParams:
+      - name: toDate
+        type: Date
+        sourceField: TitleRecord.toDate
+        required: false
+    outputType: Boolean
+    expression: toDate IS NULL OR toDate >= fromDate
+    reusedBy:
+      - BH-HR-QueryTitle
+  # [employees.sql 六处 FOREIGN KEY ... ON DELETE CASCADE] 源库级联语义
+  - id: RULE-HR-006
+    name: 源库级联删除语义
+    ruleType: VALIDATION
+    description: >-
+      删除 employees 行将级联清除 dept_emp/dept_manager/titles/salaries
+      轨迹（R14·employees.sql 六处 FK 声明 ON DELETE CASCADE）。Q4 已裁：
+      hr 域为只读消费域，业务面禁物理删除，本规则登记源库语义供集成方
+      知悉；级联为删批量行为，非可执行行级表达式，走 narrative 形态。
+    inputParams:
+      - name: empNo
+        type: Integer
+        sourceField: Employee.empNo
+        required: true
+    outputType: Boolean
+    narrative: >-
+      DELETE employees WHERE emp_no = :empNo 将级联删除该员工全部
+      部门任职/管理任职/职级/薪酬行（六处 ON DELETE CASCADE）。
+      消费域不得触发物理删除。
+    reusedBy: []
+  # [current_dept_emp 视图行集] 部门在职人数口径
+  - id: RULE-HR-007
+    name: 部门在职人数口径
+    ruleType: CALCULATION
+    description: >-
+      部门在职人数 = 该部门现行任职行数（R14·current_dept_emp 视图即
+      「每员工现行部门」的官方读法；现行判定 RULE-HR-003）。
+    inputParams:
+      - name: assignmentRows
+        type: Integer
+        sourceField: DepartmentAssignment.deptNo
+        required: true
+    outputType: Integer
+    expression: COUNT(DISTINCT empNo) WHERE 现行任职（RULE-HR-003 过滤）
+    reusedBy:
+      - BH-HR-QueryHeadcount
+  # [employees.hire_date + asOfDay] 人司年限口径（细稿 Q6 已裁）
+  - id: RULE-HR-008
+    name: 人司年限口径
+    ruleType: CALCULATION
+    description: >-
+      人司年限 = DATEDIFF(统计日, hire_date) ÷ 365.25，一位小数（Q6 已
+      裁：365.25 折年；hire_date 为唯一入职证据 R14·employees 表）。
+    inputParams:
+      - name: hireDate
+        type: Date
+        sourceField: Employee.hireDate
+        required: true
+    outputType: Decimal
+    expression: DATEDIFF(asOfDay, hireDate) / 365.25
+    reusedBy:
+      - BH-HR-QueryTenure

@@ -106,8 +106,11 @@ class OnboardRealRepo(unittest.TestCase):
         self.assertIn(("skillpkg 导出", "warn"), kinds)
 
     def test_enumeration_same_source_as_meta_probe(self):
-        self.assertEqual(oc.list_domains(REPO_ROOT),
-                         ["bohai", "his", "pkb"])
+        # 期望值动态取自文件系统（不钉死域数——票 79 第四域打红三域字面量）
+        expected = sorted(p.parent.name for p in
+                          (REPO_ROOT / "ontology").glob("*/manifest.json"))
+        self.assertGreaterEqual(len(expected), 4)
+        self.assertEqual(oc.list_domains(REPO_ROOT), expected)
         proc = subprocess.run(
             [sys.executable, str(REPO_ROOT / "tools" / "meta_probe.py"),
              "--list-domains"],

@@ -104,16 +104,23 @@ class ReportNumbersTmp(unittest.TestCase):
 
 
 class ReportNumbersRealRepo(unittest.TestCase):
-    """实跑面：真仓计数非零、三域在册、exports 面齐全。"""
+    """实跑面：真仓计数非零、域面与 exports 面动态对齐文件系统
+    （不钉死域数——票 79 第四域入仓打红三域字面量，动态化根治）。"""
 
     def test_real_repo_snapshot_shape(self):
         rep = rn.collect(REPO_ROOT)
         self.assertGreater(rep["unitTests"], 50)
         self.assertNotEqual(rep["gitHead"], "未知")
+        expected_domains = sorted(p.parent.name for p in
+                                  (REPO_ROOT / "ontology").glob("*/manifest.json"))
         self.assertEqual([r["domain"] for r in rep["domains"]],
-                         ["bohai", "his", "pkb"])
-        targets = [r["target"] for r in rep["exports"]]
-        self.assertEqual(len(targets), 5)  # 3 devkit + 2 skillpkg（pkb 豁免）
+                         expected_domains)
+        expected_exports = sorted(
+            str(t.relative_to(REPO_ROOT))
+            for pat in rn.review_gate.VERIFY_ALL_GLOBS
+            for t in REPO_ROOT.glob(pat))
+        self.assertEqual([r["target"] for r in rep["exports"]],
+                         expected_exports)
         self.assertGreater(rep["checkupNotes"], 0)
 
 

@@ -1,0 +1,99 @@
+# =====================================================================
+# hr 人力资本域（hr）· M6 流程模型（票 79 建模，db-reverse 首实战）
+# ────────────────────────────────────────────────────────────────
+# 素材：R14——六表公共的 from_date/to_date 时态结构即「员工记录生命
+#   周期」的结构证据：入职建档→部门分配→任职期事件（调薪/晋升/调任可
+#   独立发生=GATEWAY 并行）→记录关闭。与 his 的 PRD 流程不同，本流程
+#   节点全部是源库数据事件（USER_TASK 由集成装载侧承载，roleRef=系统
+#   集成方），非人工审批流——审批流素材外不发明（细稿 §五）。
+# =====================================================================
+model_type: FLOW
+version: "1.0.0"
+domain: hr
+flows:
+  # [employees.sql 六表 from_date/to_date 时态结构 + employees.hire_date]
+  - id: FLOW-HR-001
+    name: 员工记录时态生命周期
+    description: >-
+      员工自主数据记录的产生-流转-关闭全周期（R14·时态结构推定，非审批
+      流程）：employees 行生效起，dept_emp/titles/salaries 随任职期追加，
+      离职/调整时末段 to_date 关闭（或置现行语义，RULE-HR-003/RULE-HR-005）。
+      调薪/晋升/调任三事件相互独立（各表 PK 互不约束），GATEWAY 并行分支
+      如实表达。
+    flowType: COLLABORATION
+    businessObjectRefs:
+      - AGG-HR-001
+      - AGG-HR-002
+      - AGG-HR-003
+      - AGG-HR-004
+      - AGG-HR-005
+      - AGG-HR-006
+    roleRefs:
+      - ROLE-HR-004
+    trigger:
+      triggerType: MANUAL     # 源库事件触发（入职建档为起点）
+    startActivity: ACT-HR-101
+    endActivities:
+      - ACT-HR-109
+    activities:
+      # [employees 表 INSERT 事件] hire_date 落行即生命周期起点
+      - activityId: ACT-HR-101
+        name: 开始（员工记录生效）
+        activityType: START
+        nextActivities:
+          - ACT-HR-102
+      # [CREATE TABLE employees] 入职建档：employees 行写入（六列 NOT NULL）
+      - activityId: ACT-HR-102
+        name: 入职建档
+        activityType: USER_TASK
+        roleRef: ROLE-HR-004
+        nextActivities:
+          - ACT-HR-103
+      # [CREATE TABLE dept_emp] 部门分配：首段任职行写入（RULE-HR-003 起点）
+      - activityId: ACT-HR-103
+        name: 部门分配
+        activityType: USER_TASK
+        roleRef: ROLE-HR-004
+        nextActivities:
+          - ACT-HR-104
+      # 任职期三事件相互独立（salaries/titles/dept_emp 各表 PK 互不约束）
+      - activityId: ACT-HR-104
+        name: 任职期事件分支（调薪/晋升/调任）
+        activityType: GATEWAY
+        conditionExpression: 任一事件发生即行（可并行，无顺序约束证据）
+        nextActivities:
+          - ACT-HR-105
+          - ACT-HR-106
+          - ACT-HR-107
+      # [CREATE TABLE salaries] 薪酬调整：追加薪档行（RULE-HR-002 一期一条）
+      - activityId: ACT-HR-105
+        name: 薪酬调整
+        activityType: USER_TASK
+        roleRef: ROLE-HR-004
+        nextActivities:
+          - ACT-HR-108
+      # [CREATE TABLE titles] 职级变更：追加职级行（to_date 可空=现行，RULE-HR-005）
+      - activityId: ACT-HR-106
+        name: 职级变更
+        activityType: USER_TASK
+        roleRef: ROLE-HR-004
+        nextActivities:
+          - ACT-HR-108
+      # [dept_emp 行关闭+新行开启] 调任重派（RULE-HR-003 现行行切换）
+      - activityId: ACT-HR-107
+        name: 调任重派
+        activityType: USER_TASK
+        roleRef: ROLE-HR-004
+        nextActivities:
+          - ACT-HR-108
+      - activityId: ACT-HR-108
+        name: 任职期汇合（记录存续）
+        activityType: GATEWAY
+        conditionExpression: 任职存续期间回到事件分支等待
+        nextActivities:
+          - ACT-HR-104
+          - ACT-HR-109
+      # [末段 to_date 关闭] 离职/记录终止
+      - activityId: ACT-HR-109
+        name: 结束（记录关闭/离职）
+        activityType: END

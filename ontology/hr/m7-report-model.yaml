@@ -1,0 +1,254 @@
+# =====================================================================
+# hr 人力资本域（hr）· M7 查询统计与报表模型（票 79 建模，db-reverse 首实战）
+# ────────────────────────────────────────────────────────────────
+# 素材：R14——五查询出口逐一对应五个结构证据（细稿 Q7 已裁不越权）：
+#   salaries/dept_emp(+视图)/titles/dept_manager 各一消费出口 + 员工主档
+#   人司年限出口。与 M2 QUERY 行为严格一对一（M7→M2 单向，票 76 分桶
+#   机判面）。表达式里的 alias.field 均对齐 M1 属性名（L3-2 机判面）；
+#   口径真源在 M3（逐列注 RULE 引用）。
+# =====================================================================
+model_type: REPORT
+version: "1.0.0"
+domain: hr
+query_reports:
+  # [salaries 表结构证据] 员工薪酬明细（Q1 期间薪档/Q5 姓名拼接/Q3 现行标记）
+  - id: QR-HR-001
+    name: 员工薪酬明细查询
+    alias: salaryDetailQuery
+    description: "员工粒度薪酬轨迹出口（R14·salaries 表直读）：期间薪档+起止区间+现行标记（Q3：哨兵注记为数据惯例，判定语义 RULE-HR-003）。"
+    objectType: STATISTICAL_QUERY
+    behaviorRef: BH-HR-QuerySalary
+    sourceObjects:
+      - objectRef: AGG-HR-006
+        alias: s
+        primary: true
+      - objectRef: AGG-HR-001
+        alias: e
+        primary: false
+    parameters:
+      - name: startDay
+        label: 生效起始日
+        dataType: Date
+        required: true
+      - name: endDay
+        label: 生效截止日
+        dataType: Date
+        required: true
+    conditions:
+      - conditionId: COND-HR-001
+        leftExpression: s.fromDate
+        operator: BETWEEN
+        parameterRef: startDay
+    resultColumns:
+      - name: empNo
+        label: 员工编号
+        dataType: Integer
+        sourceExpression: e.empNo
+      - name: fullName
+        label: 姓名
+        dataType: String
+        sourceExpression: CONCAT(e.lastName, ' ', e.firstName)   # Q5 已裁：出口拼接
+      - name: salary
+        label: 期间薪档
+        dataType: Integer
+        sourceExpression: s.salary   # 语义 RULE-HR-002 一期一条；Q1 不标单位
+      - name: fromDate
+        label: 生效日期
+        dataType: Date
+        sourceExpression: s.fromDate
+      - name: toDate
+        label: 截止日期
+        dataType: Date
+        sourceExpression: s.toDate
+      - name: isCurrent
+        label: 是否现行
+        dataType: Boolean
+        sourceExpression: s.toDate == DATE '9999-01-01'   # Q3 已裁：哨兵为数据惯例注记；现行判定语义 RULE-HR-003
+  # [dept_emp 表 + current_dept_emp 视图结构证据] 部门在职人数
+  - id: QR-HR-002
+    name: 部门在职人数查询
+    alias: deptHeadcountQuery
+    description: "部门粒度在职人数出口（R14·dept_emp + current_dept_emp 视图直读）：人数=现行任职行计数（口径 RULE-HR-007，现行判定 RULE-HR-003）。"
+    objectType: STATISTICAL_QUERY
+    behaviorRef: BH-HR-QueryHeadcount
+    sourceObjects:
+      - objectRef: AGG-HR-003
+        alias: a
+        primary: true
+      - objectRef: AGG-HR-002
+        alias: d
+        primary: false
+    parameters:
+      - name: startDay
+        label: 起始日
+        dataType: Date
+        required: true
+      - name: endDay
+        label: 截止日
+        dataType: Date
+        required: true
+    conditions:
+      - conditionId: COND-HR-002
+        leftExpression: a.fromDate
+        operator: BETWEEN
+        parameterRef: startDay
+    resultColumns:
+      - name: deptNo
+        label: 部门编号
+        dataType: String
+        sourceExpression: d.deptNo
+      - name: deptName
+        label: 部门名称
+        dataType: String
+        sourceExpression: d.deptName   # 唯一性 RULE-HR-004（分组粒度锚点）
+      - name: headcount
+        label: 在职人数
+        dataType: Integer
+        sourceExpression: COUNT(DISTINCT a.empNo)   # 口径 RULE-HR-007（现行行集 RULE-HR-003 过滤）
+  # [titles 表结构证据] 员工任职轨迹
+  - id: QR-HR-003
+    name: 员工任职轨迹查询
+    alias: titleHistoryQuery
+    description: "员工粒度职级轨迹出口（R14·titles 表直读）：职级为自由文本（Q2 已裁不字典化），区间有效性 RULE-HR-005。"
+    objectType: STATISTICAL_QUERY
+    behaviorRef: BH-HR-QueryTitle
+    sourceObjects:
+      - objectRef: AGG-HR-005
+        alias: t
+        primary: true
+      - objectRef: AGG-HR-001
+        alias: e
+        primary: false
+    parameters:
+      - name: startDay
+        label: 起始日
+        dataType: Date
+        required: true
+      - name: endDay
+        label: 截止日
+        dataType: Date
+        required: true
+    conditions:
+      - conditionId: COND-HR-003
+        leftExpression: t.fromDate
+        operator: BETWEEN
+        parameterRef: startDay
+    resultColumns:
+      - name: empNo
+        label: 员工编号
+        dataType: Integer
+        sourceExpression: e.empNo
+      - name: fullName
+        label: 姓名
+        dataType: String
+        sourceExpression: CONCAT(e.lastName, ' ', e.firstName)   # Q5 出口拼接
+      - name: title
+        label: 职级
+        dataType: String
+        sourceExpression: t.title
+      - name: fromDate
+        label: 起始日期
+        dataType: Date
+        sourceExpression: t.fromDate
+      - name: toDate
+        label: 截止日期
+        dataType: Date
+        sourceExpression: t.toDate   # 可空=现行职级（RULE-HR-005 注记）
+  # [dept_manager 表结构证据] 部门管理者（在任/历史）
+  - id: QR-HR-004
+    name: 部门管理者查询
+    alias: deptManagerQuery
+    description: "部门粒度管理任职出口（R14·dept_manager 表直读）：在任判定同构复用 RULE-HR-003；部门名称唯一性 RULE-HR-004。"
+    objectType: STATISTICAL_QUERY
+    behaviorRef: BH-HR-QueryManager
+    sourceObjects:
+      - objectRef: AGG-HR-004
+        alias: m
+        primary: true
+      - objectRef: AGG-HR-002
+        alias: d
+        primary: false
+      - objectRef: AGG-HR-001
+        alias: e
+        primary: false
+    parameters:
+      - name: startDay
+        label: 起始日
+        dataType: Date
+        required: true
+      - name: endDay
+        label: 截止日
+        dataType: Date
+        required: true
+    conditions:
+      - conditionId: COND-HR-004
+        leftExpression: m.fromDate
+        operator: BETWEEN
+        parameterRef: startDay
+    resultColumns:
+      - name: deptNo
+        label: 部门编号
+        dataType: String
+        sourceExpression: d.deptNo
+      - name: deptName
+        label: 部门名称
+        dataType: String
+        sourceExpression: d.deptName
+      - name: empNo
+        label: 管理者编号
+        dataType: Integer
+        sourceExpression: m.empNo
+      - name: managerName
+        label: 管理者姓名
+        dataType: String
+        sourceExpression: CONCAT(e.lastName, ' ', e.firstName)   # Q5 出口拼接
+      - name: fromDate
+        label: 任期起始
+        dataType: Date
+        sourceExpression: m.fromDate
+      - name: toDate
+        label: 任期截止
+        dataType: Date
+        sourceExpression: m.toDate
+  # [employees.hire_date 结构证据] 员工人司年限（Q6 口径）
+  - id: QR-HR-005
+    name: 员工人司年限查询
+    alias: tenureQuery
+    description: "员工粒度人司年限出口（R14·employees.hire_date 直读）：口径 RULE-HR-008（DATEDIFF/365.25 一位小数，Q6 已裁）；性别为构成分析维度（值域 RULE-HR-001）。"
+    objectType: STATISTICAL_QUERY
+    behaviorRef: BH-HR-QueryTenure
+    sourceObjects:
+      - objectRef: AGG-HR-001
+        alias: e
+        primary: true
+    parameters:
+      - name: asOfDay
+        label: 统计日
+        dataType: Date
+        required: true
+    conditions:
+      - conditionId: COND-HR-005
+        leftExpression: e.hireDate
+        operator: LESS_OR_EQUAL
+        parameterRef: asOfDay
+    resultColumns:
+      - name: empNo
+        label: 员工编号
+        dataType: Integer
+        sourceExpression: e.empNo
+      - name: fullName
+        label: 姓名
+        dataType: String
+        sourceExpression: CONCAT(e.lastName, ' ', e.firstName)   # Q5 出口拼接
+      - name: gender
+        label: 性别
+        dataType: String
+        sourceExpression: e.gender   # 值域 RULE-HR-001
+      - name: hireDate
+        label: 入职日期
+        dataType: Date
+        sourceExpression: e.hireDate
+      - name: tenureYears
+        label: 人司年限（年）
+        dataType: Decimal
+        sourceExpression: ROUND(DATEDIFF(asOfDay, e.hireDate) / 365.25, 1)   # 口径 RULE-HR-008

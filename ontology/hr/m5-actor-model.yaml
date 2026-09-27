@@ -1,0 +1,92 @@
+# =====================================================================
+# hr 人力资本域（hr）· M5 主体模型（票 79 建模，db-reverse 首实战）
+# ────────────────────────────────────────────────────────────────
+# 素材：R14——纯 DDL 无角色/权限证据（细稿 Q8 已裁按推荐档落定，待 Owner
+#   转正）：主体面按只读消费域惯例推荐四主体，权限与 M2 五 QUERY 行为
+#   一一对应（五 PERM ↔ 五行为，双射与 bohai/his 同构）。源库写操作主体
+#   （上游 HR 系统）素材外不建。
+# =====================================================================
+model_type: ACTOR
+version: "1.0.0"
+domain: hr
+actors:
+  # [细稿 Q8 推荐档] 人力数据分析岗——五出口全量消费者
+  - actorId: ACTOR-HR-001
+    name: 人力分析师
+    actorType: HUMAN
+    roles:
+      - ROLE-HR-001
+  # [细稿 Q8 推荐档] 部门管理者——本部门构成与在任信息消费者
+  - actorId: ACTOR-HR-002
+    name: 部门管理者
+    actorType: HUMAN
+    roles:
+      - ROLE-HR-002
+  # [细稿 Q8 推荐档] 高管——薪酬与人员构成消费者（敏感面，细稿 §五
+  #   注记隐私合规建真系统时须补）
+  - actorId: ACTOR-HR-003
+    name: 高管
+    actorType: HUMAN
+    roles:
+      - ROLE-HR-003
+  # [细稿 Q8 推荐档] 系统集成方——只读抽取/集成的运营主体（RULE-HR-006
+  #   级联语义的知悉方）
+  - actorId: ACTOR-HR-004
+    name: 系统集成方
+    actorType: HUMAN
+    roles:
+      - ROLE-HR-004
+roles:
+  - roleId: ROLE-HR-001
+    name: 人力分析师（全量只读）
+    inheritsFrom: []
+    permissions:
+      - PERM-HR-QuerySalary
+      - PERM-HR-QueryHeadcount
+      - PERM-HR-QueryTitle
+      - PERM-HR-QueryManager
+      - PERM-HR-QueryTenure
+  - roleId: ROLE-HR-002
+    name: 部门管理者（构成只读）
+    inheritsFrom: []
+    permissions:
+      - PERM-HR-QueryHeadcount
+      - PERM-HR-QueryTitle
+      - PERM-HR-QueryManager
+  - roleId: ROLE-HR-003
+    name: 高管（薪酬与构成只读）
+    inheritsFrom: []
+    permissions:
+      - PERM-HR-QuerySalary
+      - PERM-HR-QueryHeadcount
+      - PERM-HR-QueryTenure
+  - roleId: ROLE-HR-004
+    name: 系统集成方（集成只读）
+    inheritsFrom: []
+    permissions:
+      - PERM-HR-QuerySalary
+      - PERM-HR-QueryHeadcount
+      - PERM-HR-QueryTitle
+      - PERM-HR-QueryManager
+      - PERM-HR-QueryTenure
+permissions:
+  - permissionId: PERM-HR-QuerySalary
+    targetType: BEHAVIOR
+    targetRef: BH-HR-QuerySalary
+    dataScope: ALL
+  - permissionId: PERM-HR-QueryHeadcount
+    targetType: BEHAVIOR
+    targetRef: BH-HR-QueryHeadcount
+    dataScope: ALL
+  - permissionId: PERM-HR-QueryTitle
+    targetType: BEHAVIOR
+    targetRef: BH-HR-QueryTitle
+    dataScope: ALL
+  - permissionId: PERM-HR-QueryManager
+    targetType: BEHAVIOR
+    targetRef: BH-HR-QueryManager
+    dataScope: ALL
+  - permissionId: PERM-HR-QueryTenure
+    targetType: BEHAVIOR
+    targetRef: BH-HR-QueryTenure
+    dataScope: ALL

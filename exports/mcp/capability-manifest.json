@@ -123,6 +123,62 @@
       "schemaVersion": "1.2.0"
     },
     {
+      "domain": "hr",
+      "label": "hr 人力资本域（MySQL employees 示例库）",
+      "profile": "v9-full",
+      "models": [
+        {
+          "model": "M1",
+          "name": "对象模型",
+          "modelType": "OBJECT",
+          "camp": "business-core"
+        },
+        {
+          "model": "M2",
+          "name": "行为模型",
+          "modelType": "BEHAVIOR",
+          "camp": "business-core"
+        },
+        {
+          "model": "M3",
+          "name": "规则模型",
+          "modelType": "RULE",
+          "camp": "business-core"
+        },
+        {
+          "model": "M5",
+          "name": "主体模型",
+          "modelType": "ACTOR",
+          "camp": "business-core"
+        },
+        {
+          "model": "M6",
+          "name": "流程模型",
+          "modelType": "FLOW",
+          "camp": "business-core"
+        },
+        {
+          "model": "M7",
+          "name": "查询统计与报表模型",
+          "modelType": "REPORT",
+          "camp": "business-core"
+        },
+        {
+          "model": "GLS",
+          "name": "术语模型",
+          "modelType": "GLOSSARY",
+          "camp": "business-core"
+        }
+      ],
+      "schemaVersion": "1.2.0",
+      "omittedModels": [
+        {
+          "model": "MU",
+          "reason": "素材为纯 DDL（无 PRD/UI 设计文档），无页面交互证据，MU 不建文件——bohai 先例（票 13 AC6 反向豁免登记式）；建议档见 docs/requirements/hr-人力资本-细稿.md §六。"
+        }
+      ]
+    },
+    {
       "domain": "pkb",
       "label": "个人知识库域（个人版本体 WeKnora）",
       "profile": "headless",

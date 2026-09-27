@@ -1,0 +1,62 @@
+# =====================================================================
+# hr 人力资本域（hr）· M2 行为模型（票 79 建模，db-reverse 首实战）
+# ────────────────────────────────────────────────────────────────
+# 素材：R14——纯 DDL 无操作面证据，COMMAND×0 如实（Q4 已裁：hr 为只读
+#   消费域，写路径属上游 HR 系统，素材外不硬建模）。
+# QUERY×5 与 M7 查询出口严格一对一（依赖边单向 M7→M2，票 76 一致性对
+#   分桶的机判面）：五出口逐一对应五个结构证据（四张轨迹表+一视图，
+#   细稿 Q7「不越权」落定）。
+# =====================================================================
+model_type: BEHAVIOR
+version: "1.0.0"
+domain: hr
+behaviors:
+  # ── QUERY 侧：五结构证据各一出口（细稿 Q7）──
+  # [salaries 表 = 薪酬消费出口的结构证据]
+  - id: BH-HR-QuerySalary
+    name: 查询员工薪酬
+    ownerEntity: AGG-HR-006
+    behaviorType: QUERY
+    appliedRules:
+      - RULE-HR-002    # 一期一条（PK 语义，出口去重锚点）
+      - RULE-HR-003    # 现行判定（「是否现行」列语义）
+    requiredPermissions:
+      - PERM-HR-QuerySalary
+  # [dept_emp 表 + current_dept_emp 视图 = 在职人数出口的结构证据]
+  - id: BH-HR-QueryHeadcount
+    name: 查询部门在职人数
+    ownerEntity: AGG-HR-003
+    behaviorType: QUERY
+    appliedRules:
+      - RULE-HR-003    # 现行任职判定（视图条件）
+      - RULE-HR-007    # 在职人数口径
+    requiredPermissions:
+      - PERM-HR-QueryHeadcount
+  # [titles 表 = 任职轨迹出口的结构证据]
+  - id: BH-HR-QueryTitle
+    name: 查询任职轨迹
+    ownerEntity: AGG-HR-005
+    behaviorType: QUERY
+    appliedRules:
+      - RULE-HR-005    # 区间有效性（to_date 可空注记）
+    requiredPermissions:
+      - PERM-HR-QueryTitle
+  # [dept_manager 表 = 管理者出口的结构证据]
+  - id: BH-HR-QueryManager
+    name: 查询部门管理者
+    ownerEntity: AGG-HR-004
+    behaviorType: QUERY
+    appliedRules:
+      - RULE-HR-003    # 现行判定（在任/卸任语义同构）
+    requiredPermissions:
+      - PERM-HR-QueryManager
+  # [employees 表 hire_date = 人司年限出口的结构证据]
+  - id: BH-HR-QueryTenure
+    name: 查询人司年限
+    ownerEntity: AGG-HR-001
+    behaviorType: QUERY
+    appliedRules:
+      - RULE-HR-001    # 性别值域（构成分析维度合法性）
+      - RULE-HR-008    # 人司年限口径（Q6 已裁）
+    requiredPermissions:
+      - PERM-HR-QueryTenure

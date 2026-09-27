@@ -1,0 +1,200 @@
+# =====================================================================
+# hr 人力资本域（hr）· M1 对象模型（票 79 建模，db-reverse 首实战）
+# ────────────────────────────────────────────────────────────────
+# 素材：R14·references/hr-source/employees.sql（MySQL 官方示例库 employees
+#   DDL，CC BY-SA 3.0）——db-reverse 通路首个实战域，逐属性注 DDL 证据。
+# 结构映射：六表直映六聚合（employees/departments 两业务根 + dept_emp/
+#   dept_manager/titles/salaries 四时态关联聚合），六条 FK 全部升 ASSOC
+#   关联（一行不丢）。属性名=DDL 列名驼峰化（emp_no→empNo），不发明。
+# 拍板链：Q1 期间薪档/Q2 职级不字典化/Q3 现行判定以视图语义为准/Q5 姓名
+#   拆分——均按 Owner 2026-09-28 授权按推荐落定（细稿 §四），跨批须转正。
+# 证据边界：数据行/量级/9999-01-01 哨兵不在 DDL 内，凡涉一律注记。
+# =====================================================================
+model_type: OBJECT
+version: "1.0.0"
+domain: hr
+aggregates:
+  # [employees.sql CREATE TABLE employees] 员工主表——全库枢纽，五张轨迹表
+  #   的 FK 皆指向它
+  - id: AGG-HR-001
+    name: 员工
+    alias: Employee
+    aggregateType: AGGREGATE_ROOT
+    description: >-
+      员工主档（R14·CREATE TABLE employees：emp_no PK，六列全 NOT NULL）。
+      生命周期自 hireDate 起；「在职/离职」不由本表字段承载，而由四张轨迹
+      表的时态区间表达（Q3 已裁以视图语义为准）。
+    lifecycle:
+      - 在职
+      - 离职
+    attributes:
+      - { name: empNo, label: 员工编号, type: Integer, required: true, unique: true }   # [employees] emp_no INT NOT NULL PRIMARY KEY
+      - { name: birthDate, label: 出生日期, type: Date, required: true }                # [employees] birth_date DATE NOT NULL
+      - { name: lastName, label: 姓, type: String, required: true }                     # [employees] last_name VARCHAR(16) NOT NULL（Q5 照 DDL 拆分）
+      - { name: firstName, label: 名, type: String, required: true }                    # [employees] first_name VARCHAR(14) NOT NULL（Q5 照 DDL 拆分）
+      - name: gender
+        label: 性别
+        type: Enum
+        required: true
+        enumValues: [M, F]                                                              # [employees] gender ENUM('M','F') NOT NULL——DDL 内唯一枚举
+        refRules:
+          - RULE-HR-001    # 值域校验（VALIDATION）
+      - { name: hireDate, label: 入职日期, type: Date, required: true }                 # [employees] hire_date DATE NOT NULL——人司年限口径（RULE-HR-008）载体
+  # [employees.sql CREATE TABLE departments] 部门主表
+  - id: AGG-HR-002
+    name: 部门
+    alias: Department
+    aggregateType: AGGREGATE_ROOT
+    description: >-
+      部门主档（R14·CREATE TABLE departments：dept_no CHAR(4) PK +
+      dept_name UNIQUE KEY）。示例库共九行，但量级属数据事实不入本体。
+    lifecycle:
+      - 设立
+      - 撤销
+    attributes:
+      - { name: deptNo, label: 部门编号, type: String, required: true, unique: true }   # [departments] dept_no CHAR(4) NOT NULL PRIMARY KEY
+      - name: deptName
+        label: 部门名称
+        type: String
+        required: true
+        unique: true                                                                    # [departments] dept_name VARCHAR(40) NOT NULL UNIQUE KEY
+        refRules:
+          - RULE-HR-004    # 名称全表唯一（VALIDATION）
+  # [employees.sql CREATE TABLE dept_emp] 部门任职（时态关联表升聚合：
+  #   有独立时态载荷，非纯引用）
+  - id: AGG-HR-003
+    name: 部门任职
+    alias: DepartmentAssignment
+    aggregateType: AGGREGATE_ROOT
+    description: >-
+      员工×部门的时态分配行（R14·CREATE TABLE dept_emp：PK(emp_no,dept_no)，
+      双 FK ON DELETE CASCADE）。from_date/to_date 区间承载「何时属何部门」；
+      「现行任职」判定=RULE-HR-003（current_dept_emp 视图条件，Q3 已裁）。
+    lifecycle:
+      - 任职中
+      - 已调离
+    attributes:
+      - { name: empNo, label: 员工编号, type: Integer, required: true }                 # [dept_emp] emp_no INT NOT NULL FK→employees
+      - { name: deptNo, label: 部门编号, type: String, required: true }                 # [dept_emp] dept_no CHAR(4) NOT NULL FK→departments
+      - { name: fromDate, label: 起始日期, type: Date, required: true }                 # [dept_emp] from_date DATE NOT NULL（PK 组成）
+      - { name: toDate, label: 截止日期, type: Date, required: true }                   # [dept_emp] to_date DATE NOT NULL（现行判定 RULE-HR-003 载体）
+  # [employees.sql CREATE TABLE dept_manager] 部门管理任职
+  - id: AGG-HR-004
+    name: 管理任职
+    alias: DepartmentManager
+    aggregateType: AGGREGATE_ROOT
+    description: >-
+      员工×部门的管理角色时态行（R14·CREATE TABLE dept_manager：
+      PK(emp_no,dept_no)，双 FK ON DELETE CASCADE）。结构上与部门任职同构，
+      语义=该员工在该时段管理该部门。
+    lifecycle:
+      - 任期内
+      - 已卸任
+    attributes:
+      - { name: empNo, label: 员工编号, type: Integer, required: true }                 # [dept_manager] emp_no INT NOT NULL FK→employees
+      - { name: deptNo, label: 部门编号, type: String, required: true }                 # [dept_manager] dept_no CHAR(4) NOT NULL FK→departments
+      - { name: fromDate, label: 起始日期, type: Date, required: true }                 # [dept_manager] from_date DATE NOT NULL
+      - { name: toDate, label: 截止日期, type: Date, required: true }                   # [dept_manager] to_date DATE NOT NULL
+  # [employees.sql CREATE TABLE titles] 职级记录
+  - id: AGG-HR-005
+    name: 职级记录
+    alias: TitleRecord
+    aggregateType: AGGREGATE_ROOT
+    description: >-
+      员工职级的时态轨迹行（R14·CREATE TABLE titles：PK(emp_no,title,
+      from_date)，单 FK）。title 为自由文本（Q2 已裁不字典化——DDL 无
+      枚举证据）；to_date 可空（DDL 唯一可空列，RULE-HR-005 如实注记）。
+    lifecycle:
+      - 任职中
+      - 已变更
+    attributes:
+      - { name: empNo, label: 员工编号, type: Integer, required: true }                 # [titles] emp_no INT NOT NULL FK→employees
+      - { name: title, label: 职级名称, type: String, required: true }                  # [titles] title VARCHAR(50) NOT NULL（PK 组成；Q2 不字典化）
+      - { name: fromDate, label: 起始日期, type: Date, required: true }                 # [titles] from_date DATE NOT NULL（PK 组成）
+      - { name: toDate, label: 截止日期, type: Date }                                   # [titles] to_date DATE 可空——六表唯一可空列（RULE-HR-005 注记）
+  # [employees.sql CREATE TABLE salaries] 薪酬记录
+  - id: AGG-HR-006
+    name: 薪酬记录
+    alias: SalaryRecord
+    aggregateType: AGGREGATE_ROOT
+    description: >-
+      员工薪酬的时态轨迹行（R14·CREATE TABLE salaries：PK(emp_no,from_date)，
+      单 FK ON DELETE CASCADE）。salary 语义=期间薪档（Q1 已裁：自 fromDate
+      起生效的薪档，不标单位——DDL 无单位证据）。
+    lifecycle:
+      - 生效中
+      - 已调整
+    attributes:
+      - { name: empNo, label: 员工编号, type: Integer, required: true }                 # [salaries] emp_no INT NOT NULL FK→employees
+      - name: salary
+        label: 期间薪档
+        type: Integer
+        required: true                                                                  # [salaries] salary INT NOT NULL（Q1：期间薪档，不标单位）
+        refRules:
+          - RULE-HR-002    # 一期一条（PK 语义 VALIDATION）
+      - { name: fromDate, label: 起始日期, type: Date, required: true }                 # [salaries] from_date DATE NOT NULL（PK 组成）
+      - { name: toDate, label: 截止日期, type: Date, required: true }                   # [salaries] to_date DATE NOT NULL
+data_dictionaries:
+  # [employees.sql gender ENUM('M','F')] DDL 内唯一枚举值集
+  - id: DICT-HR-001
+    name: 性别代码字典
+    alias: GenderCodeDictionary
+    description: "性别代码值集（R14·employees 表 gender ENUM('M','F')——DDL 级枚举证据）。M/F 的中文释义（男/女）为通识映射注记，非新增证据。"
+    types:
+      - name: 性别代码
+        items: [M, F]
+aggregate_associations:
+  # [employees.sql dept_emp 双 FK] 一名员工 1..* 条部门任职
+  - id: ASSOC-HR-001
+    sourceAggregate: AGG-HR-001
+    targetAggregate: AGG-HR-003
+    associationType: REFERENCE
+    sourceRole: 员工
+    targetRole: 部门任职
+    cardinality: ONE_TO_MANY
+    referenceField: empNo        # [dept_emp.emp_no FK→employees]
+  # [employees.sql dept_emp.dept_no FK] 一部门 1..* 条任职
+  - id: ASSOC-HR-002
+    sourceAggregate: AGG-HR-002
+    targetAggregate: AGG-HR-003
+    associationType: REFERENCE
+    sourceRole: 部门
+    targetRole: 部门任职
+    cardinality: ONE_TO_MANY
+    referenceField: deptNo       # [dept_emp.dept_no FK→departments]
+  # [employees.sql dept_manager 双 FK] 一名员工 1..* 段管理任职
+  - id: ASSOC-HR-003
+    sourceAggregate: AGG-HR-001
+    targetAggregate: AGG-HR-004
+    associationType: REFERENCE
+    sourceRole: 员工
+    targetRole: 管理任职
+    cardinality: ONE_TO_MANY
+    referenceField: empNo        # [dept_manager.emp_no FK→employees]
+  # [employees.sql dept_manager.dept_no FK] 一部门 1..* 段管理任职
+  - id: ASSOC-HR-004
+    sourceAggregate: AGG-HR-002
+    targetAggregate: AGG-HR-004
+    associationType: REFERENCE
+    sourceRole: 部门
+    targetRole: 管理任职
+    cardinality: ONE_TO_MANY
+    referenceField: deptNo       # [dept_manager.dept_no FK→departments]
+  # [employees.sql titles.emp_no FK] 一名员工 1..* 条职级记录
+  - id: ASSOC-HR-005
+    sourceAggregate: AGG-HR-001
+    targetAggregate: AGG-HR-005
+    associationType: REFERENCE
+    sourceRole: 员工
+    targetRole: 职级记录
+    cardinality: ONE_TO_MANY
+    referenceField: empNo        # [titles.emp_no FK→employees]
+  # [employees.sql salaries.emp_no FK] 一名员工 1..* 条薪酬记录
+  - id: ASSOC-HR-006
+    sourceAggregate: AGG-HR-001
+    targetAggregate: AGG-HR-006
+    associationType: REFERENCE
+    sourceRole: 员工
+    targetRole: 薪酬记录
+    cardinality: ONE_TO_MANY
+    referenceField: empNo        # [salaries.emp_no FK→employees ON DELETE CASCADE]

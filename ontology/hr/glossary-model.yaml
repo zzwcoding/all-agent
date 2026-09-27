@@ -1,0 +1,92 @@
+# =====================================================================
+# hr 人力资本域（hr）· GLS 术语模型（票 79 建模，db-reverse 首实战）
+# ────────────────────────────────────────────────────────────────
+# 口径真源：R14·references/hr-source/employees.sql（DDL 结构语义）+ 细稿
+# Q1–Q8 授权拍板。八词全部注源可溯；relatedObjectRefs 只挂真实存在的
+# M1 聚合（GLS→M1 单向、域内引用——票 76 悬空判定分桶面），结构词留空
+# 不硬挂。
+# =====================================================================
+model_type: GLOSSARY
+version: "1.0.0"
+domain: hr
+terms:
+  - id: GLS-HR-001
+    term: 员工
+    aliases: [雇员, Employee]
+    termType: 术语
+    definition: 人力库的主档对象——emp_no 唯一标识的一名雇员（R14·employees 表），其任职/管理/职级/薪酬皆以时态区间行挂在员工之下。
+    relatedObjectRefs: [AGG-HR-001]
+    status: 有效
+    owner: Owner
+    source: R14·employees.sql CREATE TABLE employees
+    notes: db-reverse 直映词；生命周期语义见 RULE-HR-003（现行判定）。
+  - id: GLS-HR-002
+    term: 部门
+    aliases: [Department]
+    termType: 术语
+    definition: 编号+名称唯一标识的组织单元（R14·departments 表，dept_name UNIQUE）。
+    relatedObjectRefs: [AGG-HR-002]
+    status: 有效
+    owner: Owner
+    source: R14·employees.sql CREATE TABLE departments
+    notes: 名称唯一性=RULE-HR-004；不建组织树（DDL 无自引用证据）。
+  - id: GLS-HR-003
+    term: 部门任职
+    aliases: [在职, DepartmentAssignment]
+    termType: 术语
+    definition: 员工在某时段隶属于某部门的时态分配行（R14·dept_emp 表）；「在职」=存在现行任职行。
+    relatedObjectRefs: [AGG-HR-003]
+    status: 有效
+    owner: Owner
+    source: R14·employees.sql CREATE TABLE dept_emp
+    notes: 现行判定 RULE-HR-003；在职人数口径 RULE-HR-007。
+  - id: GLS-HR-004
+    term: 薪酬记录
+    aliases: [薪档, SalaryRecord]
+    termType: 术语
+    definition: 自 from_date 起生效的期间薪档行（R14·salaries 表；Q1 已裁不标单位——DDL 无单位证据）。
+    relatedObjectRefs: [AGG-HR-006]
+    status: 有效
+    owner: Owner
+    source: R14·employees.sql CREATE TABLE salaries + 细稿 Q1
+    notes: 一期一条=RULE-HR-002（PK 语义）；「月薪/年薪」读法素材未给不登记。
+  - id: GLS-HR-005
+    term: 职级
+    aliases: [职务, Title]
+    termType: 术语
+    definition: 员工任职名称的时态轨迹行（R14·titles 表）；职级值集为自由文本（Q2 已裁不字典化）。
+    relatedObjectRefs: [AGG-HR-005]
+    status: 有效
+    owner: Owner
+    source: R14·employees.sql CREATE TABLE titles + 细稿 Q2
+    notes: to_date 可空=现行职级（RULE-HR-005 注记，六表唯一可空列）。
+  - id: GLS-HR-006
+    term: 现行任职
+    aliases: [current, 在任]
+    termType: 术语
+    definition: 该员工 from_date 最大者的成对任职行（R14·current_dept_emp 视图条件；Q3 已裁以视图语义为准，9999-01-01 哨兵为数据惯例注记非判定依据）。
+    relatedObjectRefs: [AGG-HR-003]
+    status: 有效
+    owner: Owner
+    source: R14·employees.sql CREATE OR REPLACE VIEW current_dept_emp + 细稿 Q3
+    notes: 判定规则=RULE-HR-003；管理任职同构复用。
+  - id: GLS-HR-007
+    term: 时态区间
+    aliases: [from_date/to_date, 任职区间]
+    termType: 术语
+    definition: 六表公共的 from_date/to_date 双列结构——人力库一切轨迹（任职/管理/职级/薪酬）的时段表达（R14·DDL 结构证据）。
+    relatedObjectRefs: []
+    status: 有效
+    owner: Owner
+    source: R14·employees.sql 六表 DDL 公共结构
+    notes: 结构词不挂单一对象；区间有效性 RULE-HR-005（to_date 可空特例）。
+  - id: GLS-HR-008
+    term: 人司年限
+    aliases: [司龄, Tenure]
+    termType: 术语
+    definition: 统计日与 hire_date 的天差 ÷365.25，一位小数（Q6 已裁口径；RULE-HR-008）。
+    relatedObjectRefs: [AGG-HR-001]
+    status: 有效
+    owner: Owner
+    source: R14·employees 表 hire_date + 细稿 Q6
+    notes: 出口形态见 QR-HR-005 tenureYears 列；口径真源在 M3。

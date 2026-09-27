@@ -948,13 +948,18 @@ class ListDomainsMode(unittest.TestCase):
                 rc = exc.code if isinstance(exc.code, int) else 2
         return rc, buf.getvalue()
 
-    def test_real_repo_lists_three_domains(self):
+    def test_real_repo_lists_all_domains(self):
+        # 域清单动态对文件系统枚举（不钉死域数——票 79：第四域 hr 入仓把
+        # 三域字面量打红，硬编码域清单正是票 77 要根治的病）
+        expected = sorted(p.parent.name for p in
+                          (REAL_ROOT / "ontology").glob("*/manifest.json"))
+        self.assertGreaterEqual(len(expected), 4)
         proc = subprocess.run(
             [sys.executable, str(REAL_ROOT / "tools" / "meta_probe.py"),
              "--list-domains"],
             capture_output=True, text=True, timeout=60)
         self.assertEqual(proc.returncode, 0)
-        self.assertEqual(proc.stdout.splitlines(), ["bohai", "his", "pkb"])
+        self.assertEqual(proc.stdout.splitlines(), expected)
 
     def test_tmp_root_sorted_enumeration(self):
         with tempfile.TemporaryDirectory() as td:
