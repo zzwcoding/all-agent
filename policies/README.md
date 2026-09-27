@@ -17,4 +17,4 @@
 
 **实例指针**：每条实例 = `{desc, ticket, commit, props?}`，commit 是修复落地票的短哈希、props 是该道修复涉及/产出的提案 ID。**每类路由 instances ≥2 条真实指针**；写入前逐个核实（commit 在 `git log`、PROP 文件在 `docs/proposals/`），probe 第 10 项每次体检都会逐个复核，坏指针=体检红。
 
-**维护纪律（改路由三件套）**：改路由 = ①改本 JSON + ②补/改实例指针（先核实再写入）+ ③跑 `python3 tools/meta_probe.py ontology/bohai`（第 10 项硬闸必须绿）。只改 README 不改 JSON = 没改。
+**维护纪律（改路由三件套）**：改路由 = ①改本 JSON + ②补/改实例指针（先核实再写入）+ ③跑 `python3 tools/meta_probe.py ontology/<域>` 逐域（实跑域 ontology/bohai、ontology/his 必跑；豁免注记域 ontology/pkb 照跑留痕——第 10 项硬闸必须全绿）。只改 README 不改 JSON = 没改。

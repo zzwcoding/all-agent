@@ -72,7 +72,7 @@
 - 选配路由：仅交易型/状态机型项目路由进入（判据表见 docs/ddd-modeler-建造交接包.md §5）；读多写少/规则薄/一次性项目不上
 - 信源：docs/ddd-modeler-建造交接包.md（Owner 对齐共识）、references/ddd-as-code-digest.md（DDD-as-code 调研）
 
-## 首个业务域（建议，待拍板）
+## 首个业务域（已拍板进仓，2026-09）
 
 **渤海油田产量域**——复用 R5（teach-petro-agent 设定书 v3：8 表 DDL、指标口径库、治理角色链、术语）作为第一个接入域的素材，省掉冷启动；同时它是"已经被讲过一遍"的域，便于校验本体建模的保真度。
 
@@ -112,3 +112,7 @@
 ## 决策追认（2026-09-22 · 第五期端到端实弹/第二域接入）
 
 - **第二域 pkb（个人知识库 WeKnora）批准入账**（方案 docs/第五期端到端实弹拆票方案.md 7b6591b，票 58–62）：本体 profile=headless（M1/M2/M5/GLS 已建，M3/M7 带理由豁免）；Owner Q2–Q10 全签收（docs/requirements/pkb-拍板清单-Q2-Q10.md）；DDD 路由裁决=不路由（工具/CRUD/MCP 型、规则薄、单人单域）；新仓 personal-weknora 走 sdd-flow 治理。需求真源=docs/requirements/personal-weknora-细稿.md（域素材归 requirements 层，PRD 只登记域级决策）。skillpkg 对 pkb 域=豁免（Owner 2026-09-23 裁）：headless 单人域消费面=ontology YAML+devkit+MCP manifest 已足，不出 skillpkg；真需时走提案补导出。
+
+## 决策追认（2026-09-25 · 第六批第三域 his/全八模型压测）
+
+- **第三域 his（医院数据报表）批准入账**（Owner 指令：GitHub 医药详细 PRD 加第三域全八模型彻底测试，票 66–70）：素材=luzai02/his- 五件（references/his-source/，R13）+细稿 Q1–Q8；本体 v9-full 全八模型零豁免（ontology/his/ 九件，MU 全仓首个真实文件）；三件套导出 devkit+skillpkg+manifest；Golden 8 问冻结 CORE-15–22。批收官 L5 红灯 Q2 分道票 71（金集再锚定已完成 897f7c8）；his 生成物审记 pending 待 Owner；开放问题 Q1–Q8 挂 docs/requirements/his-报表平台-细稿.md §四。
