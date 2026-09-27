@@ -75,7 +75,7 @@
 ## 六、profile 建议与模型面
 
 - profile **v9-full**：M1（二聚合根+四关联聚合+一字典+六关联）/ M2（QUERY×5，
-  COMMAND×0 如实）/ M3（七规则）/ M5（四主体+四角色+五权限，推荐档）/
+  COMMAND×0 如实）/ M3（八规则）/ M5（四主体+四角色+五权限，推荐档）/
   M6（一时态生命周期流程）/ M7（五查询出口，与 M2 一对一）/ GLS（八术语）；
 - **MU 豁免**（omittedModels 登记，bohai 先例）：素材纯 DDL 无界面证据；
 - 建模文件 7 个（m1/m2/m3/m5/m6/m7/glossary）+ manifest。

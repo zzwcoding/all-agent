@@ -130,10 +130,9 @@ status: 待Owner人审（生成物禁手改，可再生；审记旁档exports/re
 - 承载对象: AGG-HR-006 薪酬记录（主）、AGG-HR-001 员工
 - 参数: startDay（生效起始日，Date，必填）；endDay（生效截止日，Date，必填）
 - 结果列: empNo=员工编号（e.empNo）；fullName=姓名（CONCAT(e.lastName, ' ', e.firstName)）；salary=期间薪档（s.salary）；fromDate=生效日期（s.fromDate）；toDate=截止日期（s.toDate）；isCurrent=是否现行（s.toDate == DATE '9999-01-01'）
-- 命中 ID 集: QR-HR-001 BH-HR-QuerySalary AGG-HR-006 AGG-HR-001 RULE-HR-002 RULE-HR-003 RULE-HR-001 RULE-HR-008
+- 命中 ID 集: QR-HR-001 BH-HR-QuerySalary AGG-HR-006 AGG-HR-001 RULE-HR-002 RULE-HR-001 RULE-HR-008
 - 口径要点（关联规则 expression/narrative 摘录）:
   - RULE-HR-002 薪酬一期一条（VALIDATION；via=behavior.appliedRules(BH-HR-QuerySalary)）: COUNT(*) == COUNT(DISTINCT (empNo, fromDate))
-  - RULE-HR-003 现行任职判定（CALCULATION；via=behavior.appliedRules(BH-HR-QuerySalary)）: fromDate == MAX(fromDate) OVER (empNo) AND toDate == latestToDate
   - RULE-HR-001 性别代码值域（VALIDATION；via=ownerObjectBehaviors(AGG-HR-001)）: gender == 'M' or gender == 'F'
   - RULE-HR-008 人司年限口径（CALCULATION；via=ownerObjectBehaviors(AGG-HR-001)）: DATEDIFF(asOfDay, hireDate) / 365.25
 
@@ -196,7 +195,7 @@ status: 待Owner人审（生成物禁手改，可再生；审记旁档exports/re
 
 ### 行为（M2 · 5 条）
 
-- BH-HR-QuerySalary 查询员工薪酬 [QUERY/] ownerEntity=AGG-HR-006 appliedRules=RULE-HR-002,RULE-HR-003
+- BH-HR-QuerySalary 查询员工薪酬 [QUERY/] ownerEntity=AGG-HR-006 appliedRules=RULE-HR-002
 - BH-HR-QueryHeadcount 查询部门在职人数 [QUERY/] ownerEntity=AGG-HR-003 appliedRules=RULE-HR-003,RULE-HR-007
 - BH-HR-QueryTitle 查询任职轨迹 [QUERY/] ownerEntity=AGG-HR-005 appliedRules=RULE-HR-005
 - BH-HR-QueryManager 查询部门管理者 [QUERY/] ownerEntity=AGG-HR-004 appliedRules=RULE-HR-003
@@ -209,7 +208,7 @@ status: 待Owner人审（生成物禁手改，可再生；审记旁档exports/re
 - RULE-HR-003 现行任职判定 [CALCULATION]  — fromDate == MAX(fromDate) OVER (empNo) AND toDate == latestToDate
 - RULE-HR-004 部门名称唯一 [VALIDATION]  — COUNT(*) == COUNT(DISTINCT deptName)
 - RULE-HR-005 轨迹区间有效性 [VALIDATION]  — toDate IS NULL OR toDate >= fromDate
-- RULE-HR-006 源库级联删除语义 [VALIDATION]  — DELETE employees WHERE emp_no = :empNo 将级联删除该员工全部 部门任职/管理任职/职级/薪酬行（六处 ON DELETE CASCADE）。 消费域不得触发物理删除。
+- RULE-HR-006 源库级联删除语义 [VALIDATION]  — DELETE employees WHERE emp_no = :empNo 将级联删除该员工全部 部门任职/管理任职/职级/薪酬行（四处 emp_no CASCADE）； DELETE departments WHERE dept_no = :deptNo 将级联清除该部门全部 任职/管理行（两处 dept_no CASCADE）。消费域不得触发物理删除。
 - RULE-HR-007 部门在职人数口径 [CALCULATION]  — COUNT(DISTINCT empNo) WHERE 现行任职（RULE-HR-003 过滤）
 - RULE-HR-008 人司年限口径 [CALCULATION]  — DATEDIFF(asOfDay, hireDate) / 365.25
 

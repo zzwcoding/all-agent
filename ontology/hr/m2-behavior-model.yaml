@@ -19,7 +19,6 @@ behaviors:
     behaviorType: QUERY
     appliedRules:
       - RULE-HR-002    # 一期一条（PK 语义，出口去重锚点）
-      - RULE-HR-003    # 现行判定（「是否现行」列语义）
     requiredPermissions:
       - PERM-HR-QuerySalary
   # [dept_emp 表 + current_dept_emp 视图 = 在职人数出口的结构证据]

@@ -32,7 +32,7 @@
 
 | # | 事项 | L0 推荐（已按授权生效） | 留痕处 |
 |---|---|---|---|
-| D1 | 第四域选型 | **hr 人力资本域**——素材源=MySQL 官方示例库 test_db（employees，datacharmer/test_db）：db-reverse 通路三域从未实战、素材稳定可采（GitHub raw）、与 bohai/pkb/his 零重叠、8 表 6 实体含薪酬/任职/部门管理天然多模型 | 票 78 立项 |
+| D1 | 第四域选型 | **hr 人力资本域**——素材源=MySQL 官方示例库 test_db（employees，datacharmer/test_db）：db-reverse 通路三域从未实战、素材稳定可采（GitHub raw）、与 bohai/pkb/his 零重叠、6 表+2 视图（24 列）含薪酬/任职/部门管理天然多模型 | 票 78 立项 |
 | D2 | db-reverse 实战 | 第四域以 DDL 逆向（非文档萃取）进域——补齐平台「多输入」中数据库输入的实弹面 | 票 78 |
 | D3 | 审记处理 | 新域 devkit 挂 pending 不代审（见 §三） | 票 80 收官 |
 

@@ -68,7 +68,6 @@ rules:
     reusedBy:
       - BH-HR-QueryHeadcount
       - BH-HR-QueryManager
-      - BH-HR-QuerySalary
   # [employees.sql departments UNIQUE KEY (dept_name)] 名称唯一
   - id: RULE-HR-004
     name: 部门名称唯一
@@ -107,10 +106,12 @@ rules:
     name: 源库级联删除语义
     ruleType: VALIDATION
     description: >-
-      删除 employees 行将级联清除 dept_emp/dept_manager/titles/salaries
-      轨迹（R14·employees.sql 六处 FK 声明 ON DELETE CASCADE）。Q4 已裁：
-      hr 域为只读消费域，业务面禁物理删除，本规则登记源库语义供集成方
-      知悉；级联为删批量行为，非可执行行级表达式，走 narrative 形态。
+      源库六处 ON DELETE CASCADE 分两条删除路径（R14·employees.sql）：
+      员工删除级联四表（dept_emp/dept_manager/titles/salaries 的 emp_no
+      FK），部门删除级联两表（dept_emp/dept_manager 的 dept_no FK）。
+      Q4 已裁：hr 域为只读消费域，业务面禁物理删除，本规则登记源库语义
+      供集成方知悉；级联为删批量行为，非可执行行级表达式，走 narrative
+      形态。
     inputParams:
       - name: empNo
         type: Integer
@@ -119,8 +120,9 @@ rules:
     outputType: Boolean
     narrative: >-
       DELETE employees WHERE emp_no = :empNo 将级联删除该员工全部
-      部门任职/管理任职/职级/薪酬行（六处 ON DELETE CASCADE）。
-      消费域不得触发物理删除。
+      部门任职/管理任职/职级/薪酬行（四处 emp_no CASCADE）；
+      DELETE departments WHERE dept_no = :deptNo 将级联清除该部门全部
+      任职/管理行（两处 dept_no CASCADE）。消费域不得触发物理删除。
     reusedBy: []
   # [current_dept_emp 视图行集] 部门在职人数口径
   - id: RULE-HR-007

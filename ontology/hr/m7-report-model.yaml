@@ -63,7 +63,7 @@ query_reports:
       - name: isCurrent
         label: 是否现行
         dataType: Boolean
-        sourceExpression: s.toDate == DATE '9999-01-01'   # Q3 已裁：哨兵为数据惯例注记；现行判定语义 RULE-HR-003
+        sourceExpression: s.toDate == DATE '9999-01-01'   # Q3 已裁：薪酬列现行标记走哨兵读法（数据惯例注记），非 RULE-HR-003 视图判定——两读法差异如实在案
   # [dept_emp 表 + current_dept_emp 视图结构证据] 部门在职人数
   - id: QR-HR-002
     name: 部门在职人数查询
