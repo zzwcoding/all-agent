@@ -513,6 +513,7 @@ def run(target: Path) -> dict:
             f"目录「{sub.name}」含模型 YAML 但缺 manifest.json（域声明必配）")
 
     definitions: dict[str, tuple[str, int]] = {}
+    defs_by_domain: dict[str, set[str]] = {}
     # 重复 id 索引（票 38）：manifest 域值 → id → (file, line, 键, 元素名)。
     # 唯一性判定键 = manifest 域值（同一 domain 值之下 id 不得重复，跨域不判——
     # fixture 各域合法复用同形 ID、真仓单域无跨域场景）；两目录同域值 = 同一
@@ -708,8 +709,9 @@ def run(target: Path) -> dict:
                                 f"ref 类型越白名单: {mkey}.{key} → {target_model}"
                                 f" 不在允许 {sorted(allowed)}（model-deps.json/"
                                 f"model-registry.json dependsOn）")
-            for ref_id, loc in collect_definitions(
-                    data, ref_keys, prefix2model).items():
+            file_refs = collect_definitions(data, ref_keys, prefix2model)
+            defs_by_domain.setdefault(dname, set()).update(file_refs)
+            for ref_id, loc in file_refs.items():
                 definitions.setdefault(ref_id, (rel, loc))
 
         # 禁用词拦截面（票 16）：域内 GLS 术语 status 含「禁用」条目的 term+aliases
@@ -944,12 +946,11 @@ def run(target: Path) -> dict:
                     if not (isinstance(key, str) and is_ref_key(key, ref_keys)):
                         continue
                     for ref in iter_ref_strings(value):
-                        if isinstance(ref, str) and \
-                                id_model_of(ref, prefix2model) and \
-                                ref not in definitions:
+                        if isinstance(ref, str) and id_model_of(ref, prefix2model) and ref not in defs_by_domain.get(dname, set()):
                             add("L2", "dangling-ref", rel, key_line(mapping, key),
                                 f"悬空引用: ref 字段「{key}」指向的 {ref} "
-                                f"在本体仓内无 ID 定义")
+                                f"在本域（{dname}）内无 ID 定义"
+                                f"（跨域引用不合法，票 76）")
 
     # ---------- 一致性对核验（票 11；digest §12.2 本仓可行子集，schema.md §14） ----------
     # 元素收集：锚定各模型的结构性承载字段（behaviorType/targetRef/behaviorRef/
@@ -963,8 +964,18 @@ def run(target: Path) -> dict:
     permissions: dict[str, tuple[dict, str]] = {}
     query_reports: list[tuple[str, dict, str]] = []
     flows: list[tuple[str, dict, str]] = []
+    behaviors_by_domain: dict[str, dict] = {}
+    permissions_by_domain: dict[str, dict] = {}
+    query_reports_by_domain: dict = {}
+    flows_by_domain: dict = {}
     if m2_key or m5_key or m6_key or m7_key:
         for domain in domains:
+            mc = load_json(domain / "manifest.json") if (domain / "manifest.json").is_file() else {}
+            dname_c = mc.get("domain", domain.name) if isinstance(mc, dict) else domain.name
+            bh_d = behaviors_by_domain.setdefault(dname_c, {})
+            pm_d = permissions_by_domain.setdefault(dname_c, {})
+            qr_d = query_reports_by_domain.setdefault(dname_c, [])
+            fl_d = flows_by_domain.setdefault(dname_c, [])
             for path in model_files(domain):
                 rel_c = str(path)
                 try:
@@ -979,26 +990,36 @@ def run(target: Path) -> dict:
                     for eid, mapping in collect_elements(
                             data_c, m2_key, prefix2model, ref_keys):
                         if "behaviorType" in mapping:
-                            behaviors.setdefault(eid, (mapping, rel_c))
+                            bh_d.setdefault(eid, (mapping, rel_c))
                 elif m5_key and mkey_c == m5_key:
                     for eid, mapping in collect_elements(
                             data_c, m5_key, prefix2model, ref_keys):
                         if "targetRef" in mapping:
-                            permissions.setdefault(eid, (mapping, rel_c))
+                            pm_d.setdefault(eid, (mapping, rel_c))
                 elif m7_key and mkey_c == m7_key:
                     for eid, mapping in collect_elements(
                             data_c, m7_key, prefix2model, ref_keys):
                         if "behaviorRef" in mapping:
-                            query_reports.append((eid, mapping, rel_c))
+                            qr_d.append((eid, mapping, rel_c))
                 elif m6_key and mkey_c == m6_key:
                     for eid, mapping in collect_elements(
                             data_c, m6_key, prefix2model, ref_keys):
                         if "activities" in mapping:
-                            flows.append((eid, mapping, rel_c))
+                            fl_d.append((eid, mapping, rel_c))
 
     # P1 M7↔M2 严格一对一：M7.behaviorRef 必指向 behaviorType=QUERY 的行为，
     # 且同一查询行为不得被第二个 M7 绑定（依赖边单向 M7→M2，反向经 ref 反查，
     # schema.md §2/§9；本仓 M2 不写 queryReportRef）
+    # 合入全局扁平 dict（既有判定块消费面零改动；票 76 域分桶后回填）
+    for d in behaviors_by_domain.values():
+        behaviors.update(d)
+    for d in permissions_by_domain.values():
+        permissions.update(d)
+    for d in query_reports_by_domain.values():
+        query_reports.extend(d)
+    for d in flows_by_domain.values():
+        flows.extend(d)
+
     if m2_key and m7_key:
         first_bound: dict[str, str] = {}
         for qr_id, qr, rel_c in query_reports:

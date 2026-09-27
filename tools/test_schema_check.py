@@ -1696,3 +1696,48 @@ aggregates:
         self.assertIn("banned-term", self.kinds(report))
         sub = self.run_check(self.root / "demo")
         self.assertIn("banned-term", [v["kind"] for v in sub["violations"]])
+
+
+class CrossDomainIsolation(ConsBase):
+    """票 76（第十三轮 P1-1/P1-2 回归钉）：跨域借 ID 与跨域绑定必须红——
+    第十轮 T4 用不存在的 ID 验证隔离属假阴性；本类用真实他域 ID 注入实证。
+    基座用 ConsBase（M1–M7 五模型面），demo2 为第二域（Vite 式按需加装）。"""
+
+    DEMO2_MANIFEST = {"domain": "demo2", "profile": "full", "schemaVersion": "1.0.0",
+                      "omittedModels": [{"model": k, "reason": "单测：按需加装"}
+                                        for k in ("M1", "M2", "M5", "M6", "M7")]}
+
+    def _seed_two_domains(self, m7_cross_behavior_ref):
+        # demo 域：五文件全装（M1–M7），正向合法
+        self.add_cons_domain()
+        # demo2 域：仅 M1+M2（有 QUERY 行为），M7 指向 demo 域行为（跨域借 ID）
+        self.add("manifest.json", json.dumps(self.DEMO2_MANIFEST), domain="demo2")
+        m2_text = M2.replace("domain: demo", "domain: demo2").replace(
+            "BH-DEMO-Record", "BH-DEMO2-Record").replace(
+            "BH-DEMO-Query", "BH-DEMO2-Query").replace(
+            "    appliedRules:\n      - RULE-DEMO-002\n      - RULE-DEMO-003\n",
+            "    appliedRules: []\n")
+        self.add("m2-behavior-model.yaml", m2_text, domain="demo2")
+        m7_cross = CONS_M7.replace("domain: demo", "domain: demo2").replace(
+            "BH-DEMO-Query", m7_cross_behavior_ref)
+        self.add("m7-report-model.yaml", m7_cross, domain="demo2")
+
+    def test_cross_domain_real_id_borrow_is_red(self):
+        # demo2 m7 的 ownerEntity 指向 demo 域真实聚合 AGG-DEMO-001 → 仓根/单域都红
+        self._seed_two_domains("AGG-DEMO-001")
+        report = self.run_check(self.root)
+        self.assertIn("dangling-ref", self.kinds(report))
+        # 单域 demo2 也红
+        sub = self.run_check(self.root / "demo2")
+        self.assertIn("dangling-ref", [v["kind"] for v in sub["violations"]])
+
+    def test_consistency_buckets_domain_scoped(self):
+        # P1-2 回归：demo2 用独立 M2+M7（不与 demo 共享行为），各域一致性独立判定
+        self._seed_two_domains("BH-DEMO2-Query")  # demo2 的 M7 引用 demo2 自己的 QUERY 行为
+        report = self.run_check(self.root)
+        # demo 自家绑定不被拉红
+        demo_reds = [v for v in report["violations"]
+                     if "QR-DEMO-001" in v.get("message", "") and "not-one-to-one" in v.get("kind", "")]
+        self.assertEqual(demo_reds, [])
+        # demo2 自家绑定也不被拉红（独立域内闭合）
+        self.assertNotIn("consistency-not-one-to-one", self.cons_kinds(report))

@@ -15,6 +15,7 @@
 | T5 | 图索引仓根跑（195 节点 306 边）closure/impact | AGG-HIS-001 closure 2 跳 0 个 BOHAI/PKB 节点 | ✅ 图边不跨域 |
 | T6 | MCP manifest 三域块 | his 块含 MU/pkb 块缺 M3M7（与 omittedModels 一致），域块工具清单零互串 | ✅ |
 | T7 | 审记旁档共享（bohai/pkb/his 同落 devkit-review.json） | verify 按 target 过滤，his=pending/bohai+pkb=已审各自正确 | ✅ 票 59 修复有效 |
+| T4 勘误（票 76，2026-09-27）| T4 注入的 PERM-BOHAI-CaptureItem 全仓不存在（exit=1）——仓根抓红靠全局悬空而非域隔离；真实他域 ID 注入实证仓根不抓（defs_by_domain 修复后已可抓）。原 T4 行为假阴性验证 | ⚠️ 勘误 |
 | T8 | **L4 禁用词并集实验**：his 词面造含「老完成率」元素 → 单域跑 vs 仓根跑 | **单域全过、仓根 1×L4 红**（还原后复绿） | ❌ **P2-1 缝隙实锤** |
 
 **P2-1（唯一可靠性实锤）**：schema_check L4 禁用词面=仓根跑时的**全域 GLS 并集**（bohai 禁用词「老完成率」会命中 his/pkb 的正常词面），而运行时语义核心拒答是**域内**禁用词（T1 实证）——闸与运行时不一致，存在跨域误报面。当前无活实例（三域名/别名零重叠故全绿），属 Latent 缝隙：新域词面若与他域禁用词撞车，仓根 CI 必红而单域不红，误导排障方向。修=禁用词收集按域内配对（GLS 所在域的文件才匹配该域禁用词）。
