@@ -41,6 +41,9 @@ PROP-BOHAI-003（治理热词条目即全闭环）/ 004（banned-term 闸闭环�
 
 - **pre-commit 是否对触碰 ontology/proposals 的提交加跑 ci.sh**（票 15「极简」裁决重裁）：两次带红入仓事故（8a4a632 验证陈旧 / 50da7f3 管道吞码）均发生在提案采纳类提交上，票 15「极简钩子」裁决早于两次事故——是否在钩子里对触碰 ontology/**、docs/proposals/** 的提交加跑 `bash tools/ci.sh`（或至少出厂集+L3），由 Owner 重裁。本票不动钩子（协议：观察项入账待裁决）。
 - 关联机制兜底观察：CI 是否内嵌「闸链禁管道」检查器（lessons/58 取舍节）——同批待 Owner 裁决，本票不实施。
+- **his 域 L5 评分面未建**（票 72 观察①，第十轮）：L5 出厂 rubric/参照答案只覆盖 bohai 12 问；his 有 Golden 8 问机判冻结（CORE-15–22，票 69）但无评分面——建 his rubric 面或维持 bohai-only，待 Owner 裁。挂账期间 his 批 L5 按「bohai-only + his 机判面」口径执行（第六批红灯 Q2 已分道票 71）。
+- **归档闸对未跟踪文件不设防**（票 72 观察②，第十轮 D1 成因）：未跟踪文件不违归档闸，收编靠自觉（his-source 五件曾漏，后 e5b8849 收编）——改闸属扩张面（闸要扫 git 未跟踪集合），待 Owner 裁是否加「未跟踪受管面文件」警告级检查。
+
 - **skillpkg 是否需要 pkb 域产物**（2026-09-23 pkb 审查观察项 1）：~~挂账待 Owner 裁决~~ **已裁决=豁免（Owner 2026-09-23「那就不要了」）**：pkb 为 headless 单人域，消费面=ontology YAML+devkit+MCP manifest 已足，不出 skillpkg；后续真需 agent 技能包走提案补导出（skill_pack_gen 豁免感知同款修法现成，见 lessons/60）。裁决记录补注 docs/prd.md 决策追认节。出处 docs/reviews/2026-09-23-phase9-review-pkb-domain.md 观察项节。
 
 ---

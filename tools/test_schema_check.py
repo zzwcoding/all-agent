@@ -1638,3 +1638,61 @@ class L3DeterministicGate(L3Base):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class BannedTermDomainPairing(Base):
+    """票 72（第十轮 T8 回归钉）：L4 禁用词按域内配对——A 域禁用词不得命中
+    B 域词面（单域/仓根双跑一致）；本域命中照红（防修过头）。
+    T8 实况（2026-09-27 探针）：his 建模重构后现行闸已是域内配对，本类把
+    两态钉成回归测试防回退。"""
+
+    BANNED_GLS = """model_type: GLOSSARY
+version: "1.0.0"
+domain: demo
+terms:
+  - id: GLS-DEMO-002
+    term: 老完成率
+    aliases: [旧完成率]
+    definition: 废弃口径。
+    status: 禁用（替代：产量完成率）
+"""
+
+    DEMO2_M1 = """model_type: OBJECT
+version: "1.0.0"
+domain: demo2
+aggregates:
+  - id: AGG-DEMO2-001
+    name: 老完成率对照聚合
+    alias: legacyProbe
+    aggregateType: AGGREGATE_ROOT
+    attributes: []
+"""
+
+    def _seed_two_domains(self):
+        self.add("glossary-model.yaml", self.BANNED_GLS)  # demo：禁用词源
+        self.add("manifest.json", json.dumps(
+            {"domain": "demo2", "profile": "full", "schemaVersion": "1.0.0",
+             "omittedModels": [{"model": "M2", "reason": "单测：按需加装"},
+                               {"model": "GLS", "reason": "单测：demo2 无 GLS"}]}),
+            domain="demo2")
+        self.add("m1-object-model.yaml", self.DEMO2_M1, domain="demo2")
+
+    def test_t8_cross_domain_wordface_stays_green(self):
+        # T8 复现样本：demo 禁用词「老完成率」出现在 demo2 词面 → 单域/仓根双绿
+        self._seed_two_domains()
+        root_report = self.run_check(self.root)
+        self.assertEqual(root_report["status"], "pass",
+                         [v for v in root_report["violations"]
+                          if v["kind"] == "banned-term"])
+        sub = self.run_check(self.root / "demo2")
+        self.assertEqual(sub["status"], "pass", sub["violations"])
+
+    def test_own_domain_banned_match_still_red(self):
+        # 负变体：demo 自家词面命中自家禁用词 → 仓根/单域照红（防修过头）
+        self.add("glossary-model.yaml", self.BANNED_GLS)
+        self.add("m1-object-model.yaml",
+                 M1.replace("name: 井", "name: 老完成率对照聚合"))
+        report = self.run_check(self.root)
+        self.assertIn("banned-term", self.kinds(report))
+        sub = self.run_check(self.root / "demo")
+        self.assertIn("banned-term", [v["kind"] for v in sub["violations"]])

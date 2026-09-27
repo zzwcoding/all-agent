@@ -37,6 +37,8 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SERVER_SCRIPT = Path(__file__).resolve().parent / "semantic_mcp_server.py"
 DEFAULT_ONTOLOGY = "ontology/bohai"
+# 多域示例（票 72）：实跑域=ontology/bohai、ontology/his；豁免注记域=ontology/pkb
+# （smoke 的 ID 断言正则为 bohai 词面——跨域跑请先核对用例面，见 --help）
 CITATION_HEADER = "本回答引用的元素 ID"
 SERVER_NAME_EXPECTED = "all-agent-semantic"  # 契约钉死（真源=exports/mcp/capability-manifest.json）
 CALL_TIMEOUT_SECONDS = 120
@@ -331,6 +333,9 @@ def main(argv=None) -> int:
     ap.add_argument("ontology", nargs="?", default=DEFAULT_ONTOLOGY,
                     help=f"本体目录，相对仓根（缺省 {DEFAULT_ONTOLOGY}）")
     ap.add_argument("--full", action="store_true", help="打印每个回答全文（走查留证）")
+    ap.epilog = ("多域示例（票 72）：python3 tools/mcp_smoke_client.py ontology/his "
+                 "——注意 smoke 用例与 ID 断言正则为 bohai 词面（ID_TOKEN_RE），"
+                 "跨域实跑前先核用例面；pkb 为豁免注记域（无 smoke 用例）。")
     ap.add_argument("--list", action="store_true", help="只列用例表不实调")
     args = ap.parse_args(argv)
 
