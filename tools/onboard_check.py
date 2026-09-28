@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """onboard_check —— 新域接入 checklist（票 77）。
 
-背景：bohai→pkb→his 三域接入暴露「加域要人记 N 处」的系统性问题——AGENTS.md
+背景：bohai→pkb→his→hr 四域接入暴露「加域要人记 N 处」的系统性问题——AGENTS.md
 锚点与协议①⑥、smoke 文案、信号路由表、体检留痕、L5 评分面、审记、exports
-全靠人记忆逐处补。本工具把接入面收敛为一条命令：逐域十项检查，硬缺口
-exit 1，软项警告不阻塞。确定性、无 LLM、只读（审记核验复用 review_gate
-verify_record 状态机，不复制逻辑）。
+全靠人记忆逐处补。本工具把接入面收敛为一条命令：逐域检查（项清单见
+check_domain，仓级见 check_repo），硬缺口 exit 1，软警告不阻塞。确定性、
+无 LLM、只读（审记核验复用 review_gate verify_record 状态机，不复制逻辑）。
 
 用法:
     python3 tools/onboard_check.py             # 全域（ontology/*/manifest.json 枚举）
@@ -166,6 +166,27 @@ def check_domain(root: Path, dname: str) -> "list[dict]":
     return items
 
 
+def check_repo(root: Path) -> "list[dict]":
+    """仓级检查（票 82）：全域再制件防陈旧——capability-manifest 随域增加
+    必过期，过去靠出厂集 fixture 的隔层红灯暴露（病灶与红灯隔三层）。
+    ontology 无 schema/ 注册表（临时夹具）时静默跳过：配置错不冒充软警告。"""
+    onto = root / "ontology"
+    if not (onto / "schema").is_dir():
+        return []
+    manifest = root / "exports" / "mcp" / "capability-manifest.json"
+    proc = subprocess.run(
+        [sys.executable, str(TOOLS_DIR / "mcp_manifest_gen.py"),
+         str(onto), "--check", str(manifest)],
+        capture_output=True, text=True, timeout=180)
+    lines = (proc.stdout or proc.stderr or "").strip().splitlines()
+    detail = lines[-1].strip() if lines else f"exit={proc.returncode}"
+    return [{"item": "capability-manifest 防陈旧", "severity": "soft",
+             "status": "pass" if proc.returncode == 0 else "warn",
+             "detail": (detail if proc.returncode == 0 else
+                        f"{detail}——跑 mcp_manifest_gen.py {onto} --out "
+                        f"{manifest} 再制（票 82 仓级项）")}]
+
+
 def run(root: Path, domains: "list[str] | None" = None) -> dict:
     root = root.resolve()
     names = list(domains) if domains else list_domains(root)
@@ -178,6 +199,9 @@ def run(root: Path, domains: "list[str] | None" = None) -> dict:
                                    if i["severity"] == "hard"
                                    and i["status"] == "fail")
         report["warns"] += sum(1 for i in items if i["status"] == "warn")
+    report["repoChecks"] = check_repo(root)
+    report["warns"] += sum(1 for i in report["repoChecks"]
+                           if i["status"] == "warn")
     return report
 
 
@@ -186,6 +210,11 @@ def print_human(report: dict) -> None:
     for d, items in report["domains"].items():
         print(f"\n── {d} ──")
         for i in items:
+            print(f" {mark[i['status']]} [{i['severity']}] "
+                  f"{i['item']} — {i['detail']}")
+    if report.get("repoChecks"):
+        print("\n── 仓级 ──")
+        for i in report["repoChecks"]:
             print(f" {mark[i['status']]} [{i['severity']}] "
                   f"{i['item']} — {i['detail']}")
     print(f"\nonboard_check: 硬缺口 {report['hardFails']}，软警告 "

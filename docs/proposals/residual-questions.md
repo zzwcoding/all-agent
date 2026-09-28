@@ -44,7 +44,15 @@ PROP-BOHAI-003（治理热词条目即全闭环）/ 004（banned-term 闸闭环�
 - **his 域 L5 评分面未建**（票 72 观察①，第十轮）：L5 出厂 rubric/参照答案只覆盖 bohai 12 问；his 有 Golden 8 问机判冻结（CORE-15–22，票 69）但无评分面——建 his rubric 面或维持 bohai-only，待 Owner 裁。挂账期间 his 批 L5 按「bohai-only + his 机判面」口径执行（第六批红灯 Q2 已分道票 71）。
 - **归档闸对未跟踪文件不设防**（票 72 观察②，第十轮 D1 成因）：未跟踪文件不违归档闸，收编靠自觉（his-source 五件曾漏，后 e5b8849 收编）——改闸属扩张面（闸要扫 git 未跟踪集合），待 Owner 裁是否加「未跟踪受管面文件」警告级检查。
 
-- **skillpkg 是否需要 pkb 域产物**（2026-09-23 pkb 审查观察项 1）：~~挂账待 Owner 裁决~~ **已裁决=豁免（Owner 2026-09-23「那就不要了」）**：pkb 为 headless 单人域，消费面=ontology YAML+devkit+MCP manifest 已足，不出 skillpkg；后续真需 agent 技能包走提案补导出（skill_pack_gen 豁免感知同款修法现成，见 lessons/60）。裁决记录补注 docs/prd.md 决策追认节。出处 docs/reviews/2026-09-23-phase9-review-pkb-domain.md 观察项节。
+- **skillpkg 是否需要 pkb 域产物**（2026-09-23 pkb 审查观察项 1）：~~挂账待 Owner 裁决~~ **已裁决=豁免（Owner 2026-09-23「那就不要了」）**：pkb 为 headless 单人域，消费面=ontology YAML+devkit+MCP manifest 已足，不出 skillpkg；后续真需 agent 技能包走提案补导出（skill_pack_gen 豁免感知同款修法现成，见 lessons/60）。裁决记录补注 docs/prd.md 决策追认节。
+
+### 第四域 hr 批挂账（2026-09-28，票 82 补登——协议⑨软警告台账首跑）
+
+- **审记待人审 ×4**（2026-09-28）：his devkit/skillpkg + hr devkit/skillpkg 审记 pending。approve 须 Owner 亲署——review_gate 的 by= 字段机械取 git user.name，代审会留「Owner 已审」假痕（授权记录 docs/meta/owner-delegation-2026-09-28.md §三 L0 自设边界）。`review_gate.py verify --all` 现跑 7 件=pass 3/pending 4。
+- **hr 域 L5 评分面未建**（2026-09-28，票 80 观察）：与 his 同待遇挂观察；golden 候选四问已录 docs/walkthrough/hr-walkthrough.md §四（薪酬口径/在职人数/现行判定/人司年限）。建 hr rubric 面或维持 bohai-only，待 Owner 裁。
+- **smoke ID 断言面仅 bohai 词面**（2026-09-28，票 80 注记）：his/hr 语义服务面可问答（hr 两问实答引用零悬空）但 smoke 用例/ID 断言未建——是否扩多域用例面（ID_TOKEN_RE 参数化+每域用例）待 Owner 裁。
+- **第四域选型 D1 追认**（2026-09-28）：hr=MySQL employees 示例库（db-reverse 首实战）由 L0 按授权拍板（授权记录 §四 D1）——追认或改选待 Owner 裁；改选成本=票 78–81 四票作废重来。
+- **第六期端到端实弹是否开工**（2026-09-28）：草案 docs/第六期端到端实弹拆票方案-草案.md（票 83–87：hr-insight 新仓/数据装载/语义取数/CLI+MCP/走查收官）待 Owner 授权——跨批须新授权记录（协议⑪；授权记录 §三边界）。出处 docs/reviews/2026-09-23-phase9-review-pkb-domain.md 观察项节。
 
 ---
 

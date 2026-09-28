@@ -76,6 +76,12 @@ class OnboardTmpFixture(unittest.TestCase):
         self.assertEqual(rc, 0)  # 无域可查不算硬缺口
         self.assertIn("无域可查", out)
 
+    def test_repo_checks_skipped_without_schema_registry(self):
+        # 临时夹具无 ontology/schema/ 注册表 → 仓级 manifest 项静默跳过
+        seed_manifest(self.root, "demo")
+        rep = oc.run(self.root, ["demo"])
+        self.assertEqual(rep["repoChecks"], [])
+
     def test_json_flag_machine_readable(self):
         seed_manifest(self.root, "demo")
         rc, out, _err = run_main(["demo", "--root", str(self.root), "--json"])
@@ -104,6 +110,14 @@ class OnboardRealRepo(unittest.TestCase):
         self.assertEqual(rep["hardFails"], 0)
         kinds = {(i["item"], i["status"]) for i in rep["domains"]["pkb"]}
         self.assertIn(("skillpkg 导出", "warn"), kinds)
+
+    def test_repo_manifest_freshness_pass_real_repo(self):
+        # 票 82 仓级项：现值 manifest 再制一致 → pass；无 schema 夹具静默
+        rep = oc.run(REPO_ROOT, ["bohai"])
+        items = rep["repoChecks"]
+        self.assertEqual([i["item"] for i in items],
+                         ["capability-manifest 防陈旧"])
+        self.assertEqual(items[0]["status"], "pass")
 
     def test_enumeration_same_source_as_meta_probe(self):
         # 期望值动态取自文件系统（不钉死域数——票 79 第四域打红三域字面量）
