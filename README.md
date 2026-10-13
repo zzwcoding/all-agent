@@ -8,8 +8,7 @@
 
 | 仓库 | 角色 |
 |---|---|
-| **本仓** [all-agent](https://github.com/zzwcoding/all-agent) | 企业语义中台本体：本体仓 · 工具闸 · 技能 · 出口产物 · 施工史 |
-| [skills](https://github.com/zzwcoding/skills) | 技能合集独立仓：本仓 `skills/` 九枚语义中台技能的对外发布面（另含教学线五枚） |
+| **本仓** [all-agent](https://github.com/zzwcoding/all-agent) | 企业语义中台本体：本体仓 · 工具闸 · 技能（`skills/` 九枚） · 出口产物 · 施工史 |
 | [petro-agent-platform](https://github.com/zzwcoding/petro-agent-platform) | 消费实例：其 `ontology/` 沿用本仓方法蓝本（fork 本仓 schema 与校验工具链，保留全部机器闸） |
 
 ## 功能架构
@@ -97,7 +96,7 @@ python3 tools/onboard_check.py          # 新窗口/新域接入自检
 python3 tools/schema_check.py           # 本体结构校验（单域或仓根）
 ```
 
-把九枚技能装进你的 agent 技能目录（或直接用 [skills](https://github.com/zzwcoding/skills) 仓）：`python3 tools/install_skills.py`（装机登记见 `tools/install-registry.json`）。新窗口进入本仓请先读 `AGENTS.md` 入口协议。
+把九枚技能装进你的 agent 技能目录：`python3 tools/install_skills.py`（装机登记见 `tools/install-registry.json`），或直接拷贝 `skills/<技能名>/` 到 `~/.claude/skills/`（Claude Code）／`~/.agents/skills/`（ZCode）。新窗口进入本仓请先读 `AGENTS.md` 入口协议。
 
 ## 组织架构（施工与治理）
 
@@ -114,4 +113,4 @@ python3 tools/schema_check.py           # 本体结构校验（单域或仓根�
 | PRD 与阶段状态 | `docs/prd.md`（顶部状态行） |
 | 全部施工票与教训 | `tickets/` · `lessons/` |
 | 软警告与挂账台账 | `docs/proposals/residual-questions.md` |
-| 九枚技能的对外发布面 | [skills](https://github.com/zzwcoding/skills) |
+| 九枚技能的 SKILL.md 与参考件 | 本仓 `skills/` 目录 |
